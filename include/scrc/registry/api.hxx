@@ -1,7 +1,7 @@
 #ifndef __SCRCAPI_HXX__
 #define __SCRCAPI_HXX__
 
-#include "jsoncpp/json/json.h"
+#include <json/reader.h>
 #include <iostream>
 #include <curl/curl.h>
 #include <string>

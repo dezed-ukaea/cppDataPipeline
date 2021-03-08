@@ -3,12 +3,10 @@
 
 #include <string>
 #include "api.hxx"
-#include <jsoncpp/json/json.h>
+#include "json/json.h"
 
 namespace SCRC
 {
-    
-
     class DataPipeline
     {
         public:

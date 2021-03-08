@@ -1,0 +1,16 @@
+name: SCRC C++ API
+
+on: [push]
+
+jobs:
+  build:
+    name: Build and Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Compile Library
+        run: |
+          cmake . -Bbuild -DCMAKE_BUILD_TYPE=Debug
+          cmake --build build
+      - name: Run Unit Tests
+        run: cmake --build build --target test

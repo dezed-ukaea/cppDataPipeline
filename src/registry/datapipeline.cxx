@@ -1,4 +1,4 @@
-#include "data_pipeline.hxx"
+#include "scrc/registry/datapipeline.hxx"
 
 namespace SCRC
 {

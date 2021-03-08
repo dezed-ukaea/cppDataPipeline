@@ -1,4 +1,5 @@
-#include "api.hxx"
+
+#include "scrc/registry/api.hxx"
 
 namespace SCRC
 {
@@ -24,15 +25,24 @@ namespace SCRC
 
     Json::Value API::request(std::filesystem::path addr_path)
     {
-        Json::Reader json_reader_;
         Json::Value root_;
+        Json::CharReaderBuilder json_charbuilder_;
 
         std::string response_str_;
         const std::filesystem::path search_str_ = url_root_ / addr_path;
 
         auto* session_ = setup_session_(search_str_, &response_str_);
-
-        json_reader_.parse(response_str_, root_);
+        
+        const std::unique_ptr<Json::CharReader> json_reader_(json_charbuilder_.newCharReader());
+        const auto response_str_len_ = static_cast<int>(response_str_.length());
+        JSONCPP_STRING err;
+        
+        if (!json_reader_->parse(
+                response_str_.c_str(),
+                response_str_.c_str() + response_str_len_, &root_,
+                &err)) {
+            throw std::runtime_error("Failed to retrieve information from JSON response string");
+        }
 
         return root_["results"];
     }
