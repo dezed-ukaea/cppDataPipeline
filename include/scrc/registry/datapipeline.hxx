@@ -14,6 +14,8 @@ namespace SCRC
             double read_estimate(std::string data_product, const std::string &component);
             Json::Value fetch_all_objects();
             Json::Value fetch_object_by_id(int identifier);
+            Json::Value fetch_all_data_products();
+            Json::Value fetch_data_product_by_id(int identifier);
         private:
             API* api_ = new API;
     };
