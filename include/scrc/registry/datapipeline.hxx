@@ -13,6 +13,7 @@ namespace SCRC
             DataPipeline() {}
             double read_estimate(std::string data_product, const std::string &component);
             Json::Value fetch_all_objects();
+            Json::Value fetch_object_by_id(int identifier);
         private:
             API* api_ = new API;
     };

@@ -28,14 +28,24 @@ namespace SCRC
         Json::Value root_;
         Json::CharReaderBuilder json_charbuilder_;
 
+        long http_code;
+
         std::string response_str_;
         const std::filesystem::path search_str_ = url_root_ / addr_path;
 
         auto* session_ = setup_session_(search_str_, &response_str_);
+        curl_easy_getinfo (session_, CURLINFO_RESPONSE_CODE, &http_code);
         
         const std::unique_ptr<Json::CharReader> json_reader_(json_charbuilder_.newCharReader());
         const auto response_str_len_ = static_cast<int>(response_str_.length());
         JSONCPP_STRING err;
+
+        if(http_code != 200)
+        {
+            throw std::runtime_error(
+                "Request '"+search_str_.string()+"' returned exit code "+std::to_string(http_code)
+            );
+        }
         
         if (!json_reader_->parse(
                 response_str_.c_str(),
