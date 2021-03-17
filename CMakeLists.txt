@@ -9,7 +9,7 @@ SET( CMAKE_CXX_STANDARD_REQUIRED ON )
 
 SET( SCRCAPI_INCLUDE_DIRS ${CMAKE_SOURCE_DIR}/include )
 
-FIND_PACKAGE(CURL REQUIRED)
+INCLUDE( external/curl.cmake )
 INCLUDE( external/jsoncpp.cmake )
 INCLUDE( external/semver.cmake )
 
