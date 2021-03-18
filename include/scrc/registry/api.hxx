@@ -1,5 +1,5 @@
-#ifndef __SCRCAPI_HXX__
-#define __SCRCAPI_HXX__
+#ifndef __SCRC_API_HXX__
+#define __SCRC_API_HXX__
 
 #include <json/reader.h>
 #include <iostream>
@@ -17,10 +17,12 @@ namespace SCRC
     {
         public:
             API(std::string url_root=API_ROOT) : url_root_(url_root) {}
-            Json::Value request(std::filesystem::path addr_path);
+            Json::Value request(std::filesystem::path addr_path, long expected_response = 200);
+            void download(std::filesystem::path remote_addr, std::filesystem::path output_loc);
         private:
             std::string url_root_;
-            CURL* setup_session_(std::filesystem::path addr_path, std::string* response);
+            CURL* setup_json_session_(std::filesystem::path addr_path, std::string* response);
+            CURL* setup_download_session_(std::filesystem::path addr_path, FILE* file);
     };
 };
 

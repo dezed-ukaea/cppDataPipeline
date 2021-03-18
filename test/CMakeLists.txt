@@ -12,6 +12,8 @@ ExternalProject_Add(
   INSTALL_COMMAND ""
 )
 
+SET( CMAKE_CXX_FLAGS "-DTESTDIR=\\\"${CMAKE_CURRENT_SOURCE_DIR}\\\"" ${CMAKE_CXX_FLAGS} )
+
 SET( TEST_NAME ${PROJECT_NAME}-tests )
 
 # assume built-in pthreads on MacOS

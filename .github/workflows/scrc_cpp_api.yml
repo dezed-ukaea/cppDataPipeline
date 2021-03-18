@@ -10,7 +10,7 @@ jobs:
       - uses: actions/checkout@v2
       - name: Install Dependencies
         run: |
-          sudo apt install -y libjsoncpp-dev curl libcurl4-openssl-dev
+          sudo apt install -y libjsoncpp-dev curl libcurl4-openssl-dev libyaml-cpp-dev
       - name: Compile Library
         run: |
           cmake . -Bbuild -DCMAKE_BUILD_TYPE=Debug
