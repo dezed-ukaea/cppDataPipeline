@@ -10,15 +10,15 @@ namespace SCRC
     }
 
     LocalFileSystem::LocalFileSystem(std::filesystem::path config_file_path) :
-        config_path_(config_file_path)
+        config_path_(config_file_path),
+        config_data_(parse_yaml_(config_file_path))
     {
-        YAML::Node config_file_data_ = parse_yaml_(config_path_);
 
         std::filesystem::path data_directory_path_;
 
         try
         {
-            data_directory_path_ = config_file_data_["data_directory"].as<std::string>();
+            data_directory_path_ = config_data_["data_directory"].as<std::string>();
         }
         catch(const YAML::BadConversion& e)
         {
@@ -32,5 +32,10 @@ namespace SCRC
         // Create the data directory within the config file id it does not exist
         std::filesystem::create_directory((config_loc_dir_ / data_directory_path_).c_str());
 
+    }
+
+    std::string LocalFileSystem::get_namespace() const
+    {
+        return config_data_["namespace"].as<std::string>();
     }
 };

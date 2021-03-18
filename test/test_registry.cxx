@@ -1,35 +1,43 @@
 #include "gtest/gtest.h"
+#include <filesystem>
 #include "scrc/registry/datapipeline.hxx"
 #include "scrc/registry/file_system.hxx"
 
 using namespace SCRC;
 
-TEST(SCRCAPITest, TestAccessObjectRegistry)
+DataPipeline* init_pipeline()
 {
-    DataPipeline* api = new DataPipeline;
-    ASSERT_NO_THROW(api->fetch_all_objects());
+    const std::filesystem::path config_path_ = std::filesystem::path(TESTDIR) / "config.yaml";
+    return new DataPipeline(config_path_);
+}
+
+TEST(SCRCAPITest, TestAccessObjectRegistry)
+{ 
+    ASSERT_NO_THROW(init_pipeline()->fetch_all_objects());
 }
 
 TEST(SCRCAPITest, TestAccessObject)
 {
-    DataPipeline* api = new DataPipeline;
-    ASSERT_NO_THROW(api->fetch_object_by_id(72974));
+    ASSERT_NO_THROW(init_pipeline()->fetch_object_by_id(72974));
 }
 
 TEST(SCRCAPITest, TestAccessDataRegistry)
 {
-    DataPipeline* api = new DataPipeline;
-    ASSERT_NO_THROW(api->fetch_all_data_products());
+    ASSERT_NO_THROW(init_pipeline()->fetch_all_data_products());
 }
 
 TEST(SCRCAPITest, TestAccessData)
 {
-    DataPipeline* api = new DataPipeline;
-    ASSERT_NO_THROW(api->fetch_object_by_id(3337));
+    ASSERT_NO_THROW(init_pipeline()->fetch_object_by_id(3337));
 }
 
 TEST(SCRCAPITest, TestFileSystemSetup)
 {
-    LocalFileSystem* filesystem = new LocalFileSystem(std::filesystem::path(TESTDIR) / "config.yaml");
+    LocalFileSystem(std::filesystem::path(TESTDIR) / "config.yaml");
     ASSERT_TRUE(std::filesystem::exists(std::filesystem::path(TESTDIR) / "data"));
+}
+
+TEST(SCRCAPITest, TestSearchDataProducts)
+{
+    ASSERT_NO_THROW(init_pipeline()->search_data_products("parameters"));
 }

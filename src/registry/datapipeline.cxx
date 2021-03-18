@@ -36,9 +36,19 @@ namespace SCRC
         return download_path_;
     }
 
-    void DataPipeline::download_data(int identifier)
+    Json::Value DataPipeline::search_data_products(std::string search_str, DataProduct::Filters filter)
     {
-        std::filesystem::path download_path_ = get_data_download_path_(identifier);
-        api_->download(download_path_, "");
+        std::filesystem::path query_ = "data_product";
+        query_ /= "?"+DataProduct::to_string(filter);
+        query_ += "="+search_str;
+        return api_->request(query_);
+    }
+
+    Json::Value DataPipeline::search_objects(std::string search_str, Object::Filters filter)
+    {
+        std::filesystem::path query_ = "data_product";
+        query_ /= "?"+Object::to_string(filter);
+        query_ += "="+search_str;
+        return api_->request(query_);
     }
 };

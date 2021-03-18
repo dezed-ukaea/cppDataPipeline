@@ -20,7 +20,6 @@ IF(CMAKE_BUILD_TYPE STREQUAL "Debug")
     MESSAGE(STATUS "Including Code Coverage")
     SET( COVERAGE_COMPILER_FLAGS "-g -fprofile-arcs -ftest-coverage" )
 	SET( CMAKE_CXX_FLAGS "-std=gnu++17 -O0 -Wall -Wextra ${COVERAGE_COMPILER_FLAGS} ${CMAKE_CXX_FLAGS}" )
-    SET(BUILD_TESTING ON)
     INCLUDE( CTest )
     ADD_SUBDIRECTORY( test )
 

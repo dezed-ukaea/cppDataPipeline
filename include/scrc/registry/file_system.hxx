@@ -13,9 +13,10 @@ namespace SCRC
     {
         private:
             const std::filesystem::path config_path_;
-            YAML::Node config_data_;
+            const YAML::Node config_data_;
         public:
             LocalFileSystem(std::filesystem::path config_file_path);
+            std::string get_namespace() const;
     };
 };
 
