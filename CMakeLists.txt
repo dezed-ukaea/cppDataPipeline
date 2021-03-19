@@ -9,6 +9,7 @@ SET( CMAKE_CXX_STANDARD_REQUIRED ON )
 
 SET( SCRCAPI_INCLUDE_DIRS ${CMAKE_SOURCE_DIR}/include )
 
+INCLUDE( external/digestpp.cmake )
 INCLUDE( external/curl.cmake )
 INCLUDE( external/yaml_cpp.cmake )
 INCLUDE( external/jsoncpp.cmake )

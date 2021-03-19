@@ -3,6 +3,7 @@
 #include <vector>
 #include "scrc/registry/datapipeline.hxx"
 #include "scrc/registry/file_system.hxx"
+#include "scrc/registry/file.hxx"
 
 using namespace SCRC;
 
@@ -46,4 +47,10 @@ TEST(SCRCAPITest, TestGetConfigDataProducts)
     const std::filesystem::path path_ = metadata_subsets_[0]->get_path();
     ASSERT_EQ(version_, semver::version({0, 1, 0}));
     ASSERT_EQ(path_, "fixed-parameters/T_lat");
+}
+
+TEST(SCRCAPITest, TestHashFile)
+{
+    const std::string file_hash_ = calculate_hash(std::filesystem::path(TESTDIR) / "config.yaml");
+    std::cout << "HASH: " << file_hash_ << std::endl;
 }
