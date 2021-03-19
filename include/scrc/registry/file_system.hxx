@@ -3,11 +3,27 @@
 
 #include <string>
 #include <filesystem>
+#include <semver.hpp>
 #include <yaml-cpp/yaml.h>
 
 namespace SCRC
 {
     YAML::Node parse_config_();
+
+    class MetadataSubset
+    {
+        private:
+            const semver::version version_;
+            const std::filesystem::path data_product_;
+        public:
+            MetadataSubset(std::string data_product, std::string version) :
+                data_product_(data_product),
+                version_(version)
+            {}
+            semver::version get_version() const {return version_;}
+            std::filesystem::path get_path() const {return data_product_;}
+                
+    };
 
     class LocalFileSystem
     {
@@ -17,6 +33,7 @@ namespace SCRC
         public:
             LocalFileSystem(std::filesystem::path config_file_path);
             std::string get_namespace() const;
+            std::vector<MetadataSubset*> get_data_products() const;
     };
 };
 

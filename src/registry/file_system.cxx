@@ -38,4 +38,23 @@ namespace SCRC
     {
         return config_data_["namespace"].as<std::string>();
     }
+
+    std::vector<MetadataSubset*> LocalFileSystem::get_data_products() const
+    {
+        std::vector<MetadataSubset*> data_products_;
+        const YAML::Node read_node = config_data_["read"];
+
+        for(auto& item : read_node)
+        {
+            const YAML::Node use_node_ = item["use"];
+            const YAML::Node where_node_ = item["where"];
+            const std::string version_ = use_node_["version"].as<std::string>();
+            const std::string file_path_ = where_node_["data_product"].as<std::string>();
+            data_products_.push_back(new MetadataSubset(file_path_, version_));
+        }
+
+        if(data_products_.empty()) throw std::runtime_error("No data products found in config");
+    
+        return data_products_;
+    }
 };
