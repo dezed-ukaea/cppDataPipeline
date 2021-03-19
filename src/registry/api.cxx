@@ -16,6 +16,41 @@ namespace SCRC
         return written;
     }
 
+    void Query::append(std::string key, std::string value)
+    {
+        if(std::find(valid_filters_.begin(), valid_filters_.end(), key) == valid_filters_.end())
+        {
+            throw std::invalid_argument(
+                "Search term '"+key+"' is not a valid filter for type '"+string_repr_+"'"
+            );
+        }
+        components_[key] = value;
+    }
+
+    std::filesystem::path Query::build_query()
+    {
+        if(components_.empty())
+        {
+            std::string query_path_ = std::filesystem::path(string_repr_) / fragments_;
+            if(!fragments_.empty()) query_path_ += "/";
+            return query_path_;
+        }
+
+        std::stringstream out_url_query_;
+        std::vector<std::string> as_strs_;
+        
+        for(auto& component: components_)
+        {
+            as_strs_.push_back(component.first+"="+component.second);
+        }
+    
+        std::copy(as_strs_.begin(), as_strs_.end(), std::ostream_iterator<std::string>(out_url_query_, "&"));
+
+        const std::filesystem::path query_path_(out_url_query_.str());
+
+        return std::string(std::filesystem::path(string_repr_) / query_path_) + "/";
+    }
+
     CURL* API::setup_json_session_(std::filesystem::path addr_path, std::string* response)
     {
         CURL* curl_ = curl_easy_init();
@@ -77,6 +112,11 @@ namespace SCRC
         }
 
         return root_["results"];
+    }
+
+    Json::Value API::query(Query query, long expected_response)
+    {
+        return request(query.build_query(), expected_response);
     }
 
     void API::download(std::filesystem::path remote_addr, std::filesystem::path output_loc)

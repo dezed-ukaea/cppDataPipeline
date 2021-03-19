@@ -2,10 +2,9 @@
 #define __SCRC_DATAPIPELINE_HXX__
 
 #include <string>
-#include "api.hxx"
 #include "json/json.h"
+#include "scrc/registry/api.hxx"
 #include "scrc/registry/file_system.hxx"
-#include "scrc/registry/options.hxx"
 
 namespace SCRC
 {
@@ -19,13 +18,83 @@ namespace SCRC
             Json::Value fetch_object_by_id(int identifier);
             Json::Value fetch_all_data_products();
             Json::Value fetch_data_product_by_id(int identifier);
-            Json::Value search_data_products(std::string search_str, DataProduct::Filters filter=DataProduct::Filters::NAME);
-            Json::Value search_objects(std::string search_str, Object::Filters filter=Object::Filters::KEYWORDS);
+            Json::Value fetch_data_store_by_id(int identifier);
+            int get_id_from_path(std::filesystem::path path);
         private:
             const LocalFileSystem* file_system_;
-            std::filesystem::path get_data_download_path_(int identifier);
-            std::filesystem::path get_data_download_path_(std::filesystem::path local_data_path);
             API* api_ = new API;
+    };
+
+    class DataProductQuery : public Query
+    {
+        public:
+            DataProductQuery() : Query(
+            "data_product",
+            {
+                "updated_by",
+                "last_updated",
+                "object",
+                "namespace",
+                "name",
+                "version"
+            }) {}
+            DataProductQuery(std::filesystem::path query_path) : Query(
+                "data_product",
+                query_path
+            ) {}
+    };
+
+    class ObjectQuery : public Query
+    {
+        public:
+            ObjectQuery() : Query(
+            "object",
+            {
+                "components",
+                "code_repo_of",
+                "config_of",
+                "submission_script_of",
+                "external_object",
+                "quality_control",
+                "keywords",
+                "authors",
+                "licences",
+                "data_product",
+                "code_repo_release",
+                "metadata",
+                "updated_by",
+                "last_updated",
+                "storage_location",
+                "description",
+                "file_type",
+                "issues"
+            }) {}
+
+            ObjectQuery(std::filesystem::path query_path) : Query(
+                "object",
+                query_path
+            ) {}
+    };
+
+    class StorageLocationQuery : public Query
+    {
+        public:
+            StorageLocationQuery() : Query(
+            "storage_location",
+            {
+                "location_for_object",
+                "original_store_of",
+                "updated_by",
+                "last_updated",
+                "path",
+                "hash",
+                "storage_root"
+            }) {}
+
+            StorageLocationQuery(std::filesystem::path query_path) : Query(
+                "storage_location",
+                query_path
+            ) {}
     };
 };
 

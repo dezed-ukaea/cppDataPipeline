@@ -36,8 +36,3 @@ TEST(SCRCAPITest, TestFileSystemSetup)
     LocalFileSystem(std::filesystem::path(TESTDIR) / "config.yaml");
     ASSERT_TRUE(std::filesystem::exists(std::filesystem::path(TESTDIR) / "data"));
 }
-
-TEST(SCRCAPITest, TestSearchDataProducts)
-{
-    ASSERT_NO_THROW(init_pipeline()->search_data_products("parameters"));
-}
