@@ -1,5 +1,6 @@
 #include "gtest/gtest.h"
 #include <filesystem>
+#include <ostream>
 #include <vector>
 #include "scrc/registry/datapipeline.hxx"
 #include "scrc/registry/file_system.hxx"
@@ -7,11 +8,20 @@
 
 using namespace SCRC;
 
+
 DataPipeline* init_pipeline()
 {
     const std::filesystem::path config_path_ = std::filesystem::path(TESTDIR) / "config.yaml";
-    return new DataPipeline(config_path_);
+    APILogger->set_level(spdlog::level::debug);
+    return new DataPipeline(config_path_, REMOTE_API_ROOT, spdlog::level::debug);
 }
+
+TEST(SCRCAPITest, TestLogLevelSet)
+{
+    init_pipeline();
+    ASSERT_EQ(spdlog::get_level(), spdlog::level::debug);
+}
+
 
 TEST(SCRCAPITest, TestAccessObjectRegistry)
 { 
@@ -42,9 +52,9 @@ TEST(SCRCAPITest, TestFileSystemSetup)
 TEST(SCRCAPITest, TestGetConfigDataProducts)
 {
     LocalFileSystem* fs_ = new LocalFileSystem(std::filesystem::path(TESTDIR) / "config.yaml");
-    const std::vector<MetadataSubset*> metadata_subsets_ = fs_->get_data_products();
-    const semver::version version_ = metadata_subsets_[0]->get_version();
-    const std::filesystem::path path_ = metadata_subsets_[0]->get_path();
+    const std::vector<DataProduct*> data_products_ = fs_->read_data_products();
+    const semver::version version_ = data_products_[0]->get_version();
+    const std::filesystem::path path_ = data_products_[0]->get_path();
     ASSERT_EQ(version_, semver::version({0, 1, 0}));
     ASSERT_EQ(path_, "fixed-parameters/T_lat");
 }

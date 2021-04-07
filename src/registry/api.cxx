@@ -29,6 +29,7 @@ namespace SCRC
 
     std::filesystem::path Query::build_query()
     {
+        APILogger->debug("API:Query: Building query string...");
         if(components_.empty())
         {
             std::string query_path_ = std::filesystem::path(string_repr_) / fragments_;
@@ -48,12 +49,17 @@ namespace SCRC
 
         const std::filesystem::path query_path_(out_url_query_.str());
 
-        return std::string(std::filesystem::path(string_repr_) / query_path_) + "/";
+        const std::string query_out_ = std::string(std::filesystem::path(string_repr_) / query_path_) + "/";
+
+        APILogger->debug("API:Query: Built query string: {0}", query_out_);
+
+        return query_out_;
     }
 
     CURL* API::setup_json_session_(std::filesystem::path addr_path, std::string* response)
     {
         CURL* curl_ = curl_easy_init();
+        APILogger->debug("API:JSONSession: Attempting to access: "+addr_path.string());
         curl_easy_setopt(curl_, CURLOPT_URL, addr_path.string().c_str());
         curl_easy_setopt(curl_, CURLOPT_NOPROGRESS, 1);
         curl_easy_setopt(curl_, CURLOPT_WRITEFUNCTION, write_str_);
@@ -68,6 +74,7 @@ namespace SCRC
     CURL* API::setup_download_session_(std::filesystem::path addr_path, FILE* file)
     {
         CURL* curl_ = curl_easy_init();
+        APILogger->debug("API:DownloadSession: Attempting to access: "+addr_path.string());
         curl_easy_setopt(curl_, CURLOPT_URL, addr_path.string().c_str());
         curl_easy_setopt(curl_, CURLOPT_NOPROGRESS, 1);
         curl_easy_setopt(curl_, CURLOPT_WRITEFUNCTION, write_file_);
@@ -80,6 +87,7 @@ namespace SCRC
 
     Json::Value API::request(std::filesystem::path addr_path, long expected_response)
     {
+        APILogger->debug("API: Sending request to '{0}'", addr_path.string());
         Json::Value root_;
         Json::CharReaderBuilder json_charbuilder_;
 

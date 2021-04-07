@@ -1,41 +1,46 @@
-data_directory: data
-access_log: access-{run_id}.yaml
-fail_on_hash_mismatch: True
-namespace: EERA
+fail_on_hash_mismatch: True 
+run_metadata: 
+  description: "A test model"
+  remote_data_registry_url: https://data.scrc.uk/api/ 
+  local_data_registry_url: https://localhost:8000/api/
+  default_input_namespace: SCRC 
+  default_output_namespace: EERA
+  default_data_store: "./datastore"
+  always_copy_to_store: False
 read:
-  - where:
-      data_product: fixed-parameters/T_lat
+  - data_product: fixed-parameters/T_lat
     use:
       version: 0.1.0
-  - where:
-      data_product: fixed-parameters/juvp_s
+      namespace: EERA
+  - data_product: fixed-parameters/juvp_s
     use:
       version: 0.1.0
-  - where:
-      data_product: fixed-parameters/T_inf
+      namespace: EERA
+  - data_product: fixed-parameters/T_inf
     use:
       version: 0.1.0
-  - where:
-      data_product: fixed-parameters/T_rec
+      namespace: EERA
+  - data_product: fixed-parameters/T_rec
     use:
       version: 0.1.0
-  - where:
-      data_product: fixed-parameters/T_sym
+      namespace: EERA
+  - data_product: fixed-parameters/T_sym
     use:
       version: 0.1.0
-  - where:
-      data_product: fixed-parameters/T_hos
+      namespace: EERA
+  - data_product: fixed-parameters/T_hos
     use:
       version: 0.1.0
-  - where:
-      data_product: fixed-parameters/K
+      namespace: EERA
+  - data_product: fixed-parameters/K
     use:
       version: 0.1.0
-  - where:
-      data_product: fixed-parameters/inf_asym
+      namespace: EERA
+  - data_product: fixed-parameters/inf_asym
     use:
       version: 0.1.0
-  - where:
-      data_product: fixed-parameters/total_hcw
+      namespace: EERA
+  - data_product: fixed-parameters/total_hcw
     use:
       version: 0.1.0
+      namespace: EERA

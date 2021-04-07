@@ -3,16 +3,24 @@
 
 #include <string>
 #include "json/json.h"
+#include "spdlog/spdlog.h"
 #include "scrc/registry/api.hxx"
 #include "scrc/registry/file_system.hxx"
+#include "scrc/registry/file.hxx"
+#include "scrc/utilities/logging.hxx"
 
 namespace SCRC
 {
     class DataPipeline
     {
         public:
-            DataPipeline(std::filesystem::path config_file_path) : 
-                file_system_(new LocalFileSystem(config_file_path)) {}
+            DataPipeline(std::filesystem::path config_file_path, std::filesystem::path api_root=LOCAL_API_ROOT, spdlog::level::level_enum log_level=spdlog::level::info) : 
+                file_system_(new LocalFileSystem(config_file_path)),
+                api_(new API(api_root)) 
+            {
+                spdlog::set_default_logger(APILogger);
+                APILogger->set_level(log_level);
+            }
             double read_estimate(std::string data_product, const std::string &component);
             Json::Value fetch_all_objects();
             Json::Value fetch_object_by_id(int identifier);
@@ -22,7 +30,7 @@ namespace SCRC
             int get_id_from_path(std::filesystem::path path);
         private:
             const LocalFileSystem* file_system_;
-            API* api_ = new API;
+            API* api_ = nullptr;
     };
 
     class DataProductQuery : public Query

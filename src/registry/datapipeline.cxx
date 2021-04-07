@@ -4,6 +4,7 @@ namespace SCRC
 {
     Json::Value DataPipeline::fetch_all_objects()
     {
+        APILogger->debug("DataPipeline: Fetching all objects from registry");
         return api_->query(ObjectQuery(""));
     }
 
