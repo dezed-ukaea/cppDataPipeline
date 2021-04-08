@@ -32,4 +32,9 @@ namespace SCRC
     {
         return api_->query(StorageLocationQuery(std::to_string(identifier)));
     }
+
+    void DataPipeline::add_to_register(std::string label)
+    {
+        
+    }
 };

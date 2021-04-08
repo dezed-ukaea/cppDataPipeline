@@ -10,7 +10,7 @@ namespace SCRC
 
         if(!check_)
         {
-            throw std::runtime_error("'"+prefix+"' is not a valid data object identifier prefix");
+            throw validation_error("'"+prefix+"' is not a valid data object identifier prefix");
         }
 
         return check_;

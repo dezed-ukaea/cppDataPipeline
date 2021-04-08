@@ -2,8 +2,9 @@
 #define __DOI_SCRC_HXX__
 
 #include <string>
-#include <exception>
 #include <regex>
+
+#include "scrc/exceptions.hxx"
 
 namespace SCRC
 {

@@ -52,7 +52,7 @@ TEST(SCRCAPITest, TestFileSystemSetup)
 TEST(SCRCAPITest, TestGetConfigDataProducts)
 {
     LocalFileSystem* fs_ = new LocalFileSystem(std::filesystem::path(TESTDIR) / "config.yaml");
-    const std::vector<DataProduct*> data_products_ = fs_->read_data_products();
+    const std::vector<ReadObject::DataProduct*> data_products_ = fs_->read_data_products();
     const semver::version version_ = data_products_[0]->get_version();
     const std::filesystem::path path_ = data_products_[0]->get_path();
     ASSERT_EQ(version_, semver::version({0, 1, 0}));

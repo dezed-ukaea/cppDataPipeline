@@ -49,7 +49,7 @@ namespace SCRC
     {
         if(!meta_data_()["default_input_namespace"])
         {
-            throw std::runtime_error("Cannot find value for expected key 'default_input_namespace'");
+            throw config_parsing_error("Cannot find value for expected key 'default_input_namespace'");
         }
 
         return meta_data_()["default_input_namespace"].as<std::string>();
@@ -59,26 +59,26 @@ namespace SCRC
     {
         if(!meta_data_()["default_output_namespace"])
         {
-            throw std::runtime_error("Cannot find value for expected key 'default_output_namespace'");
+            throw config_parsing_error("Cannot find value for expected key 'default_output_namespace'");
         }
 
         return meta_data_()["default_output_namespace"].as<std::string>();
     }
 
-    std::vector<DataProduct*> LocalFileSystem::read_data_products() const
+    std::vector<ReadObject::DataProduct*> LocalFileSystem::read_data_products() const
     {
-        std::vector<DataProduct*> data_products_;
+        APILogger->debug("LocalFileSystem: Reading data products list");
+
+        std::vector<ReadObject::DataProduct*> data_products_;
         const YAML::Node read_node = config_data_["read"];
 
+        APILogger->debug("LocalFileSystem: Iterating through entries");
         for(auto& item : read_node)
         {
-            const YAML::Node use_node_ = item["use"];
-            const std::string version_ = use_node_["version"].as<std::string>();
-            const std::string file_path_ = item["data_product"].as<std::string>();
-            data_products_.push_back(new DataProduct(file_path_, version_));
+            data_products_.push_back(ReadObject::data_product_from_yaml(item));
         }
 
-        if(data_products_.empty()) throw std::runtime_error("No data products found in config");
+        if(data_products_.empty()) throw config_parsing_error("No data products found in config");
     
         return data_products_;
     }

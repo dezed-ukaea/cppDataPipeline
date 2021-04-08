@@ -12,6 +12,7 @@
 #include <vector>
 
 #include "scrc/utilities/logging.hxx"
+#include "scrc/exceptions.hxx"
 
 namespace SCRC
 {

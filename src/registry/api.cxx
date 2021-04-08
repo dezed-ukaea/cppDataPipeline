@@ -105,7 +105,7 @@ namespace SCRC
 
         if(http_code != expected_response)
         {
-            throw std::runtime_error(
+            throw rest_api_query_error(
                 "Request '"+search_str_.string()+
                 "' returned exit code "+std::to_string(http_code)+
                 " but expected "+std::to_string(expected_response)
@@ -116,7 +116,7 @@ namespace SCRC
                 response_str_.c_str(),
                 response_str_.c_str() + response_str_len_, &root_,
                 &err)) {
-            throw std::runtime_error("Failed to retrieve information from JSON response string");
+            throw rest_api_query_error("Failed to retrieve information from JSON response string");
         }
 
         return root_["results"];

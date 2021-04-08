@@ -28,6 +28,7 @@ namespace SCRC
             Json::Value fetch_data_product_by_id(int identifier);
             Json::Value fetch_data_store_by_id(int identifier);
             int get_id_from_path(std::filesystem::path path);
+            void add_to_register(std::string label);
         private:
             const LocalFileSystem* file_system_;
             API* api_ = nullptr;

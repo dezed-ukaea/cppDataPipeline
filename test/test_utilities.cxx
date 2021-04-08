@@ -1,5 +1,6 @@
 #include "gtest/gtest.h"
 #include "scrc/utilities/doi.hxx"
+#include "scrc/exceptions.hxx"
 
 using namespace SCRC;
 
@@ -10,5 +11,5 @@ TEST(SCRCAPITest, TestDOIPass)
 
 TEST(SCRCAPITest, TestDOIFail)
 {
-    ASSERT_THROW(doi_from_string("10.Asdfa/eya/ddi7"), std::runtime_error);
+    ASSERT_THROW(doi_from_string("10.Asdfa/eya/ddi7"), validation_error);
 }
