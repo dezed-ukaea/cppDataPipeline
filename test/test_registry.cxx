@@ -9,11 +9,16 @@
 using namespace SCRC;
 
 
-DataPipeline* init_pipeline()
+DataPipelineImpl_* init_pipeline()
 {
+    if(std::filesystem::exists(std::filesystem::path(TESTDIR) / std::filesystem::path("datastore")))
+    {
+        std::filesystem::remove_all(std::filesystem::path(TESTDIR) / std::filesystem::path("datastore"));
+    }
+
     const std::filesystem::path config_path_ = std::filesystem::path(TESTDIR) / "config.yaml";
     APILogger->set_level(spdlog::level::debug);
-    return new DataPipeline(config_path_, REMOTE_API_ROOT, spdlog::level::debug);
+    return new DataPipelineImpl_(config_path_, REMOTE_API_ROOT, spdlog::level::debug);
 }
 
 TEST(SCRCAPITest, TestLogLevelSet)
@@ -22,6 +27,13 @@ TEST(SCRCAPITest, TestLogLevelSet)
     ASSERT_EQ(spdlog::get_level(), spdlog::level::debug);
 }
 
+TEST(SCRCAPITest, TestURLEncode)
+{
+    const std::string start_string_ = "fixed-parameters/T_lat";
+    const std::string expected_ = "fixed-parameters%2FT_lat";
+
+    ASSERT_EQ(url_encode(start_string_), expected_);
+}
 
 TEST(SCRCAPITest, TestAccessObjectRegistry)
 { 
@@ -63,4 +75,11 @@ TEST(SCRCAPITest, TestHashFile)
 {
     const std::string file_hash_ = calculate_hash(std::filesystem::path(TESTDIR) / "config.yaml");
     std::cout << "HASH: " << file_hash_ << std::endl;
+}
+
+TEST(SCRCAPITest, TestDownloadFile)
+{
+    DataPipelineImpl_* data_pipeline_ = init_pipeline();
+    const std::vector<ReadObject::DataProduct*> data_products_ = data_pipeline_->file_system->read_data_products();
+    ASSERT_NO_THROW(data_pipeline_->download_data_product(data_products_[0]));
 }

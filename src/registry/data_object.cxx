@@ -6,7 +6,6 @@ namespace SCRC
     {
         DataProduct* data_product_from_yaml(YAML::Node yaml_data)
         {
-            APILogger->debug("ReadObject: Extracting entry metadata.");
             const YAML::Node use_node_ = yaml_data["use"];
 
             if(!use_node_)
@@ -17,8 +16,9 @@ namespace SCRC
 
             const std::string version_ = use_node_["version"].as<std::string>();
             const std::string file_path_ = yaml_data["data_product"].as<std::string>();
+            const std::string name_space_ = (use_node_["namespace"]) ? use_node_["namespace"].as<std::string>() : "";
 
-            return new DataProduct(file_path_, version_);
+            return new DataProduct(file_path_, version_, name_space_);
         }
 
         ExternalObject* external_object_from_yaml(YAML::Node yaml_data)

@@ -9,11 +9,10 @@ namespace SCRC
         return size * nmemb;
     }
 
-    
     size_t write_file_(void *ptr, size_t size, size_t nmemb, FILE *stream)
     {
-        size_t written = fwrite(ptr, size, nmemb, stream);
-        return written;
+        size_t written_n_ = fwrite(ptr, size, nmemb, stream);
+        return written_n_;
     }
 
     void Query::append(std::string key, std::string value)
@@ -24,6 +23,14 @@ namespace SCRC
                 "Search term '"+key+"' is not a valid filter for type '"+string_repr_+"'"
             );
         }
+
+        if(value.empty())
+        {
+            throw std::invalid_argument(
+                "Assigning an empty string to query tag '"+key+"' is not allowed"
+            );
+        }
+
         components_[key] = value;
     }
 
@@ -42,18 +49,39 @@ namespace SCRC
         
         for(auto& component: components_)
         {
-            as_strs_.push_back(component.first+"="+component.second);
+            as_strs_.push_back(component.first+"="+url_encode(component.second));
         }
     
-        std::copy(as_strs_.begin(), as_strs_.end(), std::ostream_iterator<std::string>(out_url_query_, "&"));
+        std::string query_str_;
 
-        const std::filesystem::path query_path_(out_url_query_.str());
+        // Check if the number of query components is greater than 1, if it is
+        // combine them with '&'
+        if(as_strs_.size() > 1)
+        {
+            std::copy(as_strs_.begin(), as_strs_.end(), std::ostream_iterator<std::string>(out_url_query_, "&"));
+            
+            // Add '?' to state it is a query and remove last added '&' from end of URL
+            query_str_ = "?"+out_url_query_.str().substr(0, out_url_query_.str().size()-1);
+        }
+        else
+        {
+            // Add '?' to state it is a query
+            query_str_ = "?"+as_strs_[0];
+        }
 
-        const std::string query_out_ = std::string(std::filesystem::path(string_repr_) / query_path_) + "/";
+        const std::filesystem::path query_path_(query_str_);
+
+        const std::string query_out_ = std::string(std::filesystem::path(string_repr_) / query_path_);
 
         APILogger->debug("API:Query: Built query string: {0}", query_out_);
 
         return query_out_;
+    }
+
+    std::string url_encode(std::string url)
+    {
+        CURL* curl_ = curl_easy_init();
+        return curl_easy_escape(curl_, url.c_str(), 0);
     }
 
     CURL* API::setup_json_session_(std::filesystem::path addr_path, std::string* response)
@@ -69,6 +97,18 @@ namespace SCRC
         curl_global_cleanup();
 
         return curl_;
+    }
+
+    void API::download_file(std::filesystem::path url, std::filesystem::path out_path)
+    {
+        CURL* curl_ = curl_easy_init();
+        FILE* file_ = fopen(out_path.c_str(), "wb");
+        APILogger->debug("API: Downloading file '{0}' -> '{1}'", url.string(), out_path.string());
+        curl_easy_setopt(curl_, CURLOPT_URL, url.c_str());
+        curl_easy_setopt(curl_, CURLOPT_WRITEFUNCTION, write_file_);
+        curl_easy_setopt(curl_, CURLOPT_WRITEDATA, file_);
+        curl_easy_perform(curl_);
+        fclose(file_);      
     }
 
     CURL* API::setup_download_session_(std::filesystem::path addr_path, FILE* file)
@@ -87,7 +127,6 @@ namespace SCRC
 
     Json::Value API::request(std::filesystem::path addr_path, long expected_response)
     {
-        APILogger->debug("API: Sending request to '{0}'", addr_path.string());
         Json::Value root_;
         Json::CharReaderBuilder json_charbuilder_;
 
@@ -105,7 +144,7 @@ namespace SCRC
 
         if(http_code != expected_response)
         {
-            throw rest_api_query_error(
+            throw rest_apiquery_error(
                 "Request '"+search_str_.string()+
                 "' returned exit code "+std::to_string(http_code)+
                 " but expected "+std::to_string(expected_response)
@@ -116,31 +155,14 @@ namespace SCRC
                 response_str_.c_str(),
                 response_str_.c_str() + response_str_len_, &root_,
                 &err)) {
-            throw rest_api_query_error("Failed to retrieve information from JSON response string");
+            throw rest_apiquery_error("Failed to retrieve information from JSON response string");
         }
 
-        return root_["results"];
+        return (root_["results"]) ? root_["results"] : root_;
     }
 
     Json::Value API::query(Query query, long expected_response)
     {
         return request(query.build_query(), expected_response);
-    }
-
-    void API::download(std::filesystem::path remote_addr, std::filesystem::path output_loc)
-    {
-        Json::CharReaderBuilder json_charbuilder_;
-
-        long http_code;
-
-        std::string response_str_;
-        const std::filesystem::path search_str_ = url_root_ / remote_addr;
-
-        FILE* file_ = fopen(output_loc.c_str(), "wb");
-
-        auto* session_ = setup_download_session_(search_str_, file_);
-
-        fclose(file_);        
-
     }
 };

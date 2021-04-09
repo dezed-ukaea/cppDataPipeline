@@ -23,14 +23,22 @@ namespace SCRC
                 const std::filesystem::path cache_ = std::filesystem::path();
                 const std::string title_ = "";
             public:
-                DataProduct(std::string registry_path, std::string version, std::string title="", std::filesystem::path cache_path="") :
+                DataProduct(
+                    std::string registry_path,
+                    std::string version,
+                    std::string name_space="",
+                    std::string title="",
+                    std::filesystem::path cache_path=""
+                ) :
                     registry_path_(registry_path),
                     version_(version),
+                    namespace_(name_space),
                     title_(title),
                     cache_(cache_path)
                 {}
                 std::filesystem::path get_path() const {return registry_path_;}
                 semver::version get_version() const {return version_;}
+                std::string get_namespace() const {return namespace_;}
                 std::string get_title() const {return title_;}
                 std::string get_cache_path() const {return cache_;}
         };

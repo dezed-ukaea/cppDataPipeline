@@ -13,10 +13,17 @@ namespace SCRC
                 std::runtime_error(message) {}
     };
 
-    class rest_api_query_error: public std::runtime_error
+    class rest_apiquery_error: public std::runtime_error
     {
         public:
-            rest_api_query_error(const std::string message) :
+            rest_apiquery_error(const std::string message) :
+                std::runtime_error(message) {}
+    };
+
+    class json_parse_error: public std::runtime_error
+    {
+        public:
+            json_parse_error(const std::string message) :
                 std::runtime_error(message) {}
     };
 
@@ -24,6 +31,13 @@ namespace SCRC
     {
         public:
             validation_error(const std::string message) :
+                std::runtime_error(message) {}
+    };
+
+    class sync_error: public std::runtime_error
+    {
+        public:
+            sync_error(const std::string message) :
                 std::runtime_error(message) {}
     };
 };
