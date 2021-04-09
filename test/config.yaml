@@ -5,7 +5,7 @@ run_metadata:
   local_data_registry_url: https://localhost:8000/api/
   default_input_namespace: SCRC 
   default_output_namespace: EERA
-  default_data_store: "./datastore"
+  default_data_store: "/datastore"
   always_copy_to_store: False
 read:
   - data_product: fixed-parameters/T_lat

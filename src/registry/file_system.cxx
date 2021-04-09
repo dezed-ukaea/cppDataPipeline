@@ -33,9 +33,17 @@ namespace SCRC
         if(meta_data_()["default_data_store"])
         {
             std::string data_dir_ = meta_data_()["default_data_store"].as<std::string>();
+
+            // Handle case where tilde use for HOME
             if(data_dir_[0] == '~')
             {
                 data_dir_ = std::getenv("HOME")+data_dir_.substr(1, data_dir_.size()-1);
+            }
+
+            // Handle case where '/' used meaning relative to config file path
+            else if(data_dir_[0] == '/')
+            {
+                data_dir_ = config_path_.parent_path() / data_dir_.substr(1, data_dir_.size()-1);
             }
             return data_dir_;
         }

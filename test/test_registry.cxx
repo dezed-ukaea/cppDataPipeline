@@ -46,7 +46,7 @@ TEST(SCRCAPITest, TestAccessData)
 TEST(SCRCAPITest, TestFileSystemSetup)
 {
     LocalFileSystem(std::filesystem::path(TESTDIR) / "config.yaml");
-    ASSERT_TRUE(std::filesystem::exists(std::filesystem::path(TESTDIR) / "data"));
+    ASSERT_TRUE(std::filesystem::exists(std::filesystem::path(TESTDIR) / "datastore"));
 }
 
 TEST(SCRCAPITest, TestGetConfigDataProducts)
