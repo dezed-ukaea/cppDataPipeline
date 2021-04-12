@@ -1,13 +1,14 @@
 #ifndef __SCRC_DATAOBJECT_HXX__
 #define __SCRC_DATAOBJECT_HXX__
 
-#include <semver.hpp>
+#include <exception>
 #include <filesystem>
 #include <ctime>
 #include <yaml-cpp/yaml.h>
 
 #include "scrc/utilities/doi.hxx"
 #include "scrc/utilities/logging.hxx"
+#include "scrc/utilities/semver.hxx"
 #include "scrc/exceptions.hxx"
 
 namespace SCRC
@@ -18,7 +19,7 @@ namespace SCRC
         {
             private:
                 const std::string namespace_;
-                const semver::version version_;
+                const version version_;
                 const std::filesystem::path registry_path_;
                 const std::filesystem::path cache_ = std::filesystem::path();
                 const std::string title_ = "";
@@ -37,7 +38,7 @@ namespace SCRC
                     cache_(cache_path)
                 {}
                 std::filesystem::path get_path() const {return registry_path_;}
-                semver::version get_version() const {return version_;}
+                version get_version() const {return version_;}
                 std::string get_namespace() const {return namespace_;}
                 std::string get_title() const {return title_;}
                 std::string get_cache_path() const {return cache_;}
@@ -85,7 +86,7 @@ namespace SCRC
                 const std::filesystem::path product_name_ = "";
                 const std::string file_type_ = "";
                 const tm release_date_;
-                const semver::version version_ = semver::version();
+                const version version_ = version();
                 const bool primary_ = true;
                 const Accessibility accessibility_ = Accessibility::OPEN;
             public:

@@ -15,6 +15,17 @@ namespace SCRC
             }
 
             const std::string version_ = use_node_["version"].as<std::string>();
+
+            try
+            {
+                version(version_);
+            }
+            catch(std::exception& e)
+            {
+                APILogger->error("Invalid version identifier '{0}'", version_);
+                throw e;
+            }
+
             const std::string file_path_ = yaml_data["data_product"].as<std::string>();
             const std::string name_space_ = (use_node_["namespace"]) ? use_node_["namespace"].as<std::string>() : "";
 

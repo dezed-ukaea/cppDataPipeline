@@ -165,6 +165,8 @@ namespace SCRC
             return download_loc_ / rel_file_loc_.filename();
         }
 
+        throw std::runtime_error("Currently unsupported download operation");
+
     }
 
 };

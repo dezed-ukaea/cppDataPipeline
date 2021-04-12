@@ -65,9 +65,9 @@ TEST(SCRCAPITest, TestGetConfigDataProducts)
 {
     LocalFileSystem* fs_ = new LocalFileSystem(std::filesystem::path(TESTDIR) / "config.yaml");
     const std::vector<ReadObject::DataProduct*> data_products_ = fs_->read_data_products();
-    const semver::version version_ = data_products_[0]->get_version();
+    const version version_ = data_products_[0]->get_version();
     const std::filesystem::path path_ = data_products_[0]->get_path();
-    ASSERT_EQ(version_, semver::version({0, 1, 0}));
+    ASSERT_EQ(version_, version(0, 1, 0));
     ASSERT_EQ(path_, "fixed-parameters/T_lat");
 }
 
@@ -77,9 +77,16 @@ TEST(SCRCAPITest, TestHashFile)
     std::cout << "HASH: " << file_hash_ << std::endl;
 }
 
-TEST(SCRCAPITest, TestDownloadFile)
+TEST(SCRCAPITest, TestDownloadTOMLFile)
 {
     DataPipelineImpl_* data_pipeline_ = init_pipeline();
     const std::vector<ReadObject::DataProduct*> data_products_ = data_pipeline_->file_system->read_data_products();
     ASSERT_NO_THROW(data_pipeline_->download_data_product(data_products_[0]));
+}
+
+TEST(SCRCAPITest, TestDownloadHDF5File)
+{
+    DataPipelineImpl_* data_pipeline_ = init_pipeline();
+    const std::vector<ReadObject::DataProduct*> data_products_ = data_pipeline_->file_system->read_data_products();
+    ASSERT_NO_THROW(data_pipeline_->download_data_product(data_products_[1]));
 }

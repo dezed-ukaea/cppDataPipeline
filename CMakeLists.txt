@@ -13,7 +13,6 @@ INCLUDE( external/digestpp.cmake )
 INCLUDE( external/curl.cmake )
 INCLUDE( external/yaml_cpp.cmake )
 INCLUDE( external/jsoncpp.cmake )
-INCLUDE( external/semver.cmake )
 INCLUDE( external/spdlog.cmake )
 
 ADD_SUBDIRECTORY( src )

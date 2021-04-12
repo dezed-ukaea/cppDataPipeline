@@ -12,6 +12,10 @@ read:
     use:
       version: 0.1.0
       namespace: EERA
+  - data_product: prob_hosp_and_cfr/data_for_scotland
+    use:
+      version: 0.20200813.0
+      namespace: EERA
   - data_product: fixed-parameters/juvp_s
     use:
       version: 0.1.0
