@@ -29,4 +29,4 @@ jobs:
       - name: Code Coverage
         run: |
           cmake --build build --target coverage
-          bash <(curl -s https://codecov.io/bash) -f build/coverage.info || echo "Codecov did not collect coverage reports"
+          bash <(curl -s https://codecov.io/bash) -f build/scrcapi.info -K codecov.yml || echo "Codecov did not collect coverage reports"
