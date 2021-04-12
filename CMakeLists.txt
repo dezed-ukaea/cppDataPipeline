@@ -25,7 +25,6 @@ IF(CMAKE_BUILD_TYPE STREQUAL "Debug")
     ADD_SUBDIRECTORY( test )
 
 	find_program( LCOV_PATH  NAMES lcov lcov.bat lcov.exe lcov.perl)
-	find_program( GENHTML_PATH NAMES genhtml genhtml.perl genhtml.bat )
 	find_program( GCOV_PATH gcov )
 	
 	set(LCOV_EXCLUDES "build/*" "/usr*")
@@ -48,10 +47,7 @@ IF(CMAKE_BUILD_TYPE STREQUAL "Debug")
 		COMMAND ${LCOV_PATH} --gcov-tool ${GCOV_PATH} -a ${PROJECT_NAME}.base -a ${PROJECT_NAME}.capture --output-file ${PROJECT_NAME}.total
 	
 	    # filter collected data to final coverage report and merge outputs
-		COMMAND ${LCOV_PATH} --gcov-tool ${GCOV_PATH} --remove ${PROJECT_NAME}.total ${LCOV_EXCLUDES} --output-file ${PROJECT_NAME}.info
-	
-	    # Generate HTML output
-		COMMAND ${GENHTML_PATH} -o ${PROJECT_NAME}_coverage coverage.info
+		COMMAND ${LCOV_PATH} --gcov-tool ${GCOV_PATH} --remove ${PROJECT_NAME}.total ${LCOV_EXCLUDES} --output-file coverage.info
 	
         # Set output files as GENERATED (will be removed on 'make clean')
         BYPRODUCTS
