@@ -76,6 +76,16 @@ namespace SCRC
         return meta_data_()["default_output_namespace"].as<std::string>();
     }
 
+    std::string get_first_key_(const toml::value data_table)
+    {
+        for(const auto& [k, v] : data_table.as_table())
+        {
+            return k;
+        }
+
+        return "";
+    }
+
     std::vector<ReadObject::DataProduct*> LocalFileSystem::read_data_products() const
     {
         APILogger->debug("LocalFileSystem: Reading data products list");
@@ -93,4 +103,30 @@ namespace SCRC
     
         return data_products_;
     }
+
+    double read_point_estimate(const std::filesystem::path var_address)
+    {
+        if(!std::filesystem::exists(var_address))
+        {
+            throw std::runtime_error("File '"+var_address.string()+"' could not be opened as it does not exist");
+        }
+
+        const auto toml_data_ = toml::parse(var_address.string());
+
+        const std::string first_key_ = get_first_key_(toml_data_);
+
+        if(!toml::get<toml::table>(toml_data_).at(first_key_).contains("type"))
+        {
+            throw std::runtime_error("Expected 'type' tag but none found");
+        }
+
+        if(static_cast<std::string>(toml_data_.at(first_key_).at("type").as_string()) != "point-estimate")
+        {
+            throw std::runtime_error("Expected 'point-estimate' for type but got '"+static_cast<std::string>(toml_data_.at("type").as_string())+"'");
+        }
+
+        return (toml_data_.at(first_key_).at("value").is_floating()) ? toml_data_.at(first_key_).at("value").as_floating() : static_cast<double>(toml_data_.at(first_key_).at("value").as_integer());
+
+    }
+
 };

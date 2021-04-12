@@ -61,7 +61,7 @@ TEST(SCRCAPITest, TestFileSystemSetup)
     ASSERT_TRUE(std::filesystem::exists(std::filesystem::path(TESTDIR) / "datastore"));
 }
 
-TEST(SCRCAPITest, TestGetConfigDataProducts)
+TEST(SCRCAPITest, TestGetConfigDataTOML)
 {
     LocalFileSystem* fs_ = new LocalFileSystem(std::filesystem::path(TESTDIR) / "config.yaml");
     const std::vector<ReadObject::DataProduct*> data_products_ = fs_->read_data_products();
@@ -69,6 +69,16 @@ TEST(SCRCAPITest, TestGetConfigDataProducts)
     const std::filesystem::path path_ = data_products_[0]->get_path();
     ASSERT_EQ(version_, version(0, 1, 0));
     ASSERT_EQ(path_, "fixed-parameters/T_lat");
+}
+
+TEST(SCRCAPITest, TestGetConfigDataHDF5)
+{
+    LocalFileSystem* fs_ = new LocalFileSystem(std::filesystem::path(TESTDIR) / "config.yaml");
+    const std::vector<ReadObject::DataProduct*> data_products_ = fs_->read_data_products();
+    const version version_ = data_products_[1]->get_version();
+    const std::filesystem::path path_ = data_products_[1]->get_path();
+    ASSERT_EQ(version_, version(0, 20200813, 0));
+    ASSERT_EQ(path_, "prob_hosp_and_cfr/data_for_scotland");
 }
 
 TEST(SCRCAPITest, TestHashFile)

@@ -14,6 +14,7 @@ INCLUDE( external/curl.cmake )
 INCLUDE( external/yaml_cpp.cmake )
 INCLUDE( external/jsoncpp.cmake )
 INCLUDE( external/spdlog.cmake )
+INCLUDE( external/toml11.cmake )
 
 ADD_SUBDIRECTORY( src )
 
