@@ -129,4 +129,51 @@ namespace SCRC
 
     }
 
+    Distribution* construct_dis_(const toml::value data_table)
+    {
+        const std::string first_key_ = get_first_key_(data_table);
+        const std::string dis_type_ = data_table.at(first_key_).at("distribution").as_string();
+
+        if(dis_type_ == "normal")
+        {
+            const double mean = (data_table.at(first_key_).at("mu").is_floating()) ? data_table.at(first_key_).at("mu").as_floating() : static_cast<double>(data_table.at(first_key_).at("mu").as_integer());
+            const double sd = (data_table.at(first_key_).at("sigma").is_floating()) ? data_table.at(first_key_).at("sigma").as_floating() : static_cast<double>(data_table.at(first_key_).at("sigma").as_integer());
+            return new Normal(mean, sd);
+        }
+
+        else if(dis_type_ == "gamma")
+        {
+            const double k = (data_table.at(first_key_).at("k").is_floating()) ? data_table.at(first_key_).at("k").as_floating() : static_cast<double>(data_table.at(first_key_).at("k").as_integer());
+            const double theta = (data_table.at(first_key_).at("theta").is_floating()) ? data_table.at(first_key_).at("theta").as_floating() : static_cast<double>(data_table.at(first_key_).at("theta").as_integer());
+            return new Gamma(k, theta);
+        }
+
+        throw std::runtime_error("Distribution currently unsupported");
+    }
+
+    Distribution* read_distribution(const std::filesystem::path var_address)
+    {
+        if(!std::filesystem::exists(var_address))
+        {
+            throw std::runtime_error("File '"+var_address.string()+"' could not be opened as it does not exist");
+        }
+
+        const auto toml_data_ = toml::parse(var_address.string());
+
+        const std::string first_key_ = get_first_key_(toml_data_);
+
+        if(!toml::get<toml::table>(toml_data_).at(first_key_).contains("type"))
+        {
+            throw std::runtime_error("Expected 'type' tag but none found");
+        }
+
+        if(static_cast<std::string>(toml_data_.at(first_key_).at("type").as_string()) != "distribution")
+        {
+            throw std::runtime_error("Expected 'distribution' for type but got '"+static_cast<std::string>(toml_data_.at("type").as_string())+"'");
+        }
+
+        return construct_dis_(toml_data_);
+
+    }
+
 };

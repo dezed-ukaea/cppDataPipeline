@@ -11,6 +11,7 @@
 
 #include "scrc/utilities/logging.hxx"
 #include "scrc/registry/data_object.hxx"
+#include "scrc/objects/distributions.hxx"
 
 namespace SCRC
 {
@@ -32,8 +33,10 @@ namespace SCRC
     };
 
     std::string get_first_key_(const toml::value data_table);
+    Distribution* construct_dis_(const toml::value data_table);
 
     double read_point_estimate(const std::filesystem::path var_address);
+    Distribution* read_distribution(const std::filesystem::path var_address);
 
     enum FILE_TYPE
     {
