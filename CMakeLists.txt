@@ -1,6 +1,6 @@
 CMAKE_MINIMUM_REQUIRED( VERSION 3.12 )
 
-PROJECT( scrcapi VERSION 0.1.0 LANGUAGES CXX )
+PROJECT( scrcapi VERSION 0.1.0 LANGUAGES CXX C)
 
 INCLUDE( ExternalProject )
 
@@ -15,6 +15,8 @@ INCLUDE( external/yaml_cpp.cmake )
 INCLUDE( external/jsoncpp.cmake )
 INCLUDE( external/spdlog.cmake )
 INCLUDE( external/toml11.cmake )
+INCLUDE( external/dataframe.cmake )
+INCLUDE( external/hdf5.cmake )
 
 ADD_SUBDIRECTORY( src )
 

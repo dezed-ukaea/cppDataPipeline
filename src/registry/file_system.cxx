@@ -1,7 +1,4 @@
 #include "scrc/registry/file_system.hxx"
-
-#include <iostream>
-
 namespace SCRC
 {
     YAML::Node parse_yaml_(std::filesystem::path yaml_path)
@@ -175,5 +172,4 @@ namespace SCRC
         return construct_dis_(toml_data_);
 
     }
-
 };

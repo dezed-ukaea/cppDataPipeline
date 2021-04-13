@@ -2,6 +2,9 @@ ExternalProject_Add(jsoncpp_src
     GIT_REPOSITORY https://github.com/open-source-parsers/jsoncpp.git
     GIT_TAG 1.9.4
     GIT_SHALLOW TRUE
+    CMAKE_CACHE_ARGS
+        -DJSONCPP_WITH_TESTS:BOOL=OFF
+        -DJSONCPP_WITH_EXAMPLE:BOOL=OFF
     INSTALL_COMMAND ""
 )
 
