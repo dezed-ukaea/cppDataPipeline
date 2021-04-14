@@ -53,10 +53,14 @@ namespace SCRC
             throw std::runtime_error("Could not open HDF5 file '"+var_address.string()+"', file does not exist.");
         }
 
+        const H5File file_(var_address.c_str(), H5F_ACC_RDONLY);
+
+
+        // -------------------------------------- ARRAY RETRIEVAL -------------------------------------------- //
+
         const std::string array_key_ = key.string() + "/array";
         APILogger->debug("FileSystem:ReadArray: Reading key '{0}'", array_key_);
 
-        const H5File file_(var_address.c_str(), H5F_ACC_RDONLY);
         const DataSet data_set_ = file_.openDataSet(array_key_.c_str());
         const DataSpace data_space_ = data_set_.getSpace();
 
@@ -65,9 +69,6 @@ namespace SCRC
         hsize_t dim_[arr_dims_];
 
         data_space_.getSimpleExtentDims(dim_, NULL);
-
-        const std::vector<std::string> dim_1_name = std::vector<std::string>(static_cast<int>(dim_[0]), "a");
-        const std::vector<std::string> dim_2_name = std::vector<std::string>(static_cast<int>(dim_[1]), "b");
 
         hsize_t mem_dim_ = 1;
 
@@ -110,9 +111,36 @@ namespace SCRC
             }
         }
 
+        // -------------------------------------- TITLE RETRIEVAL -------------------------------------------- //
+
+        const int n_titles_ = arr_dims_;
+
+        std::vector<std::string> titles_(n_titles_, "");
+
+        const std::vector<std::string> dim_1_name = std::vector<std::string>(static_cast<int>(dim_[0]), "a");
+        const std::vector<std::string> dim_2_name = std::vector<std::string>(static_cast<int>(dim_[1]), "b");
+
+        for(int i{0}; i < n_titles_; ++i)
+        {
+            const std::string title_key_ = key.string() + "/Dimension_" + std::to_string(i+1) + "_title";
+            const DataSet title_set_ = file_.openDataSet(title_key_.c_str());
+            const DataSpace title_space_ = title_set_.getSpace();
+            const DataType dtype_ = title_set_.getDataType();
+
+            if(dtype_.getClass() != H5T_STRING)
+            {
+                throw std::runtime_error("Type for dimension "+std::to_string(i+1)+" title is not string");
+            }
+
+            std::string title_;
+
+            title_set_.read(title_, dtype_);
+            titles_[i] = title_;
+        }
+
         APILogger->debug("FileSystem:ReadArray: Read Successful.");
 
-        return ArrayObject<T>{"dim_1", "dim_2", dim_1_name, dim_2_name, array_};
+        return ArrayObject<T>{titles_, dim_1_name, dim_2_name, array_};
     }
 };
 

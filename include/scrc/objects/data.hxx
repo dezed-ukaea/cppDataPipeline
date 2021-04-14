@@ -14,8 +14,7 @@ namespace SCRC
     template<typename T>
     struct ArrayObject
     {
-        const std::string dimension_1_title;
-        const std::string dimension_2_title;
+        const std::vector<std::string> dimension_titles;
         const std::vector<std::string> dimension_1_names;
         const std::vector<std::string> dimension_2_names;
         const std::vector<std::vector<T>> array;
