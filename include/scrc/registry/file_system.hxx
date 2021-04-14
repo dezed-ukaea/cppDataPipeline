@@ -76,49 +76,15 @@ namespace SCRC
 
         std::vector<T> data_out_(mem_dim_);
 
-        const DataType &dtype = *HDF5::get_hdf5_type<T>();
+        const DataType &dtype_ = *HDF5::get_hdf5_type<T>();
 
-        data_set_.read(data_out_.data(), dtype, data_space_, data_space_);
-
-        std::vector<std::vector<T>> array_;
-
-        if(data_out_.size() < 1)
-        {
-            throw std::runtime_error("Failed to extract array from HDF5 file, output vector is empty");
-        }
-
-        if(dim_[1] == 0)
-        {
-            array_ = std::vector<std::vector<T>>({data_out_});
-        }
-
-        else
-        {
-            array_ = std::vector<std::vector<T>>(static_cast<int>(dim_[1]), std::vector<T>(static_cast<int>(dim_[0]), 0));
-
-            int j = 0;
-            int k = 0;
-
-            for(unsigned int i{0}; i < data_out_.size(); ++i)
-            {
-                if(i > 0 && i % dim_[0] == 0)
-                {
-                    j += 1;
-                    k = 0;
-                }
-                array_[k][j] = data_out_[i];
-                k += 1;
-            }
-        }
+        data_set_.read(data_out_.data(), dtype_, data_space_, data_space_);
 
         // -------------------------------------- TITLE RETRIEVAL -------------------------------------------- //
 
         const int n_titles_ = arr_dims_;
 
         std::vector<std::string> titles_(n_titles_, "");
-
-        const std::vector<std::string> dim_1_name = std::vector<std::string>(static_cast<int>(dim_[0]), "a");
-        const std::vector<std::string> dim_2_name = std::vector<std::string>(static_cast<int>(dim_[1]), "b");
 
         for(int i{0}; i < n_titles_; ++i)
         {
@@ -135,12 +101,40 @@ namespace SCRC
             std::string title_;
 
             title_set_.read(title_, dtype_);
+
             titles_[i] = title_;
         }
 
+        // -------------------------------------- NAMES RETRIEVAL -------------------------------------------- //
+
+        const int n_name_sets_ = arr_dims_;
+
+        std::vector<std::vector<std::string>> names_;
+
+        for(int i{0}; i < n_name_sets_; ++i)
+        {
+            const std::string names_key_ = key.string() + "/Dimension_" + std::to_string(i+1) + "_names";
+            const DataSet names_set_ = file_.openDataSet(names_key_.c_str());
+            const DataSpace names_space_ = names_set_.getSpace();
+            const DataType dtype_ = names_set_.getDataType();
+
+            std::vector<const char*> names_i_(dim_[i], "");
+            std::vector<std::string> names_i_str_;
+
+            names_set_.read(names_i_.data(), dtype_, names_space_, names_space_);
+
+            for(auto& c : names_i_) names_i_str_.push_back(std::string(c)); 
+
+            names_.push_back(names_i_str_);
+        }
+
+        std::vector<int> dimensions_;
+
+        for(auto& d : dim_) dimensions_.push_back(d);
+
         APILogger->debug("FileSystem:ReadArray: Read Successful.");
 
-        return ArrayObject<T>{titles_, dim_1_name, dim_2_name, array_};
+        return ArrayObject<T>{titles_, names_, dimensions_, data_out_};
     }
 };
 

@@ -29,5 +29,5 @@ TEST(SCRCAPITest, TestArrayRead)
 
     ArrayObject<double> array_ = read_array<double>(test_file, key);
 
-    ASSERT_EQ(array_.array[0][0], 0.4788127996331724);
+    ASSERT_EQ(array_.get({0, 0}), 0.4788127996331724);
 }
