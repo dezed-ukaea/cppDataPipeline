@@ -20,7 +20,6 @@ INCLUDE( external/yaml_cpp.cmake )
 INCLUDE( external/jsoncpp.cmake )
 INCLUDE( external/spdlog.cmake )
 INCLUDE( external/toml11.cmake )
-INCLUDE( external/dataframe.cmake )
 
 ADD_SUBDIRECTORY( src )
 
