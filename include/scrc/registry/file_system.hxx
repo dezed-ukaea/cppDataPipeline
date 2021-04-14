@@ -9,13 +9,11 @@
 #include <cstdlib>
 #include "toml.hpp"
 #include "H5Cpp.h"
-#include "DataFrame/DataFrame.h"
 
 #include <iostream>
 
-#define NDIMS 2
-
 #include "scrc/utilities/logging.hxx"
+#include "scrc/utilities/hdf5.hxx"
 #include "scrc/registry/data_object.hxx"
 #include "scrc/objects/distributions.hxx"
 #include "scrc/objects/data.hxx"
@@ -25,9 +23,6 @@ using namespace H5;
 namespace SCRC
 {
     YAML::Node parse_config_();
-
-    using dataframe = hmdf::StdDataFrame<unsigned int>;
-
     class LocalFileSystem
     {
         private:
@@ -65,7 +60,9 @@ namespace SCRC
         const DataSet data_set_ = file_.openDataSet(array_key_.c_str());
         const DataSpace data_space_ = data_set_.getSpace();
 
-        hsize_t dim_[NDIMS];
+        const int arr_dims_ = data_space_.getSimpleExtentNdims();
+
+        hsize_t dim_[arr_dims_];
 
         data_space_.getSimpleExtentDims(dim_, NULL);
 
@@ -74,27 +71,13 @@ namespace SCRC
 
         hsize_t mem_dim_ = 1;
 
-        for(int i{0}; i < NDIMS; ++i) mem_dim_ *= dim_[i];
+        for(int i{0}; i < arr_dims_; ++i) mem_dim_ *= dim_[i];
 
         std::vector<T> data_out_(mem_dim_);
 
-        if(std::is_same<T, float>::value)
-        {
-            APILogger->debug("FileSystem:ReadArray: Reading HDF5 to float");
-            data_set_.read(data_out_.data(), PredType::NATIVE_FLOAT, data_space_, data_space_);
-        }
+        const DataType &dtype = *HDF5::get_hdf5_type<T>();
 
-        else if(std::is_same<T, double>::value)
-        {
-            APILogger->debug("FileSystem:ReadArray: Reading HDF5 to double");
-            data_set_.read(data_out_.data(), PredType::NATIVE_DOUBLE, data_space_, data_space_);
-        }
-
-        else 
-        {
-            APILogger->debug("FileSystem:ReadArray: Reading HDF5 to int");
-            data_set_.read(data_out_.data(), PredType::NATIVE_INT, data_space_, data_space_);
-        }
+        data_set_.read(data_out_.data(), dtype, data_space_, data_space_);
 
         std::vector<std::vector<T>> array_;
 
@@ -131,13 +114,6 @@ namespace SCRC
 
         return ArrayObject<T>{"dim_1", "dim_2", dim_1_name, dim_2_name, array_};
     }
-
-    enum FILE_TYPE
-    {
-        TOML,
-        HDF5,
-        OTHER
-    };
 };
 
 #endif

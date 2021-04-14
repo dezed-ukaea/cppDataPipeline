@@ -9,23 +9,31 @@ SET( CMAKE_CXX_STANDARD_REQUIRED ON )
 
 SET( SCRCAPI_INCLUDE_DIRS ${CMAKE_SOURCE_DIR}/include )
 
+OPTION( SCRCAPI_BUILD_TESTS  "Build unit tests" OFF )
+OPTION( SCRCAPI_CODE_COVERAGE "Run GCov and LCov code coverage tools" OFF )
+
+FIND_PACKAGE( HDF5 REQUIRED COMPONENTS C CXX )
+FIND_PACKAGE( CURL REQUIRED )
+
 INCLUDE( external/digestpp.cmake )
-INCLUDE( external/curl.cmake )
 INCLUDE( external/yaml_cpp.cmake )
 INCLUDE( external/jsoncpp.cmake )
 INCLUDE( external/spdlog.cmake )
 INCLUDE( external/toml11.cmake )
 INCLUDE( external/dataframe.cmake )
-INCLUDE( external/hdf5.cmake )
 
 ADD_SUBDIRECTORY( src )
 
-IF(CMAKE_BUILD_TYPE STREQUAL "Debug")
+IF( SCRCAPI_BUILD_TESTS )
+    INCLUDE( CTest )
+    ADD_SUBDIRECTORY( test )
+ENDIF()
+
+IF( SCRCAPI_CODE_COVERAGE AND SCRCAPI_BUILD_TESTS )
     MESSAGE(STATUS "Including Code Coverage")
     SET( COVERAGE_COMPILER_FLAGS "-g -fprofile-arcs -ftest-coverage" )
 	SET( CMAKE_CXX_FLAGS "-std=gnu++17 -O0 -Wall -Wextra ${COVERAGE_COMPILER_FLAGS} ${CMAKE_CXX_FLAGS}" )
-    INCLUDE( CTest )
-    ADD_SUBDIRECTORY( test )
+    
 
 	find_program( LCOV_PATH  NAMES lcov lcov.bat lcov.exe lcov.perl)
 	find_program( GCOV_PATH gcov )
