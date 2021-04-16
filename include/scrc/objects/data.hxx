@@ -5,10 +5,6 @@
 #include <vector>
 #include <stdexcept>
 
-#include <DataFrame/DataFrame.h>
-
-using DataFrame = hmdf::StdDataFrame<unsigned int>;
-
 namespace SCRC
 {
     template<typename T>
@@ -16,20 +12,20 @@ namespace SCRC
     {   
         const std::string name;
         const std::string unit;
-        const std::vector<std::string> row_names;
-        const std::vector<T> values;
+        const std::vector<std::string>* row_names;
+        const std::vector<T>* values;
 
         T operator[] (const char* key)
         {
-            const auto iterator_ = std::find(row_names.begin(), row_names.end(), std::string(key));
-            if(iterator_ == row_names.end())
+            const auto iterator_ = std::find(row_names->begin(), row_names->end(), std::string(key));
+            if(iterator_ == row_names->end())
             {
                 throw std::invalid_argument("No row name '"+std::string(key)+"' in column '"+name+"'");
             }
 
-            const int distance_ = std::distance(row_names.begin(), iterator_);
+            const int distance_ = std::distance(row_names->begin(), iterator_);
 
-            return values[distance_];
+            return values->operator[](distance_);
 
         }
     };

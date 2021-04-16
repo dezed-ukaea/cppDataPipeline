@@ -36,8 +36,13 @@ TEST(SCRCAPITest, TestTableReadColumn)
 {
     APILogger->set_level(spdlog::level::debug);
     const std::filesystem::path test_file = std::filesystem::path(TESTDIR) / std::filesystem::path("test_table.hdf5");
-    const std::filesystem::path key = "/conversiontable/scotland/URcode";
+    const std::filesystem::path key = "/conversiontable/scotland";
+    const std::string column = "URcode";
 
-    read_table_column<double>(test_file, key);
+    DataTableColumn<double> column_ = read_table_column<double>(test_file, key, column);
+
+    std::cout << "YAY" << std::endl;
+
+    ASSERT_EQ(column_["2"], 5.0);
 
 }
