@@ -25,9 +25,19 @@ TEST(SCRCAPITest, TestArrayRead)
 {
     APILogger->set_level(spdlog::level::debug);
     const std::filesystem::path test_file = std::filesystem::path(TESTDIR) / std::filesystem::path("test_array.hdf5");
-    const std::filesystem::path key = "contact_matrices/home";
+    const std::filesystem::path key = "/contact_matrices/home";
 
     ArrayObject<double> array_ = read_array<double>(test_file, key);
 
     ASSERT_EQ(array_.get({0, 0}), 0.4788127996331724);
+}
+
+TEST(SCRCAPITest, TestTableReadColumn)
+{
+    APILogger->set_level(spdlog::level::debug);
+    const std::filesystem::path test_file = std::filesystem::path(TESTDIR) / std::filesystem::path("test_table.hdf5");
+    const std::filesystem::path key = "/conversiontable/scotland/URcode";
+
+    read_table_column<double>(test_file, key);
+
 }

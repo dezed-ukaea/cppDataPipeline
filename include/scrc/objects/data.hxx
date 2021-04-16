@@ -3,12 +3,35 @@
 
 #include <string>
 #include <vector>
+#include <stdexcept>
+
+#include <DataFrame/DataFrame.h>
+
+using DataFrame = hmdf::StdDataFrame<unsigned int>;
 
 namespace SCRC
 {
-    struct DataTable
-    {
+    template<typename T>
+    struct DataTableColumn
+    {   
+        const std::string name;
+        const std::string unit;
+        const std::vector<std::string> row_names;
+        const std::vector<T> values;
 
+        T operator[] (const char* key)
+        {
+            const auto iterator_ = std::find(row_names.begin(), row_names.end(), std::string(key));
+            if(iterator_ == row_names.end())
+            {
+                throw std::invalid_argument("No row name '"+std::string(key)+"' in column '"+name+"'");
+            }
+
+            const int distance_ = std::distance(row_names.begin(), iterator_);
+
+            return values[distance_];
+
+        }
     };
 
     template<typename T>
@@ -44,6 +67,8 @@ namespace SCRC
 
             return array[flat_index_];
         }
+
+        int rank() const { return dimensions.size(); }
     };
 };
 

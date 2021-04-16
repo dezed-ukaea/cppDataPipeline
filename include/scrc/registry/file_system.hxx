@@ -9,6 +9,7 @@
 #include <cstdlib>
 #include "toml.hpp"
 #include "H5Cpp.h"
+#include <DataFrame/DataFrame.h>
 
 #include <iostream>
 
@@ -19,6 +20,8 @@
 #include "scrc/objects/data.hxx"
 
 using namespace H5;
+using DataFrame = hmdf::StdDataFrame<unsigned int>;
+
 
 namespace SCRC
 {
@@ -61,8 +64,8 @@ namespace SCRC
         const std::string array_key_ = key.string() + "/array";
         APILogger->debug("FileSystem:ReadArray: Reading key '{0}'", array_key_);
 
-        const DataSet data_set_ = file_.openDataSet(array_key_.c_str());
-        const DataSpace data_space_ = data_set_.getSpace();
+        DataSet data_set_ = file_.openDataSet(array_key_.c_str());
+        DataSpace data_space_ = data_set_.getSpace();
 
         const int arr_dims_ = data_space_.getSimpleExtentNdims();
 
@@ -80,6 +83,9 @@ namespace SCRC
 
         data_set_.read(data_out_.data(), dtype_, data_space_, data_space_);
 
+        data_space_.close();
+        data_set_.close();
+
         // -------------------------------------- TITLE RETRIEVAL -------------------------------------------- //
 
         const int n_titles_ = arr_dims_;
@@ -89,8 +95,8 @@ namespace SCRC
         for(int i{0}; i < n_titles_; ++i)
         {
             const std::string title_key_ = key.string() + "/Dimension_" + std::to_string(i+1) + "_title";
-            const DataSet title_set_ = file_.openDataSet(title_key_.c_str());
-            const DataSpace title_space_ = title_set_.getSpace();
+            DataSet title_set_ = file_.openDataSet(title_key_.c_str());
+            DataSpace title_space_ = title_set_.getSpace();
             const DataType dtype_ = title_set_.getDataType();
 
             if(dtype_.getClass() != H5T_STRING)
@@ -103,6 +109,9 @@ namespace SCRC
             title_set_.read(title_, dtype_);
 
             titles_[i] = title_;
+
+            title_set_.close();
+            title_space_.close();
         }
 
         // -------------------------------------- NAMES RETRIEVAL -------------------------------------------- //
@@ -114,8 +123,8 @@ namespace SCRC
         for(int i{0}; i < n_name_sets_; ++i)
         {
             const std::string names_key_ = key.string() + "/Dimension_" + std::to_string(i+1) + "_names";
-            const DataSet names_set_ = file_.openDataSet(names_key_.c_str());
-            const DataSpace names_space_ = names_set_.getSpace();
+            DataSet names_set_ = file_.openDataSet(names_key_.c_str());
+            DataSpace names_space_ = names_set_.getSpace();
             const DataType dtype_ = names_set_.getDataType();
 
             std::vector<const char*> names_i_(dim_[i], "");
@@ -126,6 +135,9 @@ namespace SCRC
             for(auto& c : names_i_) names_i_str_.push_back(std::string(c)); 
 
             names_.push_back(names_i_str_);
+
+            names_set_.close();
+            names_space_.close();
         }
 
         std::vector<int> dimensions_;
@@ -135,6 +147,58 @@ namespace SCRC
         APILogger->debug("FileSystem:ReadArray: Read Successful.");
 
         return ArrayObject<T>{titles_, names_, dimensions_, data_out_};
+    }
+
+    template<typename T>
+    DataTableColumn<T> read_table_column(const std::filesystem::path var_address, const std::filesystem::path key)
+    {
+        APILogger->debug("FileSystem:ReadArray: Opening file '{0}'", var_address.string());
+        if(!std::filesystem::exists(var_address))
+        {
+            throw std::runtime_error("Could not open HDF5 file '"+var_address.string()+"', file does not exist.");
+        }
+
+        const H5File* file_ = new H5File(var_address.c_str(), H5F_ACC_RDONLY);
+
+        const std::string array_key_ = key.parent_path().string() + "/table";
+        const std::string column_ = key.stem();
+        APILogger->debug("FileSystem:ReadArray: Reading key '{0}'", array_key_);
+
+        DataSet* data_set_ = new DataSet(file_->openDataSet(array_key_.c_str()));
+        DataSpace* data_space_ = new DataSpace(data_set_->getSpace());
+
+        const int arr_dims_ = data_space_->getSimpleExtentNdims();
+        const CompType ctype_ = data_set_->getCompType();
+        const int n_cols_ = ctype_.getNmembers();
+
+        hsize_t dim_[arr_dims_];
+
+        data_space_->getSimpleExtentDims(dim_, NULL);
+        
+        std::cout << dim_[0] << " x " << n_cols_ << std::endl;
+
+        CompType ttype_(sizeof(T));
+
+        APILogger->debug("Got Size");
+
+        ttype_.insertMember(column_, 0, *HDF5::get_hdf5_type<T>());
+        APILogger->debug("Inserted");
+
+        T container_[dim_[0]];
+
+        data_set_->read(container_, ttype_);
+
+        for(auto& i : container_)
+        {
+            std::cout << i << std::endl;
+        }
+
+        data_space_->close();
+        data_set_->close();
+
+        delete data_space_;
+        delete data_set_;
+        delete file_;
     }
 };
 
