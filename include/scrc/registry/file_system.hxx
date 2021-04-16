@@ -156,7 +156,14 @@ namespace SCRC
 
         const int col_index_ = HDF5::get_comptype(var_address, array_key_)->getMemberIndex(column);
 
-        const std::string unit_ = HDF5::read_hdf5_as_str_vector(var_address, units_key_)[col_index_];
+        const std::vector<std::string> all_units_ = HDF5::read_hdf5_as_str_vector(var_address, units_key_);
+
+        if(col_index_ >= all_units_.size())
+        {
+            throw std::runtime_error("Failed to retrieve units for column '"+column+"', retrieved index location outside memory allocation");
+        }
+
+        const std::string unit_ = all_units_[col_index_];
 
         // ------------------------------ ROW NAMES RETRIEVAL --------------------------- //
 

@@ -22,7 +22,7 @@ const std::vector<std::string> SCRC::HDF5::read_hdf5_as_str_vector(const std::fi
 
     data_space_->getSimpleExtentDims(dim_, NULL);
 
-    std::vector<const char*> data_(dim_[0], "");
+    std::vector<const char*> data_(dim_[0]);
     std::vector<std::string> data_str_;
 
     data_set_->read(data_.data(), dtype_, *data_space_, *data_space_);

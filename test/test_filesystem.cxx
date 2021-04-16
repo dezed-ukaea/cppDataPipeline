@@ -24,7 +24,7 @@ TEST(SCRCAPITest, TestTOMLDisRead)
 TEST(SCRCAPITest, TestArrayRead)
 {
     APILogger->set_level(spdlog::level::debug);
-    const std::filesystem::path test_file = std::filesystem::path(TESTDIR) / std::filesystem::path("test_array.hdf5");
+    const std::filesystem::path test_file = std::filesystem::path(TESTDIR) / std::filesystem::path("test_array.h5");
     const std::filesystem::path key = "/contact_matrices/home";
 
     ArrayObject<double>* array_ = read_array<double>(test_file, key);
@@ -37,7 +37,7 @@ TEST(SCRCAPITest, TestArrayRead)
 TEST(SCRCAPITest, TestTableReadColumn)
 {
     APILogger->set_level(spdlog::level::debug);
-    const std::filesystem::path test_file = std::filesystem::path(TESTDIR) / std::filesystem::path("test_table.hdf5");
+    const std::filesystem::path test_file = std::filesystem::path(TESTDIR) / std::filesystem::path("test_table.h5");
     const std::filesystem::path key = "/conversiontable/scotland";
     const std::string column = "URcode";
 
