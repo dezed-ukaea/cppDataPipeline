@@ -55,7 +55,7 @@ namespace SCRC
     Distribution* read_distribution(const std::filesystem::path var_address);
 
     template<typename T>
-    ArrayObject<T> read_array(const std::filesystem::path var_address, const std::filesystem::path key)
+    ArrayObject<T>* read_array(const std::filesystem::path var_address, const std::filesystem::path key)
     {
         APILogger->debug("FileSystem:ReadArray: Opening file '{0}'", var_address.string());
         if(!std::filesystem::exists(var_address))
@@ -100,31 +100,12 @@ namespace SCRC
 
         const int n_titles_ = arr_dims_;
 
-        std::vector<std::string> titles_(n_titles_, "");
+        std::vector<std::string> titles_;
 
         for(int i{0}; i < n_titles_; ++i)
         {
             const std::string title_key_ = key.string() + "/" + std::string(DIMENSION_PREFIX) + std::to_string(i+1) + std::string(DIM_TITLE_SUFFIX);
-            DataSet* title_set_ = new DataSet(file_->openDataSet(title_key_.c_str()));
-            DataSpace* title_space_ = new DataSpace(title_set_->getSpace());
-            const DataType dtype_ = title_set_->getDataType();
-
-            if(dtype_.getClass() != H5T_STRING)
-            {
-                throw std::runtime_error("Type for dimension "+std::to_string(i+1)+" title is not string");
-            }
-
-            std::string title_;
-
-            title_set_->read(title_, dtype_);
-
-            titles_[i] = title_;
-
-            title_set_->close();
-            title_space_->close();
-
-            delete title_set_;
-            delete title_space_;
+            titles_.push_back(HDF5::read_hdf5_object<std::string>(var_address, title_key_));
         }
 
         // -------------------------------------- NAMES RETRIEVAL -------------------------------------------- //
@@ -136,24 +117,9 @@ namespace SCRC
         for(int i{0}; i < n_name_sets_; ++i)
         {
             const std::string names_key_ = key.string() + "/" + std::string(DIMENSION_PREFIX) + std::to_string(i+1) + std::string(DIM_NAME_SUFFIX);
-            DataSet* names_set_ = new DataSet(file_->openDataSet(names_key_.c_str()));
-            DataSpace* names_space_ = new DataSpace(names_set_->getSpace());
-            const DataType dtype_ = names_set_->getDataType();
-
-            std::vector<const char*> names_i_(dim_[i], "");
-            std::vector<std::string> names_i_str_;
-
-            names_set_->read(names_i_.data(), dtype_, *names_space_, *names_space_);
-
-            for(auto& c : names_i_) names_i_str_.push_back(std::string(c)); 
+            const std::vector<std::string> names_i_str_ = HDF5::read_hdf5_as_str_vector(var_address, names_key_);
 
             names_.push_back(names_i_str_);
-
-            names_space_->close();
-            names_set_->close();
-
-            delete names_space_;
-            delete names_set_;
         }
 
         delete file_;
@@ -164,11 +130,11 @@ namespace SCRC
 
         APILogger->debug("FileSystem:ReadArray: Read Successful.");
 
-        return ArrayObject<T>{titles_, names_, dimensions_, data_out_};
+        return new ArrayObject<T>{titles_, names_, dimensions_, data_out_};
     }
 
     template<typename T>
-    DataTableColumn<T> read_table_column(const std::filesystem::path var_address, const std::filesystem::path key, const std::string column)
+    DataTableColumn<T>* read_table_column(const std::filesystem::path var_address, const std::filesystem::path key, const std::string column)
     {
         APILogger->debug("FileSystem:ReadArray: Opening file '{0}'", var_address.string());
         if(!std::filesystem::exists(var_address))
@@ -178,83 +144,29 @@ namespace SCRC
 
         const H5File* file_ = new H5File(var_address.c_str(), H5F_ACC_RDONLY);
 
-        const std::string array_key_ = key.string() + "/" + std::string(TABLE);
-
         // ------------------------------ COLUMN RETRIEVAL ------------------------------ //
 
-        APILogger->debug("FileSystem:ReadTableColumn: Reading key '{0}'", array_key_);
-
-        DataSet* data_set_ = new DataSet(file_->openDataSet(array_key_.c_str()));
-        DataSpace* data_space_ = new DataSpace(data_set_->getSpace());
-
-        const int arr_dims_ = data_space_->getSimpleExtentNdims();
-        const CompType ctype_ = data_set_->getCompType();
-        const int col_index_ = ctype_.getMemberIndex(column);
-        const int n_cols_ = ctype_.getNmembers();
-
-        hsize_t dim_[arr_dims_];
-
-        data_space_->getSimpleExtentDims(dim_, NULL);
+        const std::string array_key_ = key.string() + "/" + std::string(TABLE);
         
-        CompType ttype_(sizeof(T));
-
-        const DataType dtype_ = *HDF5::get_hdf5_type<T>();
-
-        ttype_.insertMember(column, 0, dtype_);
-        APILogger->debug("FileSystem:ReadTableColumn: Extracting column '" + column + "' from Compound Type");
-
-        std::vector<T> container_(dim_[0]);
-
-        data_set_->read(container_.data(), ttype_);
-
-        data_space_->close();
-        data_set_->close();
+        const std::vector<T> container_ = HDF5::read_hdf5_comp_type_member<T>(var_address, array_key_, column);
 
         // ------------------------------ UNITS RETRIEVAL ------------------------------- //
 
         const std::string units_key_ = key.string() + "/" + std::string(COLUMN_UNITS);
-        APILogger->debug("FileSystem:ReadTableColumn: Reading key '{0}'", units_key_);
-        DataSet* units_set_ = new DataSet(file_->openDataSet(units_key_.c_str()));
-        DataSpace* units_space_ = new DataSpace(units_set_->getSpace());
-        const DataType utype_ = units_set_->getDataType();
 
-        if(utype_.getClass() != H5T_STRING)
-        {
-            throw std::runtime_error("Type for column units is not string");
-        }
+        const int col_index_ = HDF5::get_comptype(var_address, array_key_)->getMemberIndex(column);
 
-        std::vector<std::string> units_(n_cols_); // Number of dimensions matches number of columns
-
-        units_set_->read(units_.data(), utype_, *units_space_, *units_space_);
-
-        const std::string col_unit_ = units_[col_index_];
-
-        units_space_->close();
-        units_set_->close();
+        const std::string unit_ = HDF5::read_hdf5_as_str_vector(var_address, units_key_)[col_index_];
 
         // ------------------------------ ROW NAMES RETRIEVAL --------------------------- //
 
         const std::string row_names_key_ = key.string() + "/" + std::string(ROW_NAMES);
-        APILogger->debug("FileSystem:ReadTableColumn: Reading key '{0}'", row_names_key_);
-        DataSet* row_names_set_ = new DataSet(file_->openDataSet(row_names_key_.c_str()));
-        DataSpace* row_names_space_ = new DataSpace(row_names_set_->getSpace());
-        const DataType rtype_ = row_names_set_->getDataType();
-
-        if(rtype_.getClass() != H5T_STRING)
-        {
-            throw std::runtime_error("Type for column units is not string");
-        }
-
-        std::vector<std::string> row_names_(dim_[0]);
-
-        row_names_set_->read(row_names_.data(), rtype_, *row_names_space_, *row_names_space_);
-
-        row_names_space_->close();
-        row_names_set_->close();
+        
+        const std::vector<std::string> row_names_ = HDF5::read_hdf5_as_str_vector(var_address, row_names_key_);
 
         APILogger->debug("FileSystem:ReadTableColumn: Read Successful.");
 
-        return DataTableColumn<T>{column, col_unit_, &row_names_, &container_};
+        return new DataTableColumn<T>(column, unit_, row_names_, container_);
     }
 };
 

@@ -20,7 +20,8 @@ jobs:
         run: |
           wget https://data.scrc.uk/data_product/SCRC:geography/scotland/lookup_table@1.0.1 -O test/test_table.h5
           wget https://data.scrc.uk/data_product/LSHTM:distributions/R0@0.1.0 -O test/test_dis.toml
-          wget https://data.scrc.uk/data_product/EERA:fixed-parameters/T_rec@0.1.0 -o test/test_pe.toml
+          wget https://data.scrc.uk/data_product/EERA:fixed-parameters/T_rec@0.1.0 -O test/test_pe.toml
+          wget https://data.scrc.uk/data_product/LSHTM:contact_matrices/national@0.20200811.0 -O test_array.h5
           cmake --build build --target test
           if [ $? -eq 0 ]; then
             echo "Unit tests completed successfully"

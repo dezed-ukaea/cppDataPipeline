@@ -27,9 +27,11 @@ TEST(SCRCAPITest, TestArrayRead)
     const std::filesystem::path test_file = std::filesystem::path(TESTDIR) / std::filesystem::path("test_array.hdf5");
     const std::filesystem::path key = "/contact_matrices/home";
 
-    ArrayObject<double> array_ = read_array<double>(test_file, key);
+    ArrayObject<double>* array_ = read_array<double>(test_file, key);
 
-    ASSERT_EQ(array_.get({0, 0}), 0.4788127996331724);
+    ASSERT_EQ(array_->get_title(0), "rowvalue");
+    ASSERT_EQ(array_->get_dimension_names(0)[2], "10-14");
+    ASSERT_EQ(array_->get({0, 0}), 0.4788127996331724);
 }
 
 TEST(SCRCAPITest, TestTableReadColumn)
@@ -39,10 +41,10 @@ TEST(SCRCAPITest, TestTableReadColumn)
     const std::filesystem::path key = "/conversiontable/scotland";
     const std::string column = "URcode";
 
-    DataTableColumn<double> column_ = read_table_column<double>(test_file, key, column);
+    DataTableColumn<double>* column_ = read_table_column<double>(test_file, key, column);
 
-    std::cout << "YAY" << std::endl;
+    std::cout << column_->values()[0] << std::endl;
 
-    ASSERT_EQ(column_["2"], 5.0);
+    ASSERT_EQ(column_->operator[]("2"), 5.0);
 
 }
