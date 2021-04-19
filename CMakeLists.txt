@@ -29,9 +29,12 @@ IF( SCRCAPI_BUILD_TESTS )
 ENDIF()
 
 IF( SCRCAPI_CODE_COVERAGE AND SCRCAPI_BUILD_TESTS )
-    MESSAGE(STATUS "Including Code Coverage")
-    SET( COVERAGE_COMPILER_FLAGS "-g -fprofile-arcs -ftest-coverage" )
+    MESSAGE( STATUS "[Coverage]")
+    SET( COVERAGE_COMPILER_FLAGS "--coverage -fprofile-arcs -ftest-coverage" )
 	SET( CMAKE_CXX_FLAGS "-std=gnu++17 -O0 -Wall -Wextra ${COVERAGE_COMPILER_FLAGS} ${CMAKE_CXX_FLAGS}" )
+    SET( CMAKE_C_FLAGS "-O0 -Wall -Wextra ${COVERAGE_COMPILER_FLAGS} ${CMAKE_C_FLAGS}" )
+    MESSAGE( "\t CMAKE_CXX_FLAGS: ${CMAKE_CXX_FLAGS}" )
+    MESSAGE( "\t CMAKE_C_FLAGS: ${CMAKE_C_FLAGS}" )
     
 
 	find_program( LCOV_PATH  NAMES lcov lcov.bat lcov.exe lcov.perl)
