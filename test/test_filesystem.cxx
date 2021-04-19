@@ -9,14 +9,14 @@ TEST(SCRCAPITest, TestTOMLPERead)
 {
     APILogger->set_level(spdlog::level::debug);
     const std::filesystem::path test_file = std::filesystem::path(TESTDIR) / std::filesystem::path("test_pe.toml");
-    ASSERT_EQ(read_point_estimate(test_file), 11);
+    ASSERT_EQ(read_point_estimate_from_toml(test_file), 11);
 }
 
 TEST(SCRCAPITest, TestTOMLDisRead)
 {
     APILogger->set_level(spdlog::level::debug);
     const std::filesystem::path test_file = std::filesystem::path(TESTDIR) / std::filesystem::path("test_dis.toml");
-    Normal dis(*read_distribution(test_file));
+    Normal dis(*read_distribution_from_toml(test_file));
     ASSERT_EQ(dis.mean(), 2.675739);
     ASSERT_EQ(dis.standard_deviation(), 0.5719293);
 }
@@ -42,8 +42,6 @@ TEST(SCRCAPITest, TestTableReadColumn)
     const std::string column = "URcode";
 
     DataTableColumn<double>* column_ = read_table_column<double>(test_file, key, column);
-
-    std::cout << column_->values()[0] << std::endl;
 
     ASSERT_EQ(column_->operator[]("2"), 5.0);
 

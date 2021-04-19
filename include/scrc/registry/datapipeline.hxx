@@ -4,37 +4,19 @@
 #include <string>
 #include <algorithm>
 #include <iostream>
+#include <fstream>
+
 #include "json/json.h"
 #include "spdlog/spdlog.h"
+
 #include "scrc/registry/api.hxx"
 #include "scrc/registry/file_system.hxx"
 #include "scrc/registry/data_object.hxx"
-#include "scrc/registry/file.hxx"
+#include "scrc/objects/metadata.hxx"
 #include "scrc/utilities/logging.hxx"
 
 namespace SCRC
 {
-    class DataPipelineImpl_;
-
-    class DataPipeline
-    {
-        public:
-            explicit DataPipeline();
-            ~DataPipeline();
-
-            DataPipeline(DataPipeline&& rhs) noexcept;
-            DataPipeline& operator=(DataPipeline&& rhs) noexcept;
-            
-            DataPipeline(const DataPipeline& rhs);
-            DataPipeline& operator=(const DataPipeline& rhs);
-
-            double read_estimate(std::string data_product, const std::string &component);
-            void add_to_register(std::string label);
-
-        private:
-            std::unique_ptr<DataPipelineImpl_> pimpl_;
-    };
-
     class DataPipelineImpl_
     {
         public:
@@ -62,6 +44,39 @@ namespace SCRC
             int get_id_from_namespace(std::string name_space);
             int get_id_from_path(std::filesystem::path path);
 
+            void push_new_coderun();
+            void add_to_register(const std::string& handle, const std::string& alias);
+            void register_external_object(const YAML::Node& register_entry);
+            std::string new_source(const YAML::Node& data);
+            std::string new_storage_root(const YAML::Node& data);
+            std::string new_storage_location(const YAML::Node& data);
+            std::string new_external_object(const YAML::Node& data);
+    };
+
+    class DataPipeline
+    {
+        public:
+            // 'initialise' method for the API
+            explicit DataPipeline(std::filesystem::path config_file_path, std::filesystem::path apiroot=LOCAL_API_ROOT, spdlog::level::level_enum log_level=spdlog::level::info) : 
+                pimpl_(new DataPipelineImpl_(config_file_path, apiroot, log_level)),
+                session_id_(generate_run_id(config_file_path)) 
+            {
+                APILogger->debug("DataPipeline: Initialising session '{0}'", session_id_);
+            }
+
+            // 'finalise' method for the API
+            ~DataPipeline();
+
+            void add_to_register(std::string& item);
+
+            DataPipeline(DataPipeline&& rhs) noexcept;
+            DataPipeline& operator=(DataPipeline&& rhs) noexcept;
+            
+            DataPipeline(const DataPipeline& rhs);
+            DataPipeline& operator=(const DataPipeline& rhs);
+        private:
+            std::unique_ptr<DataPipelineImpl_> pimpl_;
+            const std::string session_id_;
     };
 
     class DataProductQuery : public Query

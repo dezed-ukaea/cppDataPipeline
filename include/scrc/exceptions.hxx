@@ -9,7 +9,7 @@ namespace SCRC
     class config_parsing_error: public std::runtime_error
     {
         public:
-            config_parsing_error(char const* const message) :
+            config_parsing_error(const std::string message) :
                 std::runtime_error(message) {}
     };
 

@@ -4,7 +4,7 @@
 #include <vector>
 #include "scrc/registry/datapipeline.hxx"
 #include "scrc/registry/file_system.hxx"
-#include "scrc/registry/file.hxx"
+#include "scrc/objects/metadata.hxx"
 
 using namespace SCRC;
 
@@ -19,6 +19,18 @@ DataPipelineImpl_* init_pipeline()
     const std::filesystem::path config_path_ = std::filesystem::path(TESTDIR) / "config.yaml";
     APILogger->set_level(spdlog::level::debug);
     return new DataPipelineImpl_(config_path_, REMOTE_API_ROOT, spdlog::level::debug);
+}
+
+TEST(SCRCAPITest, TestDataPipelineInit)
+{
+    if(std::filesystem::exists(std::filesystem::path(TESTDIR) / std::filesystem::path("datastore")))
+    {
+        std::filesystem::remove_all(std::filesystem::path(TESTDIR) / std::filesystem::path("datastore"));
+    }
+
+    const std::filesystem::path config_path_ = std::filesystem::path(TESTDIR) / "config.yaml";
+    APILogger->set_level(spdlog::level::debug);
+    DataPipeline(config_path_, REMOTE_API_ROOT, spdlog::level::debug);
 }
 
 TEST(SCRCAPITest, TestLogLevelSet)
@@ -83,7 +95,7 @@ TEST(SCRCAPITest, TestGetConfigDataHDF5)
 
 TEST(SCRCAPITest, TestHashFile)
 {
-    const std::string file_hash_ = calculate_hash(std::filesystem::path(TESTDIR) / "config.yaml");
+    const std::string file_hash_ = calculate_hash_from_file(std::filesystem::path(TESTDIR) / "config.yaml");
     std::cout << "HASH: " << file_hash_ << std::endl;
 }
 

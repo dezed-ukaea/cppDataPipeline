@@ -12,6 +12,7 @@
 #include <vector>
 
 #include "scrc/utilities/logging.hxx"
+#include "scrc/utilities/json.hxx"
 #include "scrc/exceptions.hxx"
 
 namespace SCRC
@@ -44,14 +45,15 @@ namespace SCRC
     {
         public:
             API(std::string url_root=LOCAL_API_ROOT) : url_root_(url_root) {}
-            Json::Value request(std::filesystem::path addr_path, long expected_response = 200);
+            Json::Value request(const std::filesystem::path& addr_path, long expected_response = 200);
             Json::Value query(Query query, long expected_response = 200);
+            std::filesystem::path post(const std::filesystem::path& addr_path, Json::Value& post_data, long expected_response = 201);
             std::string get_url_root() const {return url_root_;}
-            void download_file(std::filesystem::path url, std::filesystem::path out_path);
+            void download_file(const std::filesystem::path& url, std::filesystem::path out_path);
         private:
             std::string url_root_;
-            CURL* setup_json_session_(std::filesystem::path addr_path, std::string* response);
-            CURL* setup_download_session_(std::filesystem::path addr_path, FILE* file);
+            CURL* setup_json_session_(const std::filesystem::path& addr_path, std::string* response);
+            CURL* setup_download_session_(const std::filesystem::path& addr_path, FILE* file);
     };
 
     std::string url_encode(std::string url);

@@ -101,7 +101,7 @@ namespace SCRC
         return data_products_;
     }
 
-    double read_point_estimate(const std::filesystem::path var_address)
+    double read_point_estimate_from_toml(const std::filesystem::path var_address)
     {
         if(!std::filesystem::exists(var_address))
         {
@@ -148,7 +148,7 @@ namespace SCRC
         throw std::runtime_error("Distribution currently unsupported");
     }
 
-    Distribution* read_distribution(const std::filesystem::path var_address)
+    Distribution* read_distribution_from_toml(const std::filesystem::path var_address)
     {
         if(!std::filesystem::exists(var_address))
         {

@@ -1,7 +1,10 @@
 #include "gtest/gtest.h"
 #include "scrc/utilities/doi.hxx"
+#include "scrc/utilities/json.hxx"
 #include "scrc/utilities/semver.hxx"
 #include "scrc/exceptions.hxx"
+
+#include "json/reader.h"
 
 using namespace SCRC;
 
@@ -32,4 +35,13 @@ TEST(SCRCAPITest, TestSemVerComparisons)
 
     ASSERT_EQ(v2, v3);
     ASSERT_EQ(version("5.2.1"), v4);
+}
+
+TEST(SCRCAPITest, TestJSONString)
+{
+    Json::Value value_;
+    value_["int"] = 5;
+    value_["string"] = "hello";
+    const std::string expected_ = "{\n\t\"int\" : 5,\n\t\"string\" : \"hello\"\n}";
+    ASSERT_EQ(json_to_string(value_), expected_);
 }

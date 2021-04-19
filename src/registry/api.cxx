@@ -84,7 +84,7 @@ namespace SCRC
         return curl_easy_escape(curl_, url.c_str(), 0);
     }
 
-    CURL* API::setup_json_session_(std::filesystem::path addr_path, std::string* response)
+    CURL* API::setup_json_session_(const std::filesystem::path& addr_path, std::string* response)
     {
         CURL* curl_ = curl_easy_init();
         APILogger->debug("API:JSONSession: Attempting to access: "+addr_path.string());
@@ -99,7 +99,7 @@ namespace SCRC
         return curl_;
     }
 
-    void API::download_file(std::filesystem::path url, std::filesystem::path out_path)
+    void API::download_file(const std::filesystem::path& url, std::filesystem::path out_path)
     {
         CURL* curl_ = curl_easy_init();
         FILE* file_ = fopen(out_path.c_str(), "wb");
@@ -111,7 +111,7 @@ namespace SCRC
         fclose(file_);      
     }
 
-    CURL* API::setup_download_session_(std::filesystem::path addr_path, FILE* file)
+    CURL* API::setup_download_session_(const std::filesystem::path& addr_path, FILE* file)
     {
         CURL* curl_ = curl_easy_init();
         APILogger->debug("API:DownloadSession: Attempting to access: "+addr_path.string());
@@ -125,7 +125,7 @@ namespace SCRC
         return curl_;
     }
 
-    Json::Value API::request(std::filesystem::path addr_path, long expected_response)
+    Json::Value API::request(const std::filesystem::path& addr_path, long expected_response)
     {
         Json::Value root_;
         Json::CharReaderBuilder json_charbuilder_;
@@ -164,5 +164,47 @@ namespace SCRC
     Json::Value API::query(Query query, long expected_response)
     {
         return request(query.build_query(), expected_response);
+    }
+
+    std::filesystem::path API::post(const std::filesystem::path& addr_path, Json::Value& post_data, long expected_response)
+    {
+        const std::string url_path_ = (url_root_ / addr_path).string() + "/";
+        const std::string data_ = json_to_string(post_data);
+        long return_code_;
+        std::string response_;
+        CURL* curl_ = curl_easy_init();
+        curl_easy_setopt(curl_, CURLOPT_URL, url_path_);
+        curl_easy_getinfo(curl_, CURLINFO_RESPONSE_CODE, &return_code_);
+        curl_easy_setopt(curl_, CURLOPT_POSTFIELDS, data_);
+        curl_easy_setopt(curl_, CURLOPT_WRITEFUNCTION, write_str_);
+        curl_easy_setopt(curl_, CURLOPT_WRITEDATA, &response_);
+
+        curl_easy_perform(curl_);
+
+        if(return_code_ == 404)
+        {
+            throw rest_apiquery_error("'"+addr_path.string()+"' does not exist");
+        }
+
+        Json::Value root_;
+        Json::CharReaderBuilder json_charbuilder_;
+
+        const auto response_str_len_ = static_cast<int>(response_.length());
+        const std::unique_ptr<Json::CharReader> json_reader_(json_charbuilder_.newCharReader());
+        JSONCPP_STRING err;
+
+        if (!json_reader_->parse(
+                response_.c_str(),
+                response_.c_str() + response_str_len_, &root_,
+                &err)) {
+            throw rest_apiquery_error("Failed to retrieve information from JSON response string");
+        }
+
+        const Json::Value results_ = root_["results"];
+
+        curl_easy_cleanup(curl_);
+        curl_global_cleanup();
+
+        return std::filesystem::path(results_["url"].as<std::string>());
     }
 };

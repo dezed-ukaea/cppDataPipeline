@@ -45,14 +45,15 @@ namespace SCRC
             std::vector<ReadObject::DataProduct*> read_data_products() const;
             std::string get_default_input_namespace() const;
             std::string get_default_output_namespace() const;
+            YAML::Node get_config_data() const { return config_data_; }
 
     };
 
     std::string get_first_key_(const toml::value data_table);
     Distribution* construct_dis_(const toml::value data_table);
 
-    double read_point_estimate(const std::filesystem::path var_address);
-    Distribution* read_distribution(const std::filesystem::path var_address);
+    double read_point_estimate_from_toml(const std::filesystem::path var_address);
+    Distribution* read_distribution_from_toml(const std::filesystem::path var_address);
 
     template<typename T>
     ArrayObject<T>* read_array(const std::filesystem::path var_address, const std::filesystem::path key)
