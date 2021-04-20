@@ -137,7 +137,12 @@ Json::Value API::request(const std::filesystem::path &addr_path,
   const auto response_str_len_ = static_cast<int>(response_str_.length());
   JSONCPP_STRING err;
 
-  if (http_code != expected_response) {
+  if(http_code == 0) {
+      APILogger->error("API:Request: Request to '{0}' returned no response", search_str_.string());
+      throw rest_apiquery_error("No response was given");
+    }
+  
+  else if (http_code != expected_response) {
     throw rest_apiquery_error("Request '" + search_str_.string() +
                               "' returned exit code " +
                               std::to_string(http_code) + " but expected " +
@@ -147,6 +152,7 @@ Json::Value API::request(const std::filesystem::path &addr_path,
   if (!json_reader_->parse(response_str_.c_str(),
                            response_str_.c_str() + response_str_len_, &root_,
                            &err)) {
+    APILogger->error("API:Query: Response string '{0}' is not JSON parsable. Return Code was {1}", response_str_, http_code);
     throw rest_apiquery_error(
         "Failed to retrieve information from JSON response string");
   }
@@ -158,15 +164,22 @@ Json::Value API::query(Query query, long expected_response) {
   return request(query.build_query(), expected_response);
 }
 
-std::filesystem::path API::post(const std::filesystem::path &addr_path,
+Json::Value API::post(const std::filesystem::path &addr_path,
                                 Json::Value &post_data,
+                                const std::string& key,
                                 long expected_response) {
   const std::string url_path_ = (url_root_ / addr_path).string() + "/";
   const std::string data_ = json_to_string(post_data);
   long return_code_;
   std::string response_;
   CURL *curl_ = curl_easy_init();
+
+  struct curl_slist* headers = NULL;
+  curl_slist_append(headers, "Content-Type: application/json");
+  curl_slist_append(headers, (std::string("Authorization: ")+key).c_str());
+
   curl_easy_setopt(curl_, CURLOPT_URL, url_path_);
+  curl_easy_setopt(curl_, CURLOPT_HTTPHEADER, headers);
   curl_easy_getinfo(curl_, CURLINFO_RESPONSE_CODE, &return_code_);
   curl_easy_setopt(curl_, CURLOPT_POSTFIELDS, data_);
   curl_easy_setopt(curl_, CURLOPT_WRITEFUNCTION, write_str_);
@@ -174,7 +187,12 @@ std::filesystem::path API::post(const std::filesystem::path &addr_path,
 
   curl_easy_perform(curl_);
 
-  if (return_code_ == 404) {
+  if(return_code_ == 0) {
+    APILogger->error("API:Post: Post to '{0}' returned no response", url_path_);
+    throw rest_apiquery_error("No response was given");
+  }
+
+  else if (return_code_ == 404) {
     throw rest_apiquery_error("'" + addr_path.string() + "' does not exist");
   }
 
@@ -189,15 +207,16 @@ std::filesystem::path API::post(const std::filesystem::path &addr_path,
   if (!json_reader_->parse(response_.c_str(),
                            response_.c_str() + response_str_len_, &root_,
                            &err)) {
+    APILogger->error("API:Post: Response string '{0}' is not JSON parsable. Return Code was {1}", response_, return_code_);
     throw rest_apiquery_error(
         "Failed to retrieve information from JSON response string");
   }
 
-  const Json::Value results_ = root_["results"];
+  Json::Value results_ = (root_["results"]) ? root_["results"] : root_;
 
   curl_easy_cleanup(curl_);
   curl_global_cleanup();
 
-  return std::filesystem::path(results_["url"].as<std::string>());
+  return results_;
 }
 }; // namespace SCRC

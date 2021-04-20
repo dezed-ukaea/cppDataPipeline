@@ -185,11 +185,11 @@ void DataPipelineImpl_::push_new_coderun() {
 
 std::string DataPipelineImpl_::new_source(const YAML::Node &data) {
   Json::Value post_data_;
-  post_data_["name"] = data["name"].as<std::string>();
-  post_data_["abbreviation"] = data["abbreviation"].as<std::string>();
-  post_data_["website"] = data["website"].as<std::string>();
+  post_data_["name"] = data["source_name"].as<std::string>();
+  post_data_["abbreviation"] = data["source_abbreviation"].as<std::string>();
+  post_data_["website"] = data["source_website"].as<std::string>();
 
-  return api->post("source", post_data_);
+  return api->post("source", post_data_, read_key())["url"].asString();
 }
 
 std::string DataPipelineImpl_::new_storage_root(const YAML::Node &data) {
@@ -199,7 +199,7 @@ std::string DataPipelineImpl_::new_storage_root(const YAML::Node &data) {
   post_data_["accessibility"] =
       std::to_string(int(data["accessibility"].as<std::string>() == "closed"));
 
-  return api->post("storage_root", post_data_);
+  return api->post("storage_root", post_data_, read_key())["url"].asString();
 }
 
 std::string DataPipelineImpl_::new_storage_location(const YAML::Node &data) {
@@ -208,7 +208,7 @@ std::string DataPipelineImpl_::new_storage_location(const YAML::Node &data) {
   post_data_["hash"] = data["hash"].as<std::string>();
   post_data_["storage_root_id"] = data["storage_root_id"].as<std::string>();
 
-  return api->post("storage_location", post_data_);
+  return api->post("storage_location", post_data_, read_key())["url"].asString();
 }
 
 std::string DataPipelineImpl_::new_external_object(const YAML::Node &data) {
@@ -223,11 +223,29 @@ std::string DataPipelineImpl_::new_external_object(const YAML::Node &data) {
   post_data_["source"] = data["source"].as<std::string>();
   post_data_["original_store"] = data["original_store"].as<std::string>();
 
-  return api->post("external_object", post_data_);
+  return api->post("external_object", post_data_, read_key())["url"].asString();
+}
+
+std::string DataPipelineImpl_::read_key()
+{
+  const std::filesystem::path key_file_ = scrc_server_dir / std::filesystem::path("TOKEN.txt");
+  if(!std::filesystem::exists(key_file_))
+  {
+    throw std::runtime_error("Failed to find Authorisation token: '"+key_file_.string()+"'");
+  }
+
+  std::ifstream key_(key_file_, std::ios::in);
+  std::string key_str_;
+  key_ >> key_str_;
+  key_.close();
+  return key_str_;
 }
 
 void DataPipelineImpl_::register_external_object(
     const YAML::Node &register_entry) {
+
+  APILogger->debug("Registering external object");
+  
   const std::string file_type_ = register_entry["file_type"].as<std::string>();
   const std::filesystem::path root_ = register_entry["root"].as<std::string>();
   const std::string product_name_ =
@@ -238,9 +256,6 @@ void DataPipelineImpl_::register_external_object(
   const std::string time_stamp_ = current_time_stamp();
   const std::filesystem::path temp_file_ =
       calculate_hash_from_string(time_stamp_) + "." + file_type_;
-  const std::string file_hash_ =
-      calculate_hash_from_file(local_dir_ / temp_file_);
-  const std::filesystem::path new_filename_ = file_hash_ + "." + file_type_;
   const std::string path_ = register_entry["path"].as<std::string>();
 
   if (path_.find("SELECT") != std::string::npos &&
@@ -253,6 +268,13 @@ void DataPipelineImpl_::register_external_object(
         root_ / std::filesystem::path(url_encode(path_));
     api->download_file(encoded_path_, local_dir_ / temp_file_);
   }
+
+  const std::string file_hash_ =
+      calculate_hash_from_file(local_dir_ / temp_file_);
+
+  APILogger->debug("Calculated new Hash: {0}", file_hash_);
+
+  const std::filesystem::path new_filename_ = file_hash_ + "." + file_type_;
 
   const std::string source_id_ = new_source(register_entry);
 
@@ -269,6 +291,8 @@ void DataPipelineImpl_::register_external_object(
                                 "' for key 'accessibility' not recognised");
   }
 
+  APILogger->debug("Storing data");
+
   const std::string source_root_id_ = new_storage_root(register_entry);
 
   const std::string storage_location_id_ = new_storage_location(register_entry);
@@ -280,9 +304,10 @@ void DataPipelineImpl_::register_external_object(
                   external_object_id);
 }
 
-void DataPipelineImpl_::add_to_register(const std::string &handle,
-                                        const std::string &alias) {
+void DataPipelineImpl_::add_to_register(const std::string &alias) {
   const YAML::Node config_data_ = file_system->get_config_data();
+
+  APILogger->info("Registering item '{0}'", alias);
 
   if (!config_data_["register"]) {
     throw config_parsing_error(
@@ -291,23 +316,22 @@ void DataPipelineImpl_::add_to_register(const std::string &handle,
 
   const YAML::Node register_ = config_data_["register"];
 
-  std::string entry_type_;
+  APILogger->debug("Iterating through registration items.");
 
-  for (auto it = register_.begin(); it != register_.end(); ++it) {
-
+  for (YAML::const_iterator it = register_.begin(); it != register_.end(); ++it) {
+    const YAML::Node to_register_(*it);
     for (const std::string &s : {"external_object", "data_product", "object"}) {
-      if (it->second[s] && it->second[s].as<std::string>() == alias) {
-        const YAML::Node to_register_ = it->second;
+      if (to_register_[s] && to_register_[s].as<std::string>() == alias) {
 
-        if (entry_type_ == "external_object") {
+        if (s == "external_object") {
           register_external_object(to_register_);
         }
+
+        APILogger->debug("Found entry '{0}' of type '{1}'", alias, s);
 
         return;
       }
     }
-
-    entry_type_ = "";
   }
 
   throw config_parsing_error(

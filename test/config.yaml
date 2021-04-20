@@ -3,6 +3,7 @@ run_metadata:
   description: "A test model"
   remote_data_registry_url: https://data.scrc.uk/api/ 
   local_data_registry_url: https://localhost:8000/api/
+  local_repo: 
   default_input_namespace: SCRC 
   default_output_namespace: EERA
   default_data_store: "/datastore"

@@ -43,8 +43,9 @@ public:
   Json::Value request(const std::filesystem::path &addr_path,
                       long expected_response = 200);
   Json::Value query(Query query, long expected_response = 200);
-  std::filesystem::path post(const std::filesystem::path &addr_path,
+  Json::Value post(const std::filesystem::path &addr_path,
                              Json::Value &post_data,
+                             const std::string& key,
                              long expected_response = 201);
   std::string get_url_root() const { return url_root_; }
   void download_file(const std::filesystem::path &url,

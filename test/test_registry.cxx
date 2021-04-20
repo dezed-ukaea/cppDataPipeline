@@ -8,7 +8,7 @@
 
 using namespace SCRC;
 
-DataPipelineImpl_ *init_pipeline() {
+DataPipelineImpl_ *init_pipeline(bool use_local=false) {
   if (std::filesystem::exists(std::filesystem::path(TESTDIR) /
                               std::filesystem::path("datastore"))) {
     std::filesystem::remove_all(std::filesystem::path(TESTDIR) /
@@ -18,7 +18,8 @@ DataPipelineImpl_ *init_pipeline() {
   const std::filesystem::path config_path_ =
       std::filesystem::path(TESTDIR) / "config.yaml";
   APILogger->set_level(spdlog::level::debug);
-  return new DataPipelineImpl_(config_path_, REMOTE_API_ROOT,
+
+  return new DataPipelineImpl_(config_path_, (use_local) ? LOCAL_API_ROOT : REMOTE_API_ROOT,
                                spdlog::level::debug);
 }
 
@@ -109,4 +110,9 @@ TEST(SCRCAPITest, TestDownloadHDF5File) {
   const std::vector<ReadObject::DataProduct *> data_products_ =
       data_pipeline_->file_system->read_data_products();
   ASSERT_NO_THROW(data_pipeline_->download_data_product(data_products_[1]));
+}
+
+TEST(SCRCAPITest, TestAddToRegister) {
+  DataPipelineImpl_ *data_pipeline_ = init_pipeline(true);
+  data_pipeline_->add_to_register("raw-mortality-data");
 }

@@ -20,14 +20,31 @@ class DataPipelineImpl_ {
 public:
   const LocalFileSystem *file_system;
   API *api = nullptr;
+  const std::filesystem::path scrc_server_dir;
 
   DataPipelineImpl_(std::filesystem::path config_file_path,
                     std::filesystem::path apiroot = LOCAL_API_ROOT,
                     spdlog::level::level_enum log_level = spdlog::level::info)
       : file_system(new LocalFileSystem(config_file_path)),
-        api(new API(apiroot)) {
+        api(new API(apiroot)),
+        scrc_server_dir((std::getenv("SCRC_HOME")) ? std::getenv("SCRC_HOME") : "") {
     spdlog::set_default_logger(APILogger);
     APILogger->set_level(log_level);
+    if(scrc_server_dir.empty())
+    {
+      APILogger->error(
+        "Failed to find local registry installation, the environment variable SCRC_HOME must point "
+        "to the location of your SCRC server folder"
+      );
+      throw std::runtime_error("Failed to identify server directory.");
+    }
+    APILogger->info(
+      "\n[Configuration]\n\t- Config Path: {0}\n\t- API Root: {1}\n\t- SCRC server: {2}",
+      config_file_path.string(),
+      apiroot.string(),
+      scrc_server_dir.string()
+    );
+
   }
 
   Json::Value fetch_all_objects();
@@ -45,12 +62,13 @@ public:
   int get_id_from_path(std::filesystem::path path);
 
   void push_new_coderun();
-  void add_to_register(const std::string &handle, const std::string &alias);
+  void add_to_register(const std::string &alias);
   void register_external_object(const YAML::Node &register_entry);
   std::string new_source(const YAML::Node &data);
   std::string new_storage_root(const YAML::Node &data);
   std::string new_storage_location(const YAML::Node &data);
   std::string new_external_object(const YAML::Node &data);
+  std::string read_key();
 };
 
 class DataPipeline {
