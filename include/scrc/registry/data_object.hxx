@@ -36,14 +36,21 @@ public:
 
 class ExternalObject {
 private:
-  const DOI doi_;
+  const DOI doi_ = DOI();
+  const std::string name_ = "";
   const std::string title_ = "";
   std::filesystem::path cache_location_ = std::filesystem::path();
 
 public:
-  ExternalObject(std::string title = "", DOI doi = DOI(),
+  ExternalObject(const std::string &title = "", const DOI &doi = DOI(),
+                 const std::string &name = "",
                  std::filesystem::path cache_path = "")
-      : title_(title), doi_(doi), cache_location_(cache_path) {}
+      : title_(title), doi_(doi), name_(name), cache_location_(cache_path) {}
+  std::string get_unique_id() const {
+    if (bool(doi_))
+      return doi_.to_string();
+    return name_;
+  }
 };
 
 DataProduct *data_product_from_yaml(YAML::Node yaml_data);
@@ -52,6 +59,10 @@ ExternalObject *external_object_from_yaml(YAML::Node yaml_data);
 
 namespace RegisterObject {
 enum Accessibility { OPEN, CLOSED };
+
+Accessibility access_from_str(const std::string &access) {
+  return Accessibility(int(access == "closed"));
+}
 
 class ExternalObject {
 private:
@@ -74,6 +85,9 @@ private:
 
 public:
   ExternalObject(YAML::Node yaml_data);
+  std::string get_source_name() const { return source_name_; }
+  std::string get_source_abbreviation() const { return source_abbreviation_; }
+  std::string get_source_website() const { return source_website_; }
 };
 }; // namespace RegisterObject
 

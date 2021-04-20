@@ -29,13 +29,30 @@ DataProduct *data_product_from_yaml(YAML::Node yaml_data) {
 
 ExternalObject *external_object_from_yaml(YAML::Node yaml_data) {
   const YAML::Node use_node_ = yaml_data["use"];
-  const DOI version_ = doi_from_string(use_node_["doi"].as<std::string>());
+  DOI version_ = DOI();
+  std::string unique_name_ = "";
+
+  if (!use_node_["unique_name"] && !use_node_["doi"]) {
+    APILogger->error(
+        "Expected either key 'doi' or 'unique_name' for external object "
+        "specifier in configuration");
+    throw config_parsing_error("External object identifier retrieval failure");
+  }
+
+  if (use_node_["doi"]) {
+    version_ = doi_from_string(use_node_["doi"].as<std::string>());
+  }
+
+  if (use_node_["unique_name"]) {
+    unique_name_ = use_node_["unique_name"].as<std::string>();
+  }
+
   const std::string title_ = use_node_["title"].as<std::string>();
 
   const std::filesystem::path cache_path_ =
       (use_node_["cache"]) ? use_node_["cache"].as<std::string>() : "";
 
-  return new ExternalObject(title_, version_, cache_path_);
+  return new ExternalObject(title_, version_, unique_name_, cache_path_);
 }
 }; // namespace ReadObject
 }; // namespace SCRC

@@ -27,24 +27,20 @@ public:
                     spdlog::level::level_enum log_level = spdlog::level::info)
       : file_system(new LocalFileSystem(config_file_path)),
         api(new API(apiroot)),
-        scrc_server_dir((std::getenv("SCRC_HOME")) ? std::getenv("SCRC_HOME") : "") {
+        scrc_server_dir((std::getenv("SCRC_HOME")) ? std::getenv("SCRC_HOME")
+                                                   : "") {
     spdlog::set_default_logger(APILogger);
     APILogger->set_level(log_level);
-    if(scrc_server_dir.empty())
-    {
-      APILogger->error(
-        "Failed to find local registry installation, the environment variable SCRC_HOME must point "
-        "to the location of your SCRC server folder"
-      );
+    if (scrc_server_dir.empty()) {
+      APILogger->error("Failed to find local registry installation, the "
+                       "environment variable SCRC_HOME must point "
+                       "to the location of your SCRC server folder");
       throw std::runtime_error("Failed to identify server directory.");
     }
-    APILogger->info(
-      "\n[Configuration]\n\t- Config Path: {0}\n\t- API Root: {1}\n\t- SCRC server: {2}",
-      config_file_path.string(),
-      apiroot.string(),
-      scrc_server_dir.string()
-    );
-
+    APILogger->info("\n[Configuration]\n\t- Config Path: {0}\n\t- API Root: "
+                    "{1}\n\t- SCRC server: {2}",
+                    config_file_path.string(), apiroot.string(),
+                    scrc_server_dir.string());
   }
 
   Json::Value fetch_all_objects();
@@ -58,6 +54,8 @@ public:
   Json::Value fetch_external_object_by_id(int identifier);
   std::filesystem::path
   download_data_product(ReadObject::DataProduct *data_product);
+  std::filesystem::path
+  download_external_object(ReadObject::ExternalObject *external_object);
   int get_id_from_namespace(std::string name_space);
   int get_id_from_path(std::filesystem::path path);
 

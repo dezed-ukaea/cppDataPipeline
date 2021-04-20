@@ -8,7 +8,7 @@
 
 using namespace SCRC;
 
-DataPipelineImpl_ *init_pipeline(bool use_local=false) {
+DataPipelineImpl_ *init_pipeline(bool use_local = false) {
   if (std::filesystem::exists(std::filesystem::path(TESTDIR) /
                               std::filesystem::path("datastore"))) {
     std::filesystem::remove_all(std::filesystem::path(TESTDIR) /
@@ -19,7 +19,8 @@ DataPipelineImpl_ *init_pipeline(bool use_local=false) {
       std::filesystem::path(TESTDIR) / "config.yaml";
   APILogger->set_level(spdlog::level::debug);
 
-  return new DataPipelineImpl_(config_path_, (use_local) ? LOCAL_API_ROOT : REMOTE_API_ROOT,
+  return new DataPipelineImpl_(config_path_,
+                               (use_local) ? LOCAL_API_ROOT : REMOTE_API_ROOT,
                                spdlog::level::debug);
 }
 

@@ -23,10 +23,19 @@ public:
     check_suffix_(obj_id);
   }
 
+  DOI(const DOI &doi)
+      : registrant_id_(doi.registrant_id_), object_id_(doi.object_id_) {}
+
   std::string to_string() const { return registrant_id_ + "/" + object_id_; }
 
-  explicit operator bool() {
+  explicit operator bool() const {
     return !registrant_id_.empty() && !object_id_.empty();
+  }
+
+  DOI operator=(const DOI &doi) { return DOI(registrant_id_, object_id_); }
+
+  friend bool operator==(const DOI &a, const DOI &b) {
+    return a.registrant_id_ == b.registrant_id_ && a.object_id_ == b.object_id_;
   }
 };
 

@@ -73,6 +73,87 @@ Json::Value DataPipelineImpl_::fetch_store_root_by_id(int identifier) {
   return api->query(StorageRootQuery(std::to_string(identifier)));
 }
 
+std::filesystem::path DataPipelineImpl_::download_external_object(
+    ReadObject::ExternalObject *external_object) {
+
+  ExternalObjectQuery eoquery_ = ExternalObjectQuery();
+  eoquery_.append("doi_or_unique_name", external_object->get_unique_id());
+
+  const Json::Value res_ = api->query(eoquery_);
+
+  if (res_.size() == 0) {
+    throw rest_apiquery_error("No external object found for '" +
+                              external_object->get_unique_id() + "'");
+  }
+
+  const std::string object_id_path_ = res_[0]["object"].asString();
+  const std::string object_id_ =
+      std::filesystem::path(
+          object_id_path_.substr(0, object_id_path_.size() - 1))
+          .filename();
+
+  APILogger->debug("DataPipeline:ExternalObject: Retrieved ID '" + object_id_ +
+                   "' for object '" + external_object->get_unique_id() + "'");
+
+  Json::Value objres_ = fetch_object_by_id(std::stoi(object_id_));
+
+  const std::string store_loc_ = objres_["storage_location"].asString();
+
+  const std::string store_loc_id_ =
+      std::filesystem::path(store_loc_.substr(0, store_loc_.size() - 1))
+          .filename();
+
+  const Json::Value store_res_ =
+      fetch_data_store_by_id(std::stoi(store_loc_id_));
+
+  const std::filesystem::path rel_file_loc_ = store_res_["path"].asString();
+  const std::string hash_ = store_res_["hash"].asString();
+
+  const std::string root_loc_str_ = store_res_["storage_root"].asString();
+  const std::string root_loc_id_ =
+      std::filesystem::path(root_loc_str_.substr(0, root_loc_str_.size() - 1))
+          .filename();
+  const Json::Value root_res_ = fetch_store_root_by_id(std::stoi(root_loc_id_));
+  const std::filesystem::path root_loc_ = root_res_["root"].asString();
+
+  APILogger->debug("DataPipeline: File download location '{0}'",
+                   (root_loc_ / rel_file_loc_).string());
+
+  const std::filesystem::path download_loc_ =
+      (file_system->get_data_store() / rel_file_loc_).parent_path();
+
+  if (std::filesystem::exists(download_loc_ / rel_file_loc_.filename())) {
+    const std::string existing_hash_ =
+        calculate_hash_from_file(download_loc_ / rel_file_loc_.filename());
+
+    APILogger->debug("DataPipeline:HASH:\n\tCalculated: {0}\n\tRemote: {1}",
+                     existing_hash_, hash_);
+
+    if (hash_ == existing_hash_) {
+      APILogger->debug("DataPipeline: File '{0}' is already latest version "
+                       "and will not be updated",
+                       (download_loc_ / rel_file_loc_.filename()).string());
+      return download_loc_ / rel_file_loc_.filename();
+    }
+  }
+
+  // Create directories if they do not exist
+  if (!std::filesystem::exists(download_loc_)) {
+    std::filesystem::create_directories(download_loc_);
+  }
+
+  api->download_file(root_loc_ / rel_file_loc_,
+                     download_loc_ / rel_file_loc_.filename());
+
+  if (!std::filesystem::exists(download_loc_ / rel_file_loc_.filename())) {
+    throw sync_error("Failed to download data file for '" +
+                     external_object->get_unique_id() + ":" +
+                     rel_file_loc_.string() + "'");
+  }
+
+  return download_loc_ / rel_file_loc_.filename();
+}
+
 std::filesystem::path DataPipelineImpl_::download_data_product(
     ReadObject::DataProduct *data_product) {
   std::string namespace_local_ = data_product->get_namespace();
@@ -101,82 +182,63 @@ std::filesystem::path DataPipelineImpl_::download_data_product(
           object_id_path_.substr(0, object_id_path_.size() - 1))
           .filename();
 
-  APILogger->debug("DataPipeline: Retrieved ID '" + object_id_ +
+  APILogger->debug("DataPipeline:DataProduct: Retrieved ID '" + object_id_ +
                    "' for object '" + namespace_ + ":" + reg_path_ + "'");
 
   Json::Value objres_ = fetch_object_by_id(std::stoi(object_id_));
 
-  if (!objres_["storage_location"]) {
-    if (objres_["external_object"]) {
-      APILogger->debug("DataPipeline: Object is external object.");
-    } else {
-      throw rest_apiquery_error("Object is not a recognised type");
+  const std::string store_loc_ = objres_["storage_location"].asString();
+  const std::string store_loc_id_ =
+      std::filesystem::path(store_loc_.substr(0, store_loc_.size() - 1))
+          .filename();
+  const Json::Value store_res_ =
+      fetch_data_store_by_id(std::stoi(store_loc_id_));
+  const std::filesystem::path rel_file_loc_ = store_res_["path"].asString();
+  const std::string hash_ = store_res_["hash"].asString();
+
+  const std::string root_loc_str_ = store_res_["storage_root"].asString();
+  const std::string root_loc_id_ =
+      std::filesystem::path(root_loc_str_.substr(0, root_loc_str_.size() - 1))
+          .filename();
+  const Json::Value root_res_ = fetch_store_root_by_id(std::stoi(root_loc_id_));
+  const std::filesystem::path root_loc_ = root_res_["root"].asString();
+
+  APILogger->debug("DataPipeline: File download location '{0}'",
+                   (root_loc_ / rel_file_loc_).string());
+
+  const std::filesystem::path download_loc_ = file_system->get_data_store() /
+                                              namespace_ /
+                                              std::filesystem::path(reg_path_);
+
+  if (std::filesystem::exists(download_loc_ / rel_file_loc_.filename())) {
+    const std::string existing_hash_ =
+        calculate_hash_from_file(download_loc_ / rel_file_loc_.filename());
+
+    APILogger->debug("DataPipeline:HASH:\n\tCalculated: {0}\n\tRemote: {1}",
+                     existing_hash_, hash_);
+
+    if (hash_ == existing_hash_) {
+      APILogger->debug("DataPipeline: File '{0}' is already latest version "
+                       "and will not be updated",
+                       (download_loc_ / rel_file_loc_.filename()).string());
+      return download_loc_ / rel_file_loc_.filename();
     }
-
-    std::string ext_obj_id_ = objres_["external_object"].asString();
-    ext_obj_id_ = ext_obj_id_.substr(0, ext_obj_id_.size() - 1);
-    Json::Value extobj_res_ =
-        fetch_external_object_by_id(std::stoi(ext_obj_id_));
-
   }
 
-  else {
-    const std::string store_loc_ = objres_["storage_location"].asString();
-    const std::string store_loc_id_ =
-        std::filesystem::path(store_loc_.substr(0, store_loc_.size() - 1))
-            .filename();
-    const Json::Value store_res_ =
-        fetch_data_store_by_id(std::stoi(store_loc_id_));
-    const std::filesystem::path rel_file_loc_ = store_res_["path"].asString();
-    const std::string hash_ = store_res_["hash"].asString();
-
-    const std::string root_loc_str_ = store_res_["storage_root"].asString();
-    const std::string root_loc_id_ =
-        std::filesystem::path(root_loc_str_.substr(0, root_loc_str_.size() - 1))
-            .filename();
-    const Json::Value root_res_ =
-        fetch_store_root_by_id(std::stoi(root_loc_id_));
-    const std::filesystem::path root_loc_ = root_res_["root"].asString();
-
-    APILogger->debug("DataPipeline: File download location '{0}'",
-                     (root_loc_ / rel_file_loc_).string());
-
-    const std::filesystem::path download_loc_ =
-        file_system->get_data_store() / namespace_ /
-        std::filesystem::path(reg_path_);
-
-    if (std::filesystem::exists(download_loc_ / rel_file_loc_.filename())) {
-      const std::string existing_hash_ =
-          calculate_hash_from_file(download_loc_ / rel_file_loc_.filename());
-
-      APILogger->debug("DataPipeline:HASH:\n\tCalculated: {0}\n\tRemote: {1}",
-                       existing_hash_, hash_);
-
-      if (hash_ == existing_hash_) {
-        APILogger->debug("DataPipeline: File '{0}' is already latest version "
-                         "and will not be updated",
-                         (download_loc_ / rel_file_loc_.filename()).string());
-        return download_loc_ / rel_file_loc_.filename();
-      }
-    }
-
-    // Create directories if they do not exist
-    if (!std::filesystem::exists(download_loc_)) {
-      std::filesystem::create_directories(download_loc_);
-    }
-
-    api->download_file(root_loc_ / rel_file_loc_,
-                       download_loc_ / rel_file_loc_.filename());
-
-    if (!std::filesystem::exists(download_loc_ / rel_file_loc_.filename())) {
-      throw sync_error("Failed to download data file for '" + namespace_ + ":" +
-                       rel_file_loc_.string() + "'");
-    }
-
-    return download_loc_ / rel_file_loc_.filename();
+  // Create directories if they do not exist
+  if (!std::filesystem::exists(download_loc_)) {
+    std::filesystem::create_directories(download_loc_);
   }
 
-  throw std::runtime_error("Currently unsupported download operation");
+  api->download_file(root_loc_ / rel_file_loc_,
+                     download_loc_ / rel_file_loc_.filename());
+
+  if (!std::filesystem::exists(download_loc_ / rel_file_loc_.filename())) {
+    throw sync_error("Failed to download data file for '" + namespace_ + ":" +
+                     rel_file_loc_.string() + "'");
+  }
+
+  return download_loc_ / rel_file_loc_.filename();
 }
 
 void DataPipelineImpl_::push_new_coderun() {
@@ -194,10 +256,12 @@ std::string DataPipelineImpl_::new_source(const YAML::Node &data) {
 
 std::string DataPipelineImpl_::new_storage_root(const YAML::Node &data) {
   Json::Value post_data_;
+  const RegisterObject::Accessibility access_ =
+      RegisterObject::access_from_str(data["accessibility"].as<std::string>());
   post_data_["name"] = data["name"].as<std::string>();
   post_data_["root"] = data["root"].as<std::string>();
   post_data_["accessibility"] =
-      std::to_string(int(data["accessibility"].as<std::string>() == "closed"));
+      std::to_string(int(access_ == RegisterObject::Accessibility::CLOSED));
 
   return api->post("storage_root", post_data_, read_key())["url"].asString();
 }
@@ -208,7 +272,8 @@ std::string DataPipelineImpl_::new_storage_location(const YAML::Node &data) {
   post_data_["hash"] = data["hash"].as<std::string>();
   post_data_["storage_root_id"] = data["storage_root_id"].as<std::string>();
 
-  return api->post("storage_location", post_data_, read_key())["url"].asString();
+  return api->post("storage_location", post_data_, read_key())["url"]
+      .asString();
 }
 
 std::string DataPipelineImpl_::new_external_object(const YAML::Node &data) {
@@ -226,12 +291,12 @@ std::string DataPipelineImpl_::new_external_object(const YAML::Node &data) {
   return api->post("external_object", post_data_, read_key())["url"].asString();
 }
 
-std::string DataPipelineImpl_::read_key()
-{
-  const std::filesystem::path key_file_ = scrc_server_dir / std::filesystem::path("TOKEN.txt");
-  if(!std::filesystem::exists(key_file_))
-  {
-    throw std::runtime_error("Failed to find Authorisation token: '"+key_file_.string()+"'");
+std::string DataPipelineImpl_::read_key() {
+  const std::filesystem::path key_file_ =
+      scrc_server_dir / std::filesystem::path("TOKEN.txt");
+  if (!std::filesystem::exists(key_file_)) {
+    throw std::runtime_error("Failed to find Authorisation token: '" +
+                             key_file_.string() + "'");
   }
 
   std::ifstream key_(key_file_, std::ios::in);
@@ -245,7 +310,7 @@ void DataPipelineImpl_::register_external_object(
     const YAML::Node &register_entry) {
 
   APILogger->debug("Registering external object");
-  
+
   const std::string file_type_ = register_entry["file_type"].as<std::string>();
   const std::filesystem::path root_ = register_entry["root"].as<std::string>();
   const std::string product_name_ =
@@ -278,18 +343,8 @@ void DataPipelineImpl_::register_external_object(
 
   const std::string source_id_ = new_source(register_entry);
 
-  const std::string accessibility_ =
-      register_entry["accessibility"].as<std::string>();
-  bool private_access_;
-
-  if (accessibility_ == "open") {
-    private_access_ = false;
-  } else if (accessibility_ == "closed") {
-    private_access_ = true;
-  } else {
-    throw std::invalid_argument("Value '" + accessibility_ +
-                                "' for key 'accessibility' not recognised");
-  }
+  const RegisterObject::Accessibility access_ = RegisterObject::access_from_str(
+      register_entry["accessibility"].as<std::string>());
 
   APILogger->debug("Storing data");
 
@@ -318,7 +373,8 @@ void DataPipelineImpl_::add_to_register(const std::string &alias) {
 
   APILogger->debug("Iterating through registration items.");
 
-  for (YAML::const_iterator it = register_.begin(); it != register_.end(); ++it) {
+  for (YAML::const_iterator it = register_.begin(); it != register_.end();
+       ++it) {
     const YAML::Node to_register_(*it);
     for (const std::string &s : {"external_object", "data_product", "object"}) {
       if (to_register_[s] && to_register_[s].as<std::string>() == alias) {
