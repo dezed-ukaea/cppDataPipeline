@@ -1,175 +1,182 @@
 #include "scrc/registry/file_system.hxx"
-namespace SCRC
-{
-    YAML::Node parse_yaml_(std::filesystem::path yaml_path)
-    {
-        APILogger->debug("LocalFileSystem: Reading configuration file '{0}'", yaml_path.string().c_str());
-        return YAML::LoadFile(yaml_path.c_str());
+namespace SCRC {
+YAML::Node parse_yaml_(std::filesystem::path yaml_path) {
+  APILogger->debug("LocalFileSystem: Reading configuration file '{0}'",
+                   yaml_path.string().c_str());
+  return YAML::LoadFile(yaml_path.c_str());
+}
+
+LocalFileSystem::LocalFileSystem(std::filesystem::path config_file_path)
+    : config_path_(config_file_path),
+      config_data_(parse_yaml_(config_file_path)) {
+  APILogger->debug("LocalFileSystem: Parsing configuration file");
+  const std::filesystem::path data_directory_path_ = get_data_store();
+
+  // Create the data directory within the config file if it does not exist
+  if (!std::filesystem::exists(data_directory_path_)) {
+    APILogger->info("Creating data directory at '{0}'",
+                    data_directory_path_.c_str());
+    std::filesystem::create_directory(data_directory_path_);
+  }
+}
+
+YAML::Node LocalFileSystem::meta_data_() const {
+  return config_data_["run_metadata"];
+}
+
+std::filesystem::path LocalFileSystem::get_data_store() const {
+  if (meta_data_()["default_data_store"]) {
+    std::string data_dir_ =
+        meta_data_()["default_data_store"].as<std::string>();
+
+    // Handle case where tilde used for HOME for environment variable
+    if (data_dir_[0] == '~') {
+      data_dir_ =
+          std::getenv("HOME") + data_dir_.substr(1, data_dir_.size() - 1);
     }
 
-    LocalFileSystem::LocalFileSystem(std::filesystem::path config_file_path) :
-        config_path_(config_file_path),
-        config_data_(parse_yaml_(config_file_path))
-    {
-        APILogger->debug("LocalFileSystem: Parsing configuration file");
-        const std::filesystem::path data_directory_path_ = get_data_store();
-
-        // Create the data directory within the config file if it does not exist
-        if(!std::filesystem::exists(data_directory_path_))
-        {
-            APILogger->info("Creating data directory at '{0}'", data_directory_path_.c_str());
-            std::filesystem::create_directory(data_directory_path_);
-        }
+    // Handle case where '/' used meaning relative to config file path
+    else if (data_dir_[0] == '/') {
+      data_dir_ = config_path_.parent_path() /
+                  data_dir_.substr(1, data_dir_.size() - 1);
     }
 
-    YAML::Node LocalFileSystem::meta_data_() const
-    {
-        return config_data_["run_metadata"];
-    }
+    return data_dir_;
+  } else {
+    return std::filesystem::path(std::getenv("HOME")) /
+           std::filesystem::path("datastore");
+  }
+}
 
-    std::filesystem::path LocalFileSystem::get_data_store() const
-    {
-        if(meta_data_()["default_data_store"])
-        {
-            std::string data_dir_ = meta_data_()["default_data_store"].as<std::string>();
+std::string LocalFileSystem::get_default_input_namespace() const {
+  if (!meta_data_()["default_input_namespace"]) {
+    throw config_parsing_error(
+        "Cannot find value for expected key 'default_input_namespace'");
+  }
 
-            // Handle case where tilde used for HOME for environment variable
-            if(data_dir_[0] == '~')
-            {
-                data_dir_ = std::getenv("HOME")+data_dir_.substr(1, data_dir_.size()-1);
-            }
+  return meta_data_()["default_input_namespace"].as<std::string>();
+}
 
-            // Handle case where '/' used meaning relative to config file path
-            else if(data_dir_[0] == '/')
-            {
-                data_dir_ = config_path_.parent_path() / data_dir_.substr(1, data_dir_.size()-1);
-            }
+std::string LocalFileSystem::get_default_output_namespace() const {
+  if (!meta_data_()["default_output_namespace"]) {
+    throw config_parsing_error(
+        "Cannot find value for expected key 'default_output_namespace'");
+  }
 
-            return data_dir_;
-        }
-        else
-        {
-            return std::filesystem::path(std::getenv("HOME")) / std::filesystem::path("datastore");
-        }
-    }
+  return meta_data_()["default_output_namespace"].as<std::string>();
+}
 
-    std::string LocalFileSystem::get_default_input_namespace() const
-    {
-        if(!meta_data_()["default_input_namespace"])
-        {
-            throw config_parsing_error("Cannot find value for expected key 'default_input_namespace'");
-        }
+std::string get_first_key_(const toml::value data_table) {
+  for (const auto &[k, v] : data_table.as_table()) {
+    return k;
+  }
 
-        return meta_data_()["default_input_namespace"].as<std::string>();
-    }
+  return "";
+}
 
-    std::string LocalFileSystem::get_default_output_namespace() const
-    {
-        if(!meta_data_()["default_output_namespace"])
-        {
-            throw config_parsing_error("Cannot find value for expected key 'default_output_namespace'");
-        }
+std::vector<ReadObject::DataProduct *>
+LocalFileSystem::read_data_products() const {
+  APILogger->debug("LocalFileSystem: Reading data products list");
 
-        return meta_data_()["default_output_namespace"].as<std::string>();
-    }
+  std::vector<ReadObject::DataProduct *> data_products_;
+  const YAML::Node read_node = config_data_["read"];
 
-    std::string get_first_key_(const toml::value data_table)
-    {
-        for(const auto& [k, v] : data_table.as_table())
-        {
-            return k;
-        }
+  APILogger->debug("LocalFileSystem: Iterating through entries");
+  for (auto &item : read_node) {
+    data_products_.push_back(ReadObject::data_product_from_yaml(item));
+  }
 
-        return "";
-    }
+  if (data_products_.empty())
+    throw config_parsing_error("No data products found in config");
 
-    std::vector<ReadObject::DataProduct*> LocalFileSystem::read_data_products() const
-    {
-        APILogger->debug("LocalFileSystem: Reading data products list");
+  return data_products_;
+}
 
-        std::vector<ReadObject::DataProduct*> data_products_;
-        const YAML::Node read_node = config_data_["read"];
+double read_point_estimate_from_toml(const std::filesystem::path var_address) {
+  if (!std::filesystem::exists(var_address)) {
+    throw std::runtime_error("File '" + var_address.string() +
+                             "' could not be opened as it does not exist");
+  }
 
-        APILogger->debug("LocalFileSystem: Iterating through entries");
-        for(auto& item : read_node)
-        {
-            data_products_.push_back(ReadObject::data_product_from_yaml(item));
-        }
+  const auto toml_data_ = toml::parse(var_address.string());
 
-        if(data_products_.empty()) throw config_parsing_error("No data products found in config");
-    
-        return data_products_;
-    }
+  const std::string first_key_ = get_first_key_(toml_data_);
 
-    double read_point_estimate_from_toml(const std::filesystem::path var_address)
-    {
-        if(!std::filesystem::exists(var_address))
-        {
-            throw std::runtime_error("File '"+var_address.string()+"' could not be opened as it does not exist");
-        }
+  if (!toml::get<toml::table>(toml_data_).at(first_key_).contains("type")) {
+    throw std::runtime_error("Expected 'type' tag but none found");
+  }
 
-        const auto toml_data_ = toml::parse(var_address.string());
+  if (static_cast<std::string>(
+          toml_data_.at(first_key_).at("type").as_string()) !=
+      "point-estimate") {
+    throw std::runtime_error(
+        "Expected 'point-estimate' for type but got '" +
+        static_cast<std::string>(toml_data_.at("type").as_string()) + "'");
+  }
 
-        const std::string first_key_ = get_first_key_(toml_data_);
+  return (toml_data_.at(first_key_).at("value").is_floating())
+             ? toml_data_.at(first_key_).at("value").as_floating()
+             : static_cast<double>(
+                   toml_data_.at(first_key_).at("value").as_integer());
+}
 
-        if(!toml::get<toml::table>(toml_data_).at(first_key_).contains("type"))
-        {
-            throw std::runtime_error("Expected 'type' tag but none found");
-        }
+Distribution *construct_dis_(const toml::value data_table) {
+  const std::string first_key_ = get_first_key_(data_table);
+  const std::string dis_type_ =
+      data_table.at(first_key_).at("distribution").as_string();
 
-        if(static_cast<std::string>(toml_data_.at(first_key_).at("type").as_string()) != "point-estimate")
-        {
-            throw std::runtime_error("Expected 'point-estimate' for type but got '"+static_cast<std::string>(toml_data_.at("type").as_string())+"'");
-        }
+  if (dis_type_ == "normal") {
+    const double mean =
+        (data_table.at(first_key_).at("mu").is_floating())
+            ? data_table.at(first_key_).at("mu").as_floating()
+            : static_cast<double>(
+                  data_table.at(first_key_).at("mu").as_integer());
+    const double sd =
+        (data_table.at(first_key_).at("sigma").is_floating())
+            ? data_table.at(first_key_).at("sigma").as_floating()
+            : static_cast<double>(
+                  data_table.at(first_key_).at("sigma").as_integer());
+    return new Normal(mean, sd);
+  }
 
-        return (toml_data_.at(first_key_).at("value").is_floating()) ? toml_data_.at(first_key_).at("value").as_floating() : static_cast<double>(toml_data_.at(first_key_).at("value").as_integer());
+  else if (dis_type_ == "gamma") {
+    const double k = (data_table.at(first_key_).at("k").is_floating())
+                         ? data_table.at(first_key_).at("k").as_floating()
+                         : static_cast<double>(
+                               data_table.at(first_key_).at("k").as_integer());
+    const double theta =
+        (data_table.at(first_key_).at("theta").is_floating())
+            ? data_table.at(first_key_).at("theta").as_floating()
+            : static_cast<double>(
+                  data_table.at(first_key_).at("theta").as_integer());
+    return new Gamma(k, theta);
+  }
 
-    }
+  throw std::runtime_error("Distribution currently unsupported");
+}
 
-    Distribution* construct_dis_(const toml::value data_table)
-    {
-        const std::string first_key_ = get_first_key_(data_table);
-        const std::string dis_type_ = data_table.at(first_key_).at("distribution").as_string();
+Distribution *
+read_distribution_from_toml(const std::filesystem::path var_address) {
+  if (!std::filesystem::exists(var_address)) {
+    throw std::runtime_error("File '" + var_address.string() +
+                             "' could not be opened as it does not exist");
+  }
 
-        if(dis_type_ == "normal")
-        {
-            const double mean = (data_table.at(first_key_).at("mu").is_floating()) ? data_table.at(first_key_).at("mu").as_floating() : static_cast<double>(data_table.at(first_key_).at("mu").as_integer());
-            const double sd = (data_table.at(first_key_).at("sigma").is_floating()) ? data_table.at(first_key_).at("sigma").as_floating() : static_cast<double>(data_table.at(first_key_).at("sigma").as_integer());
-            return new Normal(mean, sd);
-        }
+  const auto toml_data_ = toml::parse(var_address.string());
 
-        else if(dis_type_ == "gamma")
-        {
-            const double k = (data_table.at(first_key_).at("k").is_floating()) ? data_table.at(first_key_).at("k").as_floating() : static_cast<double>(data_table.at(first_key_).at("k").as_integer());
-            const double theta = (data_table.at(first_key_).at("theta").is_floating()) ? data_table.at(first_key_).at("theta").as_floating() : static_cast<double>(data_table.at(first_key_).at("theta").as_integer());
-            return new Gamma(k, theta);
-        }
+  const std::string first_key_ = get_first_key_(toml_data_);
 
-        throw std::runtime_error("Distribution currently unsupported");
-    }
+  if (!toml::get<toml::table>(toml_data_).at(first_key_).contains("type")) {
+    throw std::runtime_error("Expected 'type' tag but none found");
+  }
 
-    Distribution* read_distribution_from_toml(const std::filesystem::path var_address)
-    {
-        if(!std::filesystem::exists(var_address))
-        {
-            throw std::runtime_error("File '"+var_address.string()+"' could not be opened as it does not exist");
-        }
+  if (static_cast<std::string>(
+          toml_data_.at(first_key_).at("type").as_string()) != "distribution") {
+    throw std::runtime_error(
+        "Expected 'distribution' for type but got '" +
+        static_cast<std::string>(toml_data_.at("type").as_string()) + "'");
+  }
 
-        const auto toml_data_ = toml::parse(var_address.string());
-
-        const std::string first_key_ = get_first_key_(toml_data_);
-
-        if(!toml::get<toml::table>(toml_data_).at(first_key_).contains("type"))
-        {
-            throw std::runtime_error("Expected 'type' tag but none found");
-        }
-
-        if(static_cast<std::string>(toml_data_.at(first_key_).at("type").as_string()) != "distribution")
-        {
-            throw std::runtime_error("Expected 'distribution' for type but got '"+static_cast<std::string>(toml_data_.at("type").as_string())+"'");
-        }
-
-        return construct_dis_(toml_data_);
-
-    }
-};
+  return construct_dis_(toml_data_);
+}
+}; // namespace SCRC

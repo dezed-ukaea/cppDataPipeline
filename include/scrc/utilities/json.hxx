@@ -3,9 +3,8 @@
 
 #include <json/writer.h>
 
-namespace SCRC
-{
-    std::string json_to_string(Json::Value& json_data);
+namespace SCRC {
+std::string json_to_string(Json::Value &json_data);
 };
 
 #endif
