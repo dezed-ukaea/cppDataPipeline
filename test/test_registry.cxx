@@ -76,6 +76,7 @@ TEST(SCRCAPITest, TestGetConfigDataTOML) {
       new LocalFileSystem(std::filesystem::path(TESTDIR) / "config.yaml");
   const std::vector<ReadObject::DataProduct *> data_products_ =
       fs_->read_data_products();
+  ASSERT_TRUE(data_products_[0]);
   const version version_ = data_products_[0]->get_version();
   const std::filesystem::path path_ = data_products_[0]->get_path();
   ASSERT_EQ(version_, version(0, 1, 0));
@@ -87,6 +88,7 @@ TEST(SCRCAPITest, TestGetConfigDataHDF5) {
       new LocalFileSystem(std::filesystem::path(TESTDIR) / "config.yaml");
   const std::vector<ReadObject::DataProduct *> data_products_ =
       fs_->read_data_products();
+  ASSERT_TRUE(data_products_[1]);
   const version version_ = data_products_[1]->get_version();
   const std::filesystem::path path_ = data_products_[1]->get_path();
   ASSERT_EQ(version_, version(0, 20200813, 0));
@@ -103,6 +105,7 @@ TEST(SCRCAPITest, TestDownloadTOMLFile) {
   DataPipelineImpl_ *data_pipeline_ = init_pipeline();
   const std::vector<ReadObject::DataProduct *> data_products_ =
       data_pipeline_->file_system->read_data_products();
+  ASSERT_TRUE(data_products_[0]);
   ASSERT_NO_THROW(data_pipeline_->download_data_product(data_products_[0]));
 }
 
@@ -116,4 +119,13 @@ TEST(SCRCAPITest, TestDownloadHDF5File) {
 TEST(SCRCAPITest, TestAddToRegister) {
   DataPipelineImpl_ *data_pipeline_ = init_pipeline(true);
   data_pipeline_->add_to_register("raw-mortality-data");
+}
+
+TEST(SCRCAPITest, TestDownloadExternalObject) {
+  DataPipelineImpl_ *data_pipeline_ = init_pipeline();
+  const std::vector<ReadObject::ExternalObject *> external_objs =
+      data_pipeline_->file_system->read_external_objects();
+
+  ASSERT_TRUE(external_objs[0]);
+  ASSERT_NO_THROW(data_pipeline_->download_external_object(external_objs[0]));
 }

@@ -36,19 +36,22 @@ public:
 
 class ExternalObject {
 private:
-  const DOI doi_ = DOI();
+  const DOI* doi_ = nullptr;
   const std::string name_ = "";
   const std::string title_ = "";
   std::filesystem::path cache_location_ = std::filesystem::path();
 
 public:
-  ExternalObject(const std::string &title = "", const DOI &doi = DOI(),
+  ExternalObject(const std::string &title = "", const DOI* doi = nullptr,
                  const std::string &name = "",
                  std::filesystem::path cache_path = "")
       : title_(title), doi_(doi), name_(name), cache_location_(cache_path) {}
+  
   std::string get_unique_id() const {
-    if (bool(doi_))
-      return doi_.to_string();
+    if(doi_)
+    {
+      return doi_->to_string();
+    }
     return name_;
   }
 };
@@ -60,9 +63,7 @@ ExternalObject *external_object_from_yaml(YAML::Node yaml_data);
 namespace RegisterObject {
 enum Accessibility { OPEN, CLOSED };
 
-Accessibility access_from_str(const std::string &access) {
-  return Accessibility(int(access == "closed"));
-}
+Accessibility access_from_str(const std::string &access);
 
 class ExternalObject {
 private:

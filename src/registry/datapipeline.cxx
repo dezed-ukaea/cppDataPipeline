@@ -77,6 +77,13 @@ std::filesystem::path DataPipelineImpl_::download_external_object(
     ReadObject::ExternalObject *external_object) {
 
   ExternalObjectQuery eoquery_ = ExternalObjectQuery();
+
+  if(!external_object)
+  {
+    APILogger->error("DataPipeline:DownloadDataProduct: Could not download data product due to metadata retrieval failure.");
+    throw std::runtime_error("Attempt to access null pointer");
+  }
+
   eoquery_.append("doi_or_unique_name", external_object->get_unique_id());
 
   const Json::Value res_ = api->query(eoquery_);
@@ -156,6 +163,14 @@ std::filesystem::path DataPipelineImpl_::download_external_object(
 
 std::filesystem::path DataPipelineImpl_::download_data_product(
     ReadObject::DataProduct *data_product) {
+
+  if(!data_product)
+  {
+    APILogger->error("DataPipeline:DownloadDataProduct: Could not download data product due to metadata retrieval failure.");
+    throw std::runtime_error("Attempt to access null pointer");
+  }
+
+
   std::string namespace_local_ = data_product->get_namespace();
 
   // Check if there is a namespace for the entry, else use the global default

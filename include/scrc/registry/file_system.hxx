@@ -41,6 +41,7 @@ public:
   LocalFileSystem(std::filesystem::path config_file_path);
   std::filesystem::path get_data_store() const;
   std::vector<ReadObject::DataProduct *> read_data_products() const;
+  std::vector<ReadObject::ExternalObject *> read_external_objects() const;
   std::string get_default_input_namespace() const;
   std::string get_default_output_namespace() const;
   YAML::Node get_config_data() const { return config_data_; }

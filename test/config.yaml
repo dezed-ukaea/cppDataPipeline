@@ -17,6 +17,9 @@ read:
     use:
       version: 0.20200813.0
       namespace: EERA
+  - external_object: scottish coronavirus-covid-19-management-information
+    use:
+      unique_name: scottish coronavirus-covid-19-management-information
   - data_product: fixed-parameters/juvp_s
     use:
       version: 0.1.0

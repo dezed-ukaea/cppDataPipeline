@@ -76,14 +76,22 @@ std::string get_first_key_(const toml::value data_table) {
 
 std::vector<ReadObject::DataProduct *>
 LocalFileSystem::read_data_products() const {
-  APILogger->debug("LocalFileSystem: Reading data products list");
+  APILogger->debug("LocalFileSystem:ReadDataProducts: Reading data products list");
 
   std::vector<ReadObject::DataProduct *> data_products_;
   const YAML::Node read_node = config_data_["read"];
 
-  APILogger->debug("LocalFileSystem: Iterating through entries");
+  APILogger->debug("LocalFileSystem:ReadDataProducts: Iterating through entries");
   for (auto &item : read_node) {
-    data_products_.push_back(ReadObject::data_product_from_yaml(item));
+    if(item["data_product"]) {
+      ReadObject::DataProduct* object_ = ReadObject::data_product_from_yaml(item);
+      if(!object_)
+      {
+        APILogger->error("Failed to retrieve data product metadata for '{0}'", item["data_product"].as<std::string>());
+        throw config_parsing_error("Data product metadata extraction failed");
+      }
+      data_products_.push_back(object_);
+    }
   }
 
   if (data_products_.empty())
@@ -91,6 +99,34 @@ LocalFileSystem::read_data_products() const {
 
   return data_products_;
 }
+
+std::vector<ReadObject::ExternalObject *>
+LocalFileSystem::read_external_objects() const {
+  APILogger->debug("LocalFileSystem:ReadExternalObjects: Reading external objects list");
+
+  std::vector<ReadObject::ExternalObject *> external_objects_;
+  const YAML::Node read_node = config_data_["read"];
+
+  APILogger->debug("LocalFileSystem:ReadExternalObjects: Iterating through entries");
+  for (auto &item : read_node) {
+    if(item["external_object"])
+    {
+      ReadObject::ExternalObject* object_ = ReadObject::external_object_from_yaml(item);
+      if(!object_)
+      {
+        APILogger->error("Failed to retrieve external object metadata for '{0}'", item["external_object"].as<std::string>());
+        throw config_parsing_error("External object metadata extraction failed");
+      }
+      external_objects_.push_back(object_);
+    }
+  }
+
+  if (external_objects_.empty())
+    throw config_parsing_error("No data products found in config");
+
+  return external_objects_;
+}
+
 
 double read_point_estimate_from_toml(const std::filesystem::path var_address) {
   if (!std::filesystem::exists(var_address)) {
