@@ -3,9 +3,9 @@
 namespace SCRC {
 namespace ReadObject {
 DataProduct *data_product_from_yaml(YAML::Node yaml_data) {
-  if(!yaml_data["use"])
-  {
-    APILogger->error("Expected a 'use' key containing metadata for retrieving the data product");
+  if (!yaml_data["use"]) {
+    APILogger->error("Expected a 'use' key containing metadata for retrieving "
+                     "the data product");
     throw config_parsing_error("Failed to determine data product metadata");
   }
   const YAML::Node use_node_ = yaml_data["use"];
@@ -33,13 +33,13 @@ DataProduct *data_product_from_yaml(YAML::Node yaml_data) {
 }
 
 ExternalObject *external_object_from_yaml(YAML::Node yaml_data) {
-  if(!yaml_data["use"])
-  {
-    APILogger->error("Expected a 'use' key containing metadata for retrieving the external object");
+  if (!yaml_data["use"]) {
+    APILogger->error("Expected a 'use' key containing metadata for retrieving "
+                     "the external object");
     throw config_parsing_error("Failed to determine external object metadata");
   }
   const YAML::Node use_node_ = yaml_data["use"];
-  DOI* version_ = nullptr;
+  DOI *version_ = nullptr;
   std::string unique_name_ = "";
 
   if (!use_node_["unique_name"] && !use_node_["doi"]) {
@@ -57,23 +57,26 @@ ExternalObject *external_object_from_yaml(YAML::Node yaml_data) {
     unique_name_ = use_node_["unique_name"].as<std::string>();
   }
 
-  const std::string title_ = (use_node_["title"]) ? use_node_["title"].as<std::string>() : unique_name_;
+  const std::string title_ = (use_node_["title"])
+                                 ? use_node_["title"].as<std::string>()
+                                 : unique_name_;
 
   const std::filesystem::path cache_path_ =
       (use_node_["cache"]) ? use_node_["cache"].as<std::string>() : "";
 
   const std::string version_print_ = (version_) ? version_->to_string() : "";
-  APILogger->debug("Found external object: {0}\n\t - Version: {1}\n\t - Unique Name: {2}\n\t - Cache: {3}", title_, version_print_, unique_name_, cache_path_.string());
+  APILogger->debug("Found external object: {0}\n\t - Version: {1}\n\t - Unique "
+                   "Name: {2}\n\t - Cache: {3}",
+                   title_, version_print_, unique_name_, cache_path_.string());
 
   return new ExternalObject(title_, version_, unique_name_, cache_path_);
 }
 }; // namespace ReadObject
 
 namespace RegisterObject {
-  Accessibility access_from_str(const std::string &access)
-  {
-    return Accessibility(int(access == "closed"));
-  }
-};
+Accessibility access_from_str(const std::string &access) {
+  return Accessibility(int(access == "closed"));
+}
+}; // namespace RegisterObject
 
 }; // namespace SCRC

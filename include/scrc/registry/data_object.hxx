@@ -36,20 +36,19 @@ public:
 
 class ExternalObject {
 private:
-  const DOI* doi_ = nullptr;
+  const DOI *doi_ = nullptr;
   const std::string name_ = "";
   const std::string title_ = "";
   std::filesystem::path cache_location_ = std::filesystem::path();
 
 public:
-  ExternalObject(const std::string &title = "", const DOI* doi = nullptr,
+  ExternalObject(const std::string &title = "", const DOI *doi = nullptr,
                  const std::string &name = "",
                  std::filesystem::path cache_path = "")
       : title_(title), doi_(doi), name_(name), cache_location_(cache_path) {}
-  
+
   std::string get_unique_id() const {
-    if(doi_)
-    {
+    if (doi_) {
       return doi_->to_string();
     }
     return name_;

@@ -78,9 +78,9 @@ std::filesystem::path DataPipelineImpl_::download_external_object(
 
   ExternalObjectQuery eoquery_ = ExternalObjectQuery();
 
-  if(!external_object)
-  {
-    APILogger->error("DataPipeline:DownloadDataProduct: Could not download data product due to metadata retrieval failure.");
+  if (!external_object) {
+    APILogger->error("DataPipeline:DownloadDataProduct: Could not download "
+                     "data product due to metadata retrieval failure.");
     throw std::runtime_error("Attempt to access null pointer");
   }
 
@@ -164,12 +164,11 @@ std::filesystem::path DataPipelineImpl_::download_external_object(
 std::filesystem::path DataPipelineImpl_::download_data_product(
     ReadObject::DataProduct *data_product) {
 
-  if(!data_product)
-  {
-    APILogger->error("DataPipeline:DownloadDataProduct: Could not download data product due to metadata retrieval failure.");
+  if (!data_product) {
+    APILogger->error("DataPipeline:DownloadDataProduct: Could not download "
+                     "data product due to metadata retrieval failure.");
     throw std::runtime_error("Attempt to access null pointer");
   }
-
 
   std::string namespace_local_ = data_product->get_namespace();
 

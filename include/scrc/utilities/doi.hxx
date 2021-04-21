@@ -17,7 +17,7 @@ private:
   bool check_suffix_(std::string &suffix);
 
 public:
-  DOI() {};
+  DOI(){};
   DOI(std::string reg_id, std::string obj_id)
       : registrant_id_(reg_id), object_id_(obj_id) {
     check_prefix_(reg_id);
@@ -27,10 +27,7 @@ public:
   DOI(const DOI &doi)
       : registrant_id_(doi.registrant_id_), object_id_(doi.object_id_) {}
 
-  std::string to_string() const 
-  {
-    return registrant_id_ + "/" + object_id_; 
-  }
+  std::string to_string() const { return registrant_id_ + "/" + object_id_; }
 
   DOI operator=(const DOI &doi) { return DOI(registrant_id_, object_id_); }
 
