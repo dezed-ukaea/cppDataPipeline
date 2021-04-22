@@ -4,8 +4,8 @@
 #include <ctime>
 #include <filesystem>
 #include <fstream>
-#include <iostream>
 #include <iomanip>
+#include <iostream>
 #include <sstream>
 
 #include "digestpp.hpp"
@@ -17,7 +17,7 @@ std::string calculate_hash_from_string(const std::string &input);
 
 std::string generate_run_id(std::filesystem::path config_file_path);
 
-std::string current_time_stamp(bool file_name=false);
+std::string current_time_stamp(bool file_name = false);
 
 }; // namespace SCRC
 

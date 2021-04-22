@@ -55,35 +55,36 @@ double read_point_estimate_from_toml(const std::filesystem::path var_address);
 Distribution *
 read_distribution_from_toml(const std::filesystem::path var_address);
 
-template<typename T>
-std::filesystem::path write_array(const ArrayObject<T>* array,
-                 const std::filesystem::path& data_product,
-                 const std::filesystem::path& component,
-                 const LocalFileSystem* file_system
-)
-{
-  const PredType* dtype_ = HDF5::get_hdf5_type<T>();
+template <typename T>
+std::filesystem::path write_array(const ArrayObject<T> *array,
+                                  const std::filesystem::path &data_product,
+                                  const std::filesystem::path &component,
+                                  const LocalFileSystem *file_system) {
+  const PredType *dtype_ = HDF5::get_hdf5_type<T>();
 
-  const std::filesystem::path name_space_ = file_system->get_default_output_namespace();
+  const std::filesystem::path name_space_ =
+      file_system->get_default_output_namespace();
   const std::filesystem::path data_store_ = file_system->get_data_store();
 
   const std::string output_file_name_ = current_time_stamp(true) + ".h5";
-  const std::filesystem::path output_dir_ = data_store_ / name_space_ / data_product;
+  const std::filesystem::path output_dir_ =
+      data_store_ / name_space_ / data_product;
   const std::filesystem::path output_path_ = output_dir_ / output_file_name_;
   const std::string arr_name_ = std::string(ARRAY);
 
-  if(output_path_.extension() != ".h5")
-  {
+  if (output_path_.extension() != ".h5") {
     throw std::invalid_argument("Output file name for array must be HDF5");
   }
 
-  if(!std::filesystem::exists(output_dir_)) std::filesystem::create_directories(output_dir_);
+  if (!std::filesystem::exists(output_dir_))
+    std::filesystem::create_directories(output_dir_);
 
-  H5File* output_file_ = new H5File(output_path_, H5F_ACC_TRUNC);
+  H5File *output_file_ = new H5File(output_path_, H5F_ACC_TRUNC);
 
-    // APILogger->debug("Writing Group '{0}' to file", component.string());
+  // APILogger->debug("Writing Group '{0}' to file", component.string());
 
-  //Group* output_group_ = new Group(output_file_->createGroup(component.c_str()));
+  // Group* output_group_ = new
+  // Group(output_file_->createGroup(component.c_str()));
 
   const std::vector<int> dimensions_ = array->get_dimensions();
 
@@ -93,31 +94,30 @@ std::filesystem::path write_array(const ArrayObject<T>* array,
 
   // ---------- WRITE ARRAY --------- //
 
-  DataSpace* dspace_ = new DataSpace(dimensions_.size(), dim_);
+  DataSpace *dspace_ = new DataSpace(dimensions_.size(), dim_);
 
-  DataSet* dset_ = nullptr;
+  DataSet *dset_ = nullptr;
 
-  if(*dtype_ == PredType::NATIVE_INT)
-  {
+  if (*dtype_ == PredType::NATIVE_INT) {
     IntType out_type_(*dtype_);
     out_type_.setOrder(H5T_ORDER_LE);
-    dset_ = new DataSet(output_file_->createDataSet(arr_name_.c_str(), out_type_, *dspace_));
-  }
-  else
-  {
+    dset_ = new DataSet(
+        output_file_->createDataSet(arr_name_.c_str(), out_type_, *dspace_));
+  } else {
     FloatType out_type_(*dtype_);
     out_type_.setOrder(H5T_ORDER_LE);
-    dset_ = new DataSet(output_file_->createDataSet(arr_name_.c_str(), out_type_, *dspace_));
+    dset_ = new DataSet(
+        output_file_->createDataSet(arr_name_.c_str(), out_type_, *dspace_));
   }
 
   int size_ = 1;
-  
-  for(const int& i : dimensions_) size_ *= i;
+
+  for (const int &i : dimensions_)
+    size_ *= i;
 
   T *data_ = new T[size_];
 
-  for(int i{0}; i < size_; ++i)
-  {
+  for (int i{0}; i < size_; ++i) {
     data_[i] = array->get_values()[i];
   }
 
@@ -126,27 +126,27 @@ std::filesystem::path write_array(const ArrayObject<T>* array,
   dspace_->close();
   dset_->close();
 
-  delete []data_;
+  delete[] data_;
 
   APILogger->debug("FileSystem:WriteArray: Wrote array object.");
 
   // ---------- WRITE TITLES ------------- //
 
-  for(int i{0}; i < dimensions_.size(); ++i)
-  {
+  for (int i{0}; i < dimensions_.size(); ++i) {
     const hsize_t str_dim_[1] = {1};
     const int rank = 1;
-    DataSpace* str_space_ = new DataSpace(rank, str_dim_);
+    DataSpace *str_space_ = new DataSpace(rank, str_dim_);
     const std::string title_ = array->get_title(i);
-    const std::string label_ = "Dimension_"+std::to_string(i+1)+"_title";
+    const std::string label_ = "Dimension_" + std::to_string(i + 1) + "_title";
 
     char out_title_[title_.length() + 1];
 
     strcpy(out_title_, title_.c_str());
 
-    StrType stype_(H5T_C_S1, title_.length()+1);
+    StrType stype_(H5T_C_S1, title_.length() + 1);
 
-    DataSet* dset_str_ = new DataSet(output_file_->createDataSet(label_.c_str(), stype_, *str_space_));
+    DataSet *dset_str_ = new DataSet(
+        output_file_->createDataSet(label_.c_str(), stype_, *str_space_));
     dset_str_->write(out_title_, stype_);
 
     dset_str_->close();
@@ -157,23 +157,24 @@ std::filesystem::path write_array(const ArrayObject<T>* array,
 
   // ---------- WRITE NAMES --------- //
 
-  for(int i{0}; i < dimensions_.size(); ++i)
-  {
+  for (int i{0}; i < dimensions_.size(); ++i) {
     const std::vector<std::string> names_ = array->get_dimension_names(i);
 
-    std::vector<const char*> names_c_;
+    std::vector<const char *> names_c_;
 
-    for(const std::string& name : names_) names_c_.push_back(name.c_str());
+    for (const std::string &name : names_)
+      names_c_.push_back(name.c_str());
 
     const hsize_t str_dim_[1] = {names_c_.size()};
 
     const int rank = 1;
-    DataSpace* str_space_ = new DataSpace(rank, str_dim_);
-    const std::string label_ = "Dimension_"+std::to_string(i+1)+"_names";
+    DataSpace *str_space_ = new DataSpace(rank, str_dim_);
+    const std::string label_ = "Dimension_" + std::to_string(i + 1) + "_names";
 
     StrType stype_(H5T_C_S1, H5T_VARIABLE);
 
-    DataSet* dset_str_ = new DataSet(output_file_->createDataSet(label_.c_str(), stype_, *str_space_));
+    DataSet *dset_str_ = new DataSet(
+        output_file_->createDataSet(label_.c_str(), stype_, *str_space_));
 
     dset_str_->write(names_c_.data(), stype_);
 
@@ -185,10 +186,10 @@ std::filesystem::path write_array(const ArrayObject<T>* array,
 
   output_file_->close();
 
-  APILogger->debug("FileSystem:WriteArray: Wrote file '{0}'", output_path_.string());
+  APILogger->debug("FileSystem:WriteArray: Wrote file '{0}'",
+                   output_path_.string());
 
   return output_path_;
-s
 }
 
 template <typename T>

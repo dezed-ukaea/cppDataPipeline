@@ -37,12 +37,9 @@ std::string current_time_stamp(bool file_name) {
 
   std::ostringstream oss_;
 
-  if(!file_name)
-  {
+  if (!file_name) {
     oss_ << std::put_time(&tm_, "%Y-%m-%d %H:%M:%S %Z");
-  }
-  else
-  {
+  } else {
     oss_ << std::put_time(&tm_, "%Y%m%d-%H%M%S");
   }
 

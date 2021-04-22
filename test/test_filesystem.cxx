@@ -1,14 +1,11 @@
+#include "H5Cpp.h"
+#include "scrc/objects/data.hxx"
 #include "scrc/objects/distributions.hxx"
 #include "scrc/registry/file_system.hxx"
 #include "scrc/utilities/logging.hxx"
-#include "scrc/objects/data.hxx"
 #include "gtest/gtest.h"
-#include "H5Cpp.h"
 
 #include <vector>
-#include <stdio.h>
-#include <stdlib.h>
-
 
 using namespace SCRC;
 
@@ -58,30 +55,28 @@ TEST(SCRCAPITest, TestWriteArray) {
   APILogger->set_level(spdlog::level::debug);
   std::filesystem::path config_path_ =
       std::filesystem::path(TESTDIR) / "config.yaml";
-  LocalFileSystem* file_system_ = new LocalFileSystem(config_path_);
+  LocalFileSystem *file_system_ = new LocalFileSystem(config_path_);
   std::filesystem::path data_product_ = "test_writeout";
   std::filesystem::path component_ = "nd_array";
   std::vector<std::string> titles_ = {"dim_1", "dim_2", "dim_3"};
   std::vector<std::vector<std::string>> dim_names_ = {
-    {"a1", "a2", "a3"}, {"b1", "b2", "b3"},
-    {"c1", "c2", "c3"}
-  };
+      {"a1", "a2", "a3"}, {"b1", "b2", "b3"}, {"c1", "c2", "c3"}};
 
-  std::vector<int> elements_ = {
-    1, 2, 3, 4, 5, 6, 7, 8, 9,
-    10, 11, 12, 13, 14, 15, 16,
-    17, 18, 19, 20, 21, 22, 23,
-    24, 25, 26, 27
-  };
+  std::vector<int> elements_ = {1,  2,  3,  4,  5,  6,  7,  8,  9,
+                                10, 11, 12, 13, 14, 15, 16, 17, 18,
+                                19, 20, 21, 22, 23, 24, 25, 26, 27};
 
   std::vector<int> dimensions_ = {3, 3, 3};
 
-  ArrayObject<int>* arr_ = new ArrayObject<int>(titles_, dim_names_, dimensions_, elements_);
+  ArrayObject<int> *arr_ =
+      new ArrayObject<int>(titles_, dim_names_, dimensions_, elements_);
 
-  const std::filesystem::path output_file_ = write_array(arr_, data_product_, component_, file_system_);
+  const std::filesystem::path output_file_ =
+      write_array(arr_, data_product_, component_, file_system_);
 
   ASSERT_TRUE(std::filesystem::exists(output_file_));
-  const std::string cmd_ = "h5dump -n "+output_file_.string();
-  system(cmd_.c_str());
-  ASSERT_NO_THROW(read_array<int>(output_file_, ""));
+  ArrayObject<int> *array_ = read_array<int>(output_file_, "");
+  ASSERT_EQ(array_->get_title(0), "dim_1");
+  ASSERT_EQ(array_->get_dimension_names(0)[0], "a1");
+  ASSERT_EQ(array_->get({0, 0, 0}), 1);
 }

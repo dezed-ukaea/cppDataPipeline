@@ -3,6 +3,7 @@
 
 #include <stdexcept>
 #include <string>
+#include <algorithm>
 #include <vector>
 
 namespace SCRC {
