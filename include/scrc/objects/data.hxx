@@ -1,10 +1,11 @@
 #ifndef __SCRC_DATATABLE_HXX__
 #define __SCRC_DATATABLE_HXX__
 
+#include <algorithm>
 #include <stdexcept>
 #include <string>
-#include <algorithm>
 #include <vector>
+#include <iostream>
 
 namespace SCRC {
 template <typename T> class DataTableColumn {
@@ -57,14 +58,16 @@ public:
       : dimension_titles_(dim_titles), dimension_names_(dim_names),
         dimensions_(size), array_(values) {}
   T get(std::vector<int> co_ords) const {
-    int flat_index_ = 0;
+    int flat_index_ = co_ords[0];
 
     if (dimensions_.size() != co_ords.size()) {
       throw std::invalid_argument(
           "Number of coordinates must match number of dimensions");
     }
 
-    for (int i{0}; i < dimensions_.size(); ++i) {
+    int factor_ = 1;
+
+    for (int i{1}; i < dimensions_.size(); ++i) {
       if (co_ords[i] > dimensions_[i] - 1) {
         throw std::invalid_argument(
             "Coordinate[" + std::to_string(i) +
@@ -72,7 +75,9 @@ public:
             " > " + std::to_string(dimensions_[i] - 1));
       }
 
-      flat_index_ += dimensions_[i] * co_ords[i];
+      factor_ *= dimensions_[i-1];
+
+      flat_index_ += factor_ * co_ords[i];
     }
 
     return array_[flat_index_];

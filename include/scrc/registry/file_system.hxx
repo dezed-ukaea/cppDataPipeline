@@ -81,10 +81,9 @@ std::filesystem::path write_array(const ArrayObject<T> *array,
 
   H5File *output_file_ = new H5File(output_path_, H5F_ACC_TRUNC);
 
-  // APILogger->debug("Writing Group '{0}' to file", component.string());
+  APILogger->debug("Writing Group '{0}' to file", component.string());
 
-  // Group* output_group_ = new
-  // Group(output_file_->createGroup(component.c_str()));
+  Group* output_group_ = new Group(output_file_->createGroup(component.c_str()));
 
   const std::vector<int> dimensions_ = array->get_dimensions();
 

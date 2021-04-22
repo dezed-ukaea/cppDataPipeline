@@ -35,7 +35,7 @@ TEST(SCRCAPITest, TestArrayRead) {
 
   ASSERT_EQ(array_->get_title(0), "rowvalue");
   ASSERT_EQ(array_->get_dimension_names(0)[2], "10-14");
-  ASSERT_EQ(array_->get({0, 0}), 0.4788127996331724);
+  ASSERT_EQ(array_->get({4, 1}), 0.08083608969374471);
 }
 
 TEST(SCRCAPITest, TestTableReadColumn) {
@@ -78,5 +78,5 @@ TEST(SCRCAPITest, TestWriteArray) {
   ArrayObject<int> *array_ = read_array<int>(output_file_, "");
   ASSERT_EQ(array_->get_title(0), "dim_1");
   ASSERT_EQ(array_->get_dimension_names(0)[0], "a1");
-  ASSERT_EQ(array_->get({0, 0, 0}), 1);
+  ASSERT_EQ(array_->get({1, 1, 1}), 14);
 }
