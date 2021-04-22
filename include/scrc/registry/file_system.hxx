@@ -14,6 +14,7 @@
 
 #include "scrc/objects/data.hxx"
 #include "scrc/objects/distributions.hxx"
+#include "scrc/objects/metadata.hxx"
 #include "scrc/registry/data_object.hxx"
 #include "scrc/utilities/hdf5.hxx"
 #include "scrc/utilities/logging.hxx"
@@ -54,6 +55,142 @@ double read_point_estimate_from_toml(const std::filesystem::path var_address);
 Distribution *
 read_distribution_from_toml(const std::filesystem::path var_address);
 
+template<typename T>
+std::filesystem::path write_array(const ArrayObject<T>* array,
+                 const std::filesystem::path& data_product,
+                 const std::filesystem::path& component,
+                 const LocalFileSystem* file_system
+)
+{
+  const PredType* dtype_ = HDF5::get_hdf5_type<T>();
+
+  const std::filesystem::path name_space_ = file_system->get_default_output_namespace();
+  const std::filesystem::path data_store_ = file_system->get_data_store();
+
+  const std::string output_file_name_ = current_time_stamp(true) + ".h5";
+  const std::filesystem::path output_dir_ = data_store_ / name_space_ / data_product;
+  const std::filesystem::path output_path_ = output_dir_ / output_file_name_;
+  const std::string arr_name_ = std::string(ARRAY);
+
+  if(output_path_.extension() != ".h5")
+  {
+    throw std::invalid_argument("Output file name for array must be HDF5");
+  }
+
+  if(!std::filesystem::exists(output_dir_)) std::filesystem::create_directories(output_dir_);
+
+  H5File* output_file_ = new H5File(output_path_, H5F_ACC_TRUNC);
+
+    // APILogger->debug("Writing Group '{0}' to file", component.string());
+
+  //Group* output_group_ = new Group(output_file_->createGroup(component.c_str()));
+
+  const std::vector<int> dimensions_ = array->get_dimensions();
+
+  hsize_t dim_[dimensions_.size()];
+
+  std::copy(dimensions_.begin(), dimensions_.end(), dim_);
+
+  // ---------- WRITE ARRAY --------- //
+
+  DataSpace* dspace_ = new DataSpace(dimensions_.size(), dim_);
+
+  DataSet* dset_ = nullptr;
+
+  if(*dtype_ == PredType::NATIVE_INT)
+  {
+    IntType out_type_(*dtype_);
+    out_type_.setOrder(H5T_ORDER_LE);
+    dset_ = new DataSet(output_file_->createDataSet(arr_name_.c_str(), out_type_, *dspace_));
+  }
+  else
+  {
+    FloatType out_type_(*dtype_);
+    out_type_.setOrder(H5T_ORDER_LE);
+    dset_ = new DataSet(output_file_->createDataSet(arr_name_.c_str(), out_type_, *dspace_));
+  }
+
+  int size_ = 1;
+  
+  for(const int& i : dimensions_) size_ *= i;
+
+  T *data_ = new T[size_];
+
+  for(int i{0}; i < size_; ++i)
+  {
+    data_[i] = array->get_values()[i];
+  }
+
+  dset_->write(data_, *dtype_);
+
+  dspace_->close();
+  dset_->close();
+
+  delete []data_;
+
+  APILogger->debug("FileSystem:WriteArray: Wrote array object.");
+
+  // ---------- WRITE TITLES ------------- //
+
+  for(int i{0}; i < dimensions_.size(); ++i)
+  {
+    const hsize_t str_dim_[1] = {1};
+    const int rank = 1;
+    DataSpace* str_space_ = new DataSpace(rank, str_dim_);
+    const std::string title_ = array->get_title(i);
+    const std::string label_ = "Dimension_"+std::to_string(i+1)+"_title";
+
+    char out_title_[title_.length() + 1];
+
+    strcpy(out_title_, title_.c_str());
+
+    StrType stype_(H5T_C_S1, title_.length()+1);
+
+    DataSet* dset_str_ = new DataSet(output_file_->createDataSet(label_.c_str(), stype_, *str_space_));
+    dset_str_->write(out_title_, stype_);
+
+    dset_str_->close();
+    str_space_->close();
+  }
+
+  APILogger->debug("FileSystem:WriteArray: Wrote dimension titles.");
+
+  // ---------- WRITE NAMES --------- //
+
+  for(int i{0}; i < dimensions_.size(); ++i)
+  {
+    const std::vector<std::string> names_ = array->get_dimension_names(i);
+
+    std::vector<const char*> names_c_;
+
+    for(const std::string& name : names_) names_c_.push_back(name.c_str());
+
+    const hsize_t str_dim_[1] = {names_c_.size()};
+
+    const int rank = 1;
+    DataSpace* str_space_ = new DataSpace(rank, str_dim_);
+    const std::string label_ = "Dimension_"+std::to_string(i+1)+"_names";
+
+    StrType stype_(H5T_C_S1, H5T_VARIABLE);
+
+    DataSet* dset_str_ = new DataSet(output_file_->createDataSet(label_.c_str(), stype_, *str_space_));
+
+    dset_str_->write(names_c_.data(), stype_);
+
+    dset_str_->close();
+    str_space_->close();
+  }
+
+  APILogger->debug("FileSystem:WriteArray: Wrote dimension names.");
+
+  output_file_->close();
+
+  APILogger->debug("FileSystem:WriteArray: Wrote file '{0}'", output_path_.string());
+
+  return output_path_;
+s
+}
+
 template <typename T>
 ArrayObject<T> *read_array(const std::filesystem::path var_address,
                            const std::filesystem::path key) {
@@ -66,8 +203,7 @@ ArrayObject<T> *read_array(const std::filesystem::path var_address,
 
   const H5File *file_ = new H5File(var_address.c_str(), H5F_ACC_RDONLY);
 
-  // -------------------------------------- ARRAY RETRIEVAL
-  // -------------------------------------------- //
+  // ------------- ARRAY RETRIEVAL -------------- //
 
   const std::string array_key_ = key.string() + "/" + std::string(ARRAY);
   APILogger->debug("FileSystem:ReadArray: Reading key '{0}'", array_key_);
@@ -98,8 +234,7 @@ ArrayObject<T> *read_array(const std::filesystem::path var_address,
   delete data_space_;
   delete data_set_;
 
-  // -------------------------------------- TITLE RETRIEVAL
-  // -------------------------------------------- //
+  // -------------- TITLE RETRIEVAL ------------- //
 
   const int n_titles_ = arr_dims_;
 
@@ -113,8 +248,7 @@ ArrayObject<T> *read_array(const std::filesystem::path var_address,
         HDF5::read_hdf5_object<std::string>(var_address, title_key_));
   }
 
-  // -------------------------------------- NAMES RETRIEVAL
-  // -------------------------------------------- //
+  // -------------- NAMES RETRIEVAL ------------- //
 
   const int n_name_sets_ = arr_dims_;
 
@@ -155,16 +289,14 @@ DataTableColumn<T> *read_table_column(const std::filesystem::path var_address,
 
   const H5File *file_ = new H5File(var_address.c_str(), H5F_ACC_RDONLY);
 
-  // ------------------------------ COLUMN RETRIEVAL
-  // ------------------------------ //
+  // ------------ COLUMN RETRIEVAL ----------- //
 
   const std::string array_key_ = key.string() + "/" + std::string(TABLE);
 
   const std::vector<T> container_ =
       HDF5::read_hdf5_comp_type_member<T>(var_address, array_key_, column);
 
-  // ------------------------------ UNITS RETRIEVAL
-  // ------------------------------- //
+  // ------------ UNITS RETRIEVAL ------------ //
 
   const std::string units_key_ = key.string() + "/" + std::string(COLUMN_UNITS);
 
@@ -182,8 +314,7 @@ DataTableColumn<T> *read_table_column(const std::filesystem::path var_address,
 
   const std::string unit_ = all_units_[col_index_];
 
-  // ------------------------------ ROW NAMES RETRIEVAL
-  // --------------------------- //
+  // ------ ROW NAMES RETRIEVAL ---- //
 
   const std::string row_names_key_ =
       key.string() + "/" + std::string(ROW_NAMES);

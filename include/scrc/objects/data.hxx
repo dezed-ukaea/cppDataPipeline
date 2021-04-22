@@ -98,6 +98,8 @@ public:
   }
 
   int rank() const { return dimensions_.size(); }
+  std::vector<int> get_dimensions() const { return dimensions_; }
+  std::vector<T> get_values() const { return array_; }
 };
 }; // namespace SCRC
 

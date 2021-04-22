@@ -13,7 +13,7 @@ using namespace H5;
 
 namespace SCRC {
 namespace HDF5 {
-template <typename T> const DataType *get_hdf5_type() {
+template <typename T> const PredType *get_hdf5_type() {
   if (std::is_same<T, float>::value) {
     return &PredType::NATIVE_FLOAT;
   }

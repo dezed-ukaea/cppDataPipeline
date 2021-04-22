@@ -31,12 +31,20 @@ std::string generate_run_id(std::filesystem::path config_file_path) {
   return config_hash_ + time_str_;
 }
 
-std::string current_time_stamp() {
+std::string current_time_stamp(bool file_name) {
   auto t_ = std::time(nullptr);
   auto tm_ = *std::localtime(&t_);
 
   std::ostringstream oss_;
-  oss_ << std::put_time(&tm_, "%Y-%m-%d %H:%M:%S %Z");
+
+  if(!file_name)
+  {
+    oss_ << std::put_time(&tm_, "%Y-%m-%d %H:%M:%S %Z");
+  }
+  else
+  {
+    oss_ << std::put_time(&tm_, "%Y%m%d-%H%M%S");
+  }
 
   return oss_.str();
 }

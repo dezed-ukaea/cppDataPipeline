@@ -31,6 +31,12 @@ class sync_error : public std::runtime_error {
 public:
   sync_error(const std::string message) : std::runtime_error(message) {}
 };
+
+class write_error : public std::runtime_error {
+public:
+  write_error(const std::string message) : std::runtime_error(message) {}
+};
+
 }; // namespace SCRC
 
 #endif
