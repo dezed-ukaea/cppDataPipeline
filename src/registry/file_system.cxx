@@ -103,6 +103,47 @@ LocalFileSystem::read_data_products() const {
   return data_products_;
 }
 
+std::filesystem::path create_distribution(const Distribution* distribution,
+                                          const std::filesystem::path &data_product,
+                                          const version &version_num,
+                                          const LocalFileSystem *file_system) {
+  const std::string param_name_ = data_product.stem();
+  const std::string namespace_ = file_system->get_default_output_namespace();
+  const std::filesystem::path data_store_ = file_system->get_data_store();
+  toml::value data_{
+      {param_name_, {{"type", "distribution"}, {"distribution", distribution->get_name()}}}};
+
+  for(auto& param : distribution->get_params())
+  {
+    data_[param_name_][param.first] = param.second;
+  }
+
+  const std::filesystem::path output_filename_ =
+      data_store_ / namespace_ / data_product.parent_path() /
+      std::string(version_num.to_string() + ".toml");
+  std::ofstream toml_out_;
+
+  if (!std::filesystem::exists(output_filename_.parent_path())) {
+    std::filesystem::create_directories(output_filename_.parent_path());
+  }
+
+  toml_out_.open(output_filename_);
+
+  if (!toml_out_) {
+    throw std::runtime_error("Failed to open TOML file for writing");
+  }
+
+  toml_out_ << toml::format(data_);
+
+  toml_out_.close();
+
+  APILogger->debug("FileSystem:CreateEstimate: Wrote point estimate to '{0}'",
+                   output_filename_.string());
+
+  return output_filename_;
+
+}
+
 std::vector<ReadObject::ExternalObject *>
 LocalFileSystem::read_external_objects() const {
   APILogger->debug(

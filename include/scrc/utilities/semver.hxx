@@ -53,7 +53,7 @@ public:
 
     out_str_ += std::to_string(major_) + ".";
     out_str_ += std::to_string(minor_) + ".";
-    out_str_ +=  std::to_string(patch_);
+    out_str_ += std::to_string(patch_);
 
     if (meta_tag_ != meta_tag::RELEASE) {
       out_str_ += "-" + get_tag_str();
@@ -67,7 +67,6 @@ public:
     }
 
     return out_str_;
-
   }
 
   friend std::ostream &operator<<(std::ostream &os, const version &v) {

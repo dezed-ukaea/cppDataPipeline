@@ -82,8 +82,7 @@ TEST(SCRCAPITest, TestWriteArray) {
   ASSERT_EQ(array_->get({1, 1, 1}), 14);
 }
 
-TEST(SCRCAPITest, TestWritePointEstimate)
-{
+TEST(SCRCAPITest, TestWritePointEstimate) {
   APILogger->set_level(spdlog::level::debug);
   std::filesystem::path config_path_ =
       std::filesystem::path(TESTDIR) / "config.yaml";
@@ -93,8 +92,24 @@ TEST(SCRCAPITest, TestWritePointEstimate)
   const int value_ = 10;
   const std::string component_ = "demo_val/param";
 
-  const std::filesystem::path output_file_ = create_estimate(value_, component_, v_, file_system_);
+  const std::filesystem::path output_file_ =
+      create_estimate(value_, component_, v_, file_system_);
 
   ASSERT_TRUE(std::filesystem::exists(output_file_));
-  ASSERT_EQ(read_point_estimate_from_toml(output_file_), value_);  
+  ASSERT_EQ(read_point_estimate_from_toml(output_file_), value_);
+}
+
+TEST(SCRCAPITest, TestWriteDistribution) {
+  APILogger->set_level(spdlog::level::debug);
+  std::filesystem::path config_path_ =
+      std::filesystem::path(TESTDIR) / "config.yaml";
+  LocalFileSystem *file_system_ = new LocalFileSystem(config_path_);
+  const version v_;
+  const std::string component_ = "demo_val/dist";
+
+  Normal* norm_dist_ = new Normal(5.8, 0.1);
+
+  const std::filesystem::path output_file_ = create_distribution(norm_dist_, component_, v_, file_system_);
+  ASSERT_TRUE(std::filesystem::exists(output_file_));
+  ASSERT_EQ(read_distribution_from_toml(output_file_)->get_params()["mu"], 5.8);
 }

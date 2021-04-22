@@ -15,6 +15,7 @@ public:
   double get_param(std::string param_name) const {
     return parameters_.at(param_name);
   }
+  std::string get_name() const { return name_; }
   std::map<std::string, double> get_params() const { return parameters_; }
 
 protected:
@@ -41,10 +42,10 @@ protected:
 class Normal : public Distribution {
 public:
   Normal(double mean, double sd)
-      : Distribution("normal", {{"mean", mean}, {"sd", sd}}) {}
+      : Distribution("normal", {{"mu", mean}, {"sigma", sd}}) {}
   Normal(Distribution &dis) : Distribution("normal", dis.get_params()) {}
-  double mean() const { return parameters_.at("mean"); }
-  double standard_deviation() const { return parameters_.at("sd"); }
+  double mean() const { return parameters_.at("mu"); }
+  double standard_deviation() const { return parameters_.at("sigma"); }
   double generate(std::mt19937 *gen) {
     std::normal_distribution<> dis_{mean(), standard_deviation()};
     return dis_(*gen);
