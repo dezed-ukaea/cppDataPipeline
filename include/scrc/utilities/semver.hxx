@@ -48,22 +48,30 @@ public:
     meta_tag_ = meta_tag::RELEASE;
   }
 
-  friend std::ostream &operator<<(std::ostream &os, const version &v) {
-    os << std::to_string(v.major_) << ".";
-    os << std::to_string(v.minor_) << ".";
-    os << std::to_string(v.patch_);
+  std::string to_string() const {
+    std::string out_str_;
 
-    if (v.meta_tag_ != meta_tag::RELEASE) {
-      os << "-" << v.get_tag_str();
+    out_str_ += std::to_string(major_) + ".";
+    out_str_ += std::to_string(minor_) + ".";
+    out_str_ +=  std::to_string(patch_);
 
-      if (v.tag_v_ != 1E9) {
-        os << std::to_string(v.tag_v_);
+    if (meta_tag_ != meta_tag::RELEASE) {
+      out_str_ += "-" + get_tag_str();
+
+      if (tag_v_ != 1E9) {
+        out_str_ += std::to_string(tag_v_);
       }
     }
-    if (!v.meta_data_.empty()) {
-      os << "+" << v.meta_data_;
+    if (!meta_data_.empty()) {
+      out_str_ += "+" + meta_data_;
     }
 
+    return out_str_;
+
+  }
+
+  friend std::ostream &operator<<(std::ostream &os, const version &v) {
+    os << v.to_string();
     return os;
   }
 

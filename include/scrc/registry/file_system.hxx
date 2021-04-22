@@ -55,8 +55,49 @@ double read_point_estimate_from_toml(const std::filesystem::path var_address);
 Distribution *
 read_distribution_from_toml(const std::filesystem::path var_address);
 
+template<typename T>
+std::filesystem::path create_estimate(T& value,
+                                    const std::filesystem::path &data_product,
+                                    const version &version_num,
+                                    const LocalFileSystem *file_system) {
+  const std::string param_name_ = data_product.stem();
+  const std::string namespace_ = file_system->get_default_output_namespace();
+  const std::filesystem::path data_store_ = file_system->get_data_store();
+  const toml::value data_{
+    {
+      param_name_, {
+        {"type", "point-estimate"},
+        {"value", value}
+      }
+    }
+  };
+
+  const std::filesystem::path output_filename_ = data_store_ / namespace_ / data_product.parent_path() / std::string(version_num.to_string() + ".toml");
+  std::ofstream toml_out_;
+
+  if(!std::filesystem::exists(output_filename_.parent_path()))
+  {
+    std::filesystem::create_directories(output_filename_.parent_path());
+  }
+  
+  toml_out_.open(output_filename_);
+
+  if(!toml_out_)
+  {
+    throw std::runtime_error("Failed to open TOML file for writing");
+  }
+
+  toml_out_ << toml::format(data_);
+
+  toml_out_.close();
+
+  APILogger->debug("FileSystem:CreateEstimate: Wrote point estimate to '{0}'", output_filename_.string());
+
+  return output_filename_;
+}
+
 template <typename T>
-std::filesystem::path write_array(const ArrayObject<T> *array,
+std::filesystem::path create_array(const ArrayObject<T> *array,
                                   const std::filesystem::path &data_product,
                                   const std::filesystem::path &component,
                                   const LocalFileSystem *file_system) {
@@ -81,7 +122,7 @@ std::filesystem::path write_array(const ArrayObject<T> *array,
 
   H5File *output_file_ = new H5File(output_path_, H5F_ACC_TRUNC);
 
-  APILogger->debug("Writing Group '{0}' to file", component.string());
+  APILogger->debug("FileSystem:CreateArray: Writing Group '{0}' to file", component.string());
 
   Group *output_group_ =
       new Group(output_file_->createGroup(component.c_str()));
@@ -128,7 +169,7 @@ std::filesystem::path write_array(const ArrayObject<T> *array,
 
   delete[] data_;
 
-  APILogger->debug("FileSystem:WriteArray: Wrote array object.");
+  APILogger->debug("FileSystem:CreateArray: Wrote array object.");
 
   // ---------- WRITE TITLES ------------- //
 

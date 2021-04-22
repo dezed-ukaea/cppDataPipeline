@@ -3,6 +3,7 @@
 #include "scrc/objects/distributions.hxx"
 #include "scrc/registry/file_system.hxx"
 #include "scrc/utilities/logging.hxx"
+#include "scrc/utilities/semver.hxx"
 #include "gtest/gtest.h"
 
 #include <vector>
@@ -72,11 +73,28 @@ TEST(SCRCAPITest, TestWriteArray) {
       new ArrayObject<int>(titles_, dim_names_, dimensions_, elements_);
 
   const std::filesystem::path output_file_ =
-      write_array(arr_, data_product_, component_, file_system_);
+      create_array(arr_, data_product_, component_, file_system_);
 
   ASSERT_TRUE(std::filesystem::exists(output_file_));
   ArrayObject<int> *array_ = read_array<int>(output_file_, "nd_array");
   ASSERT_EQ(array_->get_title(0), "dim_1");
   ASSERT_EQ(array_->get_dimension_names(0)[0], "a1");
   ASSERT_EQ(array_->get({1, 1, 1}), 14);
+}
+
+TEST(SCRCAPITest, TestWritePointEstimate)
+{
+  APILogger->set_level(spdlog::level::debug);
+  std::filesystem::path config_path_ =
+      std::filesystem::path(TESTDIR) / "config.yaml";
+  LocalFileSystem *file_system_ = new LocalFileSystem(config_path_);
+  const version v_;
+
+  const int value_ = 10;
+  const std::string component_ = "demo_val/param";
+
+  const std::filesystem::path output_file_ = create_estimate(value_, component_, v_, file_system_);
+
+  ASSERT_TRUE(std::filesystem::exists(output_file_));
+  ASSERT_EQ(read_point_estimate_from_toml(output_file_), value_);  
 }
