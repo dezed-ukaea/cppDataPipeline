@@ -2,10 +2,10 @@
 #define __SCRC_DATATABLE_HXX__
 
 #include <algorithm>
+#include <iostream>
 #include <stdexcept>
 #include <string>
 #include <vector>
-#include <iostream>
 
 namespace SCRC {
 template <typename T> class DataTableColumn {
@@ -75,7 +75,7 @@ public:
             " > " + std::to_string(dimensions_[i] - 1));
       }
 
-      factor_ *= dimensions_[i-1];
+      factor_ *= dimensions_[i - 1];
 
       flat_index_ += factor_ * co_ords[i];
     }

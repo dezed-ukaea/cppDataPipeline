@@ -83,7 +83,8 @@ std::filesystem::path write_array(const ArrayObject<T> *array,
 
   APILogger->debug("Writing Group '{0}' to file", component.string());
 
-  Group* output_group_ = new Group(output_file_->createGroup(component.c_str()));
+  Group *output_group_ =
+      new Group(output_file_->createGroup(component.c_str()));
 
   const std::vector<int> dimensions_ = array->get_dimensions();
 
@@ -101,12 +102,12 @@ std::filesystem::path write_array(const ArrayObject<T> *array,
     IntType out_type_(*dtype_);
     out_type_.setOrder(H5T_ORDER_LE);
     dset_ = new DataSet(
-        output_file_->createDataSet(arr_name_.c_str(), out_type_, *dspace_));
+        output_group_->createDataSet(arr_name_.c_str(), out_type_, *dspace_));
   } else {
     FloatType out_type_(*dtype_);
     out_type_.setOrder(H5T_ORDER_LE);
     dset_ = new DataSet(
-        output_file_->createDataSet(arr_name_.c_str(), out_type_, *dspace_));
+        output_group_->createDataSet(arr_name_.c_str(), out_type_, *dspace_));
   }
 
   int size_ = 1;
@@ -145,7 +146,7 @@ std::filesystem::path write_array(const ArrayObject<T> *array,
     StrType stype_(H5T_C_S1, title_.length() + 1);
 
     DataSet *dset_str_ = new DataSet(
-        output_file_->createDataSet(label_.c_str(), stype_, *str_space_));
+        output_group_->createDataSet(label_.c_str(), stype_, *str_space_));
     dset_str_->write(out_title_, stype_);
 
     dset_str_->close();
@@ -173,7 +174,7 @@ std::filesystem::path write_array(const ArrayObject<T> *array,
     StrType stype_(H5T_C_S1, H5T_VARIABLE);
 
     DataSet *dset_str_ = new DataSet(
-        output_file_->createDataSet(label_.c_str(), stype_, *str_space_));
+        output_group_->createDataSet(label_.c_str(), stype_, *str_space_));
 
     dset_str_->write(names_c_.data(), stype_);
 

@@ -75,7 +75,7 @@ TEST(SCRCAPITest, TestWriteArray) {
       write_array(arr_, data_product_, component_, file_system_);
 
   ASSERT_TRUE(std::filesystem::exists(output_file_));
-  ArrayObject<int> *array_ = read_array<int>(output_file_, "");
+  ArrayObject<int> *array_ = read_array<int>(output_file_, "nd_array");
   ASSERT_EQ(array_->get_title(0), "dim_1");
   ASSERT_EQ(array_->get_dimension_names(0)[0], "a1");
   ASSERT_EQ(array_->get({1, 1, 1}), 14);
