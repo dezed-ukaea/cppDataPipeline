@@ -20,7 +20,7 @@ jobs:
         run: |
           bash test/test_setup.sh
           mkdir temp_server
-          SCRC_HOME=$PWD/temp_server
+          export SCRC_HOME=$PWD/temp_server
           echo "ACompletelyFakeAPIToken" >> $SCRC_HOME/TOKEN.txt 
           cmake --build build --target test
           if [ $? -eq 0 ]; then

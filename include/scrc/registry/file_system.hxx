@@ -95,6 +95,13 @@ std::filesystem::path create_distribution(
     const Distribution *distribution, const std::filesystem::path &data_product,
     const version &version_num, const LocalFileSystem *file_system);
 
+std::filesystem::path create_table(
+  const DataTable* data_table, const std::filesystem::path &data_product,
+  const std::filesystem::path &component, const LocalFileSystem *file_system
+) {
+  
+}
+
 template <typename T>
 std::filesystem::path create_array(const ArrayObject<T> *array,
                                    const std::filesystem::path &data_product,
