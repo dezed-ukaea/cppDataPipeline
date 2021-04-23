@@ -116,7 +116,7 @@ TEST(SCRCAPITest, TestDownloadHDF5File) {
   ASSERT_NO_THROW(data_pipeline_->download_data_product(data_products_[1]));
 }
 
-TEST(SCRCAPITest, TestAddToRegister) {
+TEST(SCRCAPITest, DISABLED_TestAddToRegister) {
   DataPipelineImpl_ *data_pipeline_ = init_pipeline(true);
   data_pipeline_->add_to_register("raw-mortality-data");
 }

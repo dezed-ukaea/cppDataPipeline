@@ -107,9 +107,10 @@ TEST(SCRCAPITest, TestWriteDistribution) {
   const version v_;
   const std::string component_ = "demo_val/dist";
 
-  Normal* norm_dist_ = new Normal(5.8, 0.1);
+  Normal *norm_dist_ = new Normal(5.8, 0.1);
 
-  const std::filesystem::path output_file_ = create_distribution(norm_dist_, component_, v_, file_system_);
+  const std::filesystem::path output_file_ =
+      create_distribution(norm_dist_, component_, v_, file_system_);
   ASSERT_TRUE(std::filesystem::exists(output_file_));
   ASSERT_EQ(read_distribution_from_toml(output_file_)->get_params()["mu"], 5.8);
 }
