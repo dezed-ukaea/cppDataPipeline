@@ -89,6 +89,26 @@ void read_table_col_demo() {
 }
 ```
 
+#### Reading a Distribution
+```c++
+#include "scrc/registry/file_system.hxx"
+#include "scrc/objects/distributions.hxx"
+
+#include <filesystem>
+#include <random>
+
+using namespace SCRC;
+
+void read_distribution_demo() {
+    const std::filesystem::path toml_file = "/path/to/distribution/0.1.0.toml";
+    const Distribution* dis = read_distribution_from_toml(toml_file);
+
+    std::random_device rd;
+    std::mt19937* gen = new std::mt19937(rd());
+    const double random_val = dis->generate(gen);
+}
+```
+
 #### Creating an Estimate
 ```c++
 #include "scrc/registry/file_system.hxx"
