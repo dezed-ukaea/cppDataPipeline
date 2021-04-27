@@ -69,34 +69,6 @@ public:
   std::string read_key();
 };
 
-class DataPipeline {
-public:
-  // 'initialise' method for the API
-  explicit DataPipeline(
-      std::filesystem::path config_file_path,
-      std::filesystem::path apiroot = LOCAL_API_ROOT,
-      spdlog::level::level_enum log_level = spdlog::level::info)
-      : pimpl_(new DataPipelineImpl_(config_file_path, apiroot, log_level)),
-        session_id_(generate_run_id(config_file_path)) {
-    APILogger->debug("DataPipeline: Initialising session '{0}'", session_id_);
-  }
-
-  // 'finalise' method for the API
-  ~DataPipeline();
-
-  void add_to_register(std::string &item);
-
-  DataPipeline(DataPipeline &&rhs) noexcept;
-  DataPipeline &operator=(DataPipeline &&rhs) noexcept;
-
-  DataPipeline(const DataPipeline &rhs);
-  DataPipeline &operator=(const DataPipeline &rhs);
-
-private:
-  std::unique_ptr<DataPipelineImpl_> pimpl_;
-  const std::string session_id_;
-};
-
 class DataProductQuery : public Query {
 public:
   DataProductQuery()

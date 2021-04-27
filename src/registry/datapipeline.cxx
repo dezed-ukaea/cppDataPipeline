@@ -1,9 +1,7 @@
 #include "scrc/registry/datapipeline.hxx"
 
-namespace SCRC {
-DataPipeline::~DataPipeline() {}
-
-void DataPipeline::add_to_register(std::string &item) {}
+namespace SCRC
+{
 
 Json::Value DataPipelineImpl_::fetch_all_objects() {
   APILogger->debug("DataPipelineImpl_: Fetching all objects from registry");
@@ -323,7 +321,7 @@ std::string DataPipelineImpl_::read_key() {
 void DataPipelineImpl_::register_external_object(
     const YAML::Node &register_entry) {
 
-  APILogger->debug("Registering external object");
+  APILogger->debug("DataPipeline: Registering external object");
 
   const std::string file_type_ = register_entry["file_type"].as<std::string>();
   const std::filesystem::path root_ = register_entry["root"].as<std::string>();
@@ -409,5 +407,4 @@ void DataPipelineImpl_::add_to_register(const std::string &alias) {
       "' under a recognised key from "
       "[\"external_object\", \"data_product\", \"object\"]");
 }
-
-}; // namespace SCRC
+};

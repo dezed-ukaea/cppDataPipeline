@@ -1,0 +1,2 @@
+# Getting Started
+Usage of the API is based around a configuration file the location of which will be assigned as the data store. When utilising the pipeline runs of your model code will be handled by the `fdp` tool. To simulate this process during development you should create the environment variable `FDP_CONFIG_DIR` and point it to a directory containing a configuration YAML file.

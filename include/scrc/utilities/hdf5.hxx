@@ -104,7 +104,7 @@ const T read_hdf5_object(const std::filesystem::path file_name,
 
   return obj_;
 }
-
+                             
 template <typename T>
 const std::vector<T>
 read_hdf5_comp_type_member(const std::filesystem::path file_name,
@@ -124,9 +124,6 @@ read_hdf5_comp_type_member(const std::filesystem::path file_name,
 
   const int arr_dims_ = data_space_->getSimpleExtentNdims();
   const CompType ctype_ = data_set_->getCompType();
-  const int col_index_ = ctype_.getMemberIndex(member);
-  const int n_cols_ = ctype_.getNmembers();
-
   hsize_t dim_[arr_dims_];
 
   data_space_->getSimpleExtentDims(dim_, NULL);
@@ -135,7 +132,8 @@ read_hdf5_comp_type_member(const std::filesystem::path file_name,
 
   const DataType dtype_ = *HDF5::get_hdf5_type<T>();
 
-  ttype_.insertMember(member, 0, dtype_);
+  ttype_.insertMember(member, 0, dtype_); 
+
   APILogger->debug("Utilities:HDF5:ReadCompTypeMember: Extracting member '" +
                    member + "' from Compound Type");
 

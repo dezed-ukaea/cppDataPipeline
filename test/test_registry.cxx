@@ -1,4 +1,5 @@
 #include "scrc/objects/metadata.hxx"
+#include "scrc/fdp.hxx"
 #include "scrc/registry/datapipeline.hxx"
 #include "scrc/registry/file_system.hxx"
 #include "gtest/gtest.h"
@@ -34,7 +35,7 @@ TEST(SCRCAPITest, TestDataPipelineInit) {
   const std::filesystem::path config_path_ =
       std::filesystem::path(TESTDIR) / "config.yaml";
   APILogger->set_level(spdlog::level::debug);
-  DataPipeline(config_path_, REMOTE_API_ROOT, spdlog::level::debug);
+  DataPipeline(spdlog::level::debug, REMOTE_API_ROOT, config_path_);
 }
 
 TEST(SCRCAPITest, TestLogLevelSet) {

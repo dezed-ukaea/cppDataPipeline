@@ -172,13 +172,14 @@ Json::Value API::post(const std::filesystem::path &addr_path,
                       long expected_response) {
   const std::string url_path_ = (url_root_ / addr_path).string() + "/";
   const std::string data_ = json_to_string(post_data);
+  APILogger->debug("API:Post: Post Data\n{0}", data_);
   long return_code_;
   std::string response_;
   CURL *curl_ = curl_easy_init();
 
   struct curl_slist *headers = NULL;
   curl_slist_append(headers, "Content-Type: application/json");
-  curl_slist_append(headers, (std::string("Authorization: ") + key).c_str());
+  curl_slist_append(headers, (std::string("Authorization: token ") + key).c_str());
 
   curl_easy_setopt(curl_, CURLOPT_URL, url_path_);
   curl_easy_setopt(curl_, CURLOPT_HTTPHEADER, headers);
@@ -196,6 +197,10 @@ Json::Value API::post(const std::filesystem::path &addr_path,
 
   else if (return_code_ == 404) {
     throw rest_apiquery_error("'" + addr_path.string() + "' does not exist");
+  }
+
+  else if (return_code_ == 409) {
+    throw rest_apiquery_error("Entry already exists");
   }
 
   Json::Value root_;

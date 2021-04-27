@@ -71,7 +71,7 @@ private:
 public:
   DataTable() {}
 
-  int const size() { return size_; }
+  unsigned int const size() { return size_; }
   std::vector<std::string> get_row_names() const { return row_names_; }
 
   void add_column(DataTableColumn<int> *column) {
@@ -166,6 +166,18 @@ public:
     DataTableColumn<T> *new_col_ =
         new DataTableColumn(header, unit, row_names_, column_vals);
     add_column(new_col_);
+  }
+
+  std::map<std::string, DataTableColumn<int>*> get_int_columns() const {
+    return int_cols_;
+  }
+
+  std::map<std::string, DataTableColumn<float>*> get_float_columns() const {
+    return float_cols_;
+  }
+
+  std::map<std::string, DataTableColumn<std::string>*> get_str_columns() const {
+    return str_cols_;
   }
 
   std::string print() const;

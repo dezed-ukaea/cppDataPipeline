@@ -3,9 +3,11 @@
 #include "scrc/objects/distributions.hxx"
 #include "scrc/registry/file_system.hxx"
 #include "scrc/utilities/logging.hxx"
+#include "scrc/utilities/hdf5.hxx"
 #include "scrc/utilities/semver.hxx"
 #include "gtest/gtest.h"
 
+#include <string>
 #include <vector>
 
 using namespace SCRC;
