@@ -2,12 +2,28 @@
 
 **NOTE:** Currently this API implementation consists of components, assembly of these will depend on the final structure of the API itself.
 
+## Contents
+  - [Contents](#contents)
+  - [Outline](#outline)
+  - [API Backend Components](#api-backend-components)
+    - [API](#api)
+    - [LocalFileSystem](#localfilesystem)
+      - [Reading an Estimate](#reading-an-estimate)
+      - [Reading an Array](#reading-an-array)
+      - [Reading a Data Table Column](#reading-a-data-table-column)
+      - [Reading a Distribution](#reading-a-distribution)
+      - [Creating an Estimate](#creating-an-estimate)
+      - [Creating a Distribution](#creating-a-distribution)
+      - [Creating an Array](#creating-an-array)
+  - [Installation](#installation)
+  - [Unit Tests](#unit-tests)
+
 ## Outline
 The main class the user will interact with is `DataPipeline` which has only the required methods such as `read_estimate` etc. This class has a member which is a pointer to an underlying `DataPipelineImpl_` class which performs the various procedures required to handle the data. A logger has been used to give as much feedback to the user as possible, the verbosity being handled by a log level argument.
 
 Development has been made mainly to this internal class, the idea being that the top layer API will be constructed once the schema/workflow for SCRC FDP is finalised.
 
-## "Under the Hood"
+## API Backend Components
 The included unit tests show the API in action testing various methods for `DataPipelineImpl_`, `LocalFileSystem` and the extra utility methods required.
 
 ### API
@@ -128,6 +144,32 @@ void create_param_demo() {
     const std::string label = "my_params/param_a";
 
     create_estimate(value, label, v1, file_system);
+}
+```
+#### Creating a Distribution
+
+```c++
+#include "scrc/registry/file_system.hxx"
+#include "scrc/utilities/semver.hxx"
+
+#include <string>
+#include <filesystem>
+
+using namespace SCRC;
+
+void create_dis_demo() {
+    const std::filesystem::path config_file = "path/to/config.yaml";
+    LocalFileSystem* file_system = new LocalFileSystem(config_file);
+
+    const version v1(0, 2, 0);
+    const std::string label = "my_distributions/dis_a";
+
+    const double mu = 5.2;
+    const double sigma = 1.2;
+
+    Normal* dis = new Normal(mu, sigma);
+
+    create_distribution(dis, label, v1, file_system);
 }
 ```
 
