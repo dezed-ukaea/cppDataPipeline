@@ -1,5 +1,5 @@
-#include "scrc/objects/metadata.hxx"
 #include "scrc/fdp.hxx"
+#include "scrc/objects/metadata.hxx"
 #include "scrc/registry/datapipeline.hxx"
 #include "scrc/registry/file_system.hxx"
 #include "gtest/gtest.h"
@@ -20,9 +20,8 @@ DataPipelineImpl_ *init_pipeline(bool use_local = false) {
       std::filesystem::path(TESTDIR) / "config.yaml";
   APILogger->set_level(spdlog::level::debug);
 
-  return new DataPipelineImpl_(config_path_,
-                               (use_local) ? LOCAL_API_ROOT : REMOTE_API_ROOT,
-                               spdlog::level::debug);
+  return new DataPipelineImpl_(config_path_, "", spdlog::level::debug,
+                               static_cast<RESTAPI>(use_local));
 }
 
 TEST(SCRCAPITest, TestDataPipelineInit) {
@@ -35,7 +34,7 @@ TEST(SCRCAPITest, TestDataPipelineInit) {
   const std::filesystem::path config_path_ =
       std::filesystem::path(TESTDIR) / "config.yaml";
   APILogger->set_level(spdlog::level::debug);
-  DataPipeline(spdlog::level::debug, REMOTE_API_ROOT, config_path_);
+  DataPipeline(config_path_, "", spdlog::level::debug);
 }
 
 TEST(SCRCAPITest, TestLogLevelSet) {

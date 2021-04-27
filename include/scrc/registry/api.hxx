@@ -16,8 +16,7 @@
 #include "scrc/utilities/logging.hxx"
 
 namespace SCRC {
-const std::string REMOTE_API_ROOT = "https://data.scrc.uk/api";
-const std::string LOCAL_API_ROOT = "http://localhost:8000/api";
+enum RESTAPI { REMOTE, LOCAL };
 
 size_t write_func_(void *ptr, size_t size, size_t nmemb, std::string *data);
 
@@ -39,7 +38,7 @@ public:
 
 class API {
 public:
-  API(std::string url_root = LOCAL_API_ROOT) : url_root_(url_root) {}
+  API(std::string url_root) : url_root_(url_root) {}
   Json::Value request(const std::filesystem::path &addr_path,
                       long expected_response = 200);
   Json::Value query(Query query, long expected_response = 200);

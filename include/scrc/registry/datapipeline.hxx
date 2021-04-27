@@ -20,27 +20,56 @@ class DataPipelineImpl_ {
 public:
   const LocalFileSystem *file_system;
   API *api = nullptr;
-  const std::filesystem::path scrc_server_dir;
+  const std::filesystem::path access_token_file_;
 
-  DataPipelineImpl_(std::filesystem::path config_file_path,
-                    std::filesystem::path apiroot = LOCAL_API_ROOT,
-                    spdlog::level::level_enum log_level = spdlog::level::info)
+  DataPipelineImpl_(const std::filesystem::path &config_file_path,
+                    const std::filesystem::path &access_token_file,
+                    spdlog::level::level_enum log_level = spdlog::level::info,
+                    RESTAPI api_location = RESTAPI::LOCAL)
       : file_system(new LocalFileSystem(config_file_path)),
-        api(new API(apiroot)),
-        scrc_server_dir((std::getenv("SCRC_HOME")) ? std::getenv("SCRC_HOME")
-                                                   : "") {
+        access_token_file_(access_token_file) {
+    const YAML::Node config_data_ = file_system->get_config_data();
+
+    if (!config_data_["run_metadata"]) {
+      APILogger->error(
+          "Failed to obtain run metadata, the key 'run_metadata' is not"
+          " present in the configuration");
+      throw config_parsing_error("No run metadata provided");
+    }
+
+    const YAML::Node run_metadata_ = config_data_["run_metadata"];
+
+    if (api_location == RESTAPI::LOCAL &&
+        !run_metadata_["local_data_registry_url"]) {
+      APILogger->error("Could not determine URL for local repository, key "
+                       "'local_data_registry_url' "
+                       "is absent from configuration");
+      throw config_parsing_error("Failed to read local repository url");
+    }
+
+    else if (api_location == RESTAPI::REMOTE &&
+             !run_metadata_["remote_data_registry_url"]) {
+      APILogger->error("Could not determine URL for remote repository, key "
+                       "'remote_data_registry_url' "
+                       "is absent from configuration");
+      throw config_parsing_error("Failed to read remote repository url");
+    }
+
+    const YAML::Node api_ = (api_location == RESTAPI::LOCAL)
+                                ? run_metadata_["local_data_registry_url"]
+                                : run_metadata_["remote_data_registry_url"];
+    const std::filesystem::path api_root_ = api_.as<std::string>();
+
+    api = new API(api_root_);
+
     spdlog::set_default_logger(APILogger);
     APILogger->set_level(log_level);
-    if (scrc_server_dir.empty()) {
-      APILogger->error("Failed to find local registry installation, the "
-                       "environment variable SCRC_HOME must point "
-                       "to the location of your SCRC server folder");
-      throw std::runtime_error("Failed to identify server directory.");
-    }
+
     APILogger->info("\n[Configuration]\n\t- Config Path: {0}\n\t- API Root: "
-                    "{1}\n\t- SCRC server: {2}",
-                    config_file_path.string(), apiroot.string(),
-                    scrc_server_dir.string());
+                    "{1}\n\t- SCRC API Token File: {2}",
+                    config_file_path.string(), api_root_.string(),
+                    (access_token_file.empty()) ? "None"
+                                                : access_token_file.string());
   }
 
   Json::Value fetch_all_objects();

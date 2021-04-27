@@ -104,7 +104,7 @@ const T read_hdf5_object(const std::filesystem::path file_name,
 
   return obj_;
 }
-                             
+
 template <typename T>
 const std::vector<T>
 read_hdf5_comp_type_member(const std::filesystem::path file_name,
@@ -132,7 +132,7 @@ read_hdf5_comp_type_member(const std::filesystem::path file_name,
 
   const DataType dtype_ = *HDF5::get_hdf5_type<T>();
 
-  ttype_.insertMember(member, 0, dtype_); 
+  ttype_.insertMember(member, 0, dtype_);
 
   APILogger->debug("Utilities:HDF5:ReadCompTypeMember: Extracting member '" +
                    member + "' from Compound Type");

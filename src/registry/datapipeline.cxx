@@ -1,7 +1,6 @@
 #include "scrc/registry/datapipeline.hxx"
 
-namespace SCRC
-{
+namespace SCRC {
 
 Json::Value DataPipelineImpl_::fetch_all_objects() {
   APILogger->debug("DataPipelineImpl_: Fetching all objects from registry");
@@ -304,14 +303,17 @@ std::string DataPipelineImpl_::new_external_object(const YAML::Node &data) {
 }
 
 std::string DataPipelineImpl_::read_key() {
-  const std::filesystem::path key_file_ =
-      scrc_server_dir / std::filesystem::path("TOKEN.txt");
-  if (!std::filesystem::exists(key_file_)) {
+  if (!std::filesystem::exists(access_token_file_)) {
     throw std::runtime_error("Failed to find Authorisation token: '" +
-                             key_file_.string() + "'");
+                             access_token_file_.string() + "'");
   }
 
-  std::ifstream key_(key_file_, std::ios::in);
+  if (access_token_file_.empty()) {
+    APILogger->warn("API:Post: No access token provided for RestAPI POST");
+    return access_token_file_;
+  }
+
+  std::ifstream key_(access_token_file_, std::ios::in);
   std::string key_str_;
   key_ >> key_str_;
   key_.close();
@@ -407,4 +409,4 @@ void DataPipelineImpl_::add_to_register(const std::string &alias) {
       "' under a recognised key from "
       "[\"external_object\", \"data_product\", \"object\"]");
 }
-};
+}; // namespace SCRC

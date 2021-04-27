@@ -168,15 +168,16 @@ public:
     add_column(new_col_);
   }
 
-  std::map<std::string, DataTableColumn<int>*> get_int_columns() const {
+  std::map<std::string, DataTableColumn<int> *> get_int_columns() const {
     return int_cols_;
   }
 
-  std::map<std::string, DataTableColumn<float>*> get_float_columns() const {
+  std::map<std::string, DataTableColumn<float> *> get_float_columns() const {
     return float_cols_;
   }
 
-  std::map<std::string, DataTableColumn<std::string>*> get_str_columns() const {
+  std::map<std::string, DataTableColumn<std::string> *>
+  get_str_columns() const {
     return str_cols_;
   }
 

@@ -179,7 +179,11 @@ Json::Value API::post(const std::filesystem::path &addr_path,
 
   struct curl_slist *headers = NULL;
   curl_slist_append(headers, "Content-Type: application/json");
-  curl_slist_append(headers, (std::string("Authorization: token ") + key).c_str());
+
+  if (!key.empty()) {
+    curl_slist_append(headers,
+                      (std::string("Authorization: token ") + key).c_str());
+  }
 
   curl_easy_setopt(curl_, CURLOPT_URL, url_path_);
   curl_easy_setopt(curl_, CURLOPT_HTTPHEADER, headers);

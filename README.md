@@ -1,6 +1,6 @@
 # SCRC FAIR Data Pipeline C++ API
 
-Currently this API implementation consists of components, assembly of these will depend on the final structure of the API itself.
+**NOTE:** Currently this API implementation consists of components, assembly of these will depend on the final structure of the API itself.
 
 ## Outline
 The main class the user will interact with is `DataPipeline` which has only the required methods such as `read_estimate` etc. This class has a member which is a pointer to an underlying `DataPipelineImpl_` class which performs the various procedures required to handle the data. A logger has been used to give as much feedback to the user as possible, the verbosity being handled by a log level argument.
@@ -40,6 +40,55 @@ void run_api() {
 ### LocalFileSystem
 This largely handles the translation of statements in the configuration file into the retrieval of or submission of objects in the registry. It includes most of the HDF5 reading methods.
 
+
+#### Reading an Estimate
+```c++
+#include "scrc/registry/file_system.hxx"
+
+#include <filesystem>
+
+using namespace SCRC;
+
+void read_param_demo() {
+    const std::filesystem::path toml_file = "/path/to/estimate/0.1.0.toml";
+    const double value = read_point_estimate_from_toml(toml_file);
+}
+```
+
+#### Reading an Array
+```c++
+#include "scrc/registry/file_system.hxx"
+#include "scrc/objects/data.hxx"
+
+#include <filesystem>
+
+using namespace SCRC;
+
+void read_array_demo() {
+    const std::filesystem::path array_file = "path/to/array/0.20210427.0.h5";
+    const std::filesystem::path component = "test_array";
+    const ArrayObject<float>* read_array(array_file, component);
+}
+```
+
+#### Reading a Data Table Column
+```c++
+#include "scrc/registry/file_system.hxx"
+#include "scrc/objects/data.hxx"
+
+#include <string>
+#include <filesystem>
+
+using namespace SCRC;
+
+void read_table_col_demo() {
+    const std::filesystem::path array_file = "path/to/array/0.20210427.0.h5";
+    const std::filesystem::path component = "test_table";
+    const std::string column = "col_1";
+    const DataTableColumn<float>* read_table_column(array_file, component, column);
+}
+```
+
 #### Creating an Estimate
 ```c++
 #include "scrc/registry/file_system.hxx"
@@ -50,7 +99,7 @@ This largely handles the translation of statements in the configuration file int
 
 using namespace SCRC;
 
-void create_param() {
+void create_param_demo() {
     const std::filesystem::path config_file = "path/to/config.yaml";
     LocalFileSystem* file_system = new LocalFileSystem(config_file);
 
@@ -72,7 +121,7 @@ void create_param() {
 
 using namespace SCRC;
 
-void create_array() {
+void create_array_demo() {
     const std::filesystem::path config_file = "path/to/config.yaml";
     LocalFileSystem* file_system = new LocalFileSystem(config_file);
 
@@ -86,12 +135,12 @@ void create_array() {
         {1., 2., 3., 4., 5., 6., 7., 8., 9.}
     );
 
-    create_estimate(arr, data_product, component, file_system);
+    create_array(arr, data_product, component, file_system);
 }
 ```
 
 ## Installation
-You can build and test the library using CMake. All dependencies are externally fetched however it is recommended that you install the following in advance:
+You can build and test the library using CMake, this implementation requires C++17 or later as it makes use of the `std::filesystem` library. All dependencies are externally fetched however it is recommended that you install the following in advance:
 
 - [HDF5](http://www.hdfgroup.org/ftp/HDF5/current/src/)
 - [CURL](https://curl.se/libcurl/)

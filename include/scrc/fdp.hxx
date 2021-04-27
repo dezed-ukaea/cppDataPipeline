@@ -1,20 +1,21 @@
 #include "scrc/registry/datapipeline.hxx"
 
-namespace SCRC
-{
+namespace SCRC {
 class DataPipeline {
 public:
   // 'initialise' method for the API
   explicit DataPipeline(
-      spdlog::level::level_enum log_level = spdlog::level::info,
-      std::filesystem::path apiroot = LOCAL_API_ROOT,
-      std::filesystem::path config_file_path = std::filesystem::path(std::getenv("FDP_CONFIG_DIR")) / "config.yaml")
-      : pimpl_(new DataPipelineImpl_(config_file_path, apiroot, log_level)),
+      const std::filesystem::path &config_file_path,
+      const std::filesystem::path &access_token_file = "",
+      spdlog::level::level_enum log_level = spdlog::level::info)
+      : pimpl_(new DataPipelineImpl_(config_file_path, access_token_file,
+                                     log_level)),
         session_id_(generate_run_id(config_file_path)) {
-    if(!std::filesystem::exists(config_file_path))
-    {
-        APILogger->error("DataPipeline: Failed to retrieve configuration file location");
-        throw config_parsing_error("No configuration directory was identified");
+    if (!std::filesystem::exists(config_file_path)) {
+      APILogger->error("DataPipeline: Failed to retrieve configuration file "
+                       "'{0}', file does not exist",
+                       config_file_path.string());
+      throw config_parsing_error("No configuration file found");
     }
     APILogger->debug("DataPipeline: Initialising session '{0}'", session_id_);
   }
@@ -35,4 +36,4 @@ private:
   std::unique_ptr<DataPipelineImpl_> pimpl_;
   const std::string session_id_;
 };
-};
+}; // namespace SCRC
