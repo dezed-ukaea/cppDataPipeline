@@ -3,7 +3,7 @@
  * @author K. Zarebski (UKAEA)
  * @date 2021-05-05
  * @brief File containing data object classes for storing API objects
- * 
+ *
  * The classes within this file are used to store objects read from the SCRC
  * API, keeping metadata alongside values.
  ****************************************************************************/
@@ -24,7 +24,7 @@
 /*! **************************************************************************
  * @namespace SCRC
  * @brief namespace containing all SCRC API library methods and variables
- * 
+ *
  * The SCRC namespace holds all of the C++ API methods, which include reading
  * and writing to the RestAPI, storing of data into objects, file access and
  * handling of metadata.
@@ -36,9 +36,9 @@ namespace SCRC {
  * @class DataTableColumn
  * @brief stores an array of values representing a single column from a table
  * @tparam T type of the column data
- * 
+ *
  * The DataTableColumn class allows the values from a single column read from
- * a data table stored within a HDF5 file to be contained alongside the 
+ * a data table stored within a HDF5 file to be contained alongside the
  * metadata (titles etc.). The class requires a type argument indicating the
  * type of the array contained.
  ****************************************************************************/
@@ -57,7 +57,7 @@ public:
 
   /*! ************************************************************************
    * @brief Construct a new Data Table Column object
-   * 
+   *
    * @param name the name/title of the column
    * @param unit the unit of measurement for the column data
    * @param row_names a vector containing labels for each row element
@@ -70,30 +70,30 @@ public:
 
   /*! *************************************************************************
    * @brief returns the values from the given data column
-   * 
-   * @return const std::vector<T> value data as vector
+   *
+   * @return value data as vector
    ***************************************************************************/
   const std::vector<T> values() const { return values_; }
 
   /*! *************************************************************************
    * @brief returns the name/title of the data column
-   * 
-   * @return const std::string name of data column
+   *
+   * @return name of data column
    ***************************************************************************/
   const std::string name() const { return name_; }
 
   /*! *************************************************************************
    * @brief returns the number of entries within the data column
-   * 
-   * @return int length of data column
+   *
+   * @return length of data column
    ***************************************************************************/
   int size() const { return values_.size(); }
 
   /*! *************************************************************************
    * @brief retrieves the value at the given index
-   * 
+   *
    * @param index data column index
-   * @return T value at the index position
+   * @return value at the index position
    ****************************************************************************/
   T operator[](int index) {
     if (index > size()) {
@@ -106,9 +106,9 @@ public:
 
   /*! **************************************************************************
    * @brief retrieve a value from the data column by row label
-   * 
+   *
    * @param key label of the row
-   * @return T value at the relevant index
+   * @return value at the relevant index
    ****************************************************************************/
   T operator[](const std::string &key) {
     if (row_names_.empty()) {
@@ -132,10 +132,10 @@ public:
 /*! ***************************************************************************
  * @class DataTable
  * @brief class to store multi-column data
- * 
+ *
  * The class allows the storage of integer, float and string columned data
  * within a single object. The three types are stored separately.
- * 
+ *
  *****************************************************************************/
 class DataTable {
 private:
@@ -149,31 +149,31 @@ private:
 public:
   /*! ************************************************************************
    * @brief Construct an empty DataTable object
-   * 
+   *
    **************************************************************************/
   DataTable() {}
 
   /*! ************************************************************************
-   * @brief 
-   * 
-   * @return unsigned int const 
+   * @brief returns the size of the data table which is the number of entries
+   *
+   * @return total number of rows
    **************************************************************************/
   unsigned int const size() { return size_; }
 
   /*! ************************************************************************
    * @brief retrieve the labels for the column rows
-   * 
-   * @return std::vector<std::string> label list
+   *
+   * @return label list
    **************************************************************************/
   std::vector<std::string> get_row_names() const { return row_names_; }
 
   /*! ************************************************************************
    * @brief add a column of integers to the data table
    *
-   * Appends a DataTableColumn of integers to the data table, if the existing 
+   * Appends a DataTableColumn of integers to the data table, if the existing
    * table is not empty, the vector must match the size of the table,
    * else an exception will be thrown.
-   * 
+   *
    * @exception std::invalid_argument if the new vector does not match
    * existing table size
    * @param column a DataTableColumn of integers to append to table
@@ -199,10 +199,10 @@ public:
   /*! ************************************************************************
    * @brief add a column of floats to the data table
    *
-   * Appends a DataTableColumn of floats to the data table, if the existing 
+   * Appends a DataTableColumn of floats to the data table, if the existing
    * table is not empty, the vector must match the size of the table,
    * else an exception will be thrown.
-   * 
+   *
    * @exception std::invalid_argument if the new vector does not match
    * existing table size
    * @param column a DataTableColumn of floats to append to table
@@ -228,10 +228,10 @@ public:
   /*! ************************************************************************
    * @brief add a column of strings to the data table
    *
-   * Appends a DataTableColumn of strings to the data table, if the existing 
+   * Appends a DataTableColumn of strings to the data table, if the existing
    * table is not empty, the vector must match the size of the table,
    * else an exception will be thrown.
-   * 
+   *
    * @exception std::invalid_argument if the new vector does not match
    * existing table size
    * @param column a DataTableColumn of strings to append to table
@@ -254,11 +254,11 @@ public:
     ncols_ += 1;
   }
 
-  /*! ***************************************************************************
+  /*!****************************************************************************
    * @brief retrieve by name/title a column of integers from the data table
-   * 
+   *
    * @param col_name the name/title of the column within the table
-   * @return DataTableColumn<int>* 
+   * @return the named data table column
    *****************************************************************************/
   DataTableColumn<int> *get_int_column(const std::string &col_name) {
     if (int_cols_.find(col_name) == int_cols_.end()) {
@@ -270,11 +270,12 @@ public:
     return int_cols_[col_name];
   }
 
-  /*! ***************************************************************************
+  /*!
+   ****************************************************************************
    * @brief retrieve by name/title a column of strings from the data table
-   * 
+   *
    * @param col_name the name/title of the column within the table
-   * @return DataTableColumn<int>* 
+   * @return the named data table column
    *****************************************************************************/
   DataTableColumn<std::string> *get_string_column(const std::string &col_name) {
     if (str_cols_.find(col_name) == str_cols_.end()) {
@@ -286,11 +287,12 @@ public:
     return str_cols_[col_name];
   }
 
-  /*! ***************************************************************************
+  /*!
+   ****************************************************************************
    * @brief retrieve by name/title a column of floats from the data table
-   * 
+   *
    * @param col_name the name/title of the column within the table
-   * @return DataTableColumn<int>* 
+   * @return the named data table column
    *****************************************************************************/
   DataTableColumn<float> *get_float_column(const std::string &col_name) {
     if (float_cols_.find(col_name) == float_cols_.end()) {
@@ -304,14 +306,14 @@ public:
 
   /*! **************************************************************************
    * @brief remove by name/title a column from the data table
-   * 
+   *
    * @param col_name the name/title of the column to remove
    ****************************************************************************/
   void delete_column(const std::string &col_name);
 
   /*! **************************************************************************
    * @brief append a column to the data table from a vector
-   * 
+   *
    * @tparam T the type of the input data
    * @param header the name/title to be assigned to the column
    * @param column_vals the values to append
@@ -327,11 +329,11 @@ public:
 
   /*! *************************************************************************
    * @brief retrieve all integer columns from the data table
-   * 
+   *
    * Returns all stored integer columns as a map the keys of which are the
    * names/titles of the columns within the table.
-   * 
-   * @return std::map<std::string, DataTableColumn<int> *> 
+   *
+   * @return a map of all integer columns
    ***************************************************************************/
   std::map<std::string, DataTableColumn<int> *> get_int_columns() const {
     return int_cols_;
@@ -339,11 +341,11 @@ public:
 
   /*! *************************************************************************
    * @brief retrieve all float columns from the data table
-   * 
+   *
    * Returns all stored float columns as a map the keys of which are the
    * names/titles of the columns within the table.
-   * 
-   * @return std::map<std::string, DataTableColumn<int> *> 
+   *
+   * @return a map of all float columns
    ***************************************************************************/
   std::map<std::string, DataTableColumn<float> *> get_float_columns() const {
     return float_cols_;
@@ -351,11 +353,11 @@ public:
 
   /*! *************************************************************************
    * @brief retrieve all string columns from the data table
-   * 
+   *
    * Returns all stored string columns as a map the keys of which are the
    * names/titles of the columns within the table.
-   * 
-   * @return std::map<std::string, DataTableColumn<int> *> 
+   *
+   * @return a map of all string columns
    ***************************************************************************/
   std::map<std::string, DataTableColumn<std::string> *>
   get_str_columns() const {
@@ -365,22 +367,21 @@ public:
   /*! ************************************************************************
    * @brief constructs a string representation of the table which can be
    * printed to std::out
-   * 
-   * @return std::string table as string
+   *
+   * @return table as string
    **************************************************************************/
   std::string print() const;
 };
-
 
 /*! *************************************************************************
  * @class ArrayObject
  * @brief class to store an array of values from the SCRC pipeline alongside
  * the associated metadata
- * 
+ *
  * The ArrayObject class stores the values from an SCRC pipeline array type
  * with properties such as the titles of the dimensions of the array, and names
  * of positions along each of the dimension axes.
- * 
+ *
  * @tparam T the type of the array values stored
  ***************************************************************************/
 template <typename T> class ArrayObject {
@@ -393,13 +394,13 @@ private:
 public:
   /*! **********************************************************************
    * @brief constructs an empty ArrayObject instance
-   * 
+   *
    ************************************************************************/
   ArrayObject() {}
 
   /*! **********************************************************************
    * @brief constructs an array from a vector of values and given metadata
-   * 
+   *
    * @tparam T the type of the array values to store
    * @param dim_titles the names of the dimensions
    * @param dim_names the labels for each position in each dimension
@@ -414,9 +415,9 @@ public:
 
   /*! *********************************************************************
    * @brief retrieve an element from the array by giving its coordinates
-   * 
+   *
    * @param co_ords co-ordinate of the element to retrieve
-   * @return T the element within the array at the given position
+   * @return the element within the array at the given position
    ***********************************************************************/
   T get(std::vector<int> co_ords) const {
     int flat_index_ = co_ords[0];
@@ -446,9 +447,9 @@ public:
 
   /*! *********************************************************************
    * @brief retrieve the title for the given dimension
-   * 
+   *
    * @param dimension index of the dimension
-   * @return std::string the title of the dimension
+   * @return the title of the dimension
    ***********************************************************************/
   std::string get_title(unsigned int dimension) const {
     if (dimension >= dimension_titles_.size()) {
@@ -462,9 +463,9 @@ public:
 
   /*! ********************************************************************
    * @brief retrieve the names of each position in the specified dimension
-   * 
+   *
    * @param dimension index of the dimension
-   * @return std::vector<std::string> vector of labels for that dimension
+   * @return vector of labels for that dimension
    **********************************************************************/
   std::vector<std::string> get_dimension_names(unsigned int dimension) const {
     if (dimension >= dimension_titles_.size()) {
@@ -478,22 +479,22 @@ public:
 
   /*! *******************************************************************
    * @brief returns the rank of the array data
-   * 
-   * @return int array rank
+   *
+   * @return array rank
    *********************************************************************/
   int rank() const { return dimensions_.size(); }
 
   /*! *******************************************************************
    * @brief returns the dimensions of the array
-   * 
-   * @return std::vector<int> vector of dimensions
+   *
+   * @return vector of dimensions
    *********************************************************************/
   std::vector<int> get_dimensions() const { return dimensions_; }
 
   /*! *******************************************************************
    * @brief retrieves the array itself as a 1D vector of values
-   * 
-   * @return std::vector<T> all array values as a vector
+   *
+   * @return all array values as a vector
    *********************************************************************/
   std::vector<T> get_values() const { return array_; }
 };
