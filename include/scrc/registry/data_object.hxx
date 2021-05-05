@@ -22,12 +22,20 @@
 
 namespace SCRC {
 /*! **************************************************************************
- * @namespace ReadObject
- * @brief Contains classes matching the structure of objects read
- * from the RestAPI
- * 
+ * @namespace SCRC::ReadObject
+ * @brief Contains classes matching the structure of read statements within
+ * the local API configuration
+ *
  ****************************************************************************/
 namespace ReadObject {
+/*! **************************************************************************
+ * @class DataProduct
+ * @brief class for reading data product entries within the local configuration
+ *
+ * The DataProduct class has a structure that matches the YAML syntax within the
+ * local configuration file. It provides an intermediate for storing the
+ * information extracted from the config.
+ ****************************************************************************/
 class DataProduct {
 private:
   const std::string namespace_;
@@ -37,18 +45,66 @@ private:
   const std::string title_ = "";
 
 public:
+  /*! ***********************************************************************
+   * @brief Initialise a new data product instance
+   *
+   * @param registry_path registry path of the data product
+   * @param version semantic version number for the data product
+   * @param name_space namespace containing the data product
+   * @param title data product title
+   * @param cache_path location within the cache of the local file system
+   *************************************************************************/
   DataProduct(std::string registry_path, std::string version,
               std::string name_space = "", std::string title = "",
               std::filesystem::path cache_path = "")
       : registry_path_(registry_path), version_(version),
         namespace_(name_space), title_(title), cache_(cache_path) {}
+
+  /*! **********************************************************************
+   * @brief Get the registry path of the data product
+   * @return path of the data product within the registry
+   ************************************************************************/
   std::filesystem::path get_path() const { return registry_path_; }
+
+  /*! **********************************************************************
+   * @brief Get the version of the data product as a version object
+   *
+   * @return semantic version of the data product
+   ************************************************************************/
   version get_version() const { return version_; }
+
+  /*! **********************************************************************
+   * @brief Get the namespace of the data product
+   *
+   * @return namespace as a string
+   ************************************************************************/
   std::string get_namespace() const { return namespace_; }
+
+  /*! **********************************************************************
+   * @brief Get the title of the data product
+   *
+   * @return title as a string
+   ************************************************************************/
   std::string get_title() const { return title_; }
+
+  /*! **********************************************************************
+   * @brief Get the local cache path of the data product
+   *
+   * @return path of the data product in the local cache
+   ************************************************************************/
   std::string get_cache_path() const { return cache_; }
 };
 
+/**
+ * @class ExternalObject
+ * @brief class for reading external object entries within the
+ * local configuration read header
+ *
+ * The ExternalObject class has a structure that matches the YAML syntax
+ * within the local configuration file for reading of external objects.
+ * It provides an intermediate for storing the information extracted
+ * from the config.
+ ****************************************************************************/
 class ExternalObject {
 private:
   const DOI *doi_ = nullptr;
@@ -57,11 +113,25 @@ private:
   std::filesystem::path cache_location_ = std::filesystem::path();
 
 public:
+  /*! ***********************************************************************
+   * @brief Construct a new External Object object
+   *
+   * @param title external object title
+   * @param doi the DOI of the external object if appropriate
+   * @param name the unique name for the external object
+   * @param cache_path location within the cache of the local file system
+   *************************************************************************/
   ExternalObject(const std::string &title = "", const DOI *doi = nullptr,
                  const std::string &name = "",
                  std::filesystem::path cache_path = "")
       : title_(title), doi_(doi), name_(name), cache_location_(cache_path) {}
 
+  /*! ***********************************************************************
+   * @brief retrieve the unique identifier for the external object, this is
+   * either the DOI or, if not applicable, the unique name
+   * 
+   * @return unique identifier for the external object
+   *************************************************************************/
   std::string get_unique_id() const {
     if (doi_) {
       return doi_->to_string();
@@ -70,15 +140,57 @@ public:
   }
 };
 
+/*! *************************************************************************
+ * @brief convert a data product entry within the configuration into a
+ * DataProduct instance
+ * 
+ * @param yaml_data YAML data read from the configuration file
+ * @return a pointer to the new data product instance
+ ***************************************************************************/
 DataProduct *data_product_from_yaml(YAML::Node yaml_data);
+
+/*! *************************************************************************
+ * @brief convert an external object entry within the configuration into an
+ * ExternalObject instance
+ * 
+ * @param yaml_data YAML data read from the configuration file
+ * @return a pointer to the new external object instance
+ ***************************************************************************/
 ExternalObject *external_object_from_yaml(YAML::Node yaml_data);
 }; // namespace ReadObject
 
+/*! *************************************************************************
+ * @namespace SCRC::RegisterObject
+ * @brief Contains classes matching the structure of register statements
+ * within the local API configuration
+ ***************************************************************************/
 namespace RegisterObject {
-enum Accessibility { OPEN, CLOSED };
+/*! *************************************************************************
+ * @enum Accessibility
+ * @brief options for specifying whether an object can be accessed publicly
+ ***************************************************************************/
+enum Accessibility {
+  OPEN,   /*!< object can be accessed publicly */
+  CLOSED  /*!< object is private and requires authorisation to be accessed */
+};
 
+/*! *************************************************************************
+ * @brief convert string access statement to Accessibility
+ * 
+ * @param access accessibility as string
+ * @return accessibility as Accessibility type 
+ ***************************************************************************/
 Accessibility access_from_str(const std::string &access);
 
+/*! *************************************************************************
+ * @class ExternalObject
+ * @brief class for reading external object entries within the
+ * local configuration registration header
+ * 
+ * This class represents the metadata for the registration of an external
+ * object within the registry, this matches the YAML syntax for the
+ * local API configuration
+ ***************************************************************************/
 class ExternalObject {
 private:
   const std::string source_name_ = "";
@@ -99,13 +211,42 @@ private:
   const Accessibility accessibility_ = Accessibility::OPEN;
 
 public:
+  /*! ***********************************************************************
+   * @brief construct an external object registration entry from the
+   * local configuration YAML metadata
+   * 
+   * @param entry read from the local configuration register header
+   *************************************************************************/
   ExternalObject(YAML::Node yaml_data);
+
+  /*! ***********************************************************************
+   * @brief retrieve the name of the source for this entry
+   *
+   * @return source name as string
+   *************************************************************************/
   std::string get_source_name() const { return source_name_; }
+
+  /*! ***********************************************************************
+   * @brief retrieve the abbreviation name of the source for this entry
+   * 
+   * @return abbreviation as string 
+   *************************************************************************/
   std::string get_source_abbreviation() const { return source_abbreviation_; }
+
+  /*! ***********************************************************************
+   * @brief retrieve the website URL for this entry
+   * 
+   * @return URL of the source website as string
+   */
   std::string get_source_website() const { return source_website_; }
 };
 }; // namespace RegisterObject
 
+/**
+ * @namespace SCRC::WriteObject
+ * @brief Contains classes matching the structure of write statements
+ * within the local API configuration
+ ***************************************************************************/
 namespace WriteObject {
 class DataProduct {
 private:

@@ -1,3 +1,13 @@
+/*! **************************************************************************
+ * @file scrc/registry/datapipeline.hxx
+ * @author K. Zarebski (UKAEA)
+ * @date 2021-05-05
+ * @brief File containing classes for interaction with the SCRC data pipeline
+ *
+ * The classes within this file form the core objects for handling interaction
+ * with the SCRC FAIR Data pipeline. They contain methods which parse
+ * configurations and control calls to the RestAPI itself.
+ ****************************************************************************/
 #ifndef __SCRC_DATAPIPELINE_HXX__
 #define __SCRC_DATAPIPELINE_HXX__
 
@@ -16,12 +26,34 @@
 #include "scrc/utilities/logging.hxx"
 
 namespace SCRC {
+
+/*! *****************************************************************************
+ * @class DataPipelineImpl_
+ * @brief private pointer-to-implementation class containing all backend methods
+ * 
+ * This class performs all behind the scenes operations acting as the backend to
+ * the user called SCRC::DataPipeline class. 
+ * This structure has been chosen to allow for unit tests to be created to test
+ * all methods including private ones.
+ * 
+ * @warning The class should not be used directly during implementation,
+ * but rather via an SCRC::DataPipeline instance.
+ * 
+ *******************************************************************************/
 class DataPipelineImpl_ {
 public:
   const LocalFileSystem *file_system;
   API *api = nullptr;
   const std::filesystem::path access_token_file_;
 
+  /*! ***************************************************************************
+   * @brief construct a DataPipelineImpl_ instance from configurations and setup
+   * 
+   * @param config_file_path location of the local configuration file
+   * @param access_token_file API authorisation token where required
+   * @param log_level level for the output logging statements
+   * @param api_location whether to use local/remote RestAPI endpoint
+   *****************************************************************************/
   DataPipelineImpl_(const std::filesystem::path &config_file_path,
                     const std::filesystem::path &access_token_file,
                     spdlog::level::level_enum log_level = spdlog::level::info,
@@ -72,23 +104,121 @@ public:
                                                 : access_token_file.string());
   }
 
+  /*! ************************************************************************
+   * @brief Fetch all objects from the RestAPI matching the category 'object'
+   * 
+   * @return a JSON object containing all results from the RestAPI query
+   **************************************************************************/
   Json::Value fetch_all_objects();
+
+  /*! ************************************************************************
+   * @brief Fetch all objects from the RestAPI matching the
+   * category 'namespace'
+   * 
+   * @return a JSON object containing all results from the RestAPI query
+   **************************************************************************/
   Json::Value fetch_all_namespaces();
+
+  /*! ************************************************************************
+   * @brief send a request to the RestAPI for information on an 'object' by
+   * giving its registered identifier
+   * 
+   * @param identifier id representing the object in the registry
+   * @return Json::Value JSON object containing metadata for the object
+   **************************************************************************/
   Json::Value fetch_object_by_id(int identifier);
+
+  /*! ************************************************************************
+   * @brief Fetch all objects from the RestAPI matching the
+   * category 'data_product'
+   * 
+   * @return a JSON object containing all results from the RestAPI query
+   **************************************************************************/
   Json::Value fetch_all_data_products();
+
+  /*! ************************************************************************
+   * @brief Fetch all objects from the RestAPI matching the
+   * category 'external_object'
+   * 
+   * @return a JSON object containing all results from the RestAPI query
+   **************************************************************************/
   Json::Value fetch_all_external_objects();
+
+  /*! ************************************************************************
+   * @brief send a request to the RestAPI for information on an 'data_product'
+   * by giving its registered identifier
+   * 
+   * @param identifier id representing the data product in the registry
+   * @return Json::Value JSON object containing metadata for the object
+   **************************************************************************/
   Json::Value fetch_data_product_by_id(int identifier);
+
+  /*! ************************************************************************
+   * @brief send a request to the RestAPI for information on an 'storage_root'
+   * by giving its registered identifier
+   * 
+   * @param identifier id representing the data store root in the registry
+   * @return Json::Value JSON object containing metadata for the object
+   **************************************************************************/
   Json::Value fetch_store_root_by_id(int identifier);
+
+  /*! ************************************************************************
+   * @brief send a request to the RestAPI for information on an 'storage_location'
+   * by giving its registered identifier
+   * 
+   * @param identifier id representing the data store in the registry
+   * @return Json::Value JSON object containing metadata for the object
+   **************************************************************************/
   Json::Value fetch_data_store_by_id(int identifier);
+
+   /*! ************************************************************************
+   * @brief send a request to the RestAPI for information on an 'external_object'
+   * by giving its registered identifier
+   * 
+   * @param identifier id representing the external object in the registry
+   * @return Json::Value JSON object containing metadata for the object
+   **************************************************************************/
   Json::Value fetch_external_object_by_id(int identifier);
+
+  /*! ************************************************************************
+   * @brief download a data product from the registry
+   * 
+   * @param data_product an instance of SCRC::ReadObject::DataProduct
+   **************************************************************************/
   std::filesystem::path
   download_data_product(ReadObject::DataProduct *data_product);
+
+  /*! ************************************************************************
+   * @brief download an external object from the registry
+   * 
+   * @param data_product an instance of SCRC::ReadObject::ExternalObject
+   **************************************************************************/
   std::filesystem::path
   download_external_object(ReadObject::ExternalObject *external_object);
+
+  /*! ************************************************************************
+   * @brief fetch the identifier for a given namespace by name
+   * 
+   * @param name_space the name of the namespace
+   * @return the integer identifer for the namespace in the registry
+   **************************************************************************/
   int get_id_from_namespace(std::string name_space);
+
+  /*! ************************************************************************
+   * @brief retrieve the identifier part of a RestAPI URL for an object
+   * 
+   * @param path the URL/path ending in the identifier
+   * @return the integer identifer obtained from the path
+   **************************************************************************/
   int get_id_from_path(std::filesystem::path path);
 
+  /*! ************************************************************************
+   * @brief register a new code run in the registry
+   * @todo this method is incomplete!
+   **************************************************************************/
   void push_new_coderun();
+
+
   void add_to_register(const std::string &alias);
   void register_external_object(const YAML::Node &register_entry);
   std::string new_source(const YAML::Node &data);
