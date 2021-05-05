@@ -20,7 +20,7 @@ namespace SCRC {
  * @class Distribution
  * @brief represents a distribution with defined parameters which can be
  * used to generate values.
- * 
+ *
  * The Distribution class can be used to generate a random value from a
  * distribution contained within the standard library. It provides a container
  * into which a distribution object retrieved from the SCRC pipeline
@@ -30,7 +30,7 @@ class Distribution {
 public:
   /*! ************************************************************************
    * @brief construct a distribution from a given set of parameters
-   * 
+   *
    * @param name label for the distribution
    * @param params a map containing all parameters associated with the
    * distribution as defined by the relevant SCRC pipeline schema
@@ -40,7 +40,7 @@ public:
 
   /*! ************************************************************************
    * @brief generate a value using the distribution
-   * 
+   *
    * @param gen generator instance to used for random number generation
    * @return value of 1, as this is a base class
    **************************************************************************/
@@ -48,7 +48,7 @@ public:
 
   /*! ************************************************************************
    * @brief retrieve the value for the given distribution parameter
-   * 
+   *
    * @param param_name name of the parameter
    * @return the parameter value
    **************************************************************************/
@@ -58,10 +58,16 @@ public:
 
   /*! ************************************************************************
    * @brief retrieve the name of the distribution
-   * 
+   *
    * @return distribution name
    **************************************************************************/
   std::string get_name() const { return name_; }
+
+  /*!
+   * @brief Retrieve the parameters of the distribution
+   * 
+   * @return map containing parameter values
+   */
   std::map<std::string, double> get_params() const { return parameters_; }
 
 protected:
@@ -88,21 +94,23 @@ protected:
 /*! **************************************************************************
  * @class Normal
  * @brief normal (or gaussian) distribution
- * 
+ *
  * A subclass of Distribution that represents a normal distribution
  * defined as:
  * @f[
- * f(x;\mu, \sigma) = \frac{1}{\sigma\sqrt{2\pi}}\exp{\left(-\frac{1}{2}\left(\frac{x-\mu}{\sigma}\right)^2\right)}
+ * f(x;\mu, \sigma) =
+ *\frac{1}{\sigma\sqrt{2\pi}}\exp{\left(-\frac{1}{2}\left(\frac{x-\mu}{\sigma}\right)^2\right)}
  * @f]
- * within the standard library 
- * <a href="https://en.cppreference.com/w/cpp/numeric/random/normal_distribution">normal_distribution</a>.
- * 
+ * within the standard library
+ * <a
+ *href="https://en.cppreference.com/w/cpp/numeric/random/normal_distribution">normal_distribution</a>.
+ *
  ****************************************************************************/
 class Normal : public Distribution {
 public:
   /*! ************************************************************************
    * @brief Construct a Normal distribution with the given parameters
-   * 
+   *
    * @param mean the mean @f$\mu@f$ of the distribution
    * @param sd the standard deviation @f$\sigma@f$ of the distribution
    **************************************************************************/
@@ -111,28 +119,28 @@ public:
 
   /*! ************************************************************************
    * @brief Construct a Normal distribution from a given Distribution object
-   * 
+   *
    * @param dis distribution to extract parameters from
    **************************************************************************/
   Normal(Distribution &dis) : Distribution("normal", dis.get_params()) {}
 
   /*! ************************************************************************
    * @brief retrieve the mean, @f$\mu@f$ for the distribution
-   * 
+   *
    * @return the mean of the distribution
    **************************************************************************/
   double mean() const { return parameters_.at("mu"); }
 
   /*! ************************************************************************
    * @brief retrieve the standard deviation, @f$\sigma@f$ for the distribution
-   * 
+   *
    * @return the standard deviation of the distribution
    **************************************************************************/
   double standard_deviation() const { return parameters_.at("sigma"); }
 
   /*! ************************************************************************
    * @brief generate a random value from the distribution
-   * 
+   *
    * @param gen generator instance to use for seeding
    * @return double a randomly generated value
    **************************************************************************/
@@ -145,25 +153,26 @@ public:
 /*! **************************************************************************
  * @class Gamma
  * @brief gamma distribution
- * 
+ *
  * A subclass of Distribution that represents a gamma distribution
  * defined as:
  * @f[
  * p(x | k, \theta) = \frac{\theta^{k}e^{-x\theta}}{\Gamma(k)}x^{k-1}
  * @f]
- * within the standard library 
- * <a href="https://en.cppreference.com/w/cpp/numeric/random/gamma_distribution">gamma_distribution</a>.
- * Where the parameterisation is: 
+ * within the standard library
+ * <a
+ *href="https://en.cppreference.com/w/cpp/numeric/random/gamma_distribution">gamma_distribution</a>.
+ * Where the parameterisation is:
  * @f[
  *  k = \alpha,\quad\theta = 1/\beta
  * @f]
- * 
+ *
  ****************************************************************************/
 class Gamma : public Distribution {
 public:
   /*! ************************************************************************
    * @brief Construct a new Gamma distribution with the given parameters
-   * 
+   *
    * @param k shape parameter @f$k@f$
    * @param theta scale parameter, @f$\theta@f$
    **************************************************************************/
@@ -172,28 +181,28 @@ public:
 
   /*! ************************************************************************
    * @brief Construct a Gamma distribution from a given Distribution object
-   * 
+   *
    * @param dis distribution to extract parameters from
    **************************************************************************/
   Gamma(Distribution &dis) : Distribution("gamma", dis.get_params()) {}
 
   /*!
    * @brief retrieve the value of the shape parameter, @f$k@f$.
-   * 
+   *
    * @return the shape parameter value
    */
   double k() const { return parameters_.at("k"); }
 
   /*!
    * @brief retrieve the value of the scale parameter, @f$\theta@f$.
-   * 
+   *
    * @return the scale parameter value
    */
   double theta() const { return parameters_.at("theta"); }
 
   /*! ************************************************************************
    * @brief generate a random value from the distribution
-   * 
+   *
    * @param gen generator instance to use for seeding
    * @return double a randomly generated value
    **************************************************************************/

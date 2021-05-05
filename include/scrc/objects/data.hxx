@@ -131,10 +131,14 @@ public:
 
 /*! ***************************************************************************
  * @class DataTable
- * @brief class to store multi-column data
- *
- * The class allows the storage of integer, float and string columned data
+ * @brief this class allows the storage of integer, float and string columned data
  * within a single object. The three types are stored separately.
+ * @subsubsection testcases Test Cases
+ *  - `test/test_objects.cxx`: TestDataTableCreate
+ * 
+ *    This unit test checks that the DataTable initialisation method works
+ *     correctly
+ *    @snippet test/test_objects.cxx TestDataTableCreate
  *
  *****************************************************************************/
 class DataTable {

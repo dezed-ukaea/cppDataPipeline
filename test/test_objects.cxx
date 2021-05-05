@@ -1,8 +1,18 @@
+/*! **************************************************************************
+ * @file test/test_objects.cxx
+ * @author K. Zarebski (UKAEA)
+ * @date 2021-05-05
+ * @brief This file contains tests for checking the data table class
+ *
+ * The tests contained within this file check functionality and validate
+ * method associated with the data classes
+ ****************************************************************************/
 #include "scrc/objects/data.hxx"
 #include "gtest/gtest.h"
 
 using namespace SCRC;
 
+//! [TestDataTableCreate]
 TEST(SCRCAPITest, TestDataTableCreate) {
   DataTable *data_table_ = new DataTable;
   data_table_->add_column<std::string>("Name",
@@ -12,3 +22,4 @@ TEST(SCRCAPITest, TestDataTableCreate) {
   ASSERT_EQ((*data_table_->get_string_column("Name"))[2], "David");
   std::cout << data_table_->print() << std::endl;
 }
+//! [TestDataTableCreate]
