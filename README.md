@@ -3,7 +3,6 @@
 **NOTE:** Currently this API implementation consists of components, assembly of these will depend on the final structure of the API itself.
 
 ## Contents
-  - [Contents](#contents)
   - [Outline](#outline)
   - [API Backend Components](#api-backend-components)
     - [API](#api)
