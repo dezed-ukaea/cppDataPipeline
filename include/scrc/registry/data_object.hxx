@@ -1,3 +1,12 @@
+/*! **************************************************************************
+ * @file scrc/registry/data_object.hxx
+ * @author K. Zarebski (UKAEA)
+ * @date 2021-05-05
+ * @brief File containing RestAPI query objects
+ *
+ * This file contains classes to describe structures received from the RestAPI
+ * and recognised by the local configuration file.
+ ****************************************************************************/
 #ifndef __SCRC_DATAOBJECT_HXX__
 #define __SCRC_DATAOBJECT_HXX__
 
@@ -12,6 +21,12 @@
 #include "scrc/utilities/semver.hxx"
 
 namespace SCRC {
+/*! **************************************************************************
+ * @namespace ReadObject
+ * @brief Contains classes matching the structure of objects read
+ * from the RestAPI
+ * 
+ ****************************************************************************/
 namespace ReadObject {
 class DataProduct {
 private:

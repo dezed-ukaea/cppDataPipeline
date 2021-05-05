@@ -65,7 +65,7 @@ public:
 
   /*!
    * @brief Retrieve the parameters of the distribution
-   * 
+   *
    * @return map containing parameter values
    */
   std::map<std::string, double> get_params() const { return parameters_; }
