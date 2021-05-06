@@ -41,8 +41,9 @@ SCRC::HDF5::read_hdf5_as_str_vector(const std::filesystem::path file_name,
   return data_str_;
 }
 
-const H5::CompType *SCRC::HDF5::get_comptype(const std::filesystem::path file_name,
-                                         std::string key) {
+const H5::CompType *
+SCRC::HDF5::get_comptype(const std::filesystem::path file_name,
+                         std::string key) {
   APILogger->debug("Utilities:HDF5:GetCompType: Opening file '{0}'",
                    file_name.string());
 
@@ -55,7 +56,7 @@ const H5::CompType *SCRC::HDF5::get_comptype(const std::filesystem::path file_na
 
   H5::DataSet *data_set_ = new H5::DataSet(file_->openDataSet(key.c_str()));
 
-  H5::CompType* ctype_ = new H5::CompType(data_set_->getCompType());
+  H5::CompType *ctype_ = new H5::CompType(data_set_->getCompType());
 
   data_set_->close();
 
@@ -63,5 +64,4 @@ const H5::CompType *SCRC::HDF5::get_comptype(const std::filesystem::path file_na
   delete file_;
 
   return ctype_;
-
 }

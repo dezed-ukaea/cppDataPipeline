@@ -27,7 +27,7 @@
 
 namespace SCRC {
 
- /*! **************************************************************************
+/*! **************************************************************************
  * @class DataPipelineImpl_
  * @brief private pointer-to-implementation class containing all backend methods
  * @author K. Zarebski (UKAEA)
@@ -238,15 +238,15 @@ public:
    * @brief add an entry to the registry based on metadata
    * in the configuration
    * @author K. Zarebski (UKAEA)
-   * 
-   * @param alias label for the object to upload 
+   *
+   * @param alias label for the object to upload
    **************************************************************************/
   void add_to_register(const std::string &alias);
 
   /*! ************************************************************************
    * @brief add an external object to the registry using the given metadata
    * @author K. Zarebski (UKAEA)
-   * 
+   *
    * @param register_entry YAML node containing the metadata
    **************************************************************************/
   void register_external_object(const YAML::Node &register_entry);
@@ -254,7 +254,7 @@ public:
   /*! ************************************************************************
    * @brief add a new data source to the registry
    * @author K. Zarebski (UKAEA)
-   * 
+   *
    * @param data YAML node containing source metadata
    * @return the address of the newly created source object on the registry
    **************************************************************************/
@@ -263,7 +263,7 @@ public:
   /*! ************************************************************************
    * @brief add a new storage root to the registry
    * @author K. Zarebski (UKAEA)
-   * 
+   *
    * @param data YAML node containing source metadata
    * @return the address of the newly created storage root object on
    * the registry
@@ -273,7 +273,7 @@ public:
   /*! ************************************************************************
    * @brief add a new storage location to the registry
    * @author K. Zarebski (UKAEA)
-   * 
+   *
    * @param data YAML node containing source metadata
    * @return the address of the newly created storage location object
    * on the registry
@@ -283,7 +283,7 @@ public:
   /*! ************************************************************************
    * @brief add a new external object to the registry
    * @author K. Zarebski (UKAEA)
-   * 
+   *
    * @param data YAML node containing source metadata
    * @return the address of the newly created source object on the registry
    **************************************************************************/
@@ -292,26 +292,25 @@ public:
   /*! ************************************************************************
    * @brief read the authorisation key from the input token file
    * @author K. Zarebski (UKAEA)
-   * 
+   *
    * @return the key as a string
    **************************************************************************/
   std::string read_key();
 };
 
-
 /*! **************************************************************************
  * @class DataProductQuery
- * @brief class for constructing the correct URL query string for a data 
+ * @brief class for constructing the correct URL query string for a data
  * product query
  * @author K. Zarebski (UKAEA)
- * 
+ *
  ****************************************************************************/
 class DataProductQuery : public Query {
 public:
   /*! ************************************************************************
    * @brief construct an empty data product query object
    * @author K. Zarebski (UKAEA)
-   * 
+   *
    **************************************************************************/
   DataProductQuery()
       : Query("data_product", {"updated_by", "last_updated", "object",
@@ -320,7 +319,7 @@ public:
   /*! ************************************************************************
    * @brief construct a data product directly from a query path
    * @author K. Zarebski (UKAEA)
-   * 
+   *
    * @param query_path suffix of API request URL containing query fragment
    **************************************************************************/
   DataProductQuery(std::filesystem::path query_path)
@@ -342,17 +341,17 @@ public:
 
 /*! **************************************************************************
  * @class StorageLocationQuery
- * @brief class for constructing the correct URL query string for a storage 
+ * @brief class for constructing the correct URL query string for a storage
  * location query
  * @author K. Zarebski (UKAEA)
- * 
+ *
  ****************************************************************************/
 class StorageLocationQuery : public Query {
 public:
   /*! ************************************************************************
    * @brief construct an empty storage location query object
    * @author K. Zarebski (UKAEA)
-   * 
+   *
    **************************************************************************/
   StorageLocationQuery()
       : Query("storage_location",
@@ -362,7 +361,7 @@ public:
   /*! ************************************************************************
    * @brief construct a storage location query directly from a query path
    * @author K. Zarebski (UKAEA)
-   * 
+   *
    * @param query_path suffix of API request URL containing query fragment
    **************************************************************************/
   StorageLocationQuery(std::filesystem::path query_path)
@@ -371,17 +370,17 @@ public:
 
 /*! **************************************************************************
  * @class StorageRootQuery
- * @brief class for constructing the correct URL query string for a storage 
+ * @brief class for constructing the correct URL query string for a storage
  * root query
  * @author K. Zarebski (UKAEA)
- * 
+ *
  ****************************************************************************/
 class StorageRootQuery : public Query {
 public:
   /*! ************************************************************************
    * @brief construct an empty storage location query object
    * @author K. Zarebski (UKAEA)
-   * 
+   *
    **************************************************************************/
   StorageRootQuery()
       : Query("storage_root", {"name", "root", "path", "accessibility"}) {}
@@ -389,27 +388,26 @@ public:
   /*! ************************************************************************
    * @brief construct a storage root query directly from a query path
    * @author K. Zarebski (UKAEA)
-   * 
+   *
    * @param query_path suffix of API request URL containing query fragment
    **************************************************************************/
   StorageRootQuery(std::filesystem::path query_path)
       : Query("storage_root", query_path) {}
 };
 
-
 /*! **************************************************************************
  * @class ExternalObjectQuery
- * @brief class for constructing the correct URL query string for an external 
+ * @brief class for constructing the correct URL query string for an external
  * object query
  * @author K. Zarebski (UKAEA)
- * 
+ *
  ****************************************************************************/
 class ExternalObjectQuery : public Query {
 public:
   /*! ************************************************************************
    * @brief construct an empty storage location query object
    * @author K. Zarebski (UKAEA)
-   * 
+   *
    **************************************************************************/
   ExternalObjectQuery()
       : Query("external_object", {
@@ -427,7 +425,7 @@ public:
   /*! ************************************************************************
    * @brief construct an external object query directly from a query path
    * @author K. Zarebski (UKAEA)
-   * 
+   *
    * @param query_path suffix of API request URL containing query fragment
    **************************************************************************/
   ExternalObjectQuery(std::filesystem::path query_path)
@@ -437,22 +435,22 @@ public:
 /*! **************************************************************************
  * @class NamespaceQuery
  * @brief class for constructing the correct URL query string for a namespace
- * @author K. Zarebski (UKAEA) 
- * 
+ * @author K. Zarebski (UKAEA)
+ *
  ****************************************************************************/
 class NamespaceQuery : public Query {
 public:
   /*! ************************************************************************
    * @brief construct an empty namespace query object
    * @author K. Zarebski (UKAEA)
-   * 
+   *
    **************************************************************************/
   NamespaceQuery() : Query("namespace", std::vector<std::string>{"name"}) {}
 
   /*! ************************************************************************
    * @brief construct a namespace query directly from a query path
    * @author K. Zarebski (UKAEA)
-   * 
+   *
    * @param query_path suffix of API request URL containing query fragment
    **************************************************************************/
   NamespaceQuery(std::filesystem::path query_path)

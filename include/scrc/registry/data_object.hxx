@@ -67,7 +67,7 @@ public:
    * @brief Get the registry path of the data product
    * @author K. Zarebski (UKAEA)
    * @return path of the data product within the registry
-   * 
+   *
    ************************************************************************/
   std::filesystem::path get_path() const { return registry_path_; }
 
@@ -178,14 +178,14 @@ ExternalObject *external_object_from_yaml(YAML::Node yaml_data);
  * @brief Contains classes matching the structure of register statements
  * within the local API configuration
  * @author K. Zarebski (UKAEA)
- * 
+ *
  ***************************************************************************/
 namespace RegisterObject {
 /*! *************************************************************************
  * @enum Accessibility
  * @brief options for specifying whether an object can be accessed publicly
  * @author K. Zarebski (UKAEA)
- * 
+ *
  ***************************************************************************/
 enum Accessibility {
   OPEN,  /*!< object can be accessed publicly */
@@ -271,7 +271,7 @@ public:
  * @brief Contains classes matching the structure of write statements
  * within the local API configuration
  * @author K. Zarebski (UKAEA)
- * 
+ *
  ***************************************************************************/
 namespace WriteObject {
 class DataProduct {

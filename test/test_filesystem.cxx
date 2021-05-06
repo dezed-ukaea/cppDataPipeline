@@ -90,9 +90,10 @@ TEST(SCRCAPITest, TestWriteTable) {
       std::filesystem::path(TESTDIR) / "config.yaml";
   LocalFileSystem *file_system_ = new LocalFileSystem(config_path_);
 
-  DataTable* data_ = new DataTable;
+  DataTable *data_ = new DataTable;
 
-  const std::vector<std::string> names_ = {"John", "Patrick", "Sarah", "Jennifer"};
+  const std::vector<std::string> names_ = {"John", "Patrick", "Sarah",
+                                           "Jennifer"};
   const std::vector<int> ages_ = {23, 45, 65, 21};
   const std::vector<float> heights_ = {182, 178, 169, 180};
 
