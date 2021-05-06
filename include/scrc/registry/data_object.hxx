@@ -25,12 +25,14 @@ namespace SCRC {
  * @namespace SCRC::ReadObject
  * @brief Contains classes matching the structure of read statements within
  * the local API configuration
+ * @author K. Zarebski (UKAEA)
  *
  ****************************************************************************/
 namespace ReadObject {
 /*! **************************************************************************
  * @class DataProduct
  * @brief class for reading data product entries within the local configuration
+ * @author K. Zarebski (UKAEA)
  *
  * The DataProduct class has a structure that matches the YAML syntax within the
  * local configuration file. It provides an intermediate for storing the
@@ -47,6 +49,7 @@ private:
 public:
   /*! ***********************************************************************
    * @brief Initialise a new data product instance
+   * @author K. Zarebski (UKAEA)
    *
    * @param registry_path registry path of the data product
    * @param version semantic version number for the data product
@@ -62,12 +65,15 @@ public:
 
   /*! **********************************************************************
    * @brief Get the registry path of the data product
+   * @author K. Zarebski (UKAEA)
    * @return path of the data product within the registry
+   * 
    ************************************************************************/
   std::filesystem::path get_path() const { return registry_path_; }
 
   /*! **********************************************************************
    * @brief Get the version of the data product as a version object
+   * @author K. Zarebski (UKAEA)
    *
    * @return semantic version of the data product
    ************************************************************************/
@@ -75,6 +81,7 @@ public:
 
   /*! **********************************************************************
    * @brief Get the namespace of the data product
+   * @author K. Zarebski (UKAEA)
    *
    * @return namespace as a string
    ************************************************************************/
@@ -82,6 +89,7 @@ public:
 
   /*! **********************************************************************
    * @brief Get the title of the data product
+   * @author K. Zarebski (UKAEA)
    *
    * @return title as a string
    ************************************************************************/
@@ -89,6 +97,7 @@ public:
 
   /*! **********************************************************************
    * @brief Get the local cache path of the data product
+   * @author K. Zarebski (UKAEA)
    *
    * @return path of the data product in the local cache
    ************************************************************************/
@@ -99,6 +108,7 @@ public:
  * @class ExternalObject
  * @brief class for reading external object entries within the
  * local configuration read header
+ * @author K. Zarebski (UKAEA)
  *
  * The ExternalObject class has a structure that matches the YAML syntax
  * within the local configuration file for reading of external objects.
@@ -115,6 +125,7 @@ private:
 public:
   /*! ***********************************************************************
    * @brief Construct a new External Object object
+   * @author K. Zarebski (UKAEA)
    *
    * @param title external object title
    * @param doi the DOI of the external object if appropriate
@@ -129,7 +140,8 @@ public:
   /*! ***********************************************************************
    * @brief retrieve the unique identifier for the external object, this is
    * either the DOI or, if not applicable, the unique name
-   * 
+   * @author K. Zarebski (UKAEA)
+   *
    * @return unique identifier for the external object
    *************************************************************************/
   std::string get_unique_id() const {
@@ -143,7 +155,8 @@ public:
 /*! *************************************************************************
  * @brief convert a data product entry within the configuration into a
  * DataProduct instance
- * 
+ * @author K. Zarebski (UKAEA)
+ *
  * @param yaml_data YAML data read from the configuration file
  * @return a pointer to the new data product instance
  ***************************************************************************/
@@ -152,7 +165,8 @@ DataProduct *data_product_from_yaml(YAML::Node yaml_data);
 /*! *************************************************************************
  * @brief convert an external object entry within the configuration into an
  * ExternalObject instance
- * 
+ * @author K. Zarebski (UKAEA)
+ *
  * @param yaml_data YAML data read from the configuration file
  * @return a pointer to the new external object instance
  ***************************************************************************/
@@ -163,22 +177,27 @@ ExternalObject *external_object_from_yaml(YAML::Node yaml_data);
  * @namespace SCRC::RegisterObject
  * @brief Contains classes matching the structure of register statements
  * within the local API configuration
+ * @author K. Zarebski (UKAEA)
+ * 
  ***************************************************************************/
 namespace RegisterObject {
 /*! *************************************************************************
  * @enum Accessibility
  * @brief options for specifying whether an object can be accessed publicly
+ * @author K. Zarebski (UKAEA)
+ * 
  ***************************************************************************/
 enum Accessibility {
-  OPEN,   /*!< object can be accessed publicly */
-  CLOSED  /*!< object is private and requires authorisation to be accessed */
+  OPEN,  /*!< object can be accessed publicly */
+  CLOSED /*!< object is private and requires authorisation to be accessed */
 };
 
 /*! *************************************************************************
  * @brief convert string access statement to Accessibility
- * 
+ * @author K. Zarebski (UKAEA)
+ *
  * @param access accessibility as string
- * @return accessibility as Accessibility type 
+ * @return accessibility as Accessibility type
  ***************************************************************************/
 Accessibility access_from_str(const std::string &access);
 
@@ -186,7 +205,8 @@ Accessibility access_from_str(const std::string &access);
  * @class ExternalObject
  * @brief class for reading external object entries within the
  * local configuration registration header
- * 
+ * @author K. Zarebski (UKAEA)
+ *
  * This class represents the metadata for the registration of an external
  * object within the registry, this matches the YAML syntax for the
  * local API configuration
@@ -214,13 +234,15 @@ public:
   /*! ***********************************************************************
    * @brief construct an external object registration entry from the
    * local configuration YAML metadata
-   * 
+   * @author K. Zarebski (UKAEA)
+   *
    * @param entry read from the local configuration register header
    *************************************************************************/
   ExternalObject(YAML::Node yaml_data);
 
   /*! ***********************************************************************
    * @brief retrieve the name of the source for this entry
+   * @author K. Zarebski (UKAEA)
    *
    * @return source name as string
    *************************************************************************/
@@ -228,24 +250,28 @@ public:
 
   /*! ***********************************************************************
    * @brief retrieve the abbreviation name of the source for this entry
-   * 
-   * @return abbreviation as string 
+   * @author K. Zarebski (UKAEA)
+   *
+   * @return abbreviation as string
    *************************************************************************/
   std::string get_source_abbreviation() const { return source_abbreviation_; }
 
   /*! ***********************************************************************
    * @brief retrieve the website URL for this entry
-   * 
+   * @author K. Zarebski (UKAEA)
+   *
    * @return URL of the source website as string
    */
   std::string get_source_website() const { return source_website_; }
 };
 }; // namespace RegisterObject
 
-/**
+/*! *************************************************************************
  * @namespace SCRC::WriteObject
  * @brief Contains classes matching the structure of write statements
  * within the local API configuration
+ * @author K. Zarebski (UKAEA)
+ * 
  ***************************************************************************/
 namespace WriteObject {
 class DataProduct {

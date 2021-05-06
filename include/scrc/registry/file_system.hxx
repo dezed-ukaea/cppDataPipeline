@@ -1,3 +1,13 @@
+/*! **************************************************************************
+ * @file scrc/registry/file_system.hxx
+ * @author K. Zarebski (UKAEA)
+ * @date 2021-05-06
+ * @brief File containing classes for interacting with the local file system
+ *
+ * The classes within this file contain methods for interacting with the
+ * local file system. These include the reading of configurations, and
+ * the reading/writing of data to locally.
+ ****************************************************************************/
 #ifndef __SCRC_FILESYSTEM_HXX__
 #define __SCRC_FILESYSTEM_HXX__
 
@@ -19,19 +29,33 @@
 #include "scrc/utilities/hdf5.hxx"
 #include "scrc/utilities/logging.hxx"
 
-using namespace H5;
+using namespace H5; // Use the HDF5 library
 
-#define TABLE "table"
-#define ARRAY "array"
-#define COLUMN_UNITS "column_units"
-#define ROW_NAMES "row_names"
-#define DIMENSION_PREFIX "Dimension_"
-#define DIM_UNITS_SUFFIX "_units"
-#define DIM_NAME_SUFFIX "_names"
-#define DIM_TITLE_SUFFIX "_title"
+// Define constants relating to object names/keys in the HDF5 file
+#define TABLE "table"                   /*!< Key of table object */
+#define ARRAY "array"                   /*!< Key of the array object */
+#define COLUMN_UNITS "column_units"     /*!< Key of the data table column units object */
+#define ROW_NAMES "row_names"           /*!< Key of the row names object */
+#define DIMENSION_PREFIX "Dimension_"   /*!< Prefix for objects relating to array dimensions */
+#define DIM_UNITS_SUFFIX "_units"       /*!< Suffix for objects relating to units of measurement */
+#define DIM_NAME_SUFFIX "_names"        /*!< Suffix for objects relating to names */
+#define DIM_TITLE_SUFFIX "_title"       /*!< Suffix for objects relating to titles */
 
 namespace SCRC {
+ /*! **************************************************************************
+ * @brief parse the configuration file
+ * @author K. Zarebski (UKAEA)
+ * 
+ * @return a YAML::Node object containing all of the extracted metadata
+ *****************************************************************************/
 YAML::Node parse_config_();
+/*! ***************************************************************************
+ * @class LocalFileSystem
+ * @brief class for handling interaction with the local file system
+ * 
+ * This class contains methods for interacting with the configuration file and
+ * retrieving the information required to read/write data objects
+ *****************************************************************************/
 class LocalFileSystem {
 private:
   const std::filesystem::path config_path_;
@@ -39,22 +63,112 @@ private:
   YAML::Node meta_data_() const;
 
 public:
+  /*! *************************************************************************
+   * @brief construct a LocalFileSystem instance using the given configuration
+   * @author K. Zarebski (UKAEA)
+   * 
+   * @param config_file_path SCRC Pipeline configuration YAML file path
+   ***************************************************************************/
   LocalFileSystem(std::filesystem::path config_file_path);
+
+  /*! *************************************************************************
+   * @brief retrieve the data store location from the configuration file
+   * @author K. Zarebski (UKAEA)
+   * 
+   * @return path of the local data store folder
+   ***************************************************************************/
   std::filesystem::path get_data_store() const;
+
+  /*! *************************************************************************
+   * @brief read all data product entries listed in the configuration file
+   * @author K. Zarebski (UKAEA)
+   * 
+   * @return objects representing the metadata for the read data products 
+   ***************************************************************************/
   std::vector<ReadObject::DataProduct *> read_data_products() const;
+
+  /*! *************************************************************************
+   * @brief read all external object entries listed in the configuration file
+   * @author K. Zarebski (UKAEA)
+   * 
+   * @return objects representing the metadata for the read external objects 
+   ***************************************************************************/
   std::vector<ReadObject::ExternalObject *> read_external_objects() const;
+
+  /*! *************************************************************************
+   * @brief retrieve the default input namespace from the configuration file
+   * @author K. Zarebski (UKAEA)
+   * 
+   * @return the default input namespace
+   ***************************************************************************/
   std::string get_default_input_namespace() const;
+
+  /*! *************************************************************************
+   * @brief retrieve the default output namespace from the configuration file
+   * @author K. Zarebski (UKAEA)
+   * 
+   * @return the default output namespace
+   ***************************************************************************/
   std::string get_default_output_namespace() const;
+
+  /*! *************************************************************************
+   * @brief retrieve all configurations from the configuration file
+   * @author K. Zarebski (UKAEA)
+   * 
+   * @return a YAML::Node object containing all configuration entries
+   ***************************************************************************/
   YAML::Node get_config_data() const { return config_data_; }
 };
 
+/*! ***************************************************************************
+ * @brief retrieves the first key from the given TOML data
+ * @author K. Zarebski (UKAEA)
+ * 
+ * @param data_table data read from a TOML file
+ * @return std::string the first key within the given data set
+ *****************************************************************************/
 std::string get_first_key_(const toml::value data_table);
+
+/*! ***************************************************************************
+ * @brief construct a Distribution from the given extracted TOML data
+ * @author K. Zarebski (UKAEA)
+ * 
+ * @param data_table data read from a TOML file
+ * @return distribution object matching the specification
+ *****************************************************************************/
 Distribution *construct_dis_(const toml::value data_table);
 
+/*! ***************************************************************************
+ * @brief read the value of a point estimate from a given TOML file
+ * @author K. Zarebski (UKAEA)
+ * 
+ * @param var_address file path for the input TOML file
+ * @return the extracted point estimate value
+ *****************************************************************************/
 double read_point_estimate_from_toml(const std::filesystem::path var_address);
+
+/*! ***************************************************************************
+ * @brief read parameters for a distribution from a given TOML file and
+ * construct a Distribution object
+ * @author K. Zarebski (UKAEA)
+ * 
+ * @param var_address file path for the input TOML file
+ * @return the distribution created from the specified parameters
+ *****************************************************************************/
 Distribution *
 read_distribution_from_toml(const std::filesystem::path var_address);
 
+/*! ***************************************************************************
+ * @brief Create a point estimate and save it to a TOML file
+ * @author K. Zarebski (UKAEA)
+ * 
+ * @tparam T type of the input value
+ * @param value the value to save as a point estimate
+ * @param data_product the address/label for the created data product
+ * @param version_num the version associated with the value
+ * @param file_system a local file system instance to use for writing
+ * @return std::filesystem::path the output file location
+ *****************************************************************************/
 template <typename T>
 std::filesystem::path create_estimate(T &value,
                                       const std::filesystem::path &data_product,
@@ -91,10 +205,36 @@ std::filesystem::path create_estimate(T &value,
   return output_filename_;
 }
 
+/*! ***************************************************************************
+ * @brief Save a constructed distribution to a TOML file
+ * @author K. Zarebski (UKAEA)
+ * 
+ * @param distribution the distribution object to convert
+ * @param data_product the address/label for the created data product
+ * @param version_num the version associated with the value
+ * @param file_system a local file system instance to use for writing
+ * @return std::filesystem::path the output file location
+ *****************************************************************************/
 std::filesystem::path create_distribution(
     const Distribution *distribution, const std::filesystem::path &data_product,
     const version &version_num, const LocalFileSystem *file_system);
 
+std::filesystem::path create_table(const DataTable *table,
+                                   const std::filesystem::path &data_product,
+                                   const std::filesystem::path &component,
+                                   const LocalFileSystem* file_system);
+
+/*! ***************************************************************************
+ * @brief Save a constructed array to a HDF5 file
+ * @author K. Zarebski (UKAEA)
+ * 
+ * @tparam T the type of the array member values
+ * @param array values for saving to the file
+ * @param data_product the address/label for the created data product
+ * @param component the name of the component/key to save to within the file
+ * @param file_system a local file system instance to use for writing
+ * @return std::filesystem::path the output file location
+ *****************************************************************************/
 template <typename T>
 std::filesystem::path create_array(const ArrayObject<T> *array,
                                    const std::filesystem::path &data_product,
@@ -194,7 +334,7 @@ std::filesystem::path create_array(const ArrayObject<T> *array,
     str_space_->close();
   }
 
-  APILogger->debug("FileSystem:WriteArray: Wrote dimension titles.");
+  APILogger->debug("FileSystem:CreateArray: Wrote dimension titles.");
 
   // ---------- WRITE NAMES --------- //
 
@@ -223,16 +363,25 @@ std::filesystem::path create_array(const ArrayObject<T> *array,
     str_space_->close();
   }
 
-  APILogger->debug("FileSystem:WriteArray: Wrote dimension names.");
+  APILogger->debug("FileSystem:CreateArray: Wrote dimension names.");
 
   output_file_->close();
 
-  APILogger->debug("FileSystem:WriteArray: Wrote file '{0}'",
+  APILogger->debug("FileSystem:CreateArray: Wrote file '{0}'",
                    output_path_.string());
 
   return output_path_;
 }
 
+/*! *****************************************************************
+ * @brief read an array from a HDF5 file
+ * @author K. Zarebski (UKAEA)
+ * 
+ * @tparam T the type of the array values
+ * @param var_address the address of the HDF5 file
+ * @param key the key of the array entry within the file
+ * @return an array object representing the array and its metadata
+ *******************************************************************/
 template <typename T>
 ArrayObject<T> *read_array(const std::filesystem::path var_address,
                            const std::filesystem::path key) {
@@ -318,6 +467,16 @@ ArrayObject<T> *read_array(const std::filesystem::path var_address,
   return new ArrayObject<T>{titles_, names_, dimensions_, data_out_};
 }
 
+/*! *****************************************************************
+ * @brief read a column from a CompType/table within a HDF5 file
+ * @author K. Zarebski (UKAEA)
+ * 
+ * @tparam T the type of the column values
+ * @param var_address the address of the HDF5 file
+ * @param key the key of the array entry within the file
+ * @param column the header of the requested column
+ * @return an array object representing the array and its metadata
+ *******************************************************************/
 template <typename T>
 DataTableColumn<T> *read_table_column(const std::filesystem::path var_address,
                                       const std::filesystem::path key,

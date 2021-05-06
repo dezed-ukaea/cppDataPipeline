@@ -29,6 +29,7 @@ namespace SCRC {
 /*! **************************************************************************
  * @enum RESTAPI
  * @brief selection of either local or remote pipeline running
+ * @author K. Zarebski (UKAEA)
  *
  ****************************************************************************/
 enum class RESTAPI {
@@ -38,6 +39,7 @@ enum class RESTAPI {
 
 /*! **************************************************************************
  * @brief function for writing to file from a CURL call
+ * @author K. Zarebski (UKAEA)
  *
  * @param ptr
  * @param size
@@ -50,6 +52,7 @@ size_t write_func_(void *ptr, size_t size, size_t nmemb, std::string *data);
 /*! **************************************************************************
  * @class Query
  * @brief class for constructing queries to be sent to the RestAPI server
+ * @author K. Zarebski (UKAEA)
  *
  * The Query class provides a base class for constructing query strings which
  * are then sent to the RestAPI to obtain information from the pipeline
@@ -64,6 +67,7 @@ private:
 public:
   /*! ************************************************************************
    * @brief Construct a new query instance from a category and set of filters
+   * @author K. Zarebski (UKAEA)
    *
    * @param string_repr the RestAPI query type, e.g. 'object'
    * @param filters a list of components for filtering the results
@@ -73,6 +77,7 @@ public:
 
   /*! ************************************************************************
    * @brief Construct a new query instance from a category and a path
+   * @author K. Zarebski (UKAEA)
    *
    * @param string_repr the RestAPI query type, e.g. 'object'
    * @param query_path a path for narrowing/filtering the query
@@ -82,6 +87,7 @@ public:
 
   /*! ************************************************************************
    * @brief append a key-value pair to the query for filtering results
+   * @author K. Zarebski (UKAEA)
    *
    * @param key the key to use, should be an available filter for the given
    * RestAPI query category
@@ -91,6 +97,7 @@ public:
 
   /*! ************************************************************************
    * @brief assembles the query into a URL to be requested from
+   * @author K. Zarebski (UKAEA)
    *
    * @return std::filesystem::path the query as a URL
    **************************************************************************/
@@ -101,6 +108,7 @@ public:
  * @class API
  * @brief a class which handles the fetching and posting of information to the
  * SCRC data pipeline RestAPI
+ * @author K. Zarebski (UKAEA)
  *
  * The API class has know specific knowledge about the RestAPI but rather
  * provides the interface for sending/receiving data as JSON strings
@@ -109,6 +117,7 @@ class API {
 public:
   /*! *************************************************************************
    * @brief construct an API object using the given URL as the root
+   * @author K. Zarebski (UKAEA)
    *
    * @param url_root the root of the query address, e.g. localhost:8000/api
    ***************************************************************************/
@@ -116,6 +125,7 @@ public:
 
   /*! *************************************************************************
    * @brief sends the given 'packet' of information to the RestAPI
+   * @author K. Zarebski (UKAEA)
    *
    * @param addr_path the relative path within the RestAPI to send to
    * @param expected_response the expected return HTTP code
@@ -126,6 +136,7 @@ public:
 
   /*! *************************************************************************
    * @brief read a query object and send request to the RestAPI
+   * @author K. Zarebski (UKAEA)
    *
    * @param query query object containing filters, and request information
    * @param expected_response the expected HTTP code to be returned
@@ -134,6 +145,7 @@ public:
 
   /*! *************************************************************************
    * @brief post information from a JSON value object to the RestAPI
+   * @author K. Zarebski (UKAEA)
    *
    * @param addr_path relative URL path to post to
    * @param post_data the data to transmit
@@ -147,6 +159,7 @@ public:
 
   /*! *************************************************************************
    * @brief returns the root URL for the RestAPI used by the API instance
+   * @author K. Zarebski (UKAEA)
    *
    * @return URL of the RestAPI query endpoint
    ***************************************************************************/
@@ -154,6 +167,7 @@ public:
 
   /*! *************************************************************************
    * @brief download a file returned by a RestAPI query
+   * @author K. Zarebski (UKAEA)
    *
    * @param url the relative address to the data pipeline object
    * @param out_path the path to download the file to on the local system

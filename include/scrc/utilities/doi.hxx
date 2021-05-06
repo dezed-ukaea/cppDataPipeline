@@ -1,3 +1,12 @@
+/*! **************************************************************************
+ * @file scrc/utilities/doi.hxx
+ * @author K. Zarebski (UKAEA)
+ * @date 2021-05-06
+ * @brief File contains methods relating to the Digital Object Identifier class
+ *
+ * This file contains classes to describe structures received from the RestAPI
+ * and recognised by the local configuration file.
+ ****************************************************************************/
 #ifndef __DOI_SCRC_HXX__
 #define __DOI_SCRC_HXX__
 
@@ -8,7 +17,11 @@
 #include "scrc/utilities/logging.hxx"
 
 namespace SCRC {
-// Digital Object Identifier
+
+/**
+ * @class DOI
+ * @brief class for handling of Digital Object Identifiers
+ */
 class DOI {
 private:
   const std::string registrant_id_ = "";

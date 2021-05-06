@@ -20,6 +20,7 @@ namespace SCRC {
  * @class Distribution
  * @brief represents a distribution with defined parameters which can be
  * used to generate values.
+ * @author K. Zarebski (UKAEA)
  *
  * The Distribution class can be used to generate a random value from a
  * distribution contained within the standard library. It provides a container
@@ -30,6 +31,7 @@ class Distribution {
 public:
   /*! ************************************************************************
    * @brief construct a distribution from a given set of parameters
+   * @author K. Zarebski (UKAEA)
    *
    * @param name label for the distribution
    * @param params a map containing all parameters associated with the
@@ -40,6 +42,7 @@ public:
 
   /*! ************************************************************************
    * @brief generate a value using the distribution
+   * @author K. Zarebski (UKAEA)
    *
    * @param gen generator instance to used for random number generation
    * @return value of 1, as this is a base class
@@ -48,6 +51,7 @@ public:
 
   /*! ************************************************************************
    * @brief retrieve the value for the given distribution parameter
+   * @author K. Zarebski (UKAEA)
    *
    * @param param_name name of the parameter
    * @return the parameter value
@@ -58,16 +62,18 @@ public:
 
   /*! ************************************************************************
    * @brief retrieve the name of the distribution
+   * @author K. Zarebski (UKAEA)
    *
    * @return distribution name
    **************************************************************************/
   std::string get_name() const { return name_; }
 
-  /*!
+  /*! ************************************************************************
    * @brief Retrieve the parameters of the distribution
+   * @author K. Zarebski (UKAEA)
    *
    * @return map containing parameter values
-   */
+   **************************************************************************/
   std::map<std::string, double> get_params() const { return parameters_; }
 
 protected:
@@ -94,6 +100,7 @@ protected:
 /*! **************************************************************************
  * @class Normal
  * @brief normal (or gaussian) distribution
+ * @author K. Zarebski (UKAEA)
  *
  * A subclass of Distribution that represents a normal distribution
  * defined as:
@@ -110,6 +117,7 @@ class Normal : public Distribution {
 public:
   /*! ************************************************************************
    * @brief Construct a Normal distribution with the given parameters
+   * @author K. Zarebski (UKAEA)
    *
    * @param mean the mean @f$\mu@f$ of the distribution
    * @param sd the standard deviation @f$\sigma@f$ of the distribution
@@ -119,6 +127,7 @@ public:
 
   /*! ************************************************************************
    * @brief Construct a Normal distribution from a given Distribution object
+   * @author K. Zarebski (UKAEA)
    *
    * @param dis distribution to extract parameters from
    **************************************************************************/
@@ -126,6 +135,7 @@ public:
 
   /*! ************************************************************************
    * @brief retrieve the mean, @f$\mu@f$ for the distribution
+   * @author K. Zarebski (UKAEA)
    *
    * @return the mean of the distribution
    **************************************************************************/
@@ -133,6 +143,7 @@ public:
 
   /*! ************************************************************************
    * @brief retrieve the standard deviation, @f$\sigma@f$ for the distribution
+   * @author K. Zarebski (UKAEA)
    *
    * @return the standard deviation of the distribution
    **************************************************************************/
@@ -140,6 +151,7 @@ public:
 
   /*! ************************************************************************
    * @brief generate a random value from the distribution
+   * @author K. Zarebski (UKAEA)
    *
    * @param gen generator instance to use for seeding
    * @return double a randomly generated value
@@ -153,6 +165,7 @@ public:
 /*! **************************************************************************
  * @class Gamma
  * @brief gamma distribution
+ * @author K. Zarebski (UKAEA)
  *
  * A subclass of Distribution that represents a gamma distribution
  * defined as:
@@ -172,6 +185,7 @@ class Gamma : public Distribution {
 public:
   /*! ************************************************************************
    * @brief Construct a new Gamma distribution with the given parameters
+   * @author K. Zarebski (UKAEA)
    *
    * @param k shape parameter @f$k@f$
    * @param theta scale parameter, @f$\theta@f$
@@ -181,27 +195,31 @@ public:
 
   /*! ************************************************************************
    * @brief Construct a Gamma distribution from a given Distribution object
+   * @author K. Zarebski (UKAEA)
    *
    * @param dis distribution to extract parameters from
    **************************************************************************/
   Gamma(Distribution &dis) : Distribution("gamma", dis.get_params()) {}
 
-  /*!
+  /*! ************************************************************************
    * @brief retrieve the value of the shape parameter, @f$k@f$.
+   * @author K. Zarebski (UKAEA)
    *
    * @return the shape parameter value
-   */
+   **************************************************************************/
   double k() const { return parameters_.at("k"); }
 
-  /*!
+  /*! ************************************************************************
    * @brief retrieve the value of the scale parameter, @f$\theta@f$.
+   * @author K. Zarebski (UKAEA)
    *
    * @return the scale parameter value
-   */
+   **************************************************************************/
   double theta() const { return parameters_.at("theta"); }
 
   /*! ************************************************************************
    * @brief generate a random value from the distribution
+   * @author K. Zarebski (UKAEA)
    *
    * @param gen generator instance to use for seeding
    * @return double a randomly generated value

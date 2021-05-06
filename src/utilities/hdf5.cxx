@@ -11,11 +11,11 @@ SCRC::HDF5::read_hdf5_as_str_vector(const std::filesystem::path file_name,
                              "', file does not exist.");
   }
 
-  const H5File *file_ = new H5File(file_name.c_str(), H5F_ACC_RDONLY);
+  const H5::H5File *file_ = new H5::H5File(file_name.c_str(), H5F_ACC_RDONLY);
 
-  DataSet *data_set_ = new DataSet(file_->openDataSet(key.c_str()));
-  DataSpace *data_space_ = new DataSpace(data_set_->getSpace());
-  const DataType dtype_ = data_set_->getDataType();
+  H5::DataSet *data_set_ = new H5::DataSet(file_->openDataSet(key.c_str()));
+  H5::DataSpace *data_space_ = new H5::DataSpace(data_set_->getSpace());
+  const H5::DataType dtype_ = data_set_->getDataType();
 
   const int arr_dims_ = data_space_->getSimpleExtentNdims();
 
@@ -34,10 +34,14 @@ SCRC::HDF5::read_hdf5_as_str_vector(const std::filesystem::path file_name,
   data_space_->close();
   data_set_->close();
 
+  delete data_space_;
+  delete data_set_;
+  delete file_;
+
   return data_str_;
 }
 
-const CompType *SCRC::HDF5::get_comptype(const std::filesystem::path file_name,
+const H5::CompType *SCRC::HDF5::get_comptype(const std::filesystem::path file_name,
                                          std::string key) {
   APILogger->debug("Utilities:HDF5:GetCompType: Opening file '{0}'",
                    file_name.string());
@@ -47,9 +51,17 @@ const CompType *SCRC::HDF5::get_comptype(const std::filesystem::path file_name,
                              "', file does not exist.");
   }
 
-  const H5File *file_ = new H5File(file_name.c_str(), H5F_ACC_RDONLY);
+  const H5::H5File *file_ = new H5::H5File(file_name.c_str(), H5F_ACC_RDONLY);
 
-  DataSet *data_set_ = new DataSet(file_->openDataSet(key.c_str()));
+  H5::DataSet *data_set_ = new H5::DataSet(file_->openDataSet(key.c_str()));
 
-  return new CompType(data_set_->getCompType());
+  H5::CompType* ctype_ = new H5::CompType(data_set_->getCompType());
+
+  data_set_->close();
+
+  delete data_set_;
+  delete file_;
+
+  return ctype_;
+
 }

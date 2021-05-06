@@ -103,6 +103,144 @@ LocalFileSystem::read_data_products() const {
   return data_products_;
 }
 
+std::filesystem::path create_table(const DataTable *table,
+                                   const std::filesystem::path &data_product,
+                                   const std::filesystem::path &component,
+                                   const LocalFileSystem* file_system) {
+  const std::filesystem::path name_space_ =
+      file_system->get_default_output_namespace();
+  const std::filesystem::path data_store_ = file_system->get_data_store();
+
+  const std::string output_file_name_ = current_time_stamp(true) + ".h5";
+  const std::filesystem::path output_dir_ =
+      data_store_ / name_space_ / data_product;
+  const std::filesystem::path output_path_ = output_dir_ / output_file_name_;
+  const std::string arr_name_ = std::string(TABLE);
+
+  if (output_path_.extension() != ".h5") {
+    throw std::invalid_argument("Output file name for array must be HDF5");
+  }
+
+  if (!std::filesystem::exists(output_dir_))
+    std::filesystem::create_directories(output_dir_);
+
+  H5File *output_file_ = new H5File(output_path_, H5F_ACC_TRUNC);
+
+  const int rank_ = 1;
+  
+  HDF5::CompType comp_type_;
+
+  for(const auto& int_col : table->get_int_columns())
+  {
+    APILogger->debug(
+      "FileSystem:CreateTable: Adding field '{0}' to container",
+      int_col.first
+    );
+    comp_type_.AddField(int_col.first, PredType::NATIVE_INT);
+  }
+
+  for(const auto& float_col : table->get_float_columns())
+  {
+    APILogger->debug(
+      "FileSystem:CreateTable: Adding field '{0}' to container",
+      float_col.first
+    );
+    comp_type_.AddField(float_col.first, PredType::NATIVE_FLOAT);
+  }
+
+  for(const auto& str_col : table->get_str_columns())
+  {
+    APILogger->debug(
+      "FileSystem:CreateTable: Adding field '{0}' to container",
+      str_col.first
+    );
+    comp_type_.AddField(str_col.first, PredType::NATIVE_CHAR);
+  }
+
+  const int length_ = table->size();
+
+  HDF5::CompTypeArray array_to_write_(comp_type_, length_);
+
+  APILogger->debug("FileSystem:CreateTable: Writing values to CompType");
+
+  int col_counter_ = 0;
+
+  for(const auto& int_col : table->get_int_columns())
+  {
+    APILogger->debug(
+      "FileSystem:CreateTable: Writing values to field '{0}'",
+      int_col.first
+    );
+    for(const auto& value : int_col.second->values()) {
+        array_to_write_.SetValue(col_counter_, int_col.first, value);
+        col_counter_ += 1;
+    } 
+  }
+
+  for(const auto& float_col : table->get_float_columns())
+  {
+    APILogger->debug(
+      "FileSystem:CreateTable: Writing values to field '{0}'",
+      float_col.first
+    );
+    for(const auto& value : float_col.second->values()) {
+        array_to_write_.SetValue(col_counter_, float_col.first, value);
+        col_counter_ += 1;
+    } 
+  }
+
+  for(const auto& str_col : table->get_str_columns())
+  {
+    APILogger->debug(
+      "FileSystem:CreateTable: Writing values to field '{0}'",
+      str_col.first
+    );
+    for(const auto& value : str_col.second->values()) {
+        array_to_write_.SetValue(col_counter_, str_col.first, value);
+        col_counter_ += 1;
+    } 
+  }
+
+  std::vector<hsize_t> dim = { table->size() };
+
+  DataSpace dspace_(rank_, dim.data());
+
+  // Specifier the memory layout of our comp type 
+	CompType h5_comp_type_(array_to_write_.type.size);
+
+  // We iterate through the fields of our custom compound type 
+	// and tell HDF5 about that.
+	for (auto const& x : array_to_write_.type.fields) {
+		auto& field_name = x.first;
+		auto& field_val = x.second;
+		h5_comp_type_.insertMember(field_name, field_val.offset, field_val.type); 
+	}
+
+  // Create data set
+	H5::DataSet *dataset_ = new DataSet(output_file_->createDataSet("DataSet", h5_comp_type_, dspace_));
+
+  // Do the write. Call teh Data() function on our array
+	dataset_->write(array_to_write_.Data(), h5_comp_type_);
+
+  // Clean up
+	delete dataset_;
+	delete output_file_;
+
+  if(!std::filesystem::exists(output_path_))
+  {
+    APILogger->error(
+      "Failed to create output HDF5 file '{0}' for object '{1}'",
+      output_path_.string(), data_product.string()
+    );
+    throw std::runtime_error("Failed to write output");
+  }
+
+  APILogger->debug("FileSystem:CreateTable: Wrote file '{0}'",
+                   output_path_.string());
+
+  return output_path_;
+}
+
 std::filesystem::path create_distribution(
     const Distribution *distribution, const std::filesystem::path &data_product,
     const version &version_num, const LocalFileSystem *file_system) {

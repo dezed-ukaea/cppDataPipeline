@@ -84,6 +84,25 @@ TEST(SCRCAPITest, TestWriteArray) {
   ASSERT_EQ(array_->get({1, 1, 1}), 14);
 }
 
+TEST(SCRCAPITest, TestWriteTable) {
+  APILogger->set_level(spdlog::level::debug);
+  std::filesystem::path config_path_ =
+      std::filesystem::path(TESTDIR) / "config.yaml";
+  LocalFileSystem *file_system_ = new LocalFileSystem(config_path_);
+
+  DataTable* data_ = new DataTable;
+
+  const std::vector<std::string> names_ = {"John", "Patrick", "Sarah", "Jennifer"};
+  const std::vector<int> ages_ = {23, 45, 65, 21};
+  const std::vector<float> heights_ = {182, 178, 169, 180};
+
+  data_->add_column("name", names_);
+  data_->add_column("age", ages_);
+  data_->add_column("height", heights_, "cm");
+
+  create_table(data_, "demo/population", "sample", file_system_);
+}
+
 TEST(SCRCAPITest, TestWritePointEstimate) {
   APILogger->set_level(spdlog::level::debug);
   std::filesystem::path config_path_ =

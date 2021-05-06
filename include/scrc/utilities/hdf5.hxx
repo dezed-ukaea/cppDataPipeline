@@ -1,3 +1,13 @@
+/*! **************************************************************************
+ * @file scrc/utilities/hdf5.hxx
+ * @authors K. Zarebski (UKAEA), T. Middleweek (UKAEA)
+ * @date 2021-05-06
+ * @brief File contains methods relating to the reading/writing to HDF5
+ *
+ * This file contains methods which implement the HDF5 C++ API in order to 
+ * read and write arrays, and data tables as CompTypes. The procedures involved
+ * require allocation of memory.
+ ****************************************************************************/
 #ifndef __SCRC_HDF5__
 #define __SCRC_HDF5__
 
@@ -6,70 +16,208 @@
 #include <stdexcept>
 #include <string>
 #include <vector>
+#include <map>
 
 #include "scrc/utilities/logging.hxx"
 
-using namespace H5;
-
 namespace SCRC {
 namespace HDF5 {
-template <typename T> const PredType *get_hdf5_type() {
+
+/*! **************************************************************************
+ * @struct CompTypeField
+ * @brief structure containing HDF5 types alongside offsets
+ * @author T. Middleweek (UKAEA)
+ * 
+ ****************************************************************************/
+struct CompTypeField {
+	H5::PredType type;
+	int offset;
+	CompTypeField() : type(H5::PredType::NATIVE_INT) {}
+};
+
+/*! **************************************************************************
+ * @brief Get the hdf5 type from a given C++ type
+ * @author K. Zarebski (UKAEA)
+ * 
+ * @tparam T the C++ type
+ * @return the HDF5 type for the given C++ type
+ ****************************************************************************/
+template <typename T> const H5::PredType *get_hdf5_type() {
   if (std::is_same<T, float>::value) {
-    return &PredType::NATIVE_FLOAT;
+    return &H5::PredType::NATIVE_FLOAT;
   }
 
   else if (std::is_same<T, double>::value) {
-    return &PredType::NATIVE_DOUBLE;
+    return &H5::PredType::NATIVE_DOUBLE;
   }
 
   else if (std::is_same<T, long double>::value) {
-    return &PredType::NATIVE_LDOUBLE;
+    return &H5::PredType::NATIVE_LDOUBLE;
   }
 
   else if (std::is_same<T, char>::value ||
            std::is_same<T, std::string>::value) {
-    return &PredType::NATIVE_CHAR;
+    return &H5::PredType::NATIVE_CHAR;
   }
 
   else if (std::is_same<T, unsigned char>::value) {
-    return &PredType::NATIVE_UCHAR;
+    return &H5::PredType::NATIVE_UCHAR;
   }
 
   else if (std::is_same<T, short>::value) {
-    return &PredType::NATIVE_SHORT;
+    return &H5::PredType::NATIVE_SHORT;
   }
 
   else if (std::is_same<T, unsigned short>::value) {
-    return &PredType::NATIVE_USHORT;
+    return &H5::PredType::NATIVE_USHORT;
   }
 
   else if (std::is_same<T, int>::value) {
-    return &PredType::NATIVE_INT;
+    return &H5::PredType::NATIVE_INT;
   }
 
   else if (std::is_same<T, unsigned int>::value) {
-    return &PredType::NATIVE_UINT;
+    return &H5::PredType::NATIVE_UINT;
   }
 
   else if (std::is_same<T, long>::value) {
-    return &PredType::NATIVE_LONG;
+    return &H5::PredType::NATIVE_LONG;
   }
 
   else if (std::is_same<T, unsigned long>::value) {
-    return &PredType::NATIVE_ULONG;
+    return &H5::PredType::NATIVE_ULONG;
   }
 
   else if (std::is_same<T, long long>::value) {
-    return &PredType::NATIVE_LLONG;
+    return &H5::PredType::NATIVE_LLONG;
   }
 
   else if (std::is_same<T, unsigned long long>::value) {
-    return &PredType::NATIVE_ULLONG;
+    return &H5::PredType::NATIVE_ULLONG;
   }
 
   throw std::runtime_error(
       "Unsupported C++ type, could not convert to HDF5 type");
 }
+
+/*! **************************************************************************
+ * @struct CompType
+ * @brief structure for holding multiple fields to be combined
+ * as a CompType within the HDF5 file
+ * @author T. Middleweek (UKAEA) 
+ * 
+ ****************************************************************************/
+struct CompType {
+	std::map<std::string, CompTypeField> fields;
+	size_t size = 0;
+
+	void AddField(const std::string &field_name, H5::PredType type) {
+		
+        CompTypeField field;
+        field.type = type;
+        field.offset = size;
+
+        fields[field_name] = field;
+		size += type.getSize();
+	}
+
+    CompTypeField GetField(const std::string &field_name) const {
+        auto it = fields.find(field_name);
+
+        if(it == fields.end()) {
+          APILogger->error("Utilities:HDF5:CompType: Cannot add value to field '{0}', field does not exist", field_name);
+          throw std::invalid_argument("Failed to add value to HDF5 container");
+        }
+
+        return it->second;
+    }
+};
+
+/*! **************************************************************************
+ * @struct CompTypeArray
+ * @brief structure for holding multiple CompTypes towards memory allocation
+ * @author T. Middleweek (UKAEA)
+ * 
+ * @note As long as this uses primitive types this should be okay.
+ * If you start putting values in here with constructors and destructors
+ * then you will encounter serious issues and it will not work.
+ ****************************************************************************/
+struct CompTypeArray {
+	CompType type;
+	int length;
+	int size;
+	char* buffer = nullptr;
+
+	CompTypeArray(const CompType& type_in, int length_in) {
+		
+		type = type_in;
+		length = length_in;
+		size = length * type.size;
+
+		buffer = new char[size];
+	} 
+
+	~CompTypeArray() {
+		delete[] buffer;
+	}
+
+    template<typename T>
+    void SetValue(int index, const std::string &member_name, T value) {
+
+        CompTypeField field = type.GetField(member_name);
+        H5::PredType pred_type = *HDF5::get_hdf5_type<T>();
+
+        if(field.type != pred_type) {
+          APILogger->error(
+            "Utilities:HDF5:CompTypeArray: Type mismatch between field and input value "
+            "when adding value '{0}', to field '{1}': {2} != {3}",
+            value,
+            member_name,
+            field.type.getId(),
+            pred_type.getId()
+          );
+          throw std::invalid_argument(
+            "Cannot insert value into HDF5 container"
+          );
+        }
+
+		int buffer_offset = (type.size * index) + field.offset;
+		
+		T *value_ptr = (T*)&buffer[buffer_offset];
+		*value_ptr = value;
+    }
+
+    template<typename T>
+    T GetValue(int index, const std::string &member_name) {
+
+		CompTypeField field = type.GetField(member_name);
+        H5::PredType pred_type = get_hdf5_type<T>();
+        // Do a type check
+        if(field.type != pred_type) {
+          APILogger->error(
+            "Utilities:HDF5:CompTypeArray: Type mismatch between field and input value "
+            "for field '{0}': {1} != {2}",
+            member_name,
+            field.type.getId(),
+            pred_type.getId()
+          );
+          throw std::invalid_argument(
+            "Cannot insert value into HDF5 container"
+          );
+        }
+
+		// Calculate the offset in teh buffer 
+		int buffer_offset = (type.size * index) + field.offset;
+		T *value_ptr = (T*)&buffer[buffer_offset];
+
+		return *value_ptr;
+	}
+
+    char* Data() {
+        return buffer;
+    }
+};
+
 
 const std::vector<std::string>
 read_hdf5_as_str_vector(const std::filesystem::path file_name,
@@ -86,10 +234,10 @@ const T read_hdf5_object(const std::filesystem::path file_name,
                              "', file does not exist.");
   }
 
-  const H5File *file_ = new H5File(file_name.c_str(), H5F_ACC_RDONLY);
-  DataSet *obj_set_ = new DataSet(file_->openDataSet(key.c_str()));
-  DataSpace *obj_space_ = new DataSpace(obj_set_->getSpace());
-  const DataType dtype_ = obj_set_->getDataType();
+  const H5::H5File *file_ = new H5::H5File(file_name.c_str(), H5F_ACC_RDONLY);
+  H5::DataSet *obj_set_ = new H5::DataSet(file_->openDataSet(key.c_str()));
+  H5::DataSpace *obj_space_ = new H5::DataSpace(obj_set_->getSpace());
+  const H5::DataType dtype_ = obj_set_->getDataType();
 
   if (dtype_.getClass() != H5T_STRING) {
     throw std::runtime_error("Type for object '" + key + "' is not string");
@@ -117,20 +265,20 @@ read_hdf5_comp_type_member(const std::filesystem::path file_name,
                              "', file does not exist.");
   }
 
-  const H5File *file_ = new H5File(file_name.c_str(), H5F_ACC_RDONLY);
+  const H5::H5File *file_ = new H5::H5File(file_name.c_str(), H5F_ACC_RDONLY);
 
-  DataSet *data_set_ = new DataSet(file_->openDataSet(key.c_str()));
-  DataSpace *data_space_ = new DataSpace(data_set_->getSpace());
+  H5::DataSet *data_set_ = new H5::DataSet(file_->openDataSet(key.c_str()));
+  H5::DataSpace *data_space_ = new H5::DataSpace(data_set_->getSpace());
 
   const int arr_dims_ = data_space_->getSimpleExtentNdims();
-  const CompType ctype_ = data_set_->getCompType();
+  const H5::CompType ctype_ = data_set_->getCompType();
   hsize_t dim_[arr_dims_];
 
   data_space_->getSimpleExtentDims(dim_, NULL);
 
-  CompType ttype_(sizeof(T));
+  H5::CompType ttype_(sizeof(T));
 
-  const DataType dtype_ = *HDF5::get_hdf5_type<T>();
+  const H5::DataType dtype_ = *HDF5::get_hdf5_type<T>();
 
   ttype_.insertMember(member, 0, dtype_);
 
@@ -147,7 +295,7 @@ read_hdf5_comp_type_member(const std::filesystem::path file_name,
   return container_;
 }
 
-const CompType *get_comptype(const std::filesystem::path file_name,
+const H5::CompType *get_comptype(const std::filesystem::path file_name,
                              std::string key);
 }; // namespace HDF5
 }; // namespace SCRC

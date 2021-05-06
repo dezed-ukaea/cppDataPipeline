@@ -24,6 +24,7 @@
 /*! **************************************************************************
  * @namespace SCRC
  * @brief namespace containing all SCRC API library methods and variables
+ * @author K. Zarebski (UKAEA)
  *
  * The SCRC namespace holds all of the C++ API methods, which include reading
  * and writing to the RestAPI, storing of data into objects, file access and
@@ -35,6 +36,8 @@ namespace SCRC {
 /*! **************************************************************************
  * @class DataTableColumn
  * @brief stores an array of values representing a single column from a table
+ * @author K. Zarebski (UKAEA)
+ * 
  * @tparam T type of the column data
  *
  * The DataTableColumn class allows the values from a single column read from
@@ -52,11 +55,14 @@ private:
 public:
   /*! ************************************************************************
    * @brief Construct an empty DataTableColumn with no data and no metadata
+   * @author K. Zarebski (UKAEA)
+   * 
    **************************************************************************/
   DataTableColumn() {}
 
   /*! ************************************************************************
    * @brief Construct a new Data Table Column object
+   * @author K. Zarebski (UKAEA)
    *
    * @param name the name/title of the column
    * @param unit the unit of measurement for the column data
@@ -70,6 +76,7 @@ public:
 
   /*! *************************************************************************
    * @brief returns the values from the given data column
+   * @author K. Zarebski (UKAEA)
    *
    * @return value data as vector
    ***************************************************************************/
@@ -77,6 +84,7 @@ public:
 
   /*! *************************************************************************
    * @brief returns the name/title of the data column
+   * @author K. Zarebski (UKAEA)
    *
    * @return name of data column
    ***************************************************************************/
@@ -84,6 +92,7 @@ public:
 
   /*! *************************************************************************
    * @brief returns the number of entries within the data column
+   * @author K. Zarebski (UKAEA)
    *
    * @return length of data column
    ***************************************************************************/
@@ -91,6 +100,7 @@ public:
 
   /*! *************************************************************************
    * @brief retrieves the value at the given index
+   * @author K. Zarebski (UKAEA)
    *
    * @param index data column index
    * @return value at the index position
@@ -106,6 +116,7 @@ public:
 
   /*! **************************************************************************
    * @brief retrieve a value from the data column by row label
+   * @author K. Zarebski (UKAEA)
    *
    * @param key label of the row
    * @return value at the relevant index
@@ -133,6 +144,8 @@ public:
  * @class DataTable
  * @brief this class allows the storage of integer, float and string columned
  *data within a single object. The three types are stored separately.
+ * @author K. Zarebski (UKAEA)
+ * 
  * @subsubsection testcases Test Cases
  *  - `test/test_objects.cxx`: TestDataTableCreate
  *
@@ -153,19 +166,22 @@ private:
 public:
   /*! ************************************************************************
    * @brief Construct an empty DataTable object
+   * @author K. Zarebski (UKAEA)
    *
    **************************************************************************/
   DataTable() {}
 
   /*! ************************************************************************
    * @brief returns the size of the data table which is the number of entries
+   * @author K. Zarebski (UKAEA)
    *
    * @return total number of rows
    **************************************************************************/
-  unsigned int const size() { return size_; }
+  unsigned int size() const { return size_; }
 
   /*! ************************************************************************
    * @brief retrieve the labels for the column rows
+   * @author K. Zarebski (UKAEA)
    *
    * @return label list
    **************************************************************************/
@@ -173,6 +189,7 @@ public:
 
   /*! ************************************************************************
    * @brief add a column of integers to the data table
+   * @author K. Zarebski (UKAEA)
    *
    * Appends a DataTableColumn of integers to the data table, if the existing
    * table is not empty, the vector must match the size of the table,
@@ -202,6 +219,7 @@ public:
 
   /*! ************************************************************************
    * @brief add a column of floats to the data table
+   * @author K. Zarebski (UKAEA)
    *
    * Appends a DataTableColumn of floats to the data table, if the existing
    * table is not empty, the vector must match the size of the table,
@@ -231,6 +249,7 @@ public:
 
   /*! ************************************************************************
    * @brief add a column of strings to the data table
+   * @author K. Zarebski (UKAEA)
    *
    * Appends a DataTableColumn of strings to the data table, if the existing
    * table is not empty, the vector must match the size of the table,
@@ -258,8 +277,26 @@ public:
     ncols_ += 1;
   }
 
+  /*! **************************************************************************
+   * @brief append a column to the data table from a vector
+   * @author K. Zarebski (UKAEA)
+   *
+   * @tparam T the type of the input data
+   * @param header the name/title to be assigned to the column
+   * @param column_vals the values to append
+   * @param unit the unit of measurement associated with the input data
+   ****************************************************************************/
+  template <typename T>
+  void add_column(const std::string &header, const std::vector<T> &column_vals,
+                  const std::string &unit = "") {
+    DataTableColumn<T> *new_col_ =
+        new DataTableColumn(header, unit, row_names_, column_vals);
+    add_column(new_col_);
+  }
+
   /*!****************************************************************************
    * @brief retrieve by name/title a column of integers from the data table
+   * @author K. Zarebski (UKAEA)
    *
    * @param col_name the name/title of the column within the table
    * @return the named data table column
@@ -277,6 +314,7 @@ public:
   /*!
    ****************************************************************************
    * @brief retrieve by name/title a column of strings from the data table
+   * @author K. Zarebski (UKAEA)
    *
    * @param col_name the name/title of the column within the table
    * @return the named data table column
@@ -294,6 +332,7 @@ public:
   /*!
    ****************************************************************************
    * @brief retrieve by name/title a column of floats from the data table
+   * @author K. Zarebski (UKAEA)
    *
    * @param col_name the name/title of the column within the table
    * @return the named data table column
@@ -310,29 +349,15 @@ public:
 
   /*! **************************************************************************
    * @brief remove by name/title a column from the data table
+   * @author K. Zarebski (UKAEA)
    *
    * @param col_name the name/title of the column to remove
    ****************************************************************************/
   void delete_column(const std::string &col_name);
 
-  /*! **************************************************************************
-   * @brief append a column to the data table from a vector
-   *
-   * @tparam T the type of the input data
-   * @param header the name/title to be assigned to the column
-   * @param column_vals the values to append
-   * @param unit the unit of measurement associated with the input data
-   ****************************************************************************/
-  template <typename T>
-  void add_column(const std::string &header, const std::vector<T> &column_vals,
-                  const std::string &unit = "") {
-    DataTableColumn<T> *new_col_ =
-        new DataTableColumn(header, unit, row_names_, column_vals);
-    add_column(new_col_);
-  }
-
   /*! *************************************************************************
    * @brief retrieve all integer columns from the data table
+   * @author K. Zarebski (UKAEA)
    *
    * Returns all stored integer columns as a map the keys of which are the
    * names/titles of the columns within the table.
@@ -345,6 +370,7 @@ public:
 
   /*! *************************************************************************
    * @brief retrieve all float columns from the data table
+   * @author K. Zarebski (UKAEA)
    *
    * Returns all stored float columns as a map the keys of which are the
    * names/titles of the columns within the table.
@@ -357,6 +383,7 @@ public:
 
   /*! *************************************************************************
    * @brief retrieve all string columns from the data table
+   * @author K. Zarebski (UKAEA)
    *
    * Returns all stored string columns as a map the keys of which are the
    * names/titles of the columns within the table.
@@ -371,6 +398,7 @@ public:
   /*! ************************************************************************
    * @brief constructs a string representation of the table which can be
    * printed to std::out
+   * @author K. Zarebski (UKAEA)
    *
    * @return table as string
    **************************************************************************/
@@ -381,6 +409,7 @@ public:
  * @class ArrayObject
  * @brief class to store an array of values from the SCRC pipeline alongside
  * the associated metadata
+ * @author K. Zarebski (UKAEA)
  *
  * The ArrayObject class stores the values from an SCRC pipeline array type
  * with properties such as the titles of the dimensions of the array, and names
@@ -398,12 +427,14 @@ private:
 public:
   /*! **********************************************************************
    * @brief constructs an empty ArrayObject instance
+   * @author K. Zarebski (UKAEA)
    *
    ************************************************************************/
   ArrayObject() {}
 
   /*! **********************************************************************
    * @brief constructs an array from a vector of values and given metadata
+   * @author K. Zarebski (UKAEA)
    *
    * @tparam T the type of the array values to store
    * @param dim_titles the names of the dimensions
@@ -419,6 +450,7 @@ public:
 
   /*! *********************************************************************
    * @brief retrieve an element from the array by giving its coordinates
+   * @author K. Zarebski (UKAEA)
    *
    * @param co_ords co-ordinate of the element to retrieve
    * @return the element within the array at the given position
@@ -451,6 +483,7 @@ public:
 
   /*! *********************************************************************
    * @brief retrieve the title for the given dimension
+   * @author K. Zarebski (UKAEA)
    *
    * @param dimension index of the dimension
    * @return the title of the dimension
@@ -467,6 +500,7 @@ public:
 
   /*! ********************************************************************
    * @brief retrieve the names of each position in the specified dimension
+   * @author K. Zarebski (UKAEA)
    *
    * @param dimension index of the dimension
    * @return vector of labels for that dimension
@@ -483,6 +517,7 @@ public:
 
   /*! *******************************************************************
    * @brief returns the rank of the array data
+   * @author K. Zarebski (UKAEA)
    *
    * @return array rank
    *********************************************************************/
@@ -490,6 +525,7 @@ public:
 
   /*! *******************************************************************
    * @brief returns the dimensions of the array
+   * @author K. Zarebski (UKAEA)
    *
    * @return vector of dimensions
    *********************************************************************/
@@ -497,6 +533,7 @@ public:
 
   /*! *******************************************************************
    * @brief retrieves the array itself as a 1D vector of values
+   * @author K. Zarebski (UKAEA)
    *
    * @return all array values as a vector
    *********************************************************************/
