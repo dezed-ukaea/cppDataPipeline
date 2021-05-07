@@ -41,7 +41,7 @@ namespace ReadObject {
 class DataProduct {
 private:
   const std::string namespace_;
-  const version version_;
+  const Versioning::version version_;
   const std::filesystem::path registry_path_;
   const std::filesystem::path cache_ = std::filesystem::path();
   const std::string title_ = "";
@@ -77,7 +77,7 @@ public:
    *
    * @return semantic version of the data product
    ************************************************************************/
-  version get_version() const { return version_; }
+  Versioning::version get_version() const { return version_; }
 
   /*! **********************************************************************
    * @brief Get the namespace of the data product
@@ -226,7 +226,7 @@ private:
   const std::filesystem::path product_name_ = "";
   const std::string file_type_ = "";
   const tm release_date_;
-  const version version_ = version();
+  const Versioning::version version_ = Versioning::version();
   const bool primary_ = true;
   const Accessibility accessibility_ = Accessibility::OPEN;
 

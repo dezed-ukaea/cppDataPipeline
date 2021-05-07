@@ -41,9 +41,10 @@ using namespace H5; // Use the HDF5 library
   "Dimension_" /*!< Prefix for objects relating to array dimensions */
 #define DIM_UNITS_SUFFIX                                                       \
   "_units" /*!< Suffix for objects relating to units of measurement */
-#define DIM_NAME_SUFFIX "_names"  /*!< Suffix for objects relating to names */
-#define DIM_TITLE_SUFFIX "_title" /*!< Suffix for objects relating to titles   \
-                                   */
+#define DIM_NAME_SUFFIX "_names" /*!< Suffix for objects relating to names */
+#define DIM_TITLE_SUFFIX                                                       \
+  "_title" /*!< Suffix for objects relating to titles                          \
+            */
 
 namespace SCRC {
 /*! **************************************************************************
@@ -148,6 +149,14 @@ Distribution *construct_dis_(const toml::value data_table);
  *
  * @param var_address file path for the input TOML file
  * @return the extracted point estimate value
+ * 
+ * @paragraph testcases Test Case
+ *    `test/test_filesystem.cxx`: TestTOMLPERead
+ *
+ *    This unit test checks that a point estimate can be read from a TOML file
+ *    successfully
+ *    @snippet `test/test_filesystem.cxx TestTOMLPERead
+ * 
  *****************************************************************************/
 double read_point_estimate_from_toml(const std::filesystem::path var_address);
 
@@ -158,6 +167,14 @@ double read_point_estimate_from_toml(const std::filesystem::path var_address);
  *
  * @param var_address file path for the input TOML file
  * @return the distribution created from the specified parameters
+ * 
+ * @paragraph testcases Test Case
+ *    `test/test_filesystem.cxx`: TestTOMLDisRead
+ *
+ *    This unit test checks that a distribution can be read from a TOML file
+ *    successfully
+ *    @snippet `test/test_filesystem.cxx TestTOMLDisRead
+ * 
  *****************************************************************************/
 Distribution *
 read_distribution_from_toml(const std::filesystem::path var_address);
@@ -172,11 +189,19 @@ read_distribution_from_toml(const std::filesystem::path var_address);
  * @param version_num the version associated with the value
  * @param file_system a local file system instance to use for writing
  * @return std::filesystem::path the output file location
+ * 
+ * @paragraph testcases Test Case
+ *    `test/test_filesystem.cxx`: TestWritePointEstimate
+ *
+ *    This unit test checks that a point estimate is successfully written
+ *    to a version labelled TOML file
+ *    @snippet `test/test_filesystem.cxx TestWritePointEstimate
+ * 
  *****************************************************************************/
 template <typename T>
 std::filesystem::path create_estimate(T &value,
                                       const std::filesystem::path &data_product,
-                                      const version &version_num,
+                                      const Versioning::version &version_num,
                                       const LocalFileSystem *file_system) {
   const std::string param_name_ = data_product.stem();
   const std::string namespace_ = file_system->get_default_output_namespace();
@@ -218,10 +243,18 @@ std::filesystem::path create_estimate(T &value,
  * @param version_num the version associated with the value
  * @param file_system a local file system instance to use for writing
  * @return std::filesystem::path the output file location
+ * 
+ * @paragraph testcases Test Case
+ *    `test/test_filesystem.cxx`: TestWriteDistribution
+ *
+ *    This unit test checks that a distribution is successfully written
+ *    to a version labelled TOML file
+ *    @snippet `test/test_filesystem.cxx TestWriteDistribution
+ * 
  *****************************************************************************/
 std::filesystem::path create_distribution(
     const Distribution *distribution, const std::filesystem::path &data_product,
-    const version &version_num, const LocalFileSystem *file_system);
+    const Versioning::version &version_num, const LocalFileSystem *file_system);
 
 std::filesystem::path create_table(const DataTable *table,
                                    const std::filesystem::path &data_product,
@@ -238,6 +271,14 @@ std::filesystem::path create_table(const DataTable *table,
  * @param component the name of the component/key to save to within the file
  * @param file_system a local file system instance to use for writing
  * @return std::filesystem::path the output file location
+ * 
+ * @paragraph testcases Test Case
+ *    `test/test_filesystem.cxx`: TestWriteArray
+ *
+ *    This unit test checks that an array is successfully written
+ *    to a version labelled HDF5 file alongside the relevant metadata
+ *    @snippet `test/test_filesystem.cxx TestWriteArray
+ * 
  *****************************************************************************/
 template <typename T>
 std::filesystem::path create_array(const ArrayObject<T> *array,
@@ -385,6 +426,14 @@ std::filesystem::path create_array(const ArrayObject<T> *array,
  * @param var_address the address of the HDF5 file
  * @param key the key of the array entry within the file
  * @return an array object representing the array and its metadata
+ * 
+ * @paragraph testcases Test Case
+ *    `test/test_filesystem.cxx`: TestArrayRead
+ *
+ *    This unit test checks that an array and metadata are
+ *    successfully read from a HDF5 file into an ArrayObject
+ *    @snippet `test/test_filesystem.cxx TestArrayRead
+ *
  *******************************************************************/
 template <typename T>
 ArrayObject<T> *read_array(const std::filesystem::path var_address,
@@ -480,6 +529,14 @@ ArrayObject<T> *read_array(const std::filesystem::path var_address,
  * @param key the key of the array entry within the file
  * @param column the header of the requested column
  * @return an array object representing the array and its metadata
+ * 
+ * @paragraph testcases Test Case
+ *    `test/test_filesystem.cxx`: TestTableReadColumn
+ *
+ *    This unit test checks that a table column and metadata are
+ *    successfully read from a HDF5 file into an DataTableColumn
+ *    @snippet `test/test_filesystem.cxx TestTableReadColumn
+ *
  *******************************************************************/
 template <typename T>
 DataTableColumn<T> *read_table_column(const std::filesystem::path var_address,

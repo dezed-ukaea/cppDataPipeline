@@ -146,12 +146,12 @@ public:
  *data within a single object. The three types are stored separately.
  * @author K. Zarebski (UKAEA)
  *
- * @subsubsection testcases Test Cases
- *  - `test/test_objects.cxx`: TestDataTableCreate
+ * @paragraph testcases Test Case
+ *    `test/test_objects.cxx`: TestDataTableCreate
  *
  *    This unit test checks that the DataTable initialisation method works
  *     correctly
- *    @snippet test/test_objects.cxx TestDataTableCreate
+ *    @snippet `test/test_objects.cxx TestDataTableCreate
  *
  *****************************************************************************/
 class DataTable {
@@ -200,12 +200,13 @@ public:
    * @param column a DataTableColumn of integers to append to table
    **************************************************************************/
   void add_column(DataTableColumn<int> *column) {
-    if(int_cols_.find(column->name()) != int_cols_.end() || float_cols_.find(column->name()) != float_cols_.end() || str_cols_.find(column->name()) != str_cols_.end())
-    {
+    if (int_cols_.find(column->name()) != int_cols_.end() ||
+        float_cols_.find(column->name()) != float_cols_.end() ||
+        str_cols_.find(column->name()) != str_cols_.end()) {
       APILogger->error("Cannot add column '{0}' to data table, column exists!");
       throw std::invalid_argument("Cannot append data to data table");
     }
-    
+
     if (ncols_ > 0 && column->size() != size_) {
       APILogger->error(
           "Column '{0}' does not match size of data table: {1} != {2}",
@@ -236,8 +237,9 @@ public:
    * @param column a DataTableColumn of floats to append to table
    **************************************************************************/
   void add_column(DataTableColumn<float> *column) {
-    if(int_cols_.find(column->name()) != int_cols_.end() || float_cols_.find(column->name()) != float_cols_.end() || str_cols_.find(column->name()) != str_cols_.end())
-    {
+    if (int_cols_.find(column->name()) != int_cols_.end() ||
+        float_cols_.find(column->name()) != float_cols_.end() ||
+        str_cols_.find(column->name()) != str_cols_.end()) {
       APILogger->error("Cannot add column '{0}' to data table, column exists!");
       throw std::invalid_argument("Cannot append data to data table");
     }
@@ -271,8 +273,9 @@ public:
    * @param column a DataTableColumn of strings to append to table
    **************************************************************************/
   void add_column(DataTableColumn<std::string> *column) {
-    if(int_cols_.find(column->name()) != int_cols_.end() || float_cols_.find(column->name()) != float_cols_.end() || str_cols_.find(column->name()) != str_cols_.end())
-    {
+    if (int_cols_.find(column->name()) != int_cols_.end() ||
+        float_cols_.find(column->name()) != float_cols_.end() ||
+        str_cols_.find(column->name()) != str_cols_.end()) {
       APILogger->error("Cannot add column '{0}' to data table, column exists!");
       throw std::invalid_argument("Cannot append data to data table");
     }
@@ -305,8 +308,9 @@ public:
   template <typename T>
   void add_column(const std::string &header, const std::vector<T> &column_vals,
                   const std::string &unit = "") {
-    if(int_cols_.find(header) != int_cols_.end() || float_cols_.find(header) != float_cols_.end() || str_cols_.find(header) != str_cols_.end())
-    {
+    if (int_cols_.find(header) != int_cols_.end() ||
+        float_cols_.find(header) != float_cols_.end() ||
+        str_cols_.find(header) != str_cols_.end()) {
       APILogger->error("Cannot add column '{0}' to data table, column exists!");
       throw std::invalid_argument("Cannot append data to data table");
     }

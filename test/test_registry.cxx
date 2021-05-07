@@ -77,9 +77,9 @@ TEST(SCRCAPITest, TestGetConfigDataTOML) {
   const std::vector<ReadObject::DataProduct *> data_products_ =
       fs_->read_data_products();
   ASSERT_TRUE(data_products_[0]);
-  const version version_ = data_products_[0]->get_version();
+  const Versioning::version version_ = data_products_[0]->get_version();
   const std::filesystem::path path_ = data_products_[0]->get_path();
-  ASSERT_EQ(version_, version(0, 1, 0));
+  ASSERT_EQ(version_, Versioning::version(0, 1, 0));
   ASSERT_EQ(path_, "fixed-parameters/T_lat");
 }
 
@@ -89,9 +89,9 @@ TEST(SCRCAPITest, TestGetConfigDataHDF5) {
   const std::vector<ReadObject::DataProduct *> data_products_ =
       fs_->read_data_products();
   ASSERT_TRUE(data_products_[1]);
-  const version version_ = data_products_[1]->get_version();
+  const Versioning::version version_ = data_products_[1]->get_version();
   const std::filesystem::path path_ = data_products_[1]->get_path();
-  ASSERT_EQ(version_, version(0, 20200813, 0));
+  ASSERT_EQ(version_, Versioning::version(0, 20200813, 0));
   ASSERT_EQ(path_, "prob_hosp_and_cfr/data_for_scotland");
 }
 

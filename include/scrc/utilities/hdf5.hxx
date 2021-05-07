@@ -1,7 +1,7 @@
 /*! **************************************************************************
  * @file scrc/utilities/hdf5.hxx
  * @authors K. Zarebski (UKAEA), T. Middleweek (UKAEA)
- * @date 2021-05-06
+ * @date 2021-05-07
  * @brief File contains methods relating to the reading/writing to HDF5
  *
  * This file contains methods which implement the HDF5 C++ API in order to
@@ -24,16 +24,28 @@ namespace SCRC {
 namespace HDF5 {
 
 /*! **************************************************************************
- * @struct CompTypeField
- * @brief structure containing HDF5 types alongside offsets
+ * @struct CompTypeMember
  * @author T. Middleweek (UKAEA)
  *
  ****************************************************************************/
-struct CompTypeField {
-  H5::PredType type;
-  int offset;
-  CompTypeField() : type(H5::PredType::NATIVE_INT) {}
+struct CompTypeMember {
+
+	H5::PredType type;
+	H5::StrType str_type;//(H5::PredType::C_S1, H5T_VARIABLE); 
+
+	int offset;
+	CompTypeMember() : type(H5::PredType::NATIVE_UINT)  {}
+
+	H5::DataType* GetType() {
+		if (type == H5::PredType::C_S1) {
+			return &str_type;
+		}else {
+			return &type;
+		}
+	}
 };
+
+
 
 /*! **************************************************************************
  * @brief Get the hdf5 type from a given C++ type
@@ -55,9 +67,16 @@ template <typename T> const H5::PredType *get_hdf5_type() {
     return &H5::PredType::NATIVE_LDOUBLE;
   }
 
-  else if (std::is_same<T, char>::value ||
-           std::is_same<T, std::string>::value) {
+  else if (std::is_same<T, char>::value) {
     return &H5::PredType::NATIVE_CHAR;
+  }
+
+  else if (std::is_same<T, char*>::value) {
+    return &H5::PredType::C_S1;
+  }
+
+  else if (std::is_same<T, std::string>::value) {
+    return &H5::PredType::C_S1;
   }
 
   else if (std::is_same<T, unsigned char>::value) {
@@ -108,104 +127,98 @@ template <typename T> const H5::PredType *get_hdf5_type() {
  *
  ****************************************************************************/
 struct CompType {
-  std::map<std::string, CompTypeField> fields;
-  size_t size = 0;
+	std::map<std::string, CompTypeMember> members;
+	size_t size = 0;
+	
+	template<typename T> 
+	void AddMember(const std::string &member_name) {
 
-  void AddField(const std::string &field_name, H5::PredType type) {
+		H5::PredType type = *HDF5::get_hdf5_type<T>(); 
 
-    CompTypeField field;
-    field.type = type;
-    field.offset = size;
+		CompTypeMember member;
+		member.offset = size;
+        member.type = type;
 
-    fields[field_name] = field;
-    size += type.getSize();
-  }
+        // In the case of a variable length string...(where type is char*)
+		if (type == H5::PredType::C_S1) {
+			member.str_type = H5::StrType(H5::PredType::C_S1, H5T_VARIABLE); 
+		}
 
-  CompTypeField GetField(const std::string &field_name) const {
-    auto it = fields.find(field_name);
+        members[member_name] = member;
+		size += sizeof(T);
+	}
 
-    if (it == fields.end()) {
-      APILogger->error("Utilities:HDF5:CompType: Cannot add value to field "
-                       "'{0}', field does not exist",
-                       field_name);
-      throw std::invalid_argument("Failed to add value to HDF5 container");
+    CompTypeMember GetMember(const std::string &member_name) const {
+        auto it = members.find(member_name);
+        assert (it != members.end()) ;
+        return it->second;
     }
-
-    return it->second;
-  }
 };
+
 
 /*! **************************************************************************
- * @struct CompTypeArray
- * @brief structure for holding multiple CompTypes towards memory allocation
  * @author T. Middleweek (UKAEA)
- *
- * @note As long as this uses primitive types this should be okay.
- * If you start putting values in here with constructors and destructors
- * then you will encounter serious issues and it will not work.
+ * 
+ * @note It is your responsiblilty to clean up complicated data types.
+ * For instance, if the compound type has a member that is a pointer,
+ * you will need to clear this up before cleaning this array.
+ * That is why there is an explict step to clean up this array to remind
+ * you to do that!
  ****************************************************************************/
-struct CompTypeArray {
-  CompType type;
-  int length;
-  int size;
-  char *buffer = nullptr;
+struct CompValueArray {
+	CompType type;
+	char* buffer = nullptr;
+	size_t size;
 
-  CompTypeArray(const CompType &type_in, int length_in) {
+	CompValueArray(const CompType& type_in, size_t size_in) : type(type_in), size(size_in) {
+		buffer = new char[type.size * size];
+	}
 
-    type = type_in;
-    length = length_in;
-    size = length * type.size;
+	~CompValueArray() {
+		// This will have a go at you if you have not cleaned up this array.
+		assert(buffer == nullptr);
+	}
 
-    buffer = new char[size];
-  }
+	template<typename T>
+    void SetValue(size_t index, const std::string &member_name, T value) {
 
-  ~CompTypeArray() { delete[] buffer; }
+        CompTypeMember member = type.GetMember(member_name);
+		// Type check
+        H5::PredType pred_type = *HDF5::get_hdf5_type<T>();
+        assert(member.type == pred_type);
 
-  template <typename T>
-  void SetValue(int index, const std::string &member_name, T value) {
+		size_t offset = (type.size * index) + member.offset;
 
-    CompTypeField field = type.GetField(member_name);
-    H5::PredType pred_type = *HDF5::get_hdf5_type<T>();
-
-    if (field.type != pred_type) {
-      APILogger->error("Utilities:HDF5:CompTypeArray: Type mismatch between "
-                       "field and input value "
-                       "when adding value '{0}', to field '{1}': {2} != {3}",
-                       value, member_name, field.type.getId(),
-                       pred_type.getId());
-      throw std::invalid_argument("Cannot insert value into HDF5 container");
+		memcpy(&buffer[offset], &value, sizeof(T));
     }
 
-    int buffer_offset = (type.size * index) + field.offset;
+	template<typename T>
+    T GetValue(size_t index, const std::string &member_name) {
 
-    T *value_ptr = (T *)&buffer[buffer_offset];
-    *value_ptr = value;
-  }
+		CompTypeMember member = type.GetMember(member_name);
+        H5::PredType pred_type = *HDF5::get_hdf5_type<T>();
+        // Do a type check
+        assert(member.type == pred_type);
 
-  template <typename T> T GetValue(int index, const std::string &member_name) {
+		// Calculate the offset in teh buffer 
+		size_t offset = (type.size * index) + member.offset;
 
-    CompTypeField field_ = type.GetField(member_name);
-    H5::PredType pred_type_ = *HDF5::get_hdf5_type<T>();
-    // Do a type check
-    if (field_.type != pred_type_) {
-      APILogger->error("Utilities:HDF5:CompTypeArray: Type mismatch between "
-                       "field and input value "
-                       "for field '{0}': {1} != {2}",
-                       member_name, field_.type.getId(), pred_type_.getId());
-      throw std::invalid_argument("Cannot insert value into HDF5 container");
-    }
+		T *value_ptr = (T*)&buffer[offset];
 
-    // Calculate the offset in teh buffer
-    int buffer_offset = (type.size * index) + field_.offset;
-    T *value_ptr = (T *)&buffer[buffer_offset];
+		return *value_ptr;
+	}
 
-    delete pred_type_;
+	char* Data() {
+		return buffer;
+	}
 
-    return *value_ptr;
-  }
-
-  char *Data() { return buffer; }
+	void Cleanup() {
+		delete [] buffer;
+		buffer = nullptr;
+	}
 };
+
+
 
 const std::vector<std::string>
 read_hdf5_as_str_vector(const std::filesystem::path file_name,

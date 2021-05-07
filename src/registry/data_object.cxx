@@ -19,7 +19,7 @@ DataProduct *data_product_from_yaml(YAML::Node yaml_data) {
   const std::string version_ = use_node_["version"].as<std::string>();
 
   try {
-    version(version_);
+    Versioning::version(version_);
   } catch (std::exception &e) {
     APILogger->error("Invalid version identifier '{0}'", version_);
     throw e;

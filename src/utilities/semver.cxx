@@ -1,7 +1,7 @@
 #include "scrc/utilities/semver.hxx"
 
 namespace SCRC {
-version::version(const std::string version_str) {
+Versioning::version::version(const std::string version_str) {
   const std::string delim_ = ".";
   const std::string meta_delim_ = "+";
   const std::string rel_delim_ = "-";
@@ -71,7 +71,7 @@ version::version(const std::string version_str) {
   patch_ = components_[2];
 }
 
-std::string version::get_tag_str() const {
+std::string Versioning::version::get_tag_str() const {
   switch (meta_tag_) {
   case (meta_tag::ALPHA):
     return "alpha";

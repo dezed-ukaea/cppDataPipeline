@@ -12,13 +12,16 @@
 
 using namespace SCRC;
 
+//! [TestTOMLPERead]
 TEST(SCRCAPITest, TestTOMLPERead) {
   APILogger->set_level(spdlog::level::debug);
   const std::filesystem::path test_file =
       std::filesystem::path(TESTDIR) / std::filesystem::path("test_pe.toml");
   ASSERT_EQ(read_point_estimate_from_toml(test_file), 11);
 }
+//! [TestTOMLPERead]
 
+//! [TestTOMLDisRead]
 TEST(SCRCAPITest, TestTOMLDisRead) {
   APILogger->set_level(spdlog::level::debug);
   const std::filesystem::path test_file =
@@ -27,7 +30,9 @@ TEST(SCRCAPITest, TestTOMLDisRead) {
   ASSERT_EQ(dis.mean(), 2.675739);
   ASSERT_EQ(dis.standard_deviation(), 0.5719293);
 }
+//! [TestTOMLDisRead]
 
+//! [TestArrayRead]
 TEST(SCRCAPITest, TestArrayRead) {
   APILogger->set_level(spdlog::level::debug);
   const std::filesystem::path test_file =
@@ -40,7 +45,9 @@ TEST(SCRCAPITest, TestArrayRead) {
   ASSERT_EQ(array_->get_dimension_names(0)[2], "10-14");
   ASSERT_EQ(array_->get({4, 1}), 0.08083608969374471);
 }
+//! [TestArrayRead]
 
+//! [TestTableReadColumn]
 TEST(SCRCAPITest, TestTableReadColumn) {
   APILogger->set_level(spdlog::level::debug);
   const std::filesystem::path test_file =
@@ -53,7 +60,9 @@ TEST(SCRCAPITest, TestTableReadColumn) {
 
   ASSERT_EQ(column_->operator[]("2"), 5.0);
 }
+//! [TestTableReadColumn]
 
+//! [TestWriteArray]
 TEST(SCRCAPITest, TestWriteArray) {
   APILogger->set_level(spdlog::level::debug);
   std::filesystem::path config_path_ =
@@ -83,7 +92,9 @@ TEST(SCRCAPITest, TestWriteArray) {
   ASSERT_EQ(array_->get_dimension_names(0)[0], "a1");
   ASSERT_EQ(array_->get({1, 1, 1}), 14);
 }
+//! [TestWriteArray]
 
+//! [TestWriteTable]
 TEST(SCRCAPITest, TestWriteTable) {
   APILogger->set_level(spdlog::level::debug);
   std::filesystem::path config_path_ =
@@ -97,19 +108,22 @@ TEST(SCRCAPITest, TestWriteTable) {
   const std::vector<int> ages_ = {23, 45, 65, 21};
   const std::vector<float> heights_ = {182, 178, 169, 180};
 
-  data_->add_column("name", names_);
+  //data_->add_column("name", names_);
   data_->add_column("age", ages_);
   data_->add_column("height", heights_, "cm");
 
   create_table(data_, "demo/population", "sample", file_system_);
+  exit(EXIT_FAILURE);
 }
+//! [TestWriteTable]
 
+//! [TestWritePointEstimate]
 TEST(SCRCAPITest, TestWritePointEstimate) {
   APILogger->set_level(spdlog::level::debug);
   std::filesystem::path config_path_ =
       std::filesystem::path(TESTDIR) / "config.yaml";
   LocalFileSystem *file_system_ = new LocalFileSystem(config_path_);
-  const version v_;
+  const Versioning::version v_;
 
   const int value_ = 10;
   const std::string component_ = "demo_val/param";
@@ -120,13 +134,15 @@ TEST(SCRCAPITest, TestWritePointEstimate) {
   ASSERT_TRUE(std::filesystem::exists(output_file_));
   ASSERT_EQ(read_point_estimate_from_toml(output_file_), value_);
 }
+//! [TestWritePointEstimate]
 
+//! [TestWriteDistribution]
 TEST(SCRCAPITest, TestWriteDistribution) {
   APILogger->set_level(spdlog::level::debug);
   std::filesystem::path config_path_ =
       std::filesystem::path(TESTDIR) / "config.yaml";
   LocalFileSystem *file_system_ = new LocalFileSystem(config_path_);
-  const version v_;
+  const Versioning::version v_;
   const std::string component_ = "demo_val/dist";
 
   Normal *norm_dist_ = new Normal(5.8, 0.1);
@@ -136,3 +152,4 @@ TEST(SCRCAPITest, TestWriteDistribution) {
   ASSERT_TRUE(std::filesystem::exists(output_file_));
   ASSERT_EQ(read_distribution_from_toml(output_file_)->get_params()["mu"], 5.8);
 }
+//! [TestWriteDistribution]

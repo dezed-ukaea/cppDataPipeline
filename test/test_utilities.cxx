@@ -17,11 +17,11 @@ TEST(SCRCAPITest, TestDOIFail) {
 }
 
 TEST(SCRCAPITest, TestSemVerComparisons) {
-  version v1{1, 4, 5};
-  version v2;
-  version v3{1, 0, 0};
-  version v4{5, 2, 1};
-  version v3a(v3);
+  Versioning::version v1{1, 4, 5};
+  Versioning::version v2;
+  Versioning::version v3{1, 0, 0};
+  Versioning::version v4{5, 2, 1};
+  Versioning::version v3a(v3);
   v3a.alpha();
 
   ASSERT_LT(v2, v1);
@@ -31,9 +31,10 @@ TEST(SCRCAPITest, TestSemVerComparisons) {
   v2.bump_major();
 
   ASSERT_EQ(v2, v3);
-  ASSERT_EQ(version("5.2.1"), v4);
+  ASSERT_EQ(Versioning::version("5.2.1"), v4);
 }
 
+//! [TestJSONString]
 TEST(SCRCAPITest, TestJSONString) {
   Json::Value value_;
   value_["int"] = 5;
@@ -42,3 +43,4 @@ TEST(SCRCAPITest, TestJSONString) {
       "{\n\t\"int\" : 5,\n\t\"string\" : \"hello\"\n}";
   ASSERT_EQ(json_to_string(value_), expected_);
 }
+//! [TestJSONString]

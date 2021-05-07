@@ -133,24 +133,24 @@ std::filesystem::path create_table(const DataTable *table,
   for (const auto &int_col : table->get_int_columns()) {
     APILogger->debug("FileSystem:CreateTable: Adding field '{0}' to container",
                      int_col.first);
-    comp_type_.AddField(int_col.first, PredType::NATIVE_INT);
+    comp_type_.AddMember<int>(int_col.first);
   }
 
   for (const auto &float_col : table->get_float_columns()) {
     APILogger->debug("FileSystem:CreateTable: Adding field '{0}' to container",
                      float_col.first);
-    comp_type_.AddField(float_col.first, PredType::NATIVE_FLOAT);
+    comp_type_.AddMember<float>(float_col.first);
   }
 
   for (const auto &str_col : table->get_str_columns()) {
     APILogger->debug("FileSystem:CreateTable: Adding field '{0}' to container",
                      str_col.first);
-    comp_type_.AddField(str_col.first, PredType::NATIVE_CHAR);
+    comp_type_.AddMember<std::string>(str_col.first);
   }
 
   const int length_ = table->size();
 
-  HDF5::CompTypeArray array_to_write_(comp_type_, length_);
+  HDF5::CompValueArray array_to_write_(comp_type_, length_);
 
   APILogger->debug("FileSystem:CreateTable: Writing values to CompType");
 
@@ -161,8 +161,8 @@ std::filesystem::path create_table(const DataTable *table,
                      int_col.first);
     for (const int &value : int_col.second->values()) {
       array_to_write_.SetValue<int>(col_counter_, int_col.first, value);
-      col_counter_ += 1;
     }
+    col_counter_ += 1;
   }
 
   for (const auto &float_col : table->get_float_columns()) {
@@ -170,8 +170,8 @@ std::filesystem::path create_table(const DataTable *table,
                      float_col.first);
     for (const float &value : float_col.second->values()) {
       array_to_write_.SetValue<float>(col_counter_, float_col.first, value);
-      col_counter_ += 1;
     }
+    col_counter_ += 1;
   }
 
   for (const auto &str_col : table->get_str_columns()) {
@@ -179,8 +179,8 @@ std::filesystem::path create_table(const DataTable *table,
                      str_col.first);
     for (const std::string &value : str_col.second->values()) {
       array_to_write_.SetValue<std::string>(col_counter_, str_col.first, value);
-      col_counter_ += 1;
     }
+    col_counter_ += 1;
   }
 
   std::vector<hsize_t> dim = {table->size()};
@@ -192,10 +192,11 @@ std::filesystem::path create_table(const DataTable *table,
 
   // We iterate through the fields of our custom compound type
   // and tell HDF5 about that.
-  for (auto const &x : array_to_write_.type.fields) {
+  for (auto &x : array_to_write_.type.members) {
     auto &field_name = x.first;
     auto &field_val = x.second;
-    h5_comp_type_.insertMember(field_name, field_val.offset, field_val.type);
+    APILogger->debug("Name-Offset: {0} {1}", field_name, field_val.offset);
+    h5_comp_type_.insertMember(field_name, field_val.offset, *field_val.GetType());
   }
 
   // Create data set
@@ -223,7 +224,7 @@ std::filesystem::path create_table(const DataTable *table,
 
 std::filesystem::path create_distribution(
     const Distribution *distribution, const std::filesystem::path &data_product,
-    const version &version_num, const LocalFileSystem *file_system) {
+    const Versioning::version &version_num, const LocalFileSystem *file_system) {
   const std::string param_name_ = data_product.stem();
   const std::string namespace_ = file_system->get_default_output_namespace();
   const std::filesystem::path data_store_ = file_system->get_data_store();
