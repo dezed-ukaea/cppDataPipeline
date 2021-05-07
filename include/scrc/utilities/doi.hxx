@@ -22,7 +22,7 @@ namespace SCRC {
  * @class DOI
  * @brief class for handling of Digital Object Identifiers
  * @author K. Zarebski (UKAEA)
- * 
+ *
  ****************************************************************************/
 class DOI {
 private:
@@ -35,17 +35,17 @@ public:
   /*! ***********************************************************************
    * @brief a construct an empty DOI instance
    * @author K. Zarebski (UKAEA)
-   * 
+   *
    *************************************************************************/
   DOI(){};
 
   /*! ***********************************************************************
    * @brief a construct an empty DOI instance
    * @author K. Zarebski (UKAEA)
-   * 
+   *
    * @param reg_id registrant identifier
    * @param obj_id object identifier
-   * 
+   *
    *************************************************************************/
   DOI(std::string reg_id, std::string obj_id)
       : registrant_id_(reg_id), object_id_(obj_id) {
@@ -56,7 +56,7 @@ public:
   /*! **********************************************************************
    * @brief Construct a new DOI object from an existing one
    * @author K. Zarebski (UKAEA)
-   * 
+   *
    * @param doi DOI instance to clone
    *************************************************************************/
   DOI(const DOI &doi)
@@ -65,7 +65,7 @@ public:
   /*! **********************************************************************
    * @brief convert a DOI object to string representation
    * @author K. Zarebski (UKAEA)
-   * 
+   *
    * @return DOI as a string
    ************************************************************************/
   std::string to_string() const { return registrant_id_ + "/" + object_id_; }
@@ -73,7 +73,7 @@ public:
   /*! **********************************************************************
    * @brief set DOI to be equal to another
    * @author K. Zarebski (UKAEA)
-   * 
+   *
    * @param doi other DOI to copy
    * @return a new DOI matching the specified instance
    ************************************************************************/
@@ -82,7 +82,7 @@ public:
   /*! **********************************************************************
    * @brief compare to DOI instances
    * @author K. Zarebski (UKAEA)
-   * 
+   *
    * @param a first instance
    * @param b second instance
    * @return true if objects match
@@ -96,7 +96,7 @@ public:
 /*! ***********************************************************************
  * @brief Construct a DOI object from a string representation
  * @author K. Zarebski (UKAEA)
- * 
+ *
  * @param doi_id DOI as a string
  * @return DOI a DOI object representing the given DOI
  *************************************************************************/

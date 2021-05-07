@@ -30,22 +30,20 @@ namespace HDF5 {
  ****************************************************************************/
 struct CompTypeMember {
 
-	H5::PredType type;
-	H5::StrType str_type;//(H5::PredType::C_S1, H5T_VARIABLE); 
+  H5::PredType type;
+  H5::StrType str_type; //(H5::PredType::C_S1, H5T_VARIABLE);
 
-	int offset;
-	CompTypeMember() : type(H5::PredType::NATIVE_UINT)  {}
+  int offset;
+  CompTypeMember() : type(H5::PredType::NATIVE_UINT) {}
 
-	H5::DataType* GetType() {
-		if (type == H5::PredType::C_S1) {
-			return &str_type;
-		}else {
-			return &type;
-		}
-	}
+  H5::DataType *GetType() {
+    if (type == H5::PredType::C_S1) {
+      return &str_type;
+    } else {
+      return &type;
+    }
+  }
 };
-
-
 
 /*! **************************************************************************
  * @brief Get the hdf5 type from a given C++ type
@@ -71,7 +69,7 @@ template <typename T> const H5::PredType *get_hdf5_type() {
     return &H5::PredType::NATIVE_CHAR;
   }
 
-  else if (std::is_same<T, char*>::value) {
+  else if (std::is_same<T, char *>::value) {
     return &H5::PredType::C_S1;
   }
 
@@ -127,38 +125,41 @@ template <typename T> const H5::PredType *get_hdf5_type() {
  *
  ****************************************************************************/
 struct CompType {
-	std::map<std::string, CompTypeMember> members;
-	size_t size = 0;
-	
-	template<typename T> 
-	void AddMember(const std::string &member_name) {
+  std::map<std::string, CompTypeMember> members;
+  size_t size = 0;
 
-		H5::PredType type = *HDF5::get_hdf5_type<T>(); 
+  template <typename T> void AddMember(const std::string &member_name) {
 
-		CompTypeMember member;
-		member.offset = size;
-        member.type = type;
+    H5::PredType type = *HDF5::get_hdf5_type<T>();
 
-        // In the case of a variable length string...(where type is char*)
-		if (type == H5::PredType::C_S1) {
-			member.str_type = H5::StrType(H5::PredType::C_S1, H5T_VARIABLE); 
-		}
+    CompTypeMember member;
+    member.offset = size;
+    member.type = type;
 
-        members[member_name] = member;
-		size += sizeof(T);
-	}
-
-    CompTypeMember GetMember(const std::string &member_name) const {
-        auto it = members.find(member_name);
-        assert (it != members.end()) ;
-        return it->second;
+    // In the case of a variable length string...(where type is char*)
+    if (type == H5::PredType::C_S1) {
+      member.str_type = H5::StrType(H5::PredType::C_S1, H5T_VARIABLE);
     }
-};
 
+    members[member_name] = member;
+    size += sizeof(T);
+  }
+
+  CompTypeMember GetMember(const std::string &member_name) const {
+    auto it = members.find(member_name);
+    if (it == members.end()) {
+      APILogger->error("Utilities:HDF5:CompType: Cannot add value to field "
+                       "'{0}', field does not exist",
+                      member_name);
+      throw std::invalid_argument("Failed to add value to HDF5 container");
+    }
+    return it->second;
+  }
+};
 
 /*! **************************************************************************
  * @author T. Middleweek (UKAEA)
- * 
+ *
  * @note It is your responsiblilty to clean up complicated data types.
  * For instance, if the compound type has a member that is a pointer,
  * you will need to clear this up before cleaning this array.
@@ -166,59 +167,71 @@ struct CompType {
  * you to do that!
  ****************************************************************************/
 struct CompValueArray {
-	CompType type;
-	char* buffer = nullptr;
-	size_t size;
+  CompType type;
+  char *buffer = nullptr;
+  size_t size;
 
-	CompValueArray(const CompType& type_in, size_t size_in) : type(type_in), size(size_in) {
-		buffer = new char[type.size * size];
-	}
+  CompValueArray(const CompType &type_in, size_t size_in)
+      : type(type_in), size(size_in) {
+    buffer = new char[type.size * size];
+  }
 
-	~CompValueArray() {
-		// This will have a go at you if you have not cleaned up this array.
-		assert(buffer == nullptr);
-	}
+  ~CompValueArray() {
+    // This will have a go at you if you have not cleaned up this array.
+    assert(buffer == nullptr);
+  }
 
-	template<typename T>
-    void SetValue(size_t index, const std::string &member_name, T value) {
+  template <typename T>
+  void SetValue(size_t index, const std::string &member_name, T value) {
 
-        CompTypeMember member = type.GetMember(member_name);
-		// Type check
-        H5::PredType pred_type = *HDF5::get_hdf5_type<T>();
-        assert(member.type == pred_type);
+    CompTypeMember member = type.GetMember(member_name);
+    // Type check
+    H5::PredType pred_type = *HDF5::get_hdf5_type<T>();
 
-		size_t offset = (type.size * index) + member.offset;
 
-		memcpy(&buffer[offset], &value, sizeof(T));
+    if (member.type != pred_type) {
+      APILogger->error("Utilities:HDF5:CompTypeArray: Type mismatch between "
+                       "field and input value "
+                       "when adding value '{0}', to field '{1}': {2} != {3}",
+                       value, member_name, member.type.getId(),
+                       pred_type.getId());
+      throw std::invalid_argument("Cannot insert value into HDF5 container");
     }
 
-	template<typename T>
-    T GetValue(size_t index, const std::string &member_name) {
+    size_t offset = (type.size * index) + member.offset;
 
-		CompTypeMember member = type.GetMember(member_name);
-        H5::PredType pred_type = *HDF5::get_hdf5_type<T>();
-        // Do a type check
-        assert(member.type == pred_type);
+    memcpy(&buffer[offset], &value, sizeof(T));
+  }
 
-		// Calculate the offset in teh buffer 
-		size_t offset = (type.size * index) + member.offset;
+  template <typename T>
+  T GetValue(size_t index, const std::string &member_name) {
 
-		T *value_ptr = (T*)&buffer[offset];
+    CompTypeMember member = type.GetMember(member_name);
+    H5::PredType pred_type = *HDF5::get_hdf5_type<T>();
+    // Do a type check
+    if (member.type != pred_type) {
+      APILogger->error("Utilities:HDF5:CompTypeArray: Type mismatch between "
+                       "field and input value "
+                       "for field '{0}': {1} != {2}",
+                       member_name, member.type.getId(), pred_type.getId());
+      throw std::invalid_argument("Cannot insert value into HDF5 container");
+    }
 
-		return *value_ptr;
-	}
+    // Calculate the offset in teh buffer
+    size_t offset = (type.size * index) + member.offset;
 
-	char* Data() {
-		return buffer;
-	}
+    T *value_ptr = (T *)&buffer[offset];
 
-	void Cleanup() {
-		delete [] buffer;
-		buffer = nullptr;
-	}
+    return *value_ptr;
+  }
+
+  char *Data() { return buffer; }
+
+  void Cleanup() {
+    delete[] buffer;
+    buffer = nullptr;
+  }
 };
-
-
 
 const std::vector<std::string>
 read_hdf5_as_str_vector(const std::filesystem::path file_name,

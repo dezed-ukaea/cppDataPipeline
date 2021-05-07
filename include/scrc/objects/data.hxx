@@ -98,6 +98,14 @@ public:
    ***************************************************************************/
   int size() const { return values_.size(); }
 
+ /*! *************************************************************************
+   * @brief returns the unit of measurement for the data column
+   * @author K. Zarebski (UKAEA)
+   * 
+   * @return unit of measurement
+   ***************************************************************************/
+  std::string unit_of_measurement() const { return unit_; }
+
   /*! *************************************************************************
    * @brief retrieves the value at the given index
    * @author K. Zarebski (UKAEA)
@@ -213,6 +221,7 @@ public:
           column->name(), column->size(), size_);
       throw std::invalid_argument("Invalid column size for data table");
     }
+
     int_cols_[column->name()] = column;
 
     if (ncols_ == 0 && row_names_.empty()) {

@@ -108,7 +108,7 @@ TEST(SCRCAPITest, TestWriteTable) {
   const std::vector<int> ages_ = {23, 45, 65, 21};
   const std::vector<float> heights_ = {182, 178, 169, 180};
 
-  //data_->add_column("name", names_);
+  data_->add_column("name", names_);
   data_->add_column("age", ages_);
   data_->add_column("height", heights_, "cm");
 

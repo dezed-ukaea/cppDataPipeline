@@ -16,19 +16,19 @@ namespace SCRC {
 /*! **************************************************************************
  * @brief convert a JSON object to string form
  * @author K. Zarebski (UKAEA)
- * 
+ *
  * @param json_data JSON data held in a Json::Value object
  * @return the data as a JSON string
- * 
+ *
  * @paragraph testcases Test Case
  *    `test/test_utilities.cxx`: TestJSONString
  *
  *    This unit test checks that the JSON string constructed from a
  *    Json::Value object matches expectation
  *    @snippet `test/test_utilities.cxx TestJSONString
- * 
+ *
  ****************************************************************************/
 std::string json_to_string(Json::Value &json_data);
-};
+}; // namespace SCRC
 
 #endif

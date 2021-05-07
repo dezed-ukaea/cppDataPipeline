@@ -18,7 +18,7 @@ namespace SCRC {
 /*! **************************************************************************
  * @brief Create a the global logger pointer
  * @author K. Zarebski (UKAEA)
- * 
+ *
  * @return a shared pointer to the global logger instance
  ****************************************************************************/
 std::shared_ptr<spdlog::logger> create_logger_();
@@ -26,7 +26,7 @@ std::shared_ptr<spdlog::logger> create_logger_();
 /**
  * @brief Global logger used across all SCRC scripts
  * @author K. Zarebski (UKAEA)
- * 
+ *
  */
 const std::shared_ptr<spdlog::logger> APILogger = create_logger_();
 } // namespace SCRC

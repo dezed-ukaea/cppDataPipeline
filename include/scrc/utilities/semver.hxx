@@ -21,42 +21,41 @@ namespace SCRC {
  * @namespace SCRC::Versioning
  * @brief namespace containing all semantic versioning types and classes
  * @author K. Zarebski (UKAEA)
- * 
+ *
  ****************************************************************************/
-namespace Versioning
-{
+namespace Versioning {
 
 /*! **************************************************************************
  * @enum meta_tag
  * @brief the allowed tags for versions describing version state
  * @author K. Zarebski (UKAEA)
- * 
+ *
  * This enum class contains all permitted release state classifiers which
  * describe whether the code/data object is a full release or still under
  * review by the authors
- * 
+ *
  ****************************************************************************/
-enum class meta_tag { 
-  ALPHA,              /*!< Release is an Alpha release */
-  BETA,               /*!< Release is an Beta release */
-  RELEASE_CANDIDATE,  /*!< Release is a candidate for full release */
-  RELEASE             /*!< Release is a full release */
+enum class meta_tag {
+  ALPHA,             /*!< Release is an Alpha release */
+  BETA,              /*!< Release is an Beta release */
+  RELEASE_CANDIDATE, /*!< Release is a candidate for full release */
+  RELEASE            /*!< Release is a full release */
 };
 
 /*! **************************************************************************
  * @brief class describing the semantic version of an object
  * @author K. Zarebski (UKAEA)
- * 
+ *
  * This class allows the comparison and validation of semantic version numbers
  * and ensures that all data objects handled follow the same protocol
- * 
+ *
  ****************************************************************************/
 class version {
 public:
   /*! ************************************************************************
    * @brief Construct a new version with the default start value of `0.1.0`
    * @author K. Zarebski (UKAEA)
-   * 
+   *
    **************************************************************************/
   version() = default;
 
@@ -64,19 +63,19 @@ public:
    * @brief Construct a new version from integer representation
    *
    * Constructs a version object with the forms:
-   * 
+   *
    * `MAJOR.MINOR.PATCH-<tag>.<tag-version>+<meta-data>`
-   * 
+   *
    * where parts in `<>` are optional. The default for `tag_v` of `1E9` is
    * used to, as a default, represent a version that is a full release
-   * 
+   *
    * @param major the MAJOR release number
    * @param minor the MINOR release number
    * @param patch the PATCH release number
    * @param tag if applicable, whether release is alpha, beta etc.
    * @param tag_v if applicable, the version of the tag, e.g. `-alpha.2`
    * @param meta_data if applicable, additional metadata, e.g. `+<build_num>`
-   * 
+   *
    **************************************************************************/
   version(unsigned int major, unsigned int minor, unsigned int patch,
           meta_tag tag = meta_tag::RELEASE, unsigned int tag_v = 1E9,

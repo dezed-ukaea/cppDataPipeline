@@ -126,26 +126,40 @@ std::filesystem::path create_table(const DataTable *table,
 
   H5File *output_file_ = new H5File(output_path_, H5F_ACC_TRUNC);
 
+  Group *output_group_ =
+      new Group(output_file_->createGroup(component.c_str()));
+
   const int rank_ = 1;
 
   HDF5::CompType comp_type_;
 
+  std::vector<char*> col_units_;
+
   for (const auto &int_col : table->get_int_columns()) {
     APILogger->debug("FileSystem:CreateTable: Adding field '{0}' to container",
                      int_col.first);
+    char *col_unit_ = new char[int_col.second->unit_of_measurement().length()+1];
+    strcpy(col_unit_, int_col.second->unit_of_measurement().c_str());
+    col_units_.push_back(col_unit_);
     comp_type_.AddMember<int>(int_col.first);
   }
 
   for (const auto &float_col : table->get_float_columns()) {
     APILogger->debug("FileSystem:CreateTable: Adding field '{0}' to container",
                      float_col.first);
+    char *col_unit_ = new char[float_col.second->unit_of_measurement().length()+1];
+    strcpy(col_unit_, float_col.second->unit_of_measurement().c_str());
+    col_units_.push_back(col_unit_);
     comp_type_.AddMember<float>(float_col.first);
   }
 
   for (const auto &str_col : table->get_str_columns()) {
     APILogger->debug("FileSystem:CreateTable: Adding field '{0}' to container",
                      str_col.first);
-    comp_type_.AddMember<std::string>(str_col.first);
+    char *col_unit_ = new char[str_col.second->unit_of_measurement().length()+1];
+    strcpy(col_unit_, str_col.second->unit_of_measurement().c_str());
+    col_units_.push_back(col_unit_);
+    comp_type_.AddMember<char*>(str_col.first);
   }
 
   const int length_ = table->size();
@@ -178,7 +192,10 @@ std::filesystem::path create_table(const DataTable *table,
     APILogger->debug("FileSystem:CreateTable: Writing values to field '{0}'",
                      str_col.first);
     for (const std::string &value : str_col.second->values()) {
-      array_to_write_.SetValue<std::string>(col_counter_, str_col.first, value);
+      char *str = new char[value.size()+2];
+      strcpy(str, (value+"\0").c_str());  // Expects null terminated string
+      array_to_write_.SetValue<char*>(col_counter_, str_col.first, str);
+      delete[] str;
     }
     col_counter_ += 1;
   }
@@ -196,15 +213,18 @@ std::filesystem::path create_table(const DataTable *table,
     auto &field_name = x.first;
     auto &field_val = x.second;
     APILogger->debug("Name-Offset: {0} {1}", field_name, field_val.offset);
-    h5_comp_type_.insertMember(field_name, field_val.offset, *field_val.GetType());
+    h5_comp_type_.insertMember(field_name, field_val.offset,
+                               *field_val.GetType());
   }
 
   // Create data set
   H5::DataSet *dataset_ = new DataSet(
-      output_file_->createDataSet("DataSet", h5_comp_type_, dspace_));
+      output_group_->createDataSet(std::string(TABLE), h5_comp_type_, dspace_));
 
-  // Do the write. Call teh Data() function on our array
+  // Do the write. Call the Data() function on our array
   dataset_->write(array_to_write_.Data(), h5_comp_type_);
+
+  array_to_write_.Cleanup();
 
   // Clean up
   delete dataset_;
@@ -216,15 +236,35 @@ std::filesystem::path create_table(const DataTable *table,
     throw std::runtime_error("Failed to write output");
   }
 
+  // ---------- WRITE UNITS ------------- //
+
+  const hsize_t str_dim_[1] = {col_units_.size()};
+
+  const int rank = 1;
+  DataSpace *str_space_ = new DataSpace(rank, str_dim_);
+  const std::string label_ = std::string(COLUMN_UNITS);
+
+  StrType stype_(H5T_C_S1, H5T_VARIABLE);
+
+  DataSet *dset_str_ = new DataSet(
+      output_group_->createDataSet(label_.c_str(), stype_, *str_space_));
+
+  dset_str_->write(col_units_.data(), stype_);
+
+  dset_str_->close();
+  str_space_->close();
+
   APILogger->debug("FileSystem:CreateTable: Wrote file '{0}'",
                    output_path_.string());
 
   return output_path_;
 }
 
-std::filesystem::path create_distribution(
-    const Distribution *distribution, const std::filesystem::path &data_product,
-    const Versioning::version &version_num, const LocalFileSystem *file_system) {
+std::filesystem::path
+create_distribution(const Distribution *distribution,
+                    const std::filesystem::path &data_product,
+                    const Versioning::version &version_num,
+                    const LocalFileSystem *file_system) {
   const std::string param_name_ = data_product.stem();
   const std::string namespace_ = file_system->get_default_output_namespace();
   const std::filesystem::path data_store_ = file_system->get_data_store();
