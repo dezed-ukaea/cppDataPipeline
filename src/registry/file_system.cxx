@@ -187,7 +187,8 @@ std::filesystem::path create_table(const DataTable *table,
     APILogger->debug("FileSystem:CreateTable: Writing values to field '{0}'",
                      float_col.first);
     for (const float &value : float_col.second->values()) {
-      array_to_write_.SetValue<float>(row_index_counter_, float_col.first, value);
+      array_to_write_.SetValue<float>(row_index_counter_, float_col.first,
+                                      value);
       row_index_counter_ += 1;
     }
   }
@@ -242,23 +243,50 @@ std::filesystem::path create_table(const DataTable *table,
     throw std::runtime_error("Failed to write output");
   }
 
-  // ---------- WRITE UNITS ------------- //
-
-  const hsize_t str_dim_[1] = {col_units_.size()};
-
-  const int rank = 1;
-  DataSpace *str_space_ = new DataSpace(rank, str_dim_);
-  const std::string label_ = std::string(COLUMN_UNITS);
-
   StrType stype_(H5T_C_S1, H5T_VARIABLE);
 
-  DataSet *dset_str_ = new DataSet(
-      output_group_->createDataSet(label_.c_str(), stype_, *str_space_));
+  // ---------- WRITE UNITS ------------- //
 
-  dset_str_->write(col_units_.data(), stype_);
+  const hsize_t unit_dim_[1] = {col_units_.size()};
 
-  dset_str_->close();
-  str_space_->close();
+  const int urank = 1;
+  DataSpace *str_space_u_ = new DataSpace(urank, unit_dim_);
+  const std::string ulabel_ = std::string(COLUMN_UNITS);
+
+  DataSet *dset_str_u_ = new DataSet(
+      output_group_->createDataSet(ulabel_.c_str(), stype_, *str_space_u_));
+
+  dset_str_u_->write(col_units_.data(), stype_);
+
+  dset_str_u_->close();
+  str_space_u_->close();
+
+  delete dset_str_u_;
+  delete str_space_u_;
+
+  // --------- WRITE ROW NAMES --------- //
+  std::vector<char *> row_names_;
+
+  for(int i{0}; i < table->get_row_names().size(); ++i) {
+    const std::string name_ = table->get_row_names()[i];
+    char *row_name_ = new char[name_.length() + 1];
+    strcpy(row_name_, name_.c_str());
+    row_names_.push_back(row_name_);
+  }
+  const hsize_t str_dim_[1] = {table->get_row_names().size()};
+  const int rrank = 1;
+  DataSpace *str_space_r_ = new DataSpace(rrank, str_dim_);
+  const std::string rlabel_ = std::string(ROW_NAMES);
+
+  DataSet *dset_str_r_ = new DataSet(
+      output_group_->createDataSet(rlabel_.c_str(), stype_, *str_space_r_));
+  dset_str_r_->write(row_names_.data(), stype_);
+
+  dset_str_r_->close();
+  str_space_r_->close();
+
+  delete dset_str_r_;
+  delete str_space_r_;
 
   APILogger->debug("FileSystem:CreateTable: Wrote file '{0}'",
                    output_path_.string());
