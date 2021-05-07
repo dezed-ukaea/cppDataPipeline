@@ -98,10 +98,10 @@ public:
    ***************************************************************************/
   int size() const { return values_.size(); }
 
- /*! *************************************************************************
+  /*! *************************************************************************
    * @brief returns the unit of measurement for the data column
    * @author K. Zarebski (UKAEA)
-   * 
+   *
    * @return unit of measurement
    ***************************************************************************/
   std::string unit_of_measurement() const { return unit_; }

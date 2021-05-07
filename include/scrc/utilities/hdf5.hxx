@@ -150,7 +150,7 @@ struct CompType {
     if (it == members.end()) {
       APILogger->error("Utilities:HDF5:CompType: Cannot add value to field "
                        "'{0}', field does not exist",
-                      member_name);
+                       member_name);
       throw std::invalid_argument("Failed to add value to HDF5 container");
     }
     return it->second;
@@ -187,7 +187,6 @@ struct CompValueArray {
     CompTypeMember member = type.GetMember(member_name);
     // Type check
     H5::PredType pred_type = *HDF5::get_hdf5_type<T>();
-
 
     if (member.type != pred_type) {
       APILogger->error("Utilities:HDF5:CompTypeArray: Type mismatch between "

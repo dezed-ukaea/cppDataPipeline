@@ -133,12 +133,13 @@ std::filesystem::path create_table(const DataTable *table,
 
   HDF5::CompType comp_type_;
 
-  std::vector<char*> col_units_;
+  std::vector<char *> col_units_;
 
   for (const auto &int_col : table->get_int_columns()) {
     APILogger->debug("FileSystem:CreateTable: Adding field '{0}' to container",
                      int_col.first);
-    char *col_unit_ = new char[int_col.second->unit_of_measurement().length()+1];
+    char *col_unit_ =
+        new char[int_col.second->unit_of_measurement().length() + 1];
     strcpy(col_unit_, int_col.second->unit_of_measurement().c_str());
     col_units_.push_back(col_unit_);
     comp_type_.AddMember<int>(int_col.first);
@@ -147,7 +148,8 @@ std::filesystem::path create_table(const DataTable *table,
   for (const auto &float_col : table->get_float_columns()) {
     APILogger->debug("FileSystem:CreateTable: Adding field '{0}' to container",
                      float_col.first);
-    char *col_unit_ = new char[float_col.second->unit_of_measurement().length()+1];
+    char *col_unit_ =
+        new char[float_col.second->unit_of_measurement().length() + 1];
     strcpy(col_unit_, float_col.second->unit_of_measurement().c_str());
     col_units_.push_back(col_unit_);
     comp_type_.AddMember<float>(float_col.first);
@@ -156,10 +158,11 @@ std::filesystem::path create_table(const DataTable *table,
   for (const auto &str_col : table->get_str_columns()) {
     APILogger->debug("FileSystem:CreateTable: Adding field '{0}' to container",
                      str_col.first);
-    char *col_unit_ = new char[str_col.second->unit_of_measurement().length()+1];
+    char *col_unit_ =
+        new char[str_col.second->unit_of_measurement().length() + 1];
     strcpy(col_unit_, str_col.second->unit_of_measurement().c_str());
     col_units_.push_back(col_unit_);
-    comp_type_.AddMember<char*>(str_col.first);
+    comp_type_.AddMember<char *>(str_col.first);
   }
 
   const int length_ = table->size();
@@ -168,36 +171,39 @@ std::filesystem::path create_table(const DataTable *table,
 
   APILogger->debug("FileSystem:CreateTable: Writing values to CompType");
 
-  int col_counter_ = 0;
+  int row_index_counter_ = 0;
 
   for (const auto &int_col : table->get_int_columns()) {
     APILogger->debug("FileSystem:CreateTable: Writing values to field '{0}'",
                      int_col.first);
     for (const int &value : int_col.second->values()) {
-      array_to_write_.SetValue<int>(col_counter_, int_col.first, value);
+      array_to_write_.SetValue<int>(row_index_counter_, int_col.first, value);
+      row_index_counter_ += 1;
     }
-    col_counter_ += 1;
+    row_index_counter_ = 0;
   }
 
   for (const auto &float_col : table->get_float_columns()) {
     APILogger->debug("FileSystem:CreateTable: Writing values to field '{0}'",
                      float_col.first);
     for (const float &value : float_col.second->values()) {
-      array_to_write_.SetValue<float>(col_counter_, float_col.first, value);
+      array_to_write_.SetValue<float>(row_index_counter_, float_col.first, value);
+      row_index_counter_ += 1;
     }
-    col_counter_ += 1;
   }
+
+  row_index_counter_ = 0;
 
   for (const auto &str_col : table->get_str_columns()) {
     APILogger->debug("FileSystem:CreateTable: Writing values to field '{0}'",
                      str_col.first);
     for (const std::string &value : str_col.second->values()) {
-      char *str = new char[value.size()+2];
-      strcpy(str, (value+"\0").c_str());  // Expects null terminated string
-      array_to_write_.SetValue<char*>(col_counter_, str_col.first, str);
-      delete[] str;
+      char *str = new char[value.length() + 1];
+      strcpy(str, value.c_str());
+      array_to_write_.SetValue<char *>(row_index_counter_, str_col.first, str);
+      row_index_counter_ += 1;
     }
-    col_counter_ += 1;
+    row_index_counter_ = 0;
   }
 
   std::vector<hsize_t> dim = {table->size()};

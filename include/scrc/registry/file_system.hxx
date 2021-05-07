@@ -381,7 +381,9 @@ std::filesystem::path create_array(const ArrayObject<T> *array,
     const int rank = 1;
     DataSpace *str_space_ = new DataSpace(rank, str_dim_);
     const std::string title_ = array->get_title(i);
-    const std::string label_ = std::string(DIMENSION_PREFIX) + std::to_string(i + 1) + std::string(DIM_TITLE_SUFFIX);
+    const std::string label_ = std::string(DIMENSION_PREFIX) +
+                               std::to_string(i + 1) +
+                               std::string(DIM_TITLE_SUFFIX);
 
     char out_title_[title_.length() + 1];
 
