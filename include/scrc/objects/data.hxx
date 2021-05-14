@@ -324,7 +324,7 @@ public:
       throw std::invalid_argument("Cannot append data to data table");
     }
     DataTableColumn<T> *new_col_ =
-        new DataTableColumn(header, unit, row_names_, column_vals);
+        new DataTableColumn<T>(header, unit, row_names_, column_vals);
     add_column(new_col_);
   }
 
