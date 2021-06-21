@@ -1,7 +1,7 @@
 
-#include "scrc/registry/api.hxx"
+#include "fdp/registry/api.hxx"
 
-namespace SCRC {
+namespace FDP {
 size_t write_str_(void *ptr, size_t size, size_t nmemb, std::string *data) {
   data->append((char *)ptr, size * nmemb);
   return size * nmemb;
@@ -232,4 +232,4 @@ Json::Value API::post(const std::filesystem::path &addr_path,
 
   return results_;
 }
-}; // namespace SCRC
+}; // namespace FDP

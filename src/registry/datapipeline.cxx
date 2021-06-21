@@ -1,6 +1,6 @@
-#include "scrc/registry/datapipeline.hxx"
+#include "fdp/registry/datapipeline.hxx"
 
-namespace SCRC {
+namespace FDP {
 
 Json::Value DataPipelineImpl_::fetch_all_objects() {
   APILogger->debug("DataPipelineImpl_: Fetching all objects from registry");
@@ -409,4 +409,4 @@ void DataPipelineImpl_::add_to_register(const std::string &alias) {
       "' under a recognised key from "
       "[\"external_object\", \"data_product\", \"object\"]");
 }
-}; // namespace SCRC
+}; // namespace FDP

@@ -1,6 +1,6 @@
-#include "scrc/utilities/doi.hxx"
+#include "fdp/utilities/doi.hxx"
 
-namespace SCRC {
+namespace FDP {
 bool DOI::check_prefix_(std::string &prefix) {
   const std::regex prefix_reg_{"10.[0-9.]+"};
 
@@ -37,4 +37,4 @@ DOI doi_from_string(std::string doi_id) {
   return DOI(doi_id.substr(0, slash_point_),
              doi_id.substr(slash_point_ + 1, doi_id.size() - 1));
 }
-}; // namespace SCRC
+}; // namespace FDP

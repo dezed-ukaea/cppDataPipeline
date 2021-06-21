@@ -1,8 +1,8 @@
-#include "scrc/utilities/hdf5.hxx"
+#include "fdp/utilities/hdf5.hxx"
 
 const std::vector<std::string>
-SCRC::HDF5::read_hdf5_as_str_vector(const std::filesystem::path file_name,
-                                    const std::string key) {
+FDP::HDF5::read_hdf5_as_str_vector(const std::filesystem::path file_name,
+                                   const std::string key) {
   APILogger->debug("Utilities:HDF5:ReadAsStrVector: Opening file '{0}'",
                    file_name.string());
 
@@ -42,8 +42,8 @@ SCRC::HDF5::read_hdf5_as_str_vector(const std::filesystem::path file_name,
 }
 
 const H5::CompType *
-SCRC::HDF5::get_comptype(const std::filesystem::path file_name,
-                         std::string key) {
+FDP::HDF5::get_comptype(const std::filesystem::path file_name,
+                        std::string key) {
   APILogger->debug("Utilities:HDF5:GetCompType: Opening file '{0}'",
                    file_name.string());
 

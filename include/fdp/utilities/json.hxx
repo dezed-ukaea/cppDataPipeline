@@ -1,5 +1,5 @@
 /*! **************************************************************************
- * @file scrc/utilities/json.hxx
+ * @file fdp/utilities/json.hxx
  * @author K. Zarebski (UKAEA)
  * @date 2021-05-06
  * @brief File contains methods relating to handling of JSON based data
@@ -7,12 +7,12 @@
  * This file contains methods which modify/change the form of data which is
  * held as a JSON string
  ****************************************************************************/
-#ifndef __SCRC_JSON_HXX__
-#define __SCRC_JSON_HXX__
+#ifndef __FDP_JSON_HXX__
+#define __FDP_JSON_HXX__
 
 #include <json/writer.h>
 
-namespace SCRC {
+namespace FDP {
 /*! **************************************************************************
  * @brief convert a JSON object to string form
  * @author K. Zarebski (UKAEA)
@@ -29,6 +29,6 @@ namespace SCRC {
  *
  ****************************************************************************/
 std::string json_to_string(Json::Value &json_data);
-}; // namespace SCRC
+}; // namespace FDP
 
 #endif

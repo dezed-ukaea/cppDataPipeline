@@ -1,5 +1,5 @@
 /*! **************************************************************************
- * @file scrc/utilities/hdf5.hxx
+ * @file fdp/utilities/hdf5.hxx
  * @authors K. Zarebski (UKAEA), T. Middleweek (UKAEA)
  * @date 2021-05-07
  * @brief File contains methods relating to the reading/writing to HDF5
@@ -8,8 +8,8 @@
  * read and write arrays, and data tables as CompTypes. The procedures involved
  * require allocation of memory.
  ****************************************************************************/
-#ifndef __SCRC_HDF5__
-#define __SCRC_HDF5__
+#ifndef __FDP_HDF5__
+#define __FDP_HDF5__
 
 #include "H5Cpp.h"
 #include <filesystem>
@@ -18,9 +18,9 @@
 #include <string>
 #include <vector>
 
-#include "scrc/utilities/logging.hxx"
+#include "fdp/utilities/logging.hxx"
 
-namespace SCRC {
+namespace FDP {
 namespace HDF5 {
 
 /*! **************************************************************************
@@ -311,6 +311,6 @@ read_hdf5_comp_type_member(const std::filesystem::path file_name,
 const H5::CompType *get_comptype(const std::filesystem::path file_name,
                                  std::string key);
 }; // namespace HDF5
-}; // namespace SCRC
+}; // namespace FDP
 
 #endif

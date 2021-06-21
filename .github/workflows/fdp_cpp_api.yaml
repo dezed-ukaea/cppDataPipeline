@@ -1,4 +1,4 @@
-name: SCRC C++ API
+name: FDP C++ API
 
 on: [push]
 
@@ -14,7 +14,7 @@ jobs:
           sudo apt install -y lcov libjsoncpp-dev curl libcurl4-openssl-dev libyaml-cpp-dev libhdf5-dev
       - name: Compile Library
         run: |
-          cmake . -Bbuild -DSCRCAPI_BUILD_TESTS=ON
+          cmake . -Bbuild -DFDPAPI_BUILD_TESTS=ON
           cmake --build build
       - name: Run Unit Tests
         run: |

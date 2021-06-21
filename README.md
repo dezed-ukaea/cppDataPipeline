@@ -1,4 +1,4 @@
-# SCRC FAIR Data Pipeline C++ API
+# FAIR Data Pipeline C++ API
 
 **NOTE:** Currently this API implementation consists of components, assembly of these will depend on the final structure of the API itself.
 
@@ -20,7 +20,7 @@
 ## Outline
 The main class the user will interact with is `DataPipeline` which has only the required methods such as `read_estimate` etc. This class has a member which is a pointer to an underlying `DataPipelineImpl_` class which performs the various procedures required to handle the data. A logger has been used to give as much feedback to the user as possible, the verbosity being handled by a log level argument.
 
-Development has been made mainly to this internal class, the idea being that the top layer API will be constructed once the schema/workflow for SCRC FDP is finalised.
+Development has been made mainly to this internal class, the idea being that the top layer API will be constructed once the schema/workflow for FAIR Data Pipeline is finalised.
 
 ## API Backend Components
 The included unit tests show the API in action testing various methods for `DataPipelineImpl_`, `LocalFileSystem` and the extra utility methods required.
@@ -29,13 +29,13 @@ The included unit tests show the API in action testing various methods for `Data
 The core of the framework is the `API` class which sends and receives information to the RestAPI via CURL. It has no specific knowledge about the pipeline itself.
 
 ```c++
-#include "scrc/registry/api.hxx"
+#include "fdp/registry/api.hxx"
 #include "json/json.h"
 
 #include <string>
 #include <filesystem>
 
-using namespace SCRC;
+using namespace FDP;
 
 void run_api() {
     API* api = new API("https://data.scrc.uk/api/");
@@ -58,11 +58,11 @@ This largely handles the translation of statements in the configuration file int
 
 #### Reading an Estimate
 ```c++
-#include "scrc/registry/file_system.hxx"
+#include "fdp/registry/file_system.hxx"
 
 #include <filesystem>
 
-using namespace SCRC;
+using namespace FDP;
 
 void read_param_demo() {
     const std::filesystem::path toml_file = "/path/to/estimate/0.1.0.toml";
@@ -72,12 +72,12 @@ void read_param_demo() {
 
 #### Reading an Array
 ```c++
-#include "scrc/registry/file_system.hxx"
-#include "scrc/objects/data.hxx"
+#include "fdp/registry/file_system.hxx"
+#include "fdp/objects/data.hxx"
 
 #include <filesystem>
 
-using namespace SCRC;
+using namespace FDP;
 
 void read_array_demo() {
     const std::filesystem::path array_file = "path/to/array/0.20210427.0.h5";
@@ -88,13 +88,13 @@ void read_array_demo() {
 
 #### Reading a Data Table Column
 ```c++
-#include "scrc/registry/file_system.hxx"
-#include "scrc/objects/data.hxx"
+#include "fdp/registry/file_system.hxx"
+#include "fdp/objects/data.hxx"
 
 #include <string>
 #include <filesystem>
 
-using namespace SCRC;
+using namespace FDP;
 
 void read_table_col_demo() {
     const std::filesystem::path array_file = "path/to/array/0.20210427.0.h5";
@@ -106,13 +106,13 @@ void read_table_col_demo() {
 
 #### Reading a Distribution
 ```c++
-#include "scrc/registry/file_system.hxx"
-#include "scrc/objects/distributions.hxx"
+#include "fdp/registry/file_system.hxx"
+#include "fdp/objects/distributions.hxx"
 
 #include <filesystem>
 #include <random>
 
-using namespace SCRC;
+using namespace FDP;
 
 void read_distribution_demo() {
     const std::filesystem::path toml_file = "/path/to/distribution/0.1.0.toml";
@@ -126,13 +126,13 @@ void read_distribution_demo() {
 
 #### Creating an Estimate
 ```c++
-#include "scrc/registry/file_system.hxx"
-#include "scrc/utilities/semver.hxx"
+#include "fdp/registry/file_system.hxx"
+#include "fdp/utilities/semver.hxx"
 
 #include <string>
 #include <filesystem>
 
-using namespace SCRC;
+using namespace FDP;
 
 void create_param_demo() {
     const std::filesystem::path config_file = "path/to/config.yaml";
@@ -148,13 +148,13 @@ void create_param_demo() {
 #### Creating a Distribution
 
 ```c++
-#include "scrc/registry/file_system.hxx"
-#include "scrc/utilities/semver.hxx"
+#include "fdp/registry/file_system.hxx"
+#include "fdp/utilities/semver.hxx"
 
 #include <string>
 #include <filesystem>
 
-using namespace SCRC;
+using namespace FDP;
 
 void create_dis_demo() {
     const std::filesystem::path config_file = "path/to/config.yaml";
@@ -174,13 +174,13 @@ void create_dis_demo() {
 
 #### Creating an Array
 ```c++
-#include "scrc/registry/file_system.hxx"
-#include "scrc/objects/data.hxx"
+#include "fdp/registry/file_system.hxx"
+#include "fdp/objects/data.hxx"
 
 #include <string>
 #include <filesystem>
 
-using namespace SCRC;
+using namespace FDP;
 
 void create_array_demo() {
     const std::filesystem::path config_file = "path/to/config.yaml";
@@ -209,12 +209,12 @@ You can build and test the library using CMake, this implementation requires C++
 compile the library and tests by running:
 
 ```
-$ cmake -Bbuild -DSCRCAPI_BUILD_TESTS=ON
+$ cmake -Bbuild -DFDPAPI_BUILD_TESTS=ON
 $ cmake --build build
 ```
 
 ## Unit Tests
-The unit tests connect to the [SCRC remote registry API](https://data.scrc.uk), and so will not work if this service is no longer available.
+The unit tests connect to the [FDP remote registry API](https://data.scrc.uk), and so will not work if this service is no longer available.
 
 Before running the tests you will need to download the test data sets by running:
 
@@ -223,5 +223,5 @@ $ bash test/test_setup.sh
 ```
 you can then launch the GTest binary created during compilation:
 ```
-$ ./build/test/scrcapi-tests
+$ ./build/test/fdpapi-tests
 ```

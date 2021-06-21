@@ -1,6 +1,6 @@
-#include "scrc/fdp.hxx"
+#include "fdp.hxx"
 
-namespace SCRC {
+namespace FDP {
 DataPipeline::~DataPipeline() {}
 
 void DataPipeline::add_to_register(std::string &item) {}
@@ -10,4 +10,4 @@ DataPipeline::read_point_estimate(const std::filesystem::path &data_product) {
   return read_point_estimate_from_toml(data_product);
 }
 
-}; // namespace SCRC
+}; // namespace FDP

@@ -1,19 +1,19 @@
 #include "H5Cpp.h"
-#include "scrc/objects/data.hxx"
-#include "scrc/objects/distributions.hxx"
-#include "scrc/registry/file_system.hxx"
-#include "scrc/utilities/hdf5.hxx"
-#include "scrc/utilities/logging.hxx"
-#include "scrc/utilities/semver.hxx"
+#include "fdp/objects/data.hxx"
+#include "fdp/objects/distributions.hxx"
+#include "fdp/registry/file_system.hxx"
+#include "fdp/utilities/hdf5.hxx"
+#include "fdp/utilities/logging.hxx"
+#include "fdp/utilities/semver.hxx"
 #include "gtest/gtest.h"
 
 #include <string>
 #include <vector>
 
-using namespace SCRC;
+using namespace FDP;
 
 //! [TestTOMLPERead]
-TEST(SCRCAPITest, TestTOMLPERead) {
+TEST(FDPAPITest, TestTOMLPERead) {
   APILogger->set_level(spdlog::level::debug);
   const std::filesystem::path test_file =
       std::filesystem::path(TESTDIR) / std::filesystem::path("test_pe.toml");
@@ -22,7 +22,7 @@ TEST(SCRCAPITest, TestTOMLPERead) {
 //! [TestTOMLPERead]
 
 //! [TestTOMLDisRead]
-TEST(SCRCAPITest, TestTOMLDisRead) {
+TEST(FDPAPITest, TestTOMLDisRead) {
   APILogger->set_level(spdlog::level::debug);
   const std::filesystem::path test_file =
       std::filesystem::path(TESTDIR) / std::filesystem::path("test_dis.toml");
@@ -33,7 +33,7 @@ TEST(SCRCAPITest, TestTOMLDisRead) {
 //! [TestTOMLDisRead]
 
 //! [TestArrayRead]
-TEST(SCRCAPITest, TestArrayRead) {
+TEST(FDPAPITest, TestArrayRead) {
   APILogger->set_level(spdlog::level::debug);
   const std::filesystem::path test_file =
       std::filesystem::path(TESTDIR) / std::filesystem::path("test_array.h5");
@@ -48,7 +48,7 @@ TEST(SCRCAPITest, TestArrayRead) {
 //! [TestArrayRead]
 
 //! [TestTableReadColumn]
-TEST(SCRCAPITest, TestTableReadColumn) {
+TEST(FDPAPITest, TestTableReadColumn) {
   APILogger->set_level(spdlog::level::debug);
   const std::filesystem::path test_file =
       std::filesystem::path(TESTDIR) / std::filesystem::path("test_table.h5");
@@ -63,7 +63,7 @@ TEST(SCRCAPITest, TestTableReadColumn) {
 //! [TestTableReadColumn]
 
 //! [TestWriteArray]
-TEST(SCRCAPITest, TestWriteArray) {
+TEST(FDPAPITest, TestWriteArray) {
   APILogger->set_level(spdlog::level::debug);
   std::filesystem::path config_path_ =
       std::filesystem::path(TESTDIR) / "config.yaml";
@@ -95,7 +95,7 @@ TEST(SCRCAPITest, TestWriteArray) {
 //! [TestWriteArray]
 
 //! [TestWriteTable]
-TEST(SCRCAPITest, TestWriteTable) {
+TEST(FDPAPITest, TestWriteTable) {
   APILogger->set_level(spdlog::level::debug);
   std::filesystem::path config_path_ =
       std::filesystem::path(TESTDIR) / "config.yaml";
@@ -118,7 +118,7 @@ TEST(SCRCAPITest, TestWriteTable) {
 //! [TestWriteTable]
 
 //! [TestWritePointEstimate]
-TEST(SCRCAPITest, TestWritePointEstimate) {
+TEST(FDPAPITest, TestWritePointEstimate) {
   APILogger->set_level(spdlog::level::debug);
   std::filesystem::path config_path_ =
       std::filesystem::path(TESTDIR) / "config.yaml";
@@ -137,7 +137,7 @@ TEST(SCRCAPITest, TestWritePointEstimate) {
 //! [TestWritePointEstimate]
 
 //! [TestWriteDistribution]
-TEST(SCRCAPITest, TestWriteDistribution) {
+TEST(FDPAPITest, TestWriteDistribution) {
   APILogger->set_level(spdlog::level::debug);
   std::filesystem::path config_path_ =
       std::filesystem::path(TESTDIR) / "config.yaml";

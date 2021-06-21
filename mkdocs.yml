@@ -1,20 +1,20 @@
-site_name: SCRC FAIR Data Pipeline C++ API
-repo_url: https://github.com/ScottishCovidResponse/SCRC-Cpp-API
+site_name: FAIR Data Pipeline C++ API
+repo_url: https://github.com/FAIRDataPipeline/FDP-Cpp-API
 repo_name: GitHub
-site_description: Documentation for the SCRC FAIR Data Pipeline C++ API
+site_description: Documentation for the FAIR Data Pipeline C++ API
 remote_branch: gh-pages
 remote_name: scrc
 nav:
   - Manual:
-    - Installation: 'install.md'
-    - Getting Started: 'getting_started.md'
-    - Basic Usage:
-      - Parameter I/O: 'read_write_param.md'
+      - Installation: "install.md"
+      - Getting Started: "getting_started.md"
+      - Basic Usage:
+          - Parameter I/O: "read_write_param.md"
 theme:
   name: readthedocs
   highlightjs: true
   hljs_languages:
     - cmake
 markdown_extensions:
-    - toc:
-        permalink: True
+  - toc:
+      permalink: True

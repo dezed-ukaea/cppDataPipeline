@@ -1,4 +1,4 @@
-FIND_PACKAGE( JsonCpp )
+FIND_PACKAGE( JsonCpp QUIET )
 
 SET( JSONCPP_URL "https://github.com/open-source-parsers/jsoncpp.git" )
 SET( JSONCPP_TAG "1.9.4" )

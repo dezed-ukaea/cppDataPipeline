@@ -1,21 +1,21 @@
 /*! **************************************************************************
- * @file scrc/objects/distributions.hxx
+ * @file fdp/objects/distributions.hxx
  * @author K. Zarebski (UKAEA)
  * @date 2021-05-05
  * @brief File containing distribution object classes for storing API objects
  *
- * The classes within this file are used to store objects read from the SCRC
+ * The classes within this file are used to store objects read from the FDP
  * API, holding distribution data
  ****************************************************************************/
-#ifndef __SCRC_DISTRIBUTION_HXX__
-#define __SCRC_DISTRIBUTION_HXX__
+#ifndef __FDP_DISTRIBUTION_HXX__
+#define __FDP_DISTRIBUTION_HXX__
 
 #include <map>
 #include <ostream>
 #include <random>
 #include <string>
 
-namespace SCRC {
+namespace FDP {
 /*! **************************************************************************
  * @class Distribution
  * @brief represents a distribution with defined parameters which can be
@@ -24,7 +24,7 @@ namespace SCRC {
  *
  * The Distribution class can be used to generate a random value from a
  * distribution contained within the standard library. It provides a container
- * into which a distribution object retrieved from the SCRC pipeline
+ * into which a distribution object retrieved from the FDP pipeline
  * can be stored. This class forms the base class for the various types.
  ****************************************************************************/
 class Distribution {
@@ -35,7 +35,7 @@ public:
    *
    * @param name label for the distribution
    * @param params a map containing all parameters associated with the
-   * distribution as defined by the relevant SCRC pipeline schema
+   * distribution as defined by the relevant FDP pipeline schema
    **************************************************************************/
   Distribution(std::string name, std::map<std::string, double> params)
       : name_(name), parameters_(params) {}
@@ -229,6 +229,6 @@ public:
     return dis_(*gen);
   }
 };
-}; // namespace SCRC
+}; // namespace FDP
 
 #endif

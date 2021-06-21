@@ -1,5 +1,5 @@
 /*! **************************************************************************
- * @file scrc/objects/metadata.hxx
+ * @file fdp/objects/metadata.hxx
  * @author K. Zarebski (UKAEA)
  * @date 2021-05-05
  * @brief File containing methods for handling of metadata
@@ -7,8 +7,8 @@
  * The functions contained within this file process or create metadata
  * related to the versioning of objects and runs.
  ****************************************************************************/
-#ifndef __SCRC_METADATA_HXX__
-#define __SCRC_METADATA_HXX__
+#ifndef __FDP_METADATA_HXX__
+#define __FDP_METADATA_HXX__
 
 #include <ctime>
 #include <filesystem>
@@ -19,7 +19,7 @@
 
 #include "digestpp.hpp"
 
-namespace SCRC {
+namespace FDP {
 /*! **************************************************************************
  * @brief calculates a hash from a given input file via SHA1
  * @author K. Zarebski (UKAEA)
@@ -42,7 +42,7 @@ std::string calculate_hash_from_string(const std::string &input);
  * config file
  * @author K. Zarebski (UKAEA)
  *
- * @param config_file_path path to the SCRC API configuration file
+ * @param config_file_path path to the FDP API configuration file
  * @return identifier generated for the code run
  ***************************************************************************/
 std::string generate_run_id(std::filesystem::path config_file_path);
@@ -56,6 +56,6 @@ std::string generate_run_id(std::filesystem::path config_file_path);
  ***************************************************************************/
 std::string current_time_stamp(bool file_name = false);
 
-}; // namespace SCRC
+}; // namespace FDP
 
 #endif

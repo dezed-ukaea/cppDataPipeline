@@ -1,6 +1,6 @@
-#include "scrc/objects/metadata.hxx"
+#include "fdp/objects/metadata.hxx"
 
-namespace SCRC {
+namespace FDP {
 std::string calculate_hash_from_file(const std::filesystem::path &file_path) {
   if (!std::filesystem::exists(file_path)) {
     throw std::invalid_argument("File '" + file_path.string() + "' not found");
@@ -45,4 +45,4 @@ std::string current_time_stamp(bool file_name) {
 
   return oss_.str();
 }
-}; // namespace SCRC
+}; // namespace FDP

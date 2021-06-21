@@ -1,15 +1,15 @@
 /*! **************************************************************************
- * @file scrc/registry/datapipeline.hxx
+ * @file fdp/registry/datapipeline.hxx
  * @author K. Zarebski (UKAEA)
  * @date 2021-05-06
- * @brief File containing classes for interaction with the SCRC data pipeline
+ * @brief File containing classes for interaction with the FDP data pipeline
  *
  * The classes within this file form the core objects for handling interaction
- * with the SCRC FAIR Data pipeline. They contain methods which parse
+ * with the FDP FAIR Data pipeline. They contain methods which parse
  * configurations and control calls to the RestAPI itself.
  ****************************************************************************/
-#ifndef __SCRC_DATAPIPELINE_HXX__
-#define __SCRC_DATAPIPELINE_HXX__
+#ifndef __FDP_DATAPIPELINE_HXX__
+#define __FDP_DATAPIPELINE_HXX__
 
 #include <algorithm>
 #include <fstream>
@@ -19,13 +19,13 @@
 #include "spdlog/spdlog.h"
 #include "json/json.h"
 
-#include "scrc/objects/metadata.hxx"
-#include "scrc/registry/api.hxx"
-#include "scrc/registry/data_object.hxx"
-#include "scrc/registry/file_system.hxx"
-#include "scrc/utilities/logging.hxx"
+#include "fdp/objects/metadata.hxx"
+#include "fdp/registry/api.hxx"
+#include "fdp/registry/data_object.hxx"
+#include "fdp/registry/file_system.hxx"
+#include "fdp/utilities/logging.hxx"
 
-namespace SCRC {
+namespace FDP {
 
 /*! **************************************************************************
  * @class DataPipelineImpl_
@@ -33,12 +33,12 @@ namespace SCRC {
  * @author K. Zarebski (UKAEA)
  *
  * This class performs all behind the scenes operations acting as the backend to
- * the user called SCRC::DataPipeline class.
+ * the user called FDP::DataPipeline class.
  * This structure has been chosen to allow for unit tests to be created to test
  * all methods including private ones.
  *
  * @warning The class should not be used directly during implementation,
- * but rather via an SCRC::DataPipeline instance.
+ * but rather via an FDP::DataPipeline instance.
  *
  *****************************************************************************/
 class DataPipelineImpl_ {
@@ -100,7 +100,7 @@ public:
     APILogger->set_level(log_level);
 
     APILogger->info("\n[Configuration]\n\t- Config Path: {0}\n\t- API Root: "
-                    "{1}\n\t- SCRC API Token File: {2}",
+                    "{1}\n\t- FDP API Token File: {2}",
                     config_file_path.string(), api_root_.string(),
                     (access_token_file.empty()) ? "None"
                                                 : access_token_file.string());
@@ -195,7 +195,7 @@ public:
    * @brief download a data product from the registry
    * @author K. Zarebski (UKAEA)
    *
-   * @param data_product an instance of SCRC::ReadObject::DataProduct
+   * @param data_product an instance of FDP::ReadObject::DataProduct
    **************************************************************************/
   std::filesystem::path
   download_data_product(ReadObject::DataProduct *data_product);
@@ -204,7 +204,7 @@ public:
    * @brief download an external object from the registry
    * @author K. Zarebski (UKAEA)
    *
-   * @param data_product an instance of SCRC::ReadObject::ExternalObject
+   * @param data_product an instance of FDP::ReadObject::ExternalObject
    **************************************************************************/
   std::filesystem::path
   download_external_object(ReadObject::ExternalObject *external_object);
@@ -456,6 +456,6 @@ public:
   NamespaceQuery(std::filesystem::path query_path)
       : Query("namespace", query_path) {}
 };
-}; // namespace SCRC
+}; // namespace FDP
 
 #endif

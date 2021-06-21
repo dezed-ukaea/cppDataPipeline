@@ -1,15 +1,15 @@
 /*! **************************************************************************
- * @file scrc/objects/data.hxx
+ * @file fdp/objects/data.hxx
  * @author K. Zarebski (UKAEA)
  * @date 2021-05-05
  * @brief File containing data object classes for storing API objects
  *
- * The classes within this file are used to store objects read from the SCRC
+ * The classes within this file are used to store objects read from the FDP
  * API, keeping metadata alongside values.
  ****************************************************************************/
 
-#ifndef __SCRC_DATA_HXX__
-#define __SCRC_DATA_HXX__
+#ifndef __FDP_DATA_HXX__
+#define __FDP_DATA_HXX__
 
 #include <algorithm>
 #include <iomanip>
@@ -19,19 +19,19 @@
 #include <string>
 #include <vector>
 
-#include "scrc/utilities/logging.hxx"
+#include "fdp/utilities/logging.hxx"
 
 /*! **************************************************************************
- * @namespace SCRC
- * @brief namespace containing all SCRC API library methods and variables
+ * @namespace FDP
+ * @brief namespace containing all FDP API library methods and variables
  * @author K. Zarebski (UKAEA)
  *
- * The SCRC namespace holds all of the C++ API methods, which include reading
+ * The FDP namespace holds all of the C++ API methods, which include reading
  * and writing to the RestAPI, storing of data into objects, file access and
  * handling of metadata.
  *
  ****************************************************************************/
-namespace SCRC {
+namespace FDP {
 
 /*! **************************************************************************
  * @class DataTableColumn
@@ -461,11 +461,11 @@ public:
 
 /*! *************************************************************************
  * @class ArrayObject
- * @brief class to store an array of values from the SCRC pipeline alongside
+ * @brief class to store an array of values from the FDP pipeline alongside
  * the associated metadata
  * @author K. Zarebski (UKAEA)
  *
- * The ArrayObject class stores the values from an SCRC pipeline array type
+ * The ArrayObject class stores the values from an FDP pipeline array type
  * with properties such as the titles of the dimensions of the array, and names
  * of positions along each of the dimension axes.
  *
@@ -593,6 +593,6 @@ public:
    *********************************************************************/
   std::vector<T> get_values() const { return array_; }
 };
-}; // namespace SCRC
+}; // namespace FDP
 
 #endif

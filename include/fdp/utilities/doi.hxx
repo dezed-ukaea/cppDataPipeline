@@ -1,5 +1,5 @@
 /*! **************************************************************************
- * @file scrc/utilities/doi.hxx
+ * @file fdp/utilities/doi.hxx
  * @author K. Zarebski (UKAEA)
  * @date 2021-05-06
  * @brief File contains methods relating to the Digital Object Identifier class
@@ -7,16 +7,16 @@
  * This file contains classes to describe structures received from the RestAPI
  * and recognised by the local configuration file.
  ****************************************************************************/
-#ifndef __DOI_SCRC_HXX__
-#define __DOI_SCRC_HXX__
+#ifndef __DOI_FDP_HXX__
+#define __DOI_FDP_HXX__
 
 #include <regex>
 #include <string>
 
-#include "scrc/exceptions.hxx"
-#include "scrc/utilities/logging.hxx"
+#include "fdp/exceptions.hxx"
+#include "fdp/utilities/logging.hxx"
 
-namespace SCRC {
+namespace FDP {
 
 /*! **************************************************************************
  * @class DOI
@@ -101,6 +101,6 @@ public:
  * @return DOI a DOI object representing the given DOI
  *************************************************************************/
 DOI doi_from_string(std::string doi_id);
-}; // namespace SCRC
+}; // namespace FDP
 
 #endif

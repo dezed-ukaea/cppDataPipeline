@@ -1,5 +1,5 @@
 /*! **************************************************************************
- * @file scrc/registry/file_system.hxx
+ * @file fdp/registry/file_system.hxx
  * @author K. Zarebski (UKAEA)
  * @date 2021-05-06
  * @brief File containing classes for interacting with the local file system
@@ -8,8 +8,8 @@
  * local file system. These include the reading of configurations, and
  * the reading/writing of data to locally.
  ****************************************************************************/
-#ifndef __SCRC_FILESYSTEM_HXX__
-#define __SCRC_FILESYSTEM_HXX__
+#ifndef __FDP_FILESYSTEM_HXX__
+#define __FDP_FILESYSTEM_HXX__
 
 #include "H5Cpp.h"
 #include "toml.hpp"
@@ -22,12 +22,12 @@
 
 #include <iostream>
 
-#include "scrc/objects/data.hxx"
-#include "scrc/objects/distributions.hxx"
-#include "scrc/objects/metadata.hxx"
-#include "scrc/registry/data_object.hxx"
-#include "scrc/utilities/hdf5.hxx"
-#include "scrc/utilities/logging.hxx"
+#include "fdp/objects/data.hxx"
+#include "fdp/objects/distributions.hxx"
+#include "fdp/objects/metadata.hxx"
+#include "fdp/registry/data_object.hxx"
+#include "fdp/utilities/hdf5.hxx"
+#include "fdp/utilities/logging.hxx"
 
 using namespace H5; // Use the HDF5 library
 
@@ -46,7 +46,7 @@ using namespace H5; // Use the HDF5 library
   "_title" /*!< Suffix for objects relating to titles                          \
             */
 
-namespace SCRC {
+namespace FDP {
 /*! **************************************************************************
  * @brief parse the configuration file
  * @author K. Zarebski (UKAEA)
@@ -72,7 +72,7 @@ public:
    * @brief construct a LocalFileSystem instance using the given configuration
    * @author K. Zarebski (UKAEA)
    *
-   * @param config_file_path SCRC Pipeline configuration YAML file path
+   * @param config_file_path FDP Pipeline configuration YAML file path
    ***************************************************************************/
   LocalFileSystem(std::filesystem::path config_file_path);
 
@@ -608,6 +608,6 @@ DataTableColumn<T> *read_table_column(const std::filesystem::path var_address,
 
   return new DataTableColumn<T>(column, unit_, row_names_, container_);
 }
-}; // namespace SCRC
+}; // namespace FDP
 
 #endif

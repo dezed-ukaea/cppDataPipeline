@@ -1,13 +1,13 @@
-#include "scrc/fdp.hxx"
-#include "scrc/objects/metadata.hxx"
-#include "scrc/registry/datapipeline.hxx"
-#include "scrc/registry/file_system.hxx"
+#include "fdp.hxx"
+#include "fdp/objects/metadata.hxx"
+#include "fdp/registry/datapipeline.hxx"
+#include "fdp/registry/file_system.hxx"
 #include "gtest/gtest.h"
 #include <filesystem>
 #include <ostream>
 #include <vector>
 
-using namespace SCRC;
+using namespace FDP;
 
 DataPipelineImpl_ *init_pipeline(bool use_local = false) {
   if (std::filesystem::exists(std::filesystem::path(TESTDIR) /
@@ -24,7 +24,7 @@ DataPipelineImpl_ *init_pipeline(bool use_local = false) {
                                static_cast<RESTAPI>(use_local));
 }
 
-TEST(SCRCAPITest, TestDataPipelineInit) {
+TEST(FDPAPITest, TestDataPipelineInit) {
   if (std::filesystem::exists(std::filesystem::path(TESTDIR) /
                               std::filesystem::path("datastore"))) {
     std::filesystem::remove_all(std::filesystem::path(TESTDIR) /
@@ -37,41 +37,41 @@ TEST(SCRCAPITest, TestDataPipelineInit) {
   DataPipeline(config_path_, "", spdlog::level::debug);
 }
 
-TEST(SCRCAPITest, TestLogLevelSet) {
+TEST(FDPAPITest, TestLogLevelSet) {
   init_pipeline();
   ASSERT_EQ(spdlog::get_level(), spdlog::level::debug);
 }
 
-TEST(SCRCAPITest, TestURLEncode) {
+TEST(FDPAPITest, TestURLEncode) {
   const std::string start_string_ = "fixed-parameters/T_lat";
   const std::string expected_ = "fixed-parameters%2FT_lat";
 
   ASSERT_EQ(url_encode(start_string_), expected_);
 }
 
-TEST(SCRCAPITest, TestAccessObjectRegistry) {
+TEST(FDPAPITest, TestAccessObjectRegistry) {
   ASSERT_NO_THROW(init_pipeline()->fetch_all_objects());
 }
 
-TEST(SCRCAPITest, TestAccessObject) {
+TEST(FDPAPITest, TestAccessObject) {
   ASSERT_NO_THROW(init_pipeline()->fetch_object_by_id(72974));
 }
 
-TEST(SCRCAPITest, TestAccessDataRegistry) {
+TEST(FDPAPITest, TestAccessDataRegistry) {
   ASSERT_NO_THROW(init_pipeline()->fetch_all_data_products());
 }
 
-TEST(SCRCAPITest, TestAccessData) {
+TEST(FDPAPITest, TestAccessData) {
   ASSERT_NO_THROW(init_pipeline()->fetch_object_by_id(3337));
 }
 
-TEST(SCRCAPITest, TestFileSystemSetup) {
+TEST(FDPAPITest, TestFileSystemSetup) {
   LocalFileSystem(std::filesystem::path(TESTDIR) / "config.yaml");
   ASSERT_TRUE(
       std::filesystem::exists(std::filesystem::path(TESTDIR) / "datastore"));
 }
 
-TEST(SCRCAPITest, TestGetConfigDataTOML) {
+TEST(FDPAPITest, TestGetConfigDataTOML) {
   LocalFileSystem *fs_ =
       new LocalFileSystem(std::filesystem::path(TESTDIR) / "config.yaml");
   const std::vector<ReadObject::DataProduct *> data_products_ =
@@ -83,7 +83,7 @@ TEST(SCRCAPITest, TestGetConfigDataTOML) {
   ASSERT_EQ(path_, "fixed-parameters/T_lat");
 }
 
-TEST(SCRCAPITest, TestGetConfigDataHDF5) {
+TEST(FDPAPITest, TestGetConfigDataHDF5) {
   LocalFileSystem *fs_ =
       new LocalFileSystem(std::filesystem::path(TESTDIR) / "config.yaml");
   const std::vector<ReadObject::DataProduct *> data_products_ =
@@ -95,13 +95,13 @@ TEST(SCRCAPITest, TestGetConfigDataHDF5) {
   ASSERT_EQ(path_, "prob_hosp_and_cfr/data_for_scotland");
 }
 
-TEST(SCRCAPITest, TestHashFile) {
+TEST(FDPAPITest, TestHashFile) {
   const std::string file_hash_ =
       calculate_hash_from_file(std::filesystem::path(TESTDIR) / "config.yaml");
   std::cout << "HASH: " << file_hash_ << std::endl;
 }
 
-TEST(SCRCAPITest, TestDownloadTOMLFile) {
+TEST(FDPAPITest, TestDownloadTOMLFile) {
   DataPipelineImpl_ *data_pipeline_ = init_pipeline();
   const std::vector<ReadObject::DataProduct *> data_products_ =
       data_pipeline_->file_system->read_data_products();
@@ -109,19 +109,19 @@ TEST(SCRCAPITest, TestDownloadTOMLFile) {
   ASSERT_NO_THROW(data_pipeline_->download_data_product(data_products_[0]));
 }
 
-TEST(SCRCAPITest, TestDownloadHDF5File) {
+TEST(FDPAPITest, TestDownloadHDF5File) {
   DataPipelineImpl_ *data_pipeline_ = init_pipeline();
   const std::vector<ReadObject::DataProduct *> data_products_ =
       data_pipeline_->file_system->read_data_products();
   ASSERT_NO_THROW(data_pipeline_->download_data_product(data_products_[1]));
 }
 
-TEST(SCRCAPITest, DISABLED_TestAddToRegister) {
+TEST(FDPAPITest, DISABLED_TestAddToRegister) {
   DataPipelineImpl_ *data_pipeline_ = init_pipeline(true);
   data_pipeline_->add_to_register("raw-mortality-data");
 }
 
-TEST(SCRCAPITest, TestDownloadExternalObject) {
+TEST(FDPAPITest, TestDownloadExternalObject) {
   DataPipelineImpl_ *data_pipeline_ = init_pipeline();
   const std::vector<ReadObject::ExternalObject *> external_objs =
       data_pipeline_->file_system->read_external_objects();

@@ -1,15 +1,15 @@
 /*! **************************************************************************
- * @file scrc/registry/api.hxx
+ * @file fdp/registry/api.hxx
  * @author K. Zarebski (UKAEA)
  * @date 2021-05-05
  * @brief File containing classes and methods for connecting to the RestAPI
  *
- * The classes and methods within this file are used to access the SCRC
+ * The classes and methods within this file are used to access the FDP
  * Data Pipeline RestAPI, they handle sending of requests and retrieval of
  * data as JSON strings
  ****************************************************************************/
-#ifndef __SCRC_API_HXX__
-#define __SCRC_API_HXX__
+#ifndef __FDP_API_HXX__
+#define __FDP_API_HXX__
 
 #include <algorithm>
 #include <curl/curl.h>
@@ -21,11 +21,11 @@
 #include <string>
 #include <vector>
 
-#include "scrc/exceptions.hxx"
-#include "scrc/utilities/json.hxx"
-#include "scrc/utilities/logging.hxx"
+#include "fdp/exceptions.hxx"
+#include "fdp/utilities/json.hxx"
+#include "fdp/utilities/logging.hxx"
 
-namespace SCRC {
+namespace FDP {
 /*! **************************************************************************
  * @enum RESTAPI
  * @brief selection of either local or remote pipeline running
@@ -107,7 +107,7 @@ public:
 /*! **************************************************************************
  * @class API
  * @brief a class which handles the fetching and posting of information to the
- * SCRC data pipeline RestAPI
+ * FDP data pipeline RestAPI
  * @author K. Zarebski (UKAEA)
  *
  * The API class has know specific knowledge about the RestAPI but rather
@@ -185,6 +185,6 @@ private:
 
 std::string url_encode(std::string url);
 
-}; // namespace SCRC
+}; // namespace FDP
 
 #endif

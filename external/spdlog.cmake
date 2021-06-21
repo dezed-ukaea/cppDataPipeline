@@ -1,3 +1,12 @@
+SET( SPDLOG_URL "https://github.com/gabime/spdlog.git" )
+SET( SPDLOG_COMMIT "v1.8.5" )
+
+MESSAGE( STATUS "[SPD Log]" )
+
+MESSAGE( STATUS "\tSPD log not installed on this system and so will be downloaded." )
+MESSAGE( STATUS "\tURL: ${SPDLOG_URL}" )
+MESSAGE( STATUS "\tTAG: ${SPDLOG_COMMIT}" )
+
 ExternalProject_Add(spdlog_src
     GIT_REPOSITORY https://github.com/gabime/spdlog.git
     GIT_TAG v1.8.5

@@ -1,6 +1,6 @@
-#include "scrc/registry/data_object.hxx"
+#include "fdp/registry/data_object.hxx"
 
-namespace SCRC {
+namespace FDP {
 namespace ReadObject {
 DataProduct *data_product_from_yaml(YAML::Node yaml_data) {
   if (!yaml_data["use"]) {
@@ -79,4 +79,4 @@ Accessibility access_from_str(const std::string &access) {
 }
 }; // namespace RegisterObject
 
-}; // namespace SCRC
+}; // namespace FDP

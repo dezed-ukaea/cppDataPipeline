@@ -7,13 +7,13 @@
  * The tests contained within this file check functionality and validate
  * method associated with the data classes
  ****************************************************************************/
-#include "scrc/objects/data.hxx"
+#include "fdp/objects/data.hxx"
 #include "gtest/gtest.h"
 
-using namespace SCRC;
+using namespace FDP;
 
 //! [TestDataTableCreate]
-TEST(SCRCAPITest, TestDataTableCreate) {
+TEST(FDPAPITest, TestDataTableCreate) {
   DataTable *data_table_ = new DataTable;
   data_table_->add_column<std::string>("Name",
                                        {"John", "James", "David", "George"});

@@ -1,10 +1,10 @@
-#ifndef __SCRC_EXCEPTIONS_HXX__
-#define __SCRC_EXCEPTIONS_HXX__
+#ifndef __FDP_EXCEPTIONS_HXX__
+#define __FDP_EXCEPTIONS_HXX__
 
 #include <stdexcept>
 #include <string>
 
-namespace SCRC {
+namespace FDP {
 class config_parsing_error : public std::runtime_error {
 public:
   config_parsing_error(const std::string message)
@@ -37,6 +37,6 @@ public:
   write_error(const std::string message) : std::runtime_error(message) {}
 };
 
-}; // namespace SCRC
+}; // namespace FDP
 
 #endif

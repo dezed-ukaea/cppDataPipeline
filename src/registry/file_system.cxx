@@ -1,5 +1,5 @@
-#include "scrc/registry/file_system.hxx"
-namespace SCRC {
+#include "fdp/registry/file_system.hxx"
+namespace FDP {
 YAML::Node parse_yaml_(std::filesystem::path yaml_path) {
   APILogger->debug("LocalFileSystem: Reading configuration file '{0}'",
                    yaml_path.string().c_str());
@@ -453,4 +453,4 @@ read_distribution_from_toml(const std::filesystem::path var_address) {
 
   return construct_dis_(toml_data_);
 }
-}; // namespace SCRC
+}; // namespace FDP

@@ -1,6 +1,6 @@
-#include "scrc/registry/datapipeline.hxx"
+#include "fdp/registry/datapipeline.hxx"
 
-namespace SCRC {
+namespace FDP {
 class DataPipeline {
 public:
   // 'initialise' method for the API
@@ -36,4 +36,4 @@ private:
   std::unique_ptr<DataPipelineImpl_> pimpl_;
   const std::string session_id_;
 };
-}; // namespace SCRC
+}; // namespace FDP

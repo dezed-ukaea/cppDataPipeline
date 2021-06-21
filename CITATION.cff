@@ -1,6 +1,6 @@
 # YAML 1.2
 ---
-abstract: "C++ Implementation of the API for the SCRC FAIR Data Pipeline."
+abstract: "C++ Implementation of the API for the FAIR Data Pipeline."
 authors: 
   -
     affiliation: UKAEA
@@ -15,5 +15,5 @@ cff-version: "1.1.0"
 keywords: 
 license: "BSD-3-Clause"
 message: "If you use this software, please cite it using these metadata."
-repository-code: "https://github.com/ScottishCovidResponse/SCRC-Cpp-API"
-title: "SCRC FAIR Data Pipeline C++ API"
+repository-code: "https://github.com/FAIRDataPipeline/FDP-Cpp-API"
+title: "FAIR Data Pipeline C++ API"

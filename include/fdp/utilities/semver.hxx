@@ -1,5 +1,5 @@
 /*! **************************************************************************
- * @file scrc/utilities/semver.hxx
+ * @file fdp/utilities/semver.hxx
  * @author K. Zarebski (UKAEA)
  * @date 2021-05-06
  * @brief File contains classes and types for validating semantic versioning
@@ -9,16 +9,16 @@
  * which values are used during code runs.
  ****************************************************************************/
 
-#ifndef __SCRC_SEMVER_HXX__
-#define __SCRC_SEMVER_HXX__
+#ifndef __FDP_SEMVER_HXX__
+#define __FDP_SEMVER_HXX__
 
 #include <ostream>
 #include <string>
 #include <vector>
 
-namespace SCRC {
+namespace FDP {
 /*! **************************************************************************
- * @namespace SCRC::Versioning
+ * @namespace FDP::Versioning
  * @brief namespace containing all semantic versioning types and classes
  * @author K. Zarebski (UKAEA)
  *
@@ -199,6 +199,6 @@ private:
   std::string get_tag_str() const;
 };
 }; // namespace Versioning
-}; // namespace SCRC
+}; // namespace FDP
 
 #endif

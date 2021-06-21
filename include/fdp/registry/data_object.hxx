@@ -1,5 +1,5 @@
 /*! **************************************************************************
- * @file scrc/registry/data_object.hxx
+ * @file fdp/registry/data_object.hxx
  * @author K. Zarebski (UKAEA)
  * @date 2021-05-05
  * @brief File containing RestAPI query objects
@@ -7,22 +7,22 @@
  * This file contains classes to describe structures received from the RestAPI
  * and recognised by the local configuration file.
  ****************************************************************************/
-#ifndef __SCRC_DATAOBJECT_HXX__
-#define __SCRC_DATAOBJECT_HXX__
+#ifndef __FDP_DATAOBJECT_HXX__
+#define __FDP_DATAOBJECT_HXX__
 
 #include <ctime>
 #include <exception>
 #include <filesystem>
 #include <yaml-cpp/yaml.h>
 
-#include "scrc/exceptions.hxx"
-#include "scrc/utilities/doi.hxx"
-#include "scrc/utilities/logging.hxx"
-#include "scrc/utilities/semver.hxx"
+#include "fdp/exceptions.hxx"
+#include "fdp/utilities/doi.hxx"
+#include "fdp/utilities/logging.hxx"
+#include "fdp/utilities/semver.hxx"
 
-namespace SCRC {
+namespace FDP {
 /*! **************************************************************************
- * @namespace SCRC::ReadObject
+ * @namespace FDP::ReadObject
  * @brief Contains classes matching the structure of read statements within
  * the local API configuration
  * @author K. Zarebski (UKAEA)
@@ -174,7 +174,7 @@ ExternalObject *external_object_from_yaml(YAML::Node yaml_data);
 }; // namespace ReadObject
 
 /*! *************************************************************************
- * @namespace SCRC::RegisterObject
+ * @namespace FDP::RegisterObject
  * @brief Contains classes matching the structure of register statements
  * within the local API configuration
  * @author K. Zarebski (UKAEA)
@@ -267,7 +267,7 @@ public:
 }; // namespace RegisterObject
 
 /*! *************************************************************************
- * @namespace SCRC::WriteObject
+ * @namespace FDP::WriteObject
  * @brief Contains classes matching the structure of write statements
  * within the local API configuration
  * @author K. Zarebski (UKAEA)
@@ -280,6 +280,6 @@ private:
   const std::string component_;
 };
 }; // namespace WriteObject
-}; // namespace SCRC
+}; // namespace FDP
 
 #endif

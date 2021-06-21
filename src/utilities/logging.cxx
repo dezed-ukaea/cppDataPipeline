@@ -1,11 +1,11 @@
-#include "scrc/utilities/logging.hxx"
+#include "fdp/utilities/logging.hxx"
 
-namespace SCRC {
+namespace FDP {
 std::shared_ptr<spdlog::logger> create_logger_() {
-  if (!spdlog::get("SCRCAPI")) {
-    return spdlog::stdout_color_st("SCRCAPI");
+  if (!spdlog::get("FDPAPI")) {
+    return spdlog::stdout_color_st("FDPAPI");
   } else {
-    return spdlog::get("SCRCAPI");
+    return spdlog::get("FDPAPI");
   }
 }
-} // namespace SCRC
+} // namespace FDP

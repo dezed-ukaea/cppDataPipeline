@@ -1,6 +1,6 @@
-#include "scrc/objects/data.hxx"
+#include "fdp/objects/data.hxx"
 
-namespace SCRC {
+namespace FDP {
 void DataTable::delete_column(const std::string &col_name) {
   if (int_cols_.find(col_name) != int_cols_.end()) {
     int_cols_.erase(col_name);
@@ -60,4 +60,4 @@ std::string DataTable::print() const {
   out_str_ << std::endl;
   return out_str_.str();
 }
-}; // namespace SCRC
+}; // namespace FDP
