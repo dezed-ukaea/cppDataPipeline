@@ -1,4 +1,4 @@
-#include "fdp.hxx"
+#include "fdp/fdp.hxx"
 
 namespace FDP {
 DataPipeline::~DataPipeline() {}

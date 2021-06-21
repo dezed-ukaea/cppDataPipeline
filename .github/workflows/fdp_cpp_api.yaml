@@ -12,28 +12,9 @@ jobs:
         run: |
           sudo apt update
           sudo apt install -y lcov libjsoncpp-dev curl libcurl4-openssl-dev libyaml-cpp-dev libhdf5-dev
-      - name: Compile Library
+      - name: Configure Library
         run: |
           cmake . -Bbuild -DFDPAPI_BUILD_TESTS=ON
-          cmake --build build
-      - name: Run Unit Tests
-        run: |
-          bash test/test_setup.sh
-          cmake --build build --target test
-          if [ $? -eq 0 ]; then
-            echo "Unit tests completed successfully"
-            exit 0
-          else
-            echo "Unit tests failed"
-            exit 1
-          fi
-  sonar-cloud:
-    runs-on: ubuntu-latest
-    name: SonarCloud
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
       - name: Fetch cache
         uses: actions/cache@v2.1.5
         with:
@@ -48,6 +29,22 @@ jobs:
           wget -nv https://sonarcloud.io/static/cpp/build-wrapper-linux-x86.zip
           unzip -q build-wrapper-linux-x86.zip          
           echo "${PWD}/build-wrapper-linux-x86" >> $GITHUB_PATH
+      - name: Compile FDP-Cpp-API
+        run: build-wrapper-linux-x86-64 --out-dir bw-outputs cmake --build build
+        env:
+          CIBuild: 1
+          BUILD_TESTS: True
+      - name: Run Unit Tests
+        run: |
+          bash test/test_setup.sh
+          cmake --build build --target test
+          if [ $? -eq 0 ]; then
+            echo "Unit tests completed successfully"
+            exit 0
+          else
+            echo "Unit tests failed"
+            exit 1
+          fi
       - name: SonarCloud Scan
         run: |
           sonar-scanner -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=$SONAR_TOKEN -X

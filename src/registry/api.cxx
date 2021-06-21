@@ -160,7 +160,7 @@ Json::Value API::request(const std::filesystem::path &addr_path,
         "Failed to retrieve information from JSON response string");
   }
 
-  return (root_["results"]) ? root_["results"] : root_;
+  return (root_.isMember("results")) ? root_["results"] : root_;
 }
 
 Json::Value API::query(Query query, long expected_response) {
@@ -225,7 +225,7 @@ Json::Value API::post(const std::filesystem::path &addr_path,
         "Failed to retrieve information from JSON response string");
   }
 
-  Json::Value results_ = (root_["results"]) ? root_["results"] : root_;
+  Json::Value results_ = (root_.isMember("results")) ? root_["results"] : root_;
 
   curl_easy_cleanup(curl_);
   curl_global_cleanup();

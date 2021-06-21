@@ -1,4 +1,4 @@
-#include "fdp.hxx"
+#include "fdp/fdp.hxx"
 #include "fdp/objects/metadata.hxx"
 #include "fdp/registry/datapipeline.hxx"
 #include "fdp/registry/file_system.hxx"
