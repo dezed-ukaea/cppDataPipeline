@@ -23,6 +23,7 @@ FIND_PACKAGE( HDF5 REQUIRED COMPONENTS C CXX )
 FIND_PACKAGE( CURL REQUIRED )
 
 INCLUDE( external/digestpp.cmake )
+INCLUDE( external/Findyaml-cpp.cmake )
 INCLUDE( external/yaml_cpp.cmake )
 INCLUDE( external/jsoncpp.cmake )
 INCLUDE( external/spdlog.cmake )
@@ -30,7 +31,7 @@ INCLUDE( external/toml11.cmake )
 
 ADD_SUBDIRECTORY( src )
 
-CONFIGURE_FILE( ${PROJECT_NAME}.pc.in ${CMAKE_SOURCE_DIR}/${PROJECT_NAME}.pc @ONLY )
+CONFIGURE_FILE( ${CMAKE_SOURCE_DIR}/pkg-config/${PROJECT_NAME}.pc.in ${PROJECT_NAME}.pc @ONLY )
 INSTALL( FILES ${CMAKE_BINARY_DIR}/${PROJECT_NAME}.pc DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/pkgconfig )
 
 IF( SCRCAPI_BUILD_TESTS )
