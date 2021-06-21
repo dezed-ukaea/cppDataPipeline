@@ -32,8 +32,8 @@ jobs:
     name: SonarCloud
     steps:
       - uses: actions/checkout@v2
-          with:
-            fetch-depth: 0
+        with:
+          fetch-depth: 0
       - name: Prepare Sonar scanner
         run: |
           wget -nv https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.6.0.2311-linux.zip
