@@ -22,8 +22,9 @@ OPTION( SCRCAPI_CODE_COVERAGE "Run GCov and LCov code coverage tools" OFF )
 FIND_PACKAGE( HDF5 REQUIRED COMPONENTS C CXX )
 FIND_PACKAGE( CURL REQUIRED )
 
+SET( CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH};${CMAKE_SOURCE_DIR}/external" )
+
 INCLUDE( external/digestpp.cmake )
-INCLUDE( external/Findyaml-cpp.cmake )
 INCLUDE( external/yaml_cpp.cmake )
 INCLUDE( external/jsoncpp.cmake )
 INCLUDE( external/spdlog.cmake )
