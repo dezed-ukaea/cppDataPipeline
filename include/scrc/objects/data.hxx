@@ -440,24 +440,21 @@ public:
 
   /*! ************************************************************************
    * @brief Get the unit of measurement for a given column
-   * 
+   *
    * @return unit of measurement
    **************************************************************************/
   std::string get_column_unit(const std::string &col_name) const {
-    if(auto iter = int_cols_.find(col_name); iter != int_cols_.end()) {
+    if (auto iter = int_cols_.find(col_name); iter != int_cols_.end()) {
+      return iter->second->unit_of_measurement();
+    } else if (auto iter = float_cols_.find(col_name);
+               iter != float_cols_.end()) {
+      return iter->second->unit_of_measurement();
+    } else if (auto iter = str_cols_.find(col_name); iter != str_cols_.end()) {
       return iter->second->unit_of_measurement();
     }
-    else if(auto iter = float_cols_.find(col_name); iter != float_cols_.end()) {
-      return iter->second->unit_of_measurement();
-    }
-    else if(auto iter = str_cols_.find(col_name); iter != str_cols_.end()) {
-      return iter->second->unit_of_measurement();
-    }
-    APILogger->error(
-      "Failed to retrieve unit of measurement for column '{0}',"
-      " no such column in DataTable",
-      col_name
-    );
+    APILogger->error("Failed to retrieve unit of measurement for column '{0}',"
+                     " no such column in DataTable",
+                     col_name);
     throw std::invalid_argument("Cannot retrieve unit of measurement");
   }
 };

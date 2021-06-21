@@ -112,7 +112,8 @@ TEST(SCRCAPITest, TestWriteTable) {
   data_->add_column("age", ages_);
   data_->add_column("height", heights_, "cm");
 
-  ASSERT_NO_THROW(create_table(data_, "demo/population", "sample", file_system_));
+  ASSERT_NO_THROW(
+      create_table(data_, "demo/population", "sample", file_system_));
 }
 //! [TestWriteTable]
 

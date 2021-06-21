@@ -267,7 +267,7 @@ std::filesystem::path create_table(const DataTable *table,
   // --------- WRITE ROW NAMES --------- //
   std::vector<char *> row_names_;
 
-  for(int i{0}; i < table->get_row_names().size(); ++i) {
+  for (int i{0}; i < table->get_row_names().size(); ++i) {
     const std::string name_ = table->get_row_names()[i];
     char *row_name_ = new char[name_.length() + 1];
     strcpy(row_name_, name_.c_str());
