@@ -8,9 +8,21 @@
 #include "gtest/gtest.h"
 
 #include <string>
+#include <stdlib.h>
 #include <vector>
 
 using namespace FDP;
+
+//! [TestDefaultConfigPath]
+TEST(FDPAPITest, TestDefaultConfigPath) {
+  APILogger->set_level(spdlog::level::debug);
+  setenv("FDP_CONFIG_DIR", std::filesystem::path(TESTDIR).c_str(), 1);
+  LocalFileSystem *file_system_ = new LocalFileSystem();
+  std::filesystem::path expected_store_ =
+      std::filesystem::path(TESTDIR) / "datastore";
+  ASSERT_EQ(file_system_->get_data_store(), expected_store_);
+}
+//! [TestDefaultConfigPath]
 
 //! [TestTOMLPERead]
 TEST(FDPAPITest, TestTOMLPERead) {

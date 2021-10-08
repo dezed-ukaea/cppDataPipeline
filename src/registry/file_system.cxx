@@ -7,8 +7,8 @@ YAML::Node parse_yaml_(std::filesystem::path yaml_path) {
 }
 
 LocalFileSystem::LocalFileSystem(std::filesystem::path config_file_path)
-    : config_path_(config_file_path),
-      config_data_(parse_yaml_(config_file_path)) {
+    : config_path_(config_file_path.empty() ? std::getenv("FDP_CONFIG_DIR") / std::filesystem::path("config.yaml") : config_file_path),
+      config_data_(config_file_path.empty() ? parse_yaml_(std::getenv("FDP_CONFIG_DIR") / std::filesystem::path("config.yaml")) : parse_yaml_(config_file_path)) {
   APILogger->debug("LocalFileSystem: Parsing configuration file");
   const std::filesystem::path data_directory_path_ = get_data_store();
 

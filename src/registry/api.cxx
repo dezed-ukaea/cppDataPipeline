@@ -185,10 +185,10 @@ Json::Value API::post(const std::filesystem::path &addr_path,
                       (std::string("Authorization: token ") + key).c_str());
   }
 
-  curl_easy_setopt(curl_, CURLOPT_URL, url_path_);
+  curl_easy_setopt(curl_, CURLOPT_URL, url_path_.c_str());
   curl_easy_setopt(curl_, CURLOPT_HTTPHEADER, headers);
   curl_easy_getinfo(curl_, CURLINFO_RESPONSE_CODE, &return_code_);
-  curl_easy_setopt(curl_, CURLOPT_POSTFIELDS, data_);
+  curl_easy_setopt(curl_, CURLOPT_POSTFIELDS, data_.c_str());
   curl_easy_setopt(curl_, CURLOPT_WRITEFUNCTION, write_str_);
   curl_easy_setopt(curl_, CURLOPT_WRITEDATA, &response_);
 

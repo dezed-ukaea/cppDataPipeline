@@ -74,7 +74,7 @@ public:
    *
    * @param config_file_path FDP Pipeline configuration YAML file path
    ***************************************************************************/
-  LocalFileSystem(std::filesystem::path config_file_path);
+  LocalFileSystem(std::filesystem::path config_file_path = "");
 
   /*! *************************************************************************
    * @brief retrieve the data store location from the configuration file
