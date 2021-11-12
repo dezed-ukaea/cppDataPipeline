@@ -66,6 +66,11 @@ IF( WIN32 )
             "${CMAKE_BINARY_DIR}/jsoncpp_src-prefix/src/jsoncpp_src-build/bin/Release"
             $<TARGET_FILE_DIR:${TEST_NAME}>)
 ENDIF()
+
+IF( apple )
+    find_library(NAMES jsoncpp ${CMAKE_BINARY_DIR}/jsoncpp_src-prefix/src/jsoncpp_src-build/lib )
+ENDIF()
+
 # Include GoogleTest Library
 INCLUDE( GoogleTest )
 # Use GoogleTest Libary to Discover the tests
