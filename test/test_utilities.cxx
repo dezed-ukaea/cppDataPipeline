@@ -29,6 +29,7 @@ TEST(FDPAPITest, TestSemVerComparisons) {
   ASSERT_LT(v3a, v3);
 
   v2.bump_major();
+  v3.bump_minor();
 
   ASSERT_EQ(v2, v3);
   ASSERT_EQ(Versioning::version("5.2.1"), v4);
