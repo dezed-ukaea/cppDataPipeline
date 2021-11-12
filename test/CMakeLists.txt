@@ -20,10 +20,6 @@ IF( WIN32 )
     option(gtest_disable_pthreads "Disable uses of pthreads in gtest." ON)
 ENDIF()
 
-
-# Prevent overriding the parent project's compiler/linker
-# settings on Windows
-
 include(FetchContent)
 FetchContent_Declare(
   googletest
@@ -35,7 +31,7 @@ set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 
 # Find all files matching test naming (test_<name>.cxx)
-#FILE(GLOB_RECURSE src_unit CONFIGURE_DEPENDS "test_*.cxx")
+FILE(GLOB_RECURSE src_unit CONFIGURE_DEPENDS "test_*.cxx")
 
 # Add the test files to the executable
 ADD_EXECUTABLE( ${TEST_NAME} ${src_unit} )
