@@ -55,15 +55,33 @@ MESSAGE(STATUS "----------------------------------")
 # Link gtests with tests
 TARGET_LINK_LIBRARIES( ${TEST_NAME} PRIVATE ${PROJECT_NAME} gtest gtest_main)
 
+IF (NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE "Release")
+    message(STATUS "Build type not specified: Use Release by default")
+    set( B_TYPE Release )
+ELSEIF ( CMAKE_BUILD_TYPE STREQUAL "Debug" )
+    set( B_TYPE Debug )
+ELSE()
+    set( B_TYPE Release )
+ENDIF()
+
 # Windows Requires the compiled DLL files to be in the same directory (alternative add these directories to PATH)
 IF( WIN32 )
     add_custom_command(TARGET ${TEST_NAME} POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_directory
-            "${CMAKE_BINARY_DIR}/bin/Release"
+            "${CMAKE_BINARY_DIR}/bin/${B_TYPE}"
             $<TARGET_FILE_DIR:${TEST_NAME}>)
     add_custom_command(TARGET ${TEST_NAME} POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_directory
-            "${CMAKE_BINARY_DIR}/jsoncpp_src-prefix/src/jsoncpp_src-build/bin/Release"
+            "${CMAKE_BINARY_DIR}/jsoncpp_src-prefix/src/jsoncpp_src-build/bin/${B_TYPE}"
+            $<TARGET_FILE_DIR:${TEST_NAME}>)
+    add_custom_command(TARGET ${TEST_NAME} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy
+            "${CMAKE_BINARY_DIR}/yaml-cpp_src-prefix/src/yaml-cpp_src-build/${B_TYPE}/yaml-cpp.dll"
+            $<TARGET_FILE_DIR:${TEST_NAME}>)
+    add_custom_command(TARGET ${TEST_NAME} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy
+            "${CMAKE_BINARY_DIR}/curl_src-prefix/src/curl_src-build/lib/${B_TYPE}/libcurl.dll"
             $<TARGET_FILE_DIR:${TEST_NAME}>)
 ENDIF()
 # Include GoogleTest Library
