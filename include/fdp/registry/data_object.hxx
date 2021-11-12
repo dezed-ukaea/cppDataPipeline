@@ -101,7 +101,7 @@ public:
    *
    * @return path of the data product in the local cache
    ************************************************************************/
-  std::string get_cache_path() const { return cache_; }
+  std::string get_cache_path() const { return cache_.string(); }
 };
 
 /**

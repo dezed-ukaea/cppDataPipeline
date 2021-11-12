@@ -247,7 +247,7 @@ const T read_hdf5_object(const std::filesystem::path file_name,
                              "', file does not exist.");
   }
 
-  const H5::H5File *file_ = new H5::H5File(file_name.c_str(), H5F_ACC_RDONLY);
+  const H5::H5File *file_ = new H5::H5File(file_name.string().c_str(), H5F_ACC_RDONLY);
   H5::DataSet *obj_set_ = new H5::DataSet(file_->openDataSet(key.c_str()));
   H5::DataSpace *obj_space_ = new H5::DataSpace(obj_set_->getSpace());
   const H5::DataType dtype_ = obj_set_->getDataType();
@@ -278,14 +278,14 @@ read_hdf5_comp_type_member(const std::filesystem::path file_name,
                              "', file does not exist.");
   }
 
-  const H5::H5File *file_ = new H5::H5File(file_name.c_str(), H5F_ACC_RDONLY);
+  const H5::H5File *file_ = new H5::H5File(file_name.string().c_str(), H5F_ACC_RDONLY);
 
   H5::DataSet *data_set_ = new H5::DataSet(file_->openDataSet(key.c_str()));
   H5::DataSpace *data_space_ = new H5::DataSpace(data_set_->getSpace());
 
-  const int arr_dims_ = data_space_->getSimpleExtentNdims();
+  int arr_dims_ = data_space_->getSimpleExtentNdims();
   const H5::CompType ctype_ = data_set_->getCompType();
-  hsize_t dim_[arr_dims_];
+  hsize_t *dim_ = new hsize_t[arr_dims_];
 
   data_space_->getSimpleExtentDims(dim_, NULL);
 

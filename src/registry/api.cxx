@@ -31,7 +31,7 @@ void Query::append(std::string key, std::string value) {
 std::filesystem::path Query::build_query() {
   APILogger->debug("API:Query: Building query string.");
   if (components_.empty()) {
-    std::string query_path_ = std::filesystem::path(string_repr_) / fragments_;
+    std::string query_path_ = (std::filesystem::path(string_repr_) / fragments_).string();
     if (!fragments_.empty())
       query_path_ += "/";
     return query_path_;
@@ -63,7 +63,7 @@ std::filesystem::path Query::build_query() {
   const std::filesystem::path query_path_(query_str_);
 
   const std::string query_out_ =
-      std::string(std::filesystem::path(string_repr_) / query_path_);
+      std::string((std::filesystem::path(string_repr_) / query_path_).string());
 
   APILogger->debug("API:Query: Built query string: {0}", query_out_);
 
@@ -94,7 +94,7 @@ CURL *API::setup_json_session_(const std::filesystem::path &addr_path,
 void API::download_file(const std::filesystem::path &url,
                         std::filesystem::path out_path) {
   CURL *curl_ = curl_easy_init();
-  FILE *file_ = fopen(out_path.c_str(), "wb");
+  FILE *file_ = fopen(out_path.string().c_str(), "wb");
   APILogger->debug("API: Downloading file '{0}' -> '{1}'", url.string(),
                    out_path.string());
   curl_easy_setopt(curl_, CURLOPT_URL, url.c_str());

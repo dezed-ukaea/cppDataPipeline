@@ -3,7 +3,7 @@ namespace FDP {
 YAML::Node parse_yaml_(std::filesystem::path yaml_path) {
   APILogger->debug("LocalFileSystem: Reading configuration file '{0}'",
                    yaml_path.string().c_str());
-  return YAML::LoadFile(yaml_path.c_str());
+  return YAML::LoadFile(yaml_path.string().c_str());
 }
 
 LocalFileSystem::LocalFileSystem(std::filesystem::path config_file_path)
@@ -15,7 +15,7 @@ LocalFileSystem::LocalFileSystem(std::filesystem::path config_file_path)
   // Create the data directory within the config file if it does not exist
   if (!std::filesystem::exists(data_directory_path_)) {
     APILogger->info("Creating data directory at '{0}'",
-                    data_directory_path_.c_str());
+                    data_directory_path_.string());
     std::filesystem::create_directory(data_directory_path_);
   }
 }
@@ -37,8 +37,8 @@ std::filesystem::path LocalFileSystem::get_data_store() const {
 
     // Handle case where '/' used meaning relative to config file path
     else if (data_dir_[0] == '/') {
-      data_dir_ = config_path_.parent_path() /
-                  data_dir_.substr(1, data_dir_.size() - 1);
+      data_dir_ = (config_path_.parent_path() /
+                  data_dir_.substr(1, data_dir_.size() - 1)).string();
     }
 
     return data_dir_;
@@ -124,10 +124,10 @@ std::filesystem::path create_table(const DataTable *table,
   if (!std::filesystem::exists(output_dir_))
     std::filesystem::create_directories(output_dir_);
 
-  H5File *output_file_ = new H5File(output_path_, H5F_ACC_TRUNC);
+  H5File *output_file_ = new H5File(output_path_.string(), H5F_ACC_TRUNC);
 
   Group *output_group_ =
-      new Group(output_file_->createGroup(component.c_str()));
+      new Group(output_file_->createGroup(component.string().c_str()));
 
   const int rank_ = 1;
 
@@ -140,7 +140,7 @@ std::filesystem::path create_table(const DataTable *table,
                      int_col.first);
     char *col_unit_ =
         new char[int_col.second->unit_of_measurement().length() + 1];
-    strcpy(col_unit_, int_col.second->unit_of_measurement().c_str());
+    strcpy_s(col_unit_, int_col.second->unit_of_measurement().size() + 1, int_col.second->unit_of_measurement().c_str());
     col_units_.push_back(col_unit_);
     comp_type_.AddMember<int>(int_col.first);
   }
@@ -150,7 +150,7 @@ std::filesystem::path create_table(const DataTable *table,
                      float_col.first);
     char *col_unit_ =
         new char[float_col.second->unit_of_measurement().length() + 1];
-    strcpy(col_unit_, float_col.second->unit_of_measurement().c_str());
+    strcpy_s(col_unit_, float_col.second->unit_of_measurement().size() + 1, float_col.second->unit_of_measurement().c_str());
     col_units_.push_back(col_unit_);
     comp_type_.AddMember<float>(float_col.first);
   }
@@ -160,7 +160,7 @@ std::filesystem::path create_table(const DataTable *table,
                      str_col.first);
     char *col_unit_ =
         new char[str_col.second->unit_of_measurement().length() + 1];
-    strcpy(col_unit_, str_col.second->unit_of_measurement().c_str());
+    strcpy_s(col_unit_, str_col.second->unit_of_measurement().size() + 1, str_col.second->unit_of_measurement().c_str());
     col_units_.push_back(col_unit_);
     comp_type_.AddMember<char *>(str_col.first);
   }
@@ -200,7 +200,7 @@ std::filesystem::path create_table(const DataTable *table,
                      str_col.first);
     for (const std::string &value : str_col.second->values()) {
       char *str = new char[value.length() + 1];
-      strcpy(str, value.c_str());
+      strcpy_s(str, value.size() + 1, value.c_str());
       array_to_write_.SetValue<char *>(row_index_counter_, str_col.first, str);
       row_index_counter_ += 1;
     }
@@ -270,7 +270,7 @@ std::filesystem::path create_table(const DataTable *table,
   for (int i{0}; i < table->get_row_names().size(); ++i) {
     const std::string name_ = table->get_row_names()[i];
     char *row_name_ = new char[name_.length() + 1];
-    strcpy(row_name_, name_.c_str());
+    strcpy_s(row_name_, name_.size() + 1, name_.c_str());
     row_names_.push_back(row_name_);
   }
   const hsize_t str_dim_[1] = {table->get_row_names().size()};
@@ -299,7 +299,7 @@ create_distribution(const Distribution *distribution,
                     const std::filesystem::path &data_product,
                     const Versioning::version &version_num,
                     const LocalFileSystem *file_system) {
-  const std::string param_name_ = data_product.stem();
+  const std::string param_name_ = data_product.stem().string();
   const std::string namespace_ = file_system->get_default_output_namespace();
   const std::filesystem::path data_store_ = file_system->get_data_store();
   toml::value data_{

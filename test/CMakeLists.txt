@@ -2,16 +2,6 @@ FIND_PACKAGE( Threads REQUIRED )
 
 ENABLE_TESTING()
 
-INCLUDE( ExternalProject )
-
-ExternalProject_Add(
-  googletest
-  GIT_REPOSITORY https://github.com/google/googletest.git
-  UPDATE_COMMAND ""
-  GIT_TAG e7e591764baba0a0c3c9ad0014430e7a27331d16
-  INSTALL_COMMAND ""
-)
-
 SET( CMAKE_CXX_FLAGS "-DTESTDIR=\\\"${CMAKE_CURRENT_SOURCE_DIR}\\\" ${CMAKE_CXX_FLAGS}" )
 
 SET( TEST_NAME ${PROJECT_NAME}-tests )
@@ -25,52 +15,38 @@ IF( APPLE )
     SET( THREADS_PREFER_PTHREAD_FLAG ON )
 ENDIF()
 
-ExternalProject_Get_Property( googletest source_dir )
-SET( GTEST_INCLUDE_DIRS ${source_dir}/googletest/include )
-SET( GMOCK_INCLUDE_DIRS ${source_dir}/googlemock/include )
+IF( WIN32 )
+    option(CMAKE_USE_WIN32_THREADS_INIT "using WIN32 threads" ON)
+    option(gtest_disable_pthreads "Disable uses of pthreads in gtest." ON)
+ENDIF()
 
-ExternalProject_Get_Property( googletest binary_dir )
-SET( GTEST_LIBRARY_PATH  ${binary_dir}/lib/${CMAKE_FIND_LIBRARY_PREFIXES}gtest.a )
-SET(GMOCK_LIBRARY_PATH ${binary_dir}/lib/${CMAKE_FIND_LIBRARY_PREFIXES}gmock.a )
-SET( GTEST_MAIN_LIBRARY_PATH ${binary_dir}/lib/${CMAKE_FIND_LIBRARY_PREFIXES}gtest_main.a )
-SET( GMOCK_MAIN_LIBRARY_PATH ${binary_dir}/lib/${CMAKE_FIND_LIBRARY_PREFIXES}gmock_main.a )
-SET( GTEST_LIBRARY gtest )
-SET( GMOCK_LIBRARY gmock)
-SET( GTEST_MAIN_LIBRARY gtest_main )
-SET( GMOCK_MAIN_LIBRARY gmock_main )
 
-add_library( ${GTEST_LIBRARY} UNKNOWN IMPORTED )
-add_library( ${GMOCK_LIBRARY} UNKNOWN IMPORTED )
-add_library( ${GTEST_MAIN_LIBRARY} UNKNOWN IMPORTED )
-add_library( ${GMOCK_MAIN_LIBRARY} UNKNOWN IMPORTED )
+# Prevent overriding the parent project's compiler/linker
+# settings on Windows
 
-SET_TARGET_PROPERTIES( ${GTEST_LIBRARY} PROPERTIES
-    IMPORTED_LOCATION ${GTEST_LIBRARY_PATH}
-    IMPORTED_LINK_INTERFACE_LIBRARIES ${CMAKE_THREAD_LIBS_INIT} )
-SET_TARGET_PROPERTIES( ${GMOCK_LIBRARY} PROPERTIES
-    IMPORTED_LOCATION ${GMOCK_LIBRARY_PATH}
-    IMPORTED_LINK_INTERFACE_LIBRARIES ${CMAKE_THREAD_LIBS_INIT} )
-SET_TARGET_PROPERTIES( ${GTEST_MAIN_LIBRARY} PROPERTIES
-    IMPORTED_LOCATION ${GTEST_MAIN_LIBRARY_PATH}
-    IMPORTED_LINK_INTERFACE_LIBRARIES ${CMAKE_THREAD_LIBS_INIT} )
-SET_TARGET_PROPERTIES( ${GMOCK_MAIN_LIBRARY} PROPERTIES
-    IMPORTED_LOCATION ${GMOCK_MAIN_LIBRARY_PATH}
-    IMPORTED_LINK_INTERFACE_LIBRARIES ${CMAKE_THREAD_LIBS_INIT} )
-ADD_DEPENDENCIES( ${GTEST_LIBRARY} googletest )
-ADD_DEPENDENCIES( ${GMOCK_LIBRARY} googletest )
-ADD_DEPENDENCIES( ${GTEST_MAIN_LIBRARY} googletest )
-ADD_DEPENDENCIES( ${GMOCK_MAIN_LIBRARY} googletest )
+include(FetchContent)
+FetchContent_Declare(
+  googletest
+  # Specify the commit you depend on and update it regularly.
+  URL https://github.com/google/googletest/archive/refs/tags/release-1.11.0.zip
+)
+# For Windows: Prevent overriding the parent project's compiler/linker settings
+set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+FetchContent_MakeAvailable(googletest)
 
-FILE(GLOB_RECURSE src_unit "test_*.cxx")
+# Find all files matching test naming (test_<name>.cxx)
+#FILE(GLOB_RECURSE src_unit CONFIGURE_DEPENDS "test_*.cxx")
 
+# Add the test files to the executable
 ADD_EXECUTABLE( ${TEST_NAME} ${src_unit} )
+
+# Add compile options to tests
 ADD_COMPILE_OPTIONS( ${TEST_NAME} ${BUILD_TYPE_COMPILE_FLAGS} )
 
+# Add includes to tests
 TARGET_INCLUDE_DIRECTORIES( ${TEST_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/include
                             ${TEST_NAME} PUBLIC ${pybind11_INCLUDE_DIRS}
-                            ${TEST_NAME} PUBLIC ${PYTHON_INCLUDE_DIRS}
-                            ${TEST_NAME} PRIVATE ${GTEST_INCLUDE_DIRS}
-                            ${TEST_NAME} PRIVATE ${GMOCK_INCLUDE_DIRS} )
+                            ${TEST_NAME} PUBLIC ${PYTHON_INCLUDE_DIRS})
 
 MESSAGE(STATUS "----- Configuring Test Build -----")
 MESSAGE(STATUS "[Libraries]:")
@@ -80,7 +56,21 @@ MESSAGE(STATUS "\tGMOCK: ${GMOCK_INCLUDE_DIRS}")
 MESSAGE(STATUS "\tFLAGS: ${CMAKE_CXX_FLAGS}")
 MESSAGE(STATUS "----------------------------------")
 
-TARGET_LINK_LIBRARIES( ${TEST_NAME} PRIVATE ${PROJECT_NAME} ${GTEST_LIBRARY} ${GTEST_MAIN_LIBRARY} )
+# Link gtests with tests
+TARGET_LINK_LIBRARIES( ${TEST_NAME} PRIVATE ${PROJECT_NAME} gtest gtest_main)
 
+# Windows Requires the compiled DLL files to be in the same directory (alternative add these directories to PATH)
+IF( WIN32 )
+    add_custom_command(TARGET ${TEST_NAME} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+            "${CMAKE_BINARY_DIR}/bin/Release"
+            $<TARGET_FILE_DIR:${TEST_NAME}>)
+    add_custom_command(TARGET ${TEST_NAME} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+            "${CMAKE_BINARY_DIR}/jsoncpp_src-prefix/src/jsoncpp_src-build/bin/Release"
+            $<TARGET_FILE_DIR:${TEST_NAME}>)
+ENDIF()
+# Include GoogleTest Library
 INCLUDE( GoogleTest )
+# Use GoogleTest Libary to Discover the tests
 gtest_discover_tests( ${TEST_NAME} )

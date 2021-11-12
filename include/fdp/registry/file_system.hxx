@@ -203,7 +203,7 @@ std::filesystem::path create_estimate(T &value,
                                       const std::filesystem::path &data_product,
                                       const Versioning::version &version_num,
                                       const LocalFileSystem *file_system) {
-  const std::string param_name_ = data_product.stem();
+  const std::string param_name_ = data_product.stem().string();
   const std::string namespace_ = file_system->get_default_output_namespace();
   const std::filesystem::path data_store_ = file_system->get_data_store();
   const toml::value data_{
@@ -322,17 +322,17 @@ std::filesystem::path create_array(const ArrayObject<T> *array,
   if (!std::filesystem::exists(output_dir_))
     std::filesystem::create_directories(output_dir_);
 
-  H5File *output_file_ = new H5File(output_path_, H5F_ACC_TRUNC);
+  H5File *output_file_ = new H5File(output_path_.string().c_str(), H5F_ACC_TRUNC);
 
   APILogger->debug("FileSystem:CreateArray: Writing Group '{0}' to file",
                    component.string());
 
   Group *output_group_ =
-      new Group(output_file_->createGroup(component.c_str()));
+      new Group(output_file_->createGroup(component.string().c_str()));
 
   const std::vector<int> dimensions_ = array->get_dimensions();
 
-  hsize_t dim_[dimensions_.size()];
+  hsize_t *dim_ = new hsize_t[dimensions_.size()];
 
   std::copy(dimensions_.begin(), dimensions_.end(), dim_);
 
@@ -385,9 +385,9 @@ std::filesystem::path create_array(const ArrayObject<T> *array,
                                std::to_string(i + 1) +
                                std::string(DIM_TITLE_SUFFIX);
 
-    char out_title_[title_.length() + 1];
+    char* out_title_ = new char[title_.length() + 1];
 
-    strcpy(out_title_, title_.c_str());
+    strcpy_s(out_title_, title_.size() + 1, title_.c_str());
 
     StrType stype_(H5T_C_S1, title_.length() + 1);
 
@@ -465,7 +465,7 @@ ArrayObject<T> *read_array(const std::filesystem::path var_address,
                              var_address.string() + "', file does not exist.");
   }
 
-  const H5File *file_ = new H5File(var_address.c_str(), H5F_ACC_RDONLY);
+  const H5File *file_ = new H5File(var_address.string().c_str(), H5F_ACC_RDONLY);
 
   // ------------- ARRAY RETRIEVAL -------------- //
 
@@ -475,9 +475,9 @@ ArrayObject<T> *read_array(const std::filesystem::path var_address,
   DataSet *data_set_ = new DataSet(file_->openDataSet(array_key_.c_str()));
   DataSpace *data_space_ = new DataSpace(data_set_->getSpace());
 
-  const int arr_dims_ = data_space_->getSimpleExtentNdims();
+  int arr_dims_ = data_space_->getSimpleExtentNdims();
 
-  hsize_t dim_[arr_dims_];
+  hsize_t *dim_ = new hsize_t [arr_dims_];
 
   data_space_->getSimpleExtentDims(dim_, NULL);
 
@@ -532,8 +532,11 @@ ArrayObject<T> *read_array(const std::filesystem::path var_address,
 
   std::vector<int> dimensions_;
 
-  for (auto &d : dim_)
-    dimensions_.push_back(d);
+  // for (auto &d : *dim_)
+  //   dimensions_.push_back(d);
+
+  for (int i{0}; i < arr_dims_; ++i)
+    dimensions_.push_back(dim_[i]);
 
   APILogger->debug("FileSystem:ReadArray: Read Successful.");
 
@@ -569,7 +572,7 @@ DataTableColumn<T> *read_table_column(const std::filesystem::path var_address,
                              var_address.string() + "', file does not exist.");
   }
 
-  const H5File *file_ = new H5File(var_address.c_str(), H5F_ACC_RDONLY);
+  const H5File *file_ = new H5File(var_address.string().c_str(), H5F_ACC_RDONLY);
 
   // ------------ COLUMN RETRIEVAL ----------- //
 

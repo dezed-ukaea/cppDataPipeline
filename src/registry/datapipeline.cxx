@@ -2,6 +2,57 @@
 
 namespace FDP {
 
+ DataPipelineImpl_::DataPipelineImpl_(const std::filesystem::path &config_file_path,
+                    const std::filesystem::path &access_token_file,
+                    spdlog::level::level_enum log_level,
+                    RESTAPI api_location)
+      : file_system(new LocalFileSystem(config_file_path)),
+        access_token_file_(access_token_file) {
+    const YAML::Node config_data_ = file_system->get_config_data();
+
+    if (!config_data_["run_metadata"]) {
+      APILogger->error(
+          "Failed to obtain run metadata, the key 'run_metadata' is not"
+          " present in the configuration");
+      throw config_parsing_error("No run metadata provided");
+    }
+
+    const YAML::Node run_metadata_ = config_data_["run_metadata"];
+
+    if (api_location == RESTAPI::LOCAL &&
+        !run_metadata_["local_data_registry_url"]) {
+      APILogger->error("Could not determine URL for local repository, key "
+                       "'local_data_registry_url' "
+                       "is absent from configuration");
+      throw config_parsing_error("Failed to read local repository url");
+    }
+
+    else if (api_location == RESTAPI::REMOTE &&
+             !run_metadata_["remote_data_registry_url"]) {
+      APILogger->error("Could not determine URL for remote repository, key "
+                       "'remote_data_registry_url' "
+                       "is absent from configuration");
+      throw config_parsing_error("Failed to read remote repository url");
+    }
+
+    const YAML::Node api_ = (api_location == RESTAPI::LOCAL)
+                                ? run_metadata_["local_data_registry_url"]
+                                : run_metadata_["remote_data_registry_url"];
+    //const std::filesystem::path api_root_ = api_.as<std::string>();
+    const std::string api_root_ = api_.as<std::string>();
+
+    api = new API(api_root_);
+
+    spdlog::set_default_logger(APILogger);
+    APILogger->set_level(log_level);
+
+    APILogger->info("\n[Configuration]\n\t- Config Path: {0}\n\t- API Root: "
+                    "{1}\n\t- FDP API Token File: {2}",
+                    config_file_path.string(), api_root_,
+                    (access_token_file.empty()) ? "None"
+                                                : access_token_file.string());
+  }
+
 Json::Value DataPipelineImpl_::fetch_all_objects() {
   APILogger->debug("DataPipelineImpl_: Fetching all objects from registry");
   return api->query(ObjectQuery(""));
@@ -94,7 +145,7 @@ std::filesystem::path DataPipelineImpl_::download_external_object(
   const std::string object_id_ =
       std::filesystem::path(
           object_id_path_.substr(0, object_id_path_.size() - 1))
-          .filename();
+          .filename().string();
 
   APILogger->debug("DataPipeline:ExternalObject: Retrieved ID '" + object_id_ +
                    "' for object '" + external_object->get_unique_id() + "'");
@@ -105,7 +156,7 @@ std::filesystem::path DataPipelineImpl_::download_external_object(
 
   const std::string store_loc_id_ =
       std::filesystem::path(store_loc_.substr(0, store_loc_.size() - 1))
-          .filename();
+          .filename().string();
 
   const Json::Value store_res_ =
       fetch_data_store_by_id(std::stoi(store_loc_id_));
@@ -116,7 +167,7 @@ std::filesystem::path DataPipelineImpl_::download_external_object(
   const std::string root_loc_str_ = store_res_["storage_root"].asString();
   const std::string root_loc_id_ =
       std::filesystem::path(root_loc_str_.substr(0, root_loc_str_.size() - 1))
-          .filename();
+          .filename().string();
   const Json::Value root_res_ = fetch_store_root_by_id(std::stoi(root_loc_id_));
   const std::filesystem::path root_loc_ = root_res_["root"].asString();
 
@@ -174,7 +225,7 @@ std::filesystem::path DataPipelineImpl_::download_data_product(
       (namespace_local_.empty()) ? file_system->get_default_input_namespace()
                                  : namespace_local_;
   const int ns_id_ = get_id_from_namespace(namespace_);
-  const std::string reg_path_ = data_product->get_path();
+  const std::string reg_path_ = data_product->get_path().string();
 
   DataProductQuery dpquery_ = DataProductQuery();
   dpquery_.append("namespace", std::to_string(ns_id_));
@@ -191,7 +242,7 @@ std::filesystem::path DataPipelineImpl_::download_data_product(
   const std::string object_id_ =
       std::filesystem::path(
           object_id_path_.substr(0, object_id_path_.size() - 1))
-          .filename();
+          .filename().string();
 
   APILogger->debug("DataPipeline:DataProduct: Retrieved ID '" + object_id_ +
                    "' for object '" + namespace_ + ":" + reg_path_ + "'");
@@ -201,7 +252,7 @@ std::filesystem::path DataPipelineImpl_::download_data_product(
   const std::string store_loc_ = objres_["storage_location"].asString();
   const std::string store_loc_id_ =
       std::filesystem::path(store_loc_.substr(0, store_loc_.size() - 1))
-          .filename();
+          .filename().string();
   const Json::Value store_res_ =
       fetch_data_store_by_id(std::stoi(store_loc_id_));
   const std::filesystem::path rel_file_loc_ = store_res_["path"].asString();
@@ -210,7 +261,7 @@ std::filesystem::path DataPipelineImpl_::download_data_product(
   const std::string root_loc_str_ = store_res_["storage_root"].asString();
   const std::string root_loc_id_ =
       std::filesystem::path(root_loc_str_.substr(0, root_loc_str_.size() - 1))
-          .filename();
+          .filename().string();
   const Json::Value root_res_ = fetch_store_root_by_id(std::stoi(root_loc_id_));
   const std::filesystem::path root_loc_ = root_res_["root"].asString();
 
@@ -310,7 +361,7 @@ std::string DataPipelineImpl_::read_key() {
 
   if (access_token_file_.empty()) {
     APILogger->warn("API:Post: No access token provided for RestAPI POST");
-    return access_token_file_;
+    return access_token_file_.string();
   }
 
   std::ifstream key_(access_token_file_, std::ios::in);
@@ -344,7 +395,7 @@ void DataPipelineImpl_::register_external_object(
     }
 
     const std::string encoded_path_ =
-        root_ / std::filesystem::path(url_encode(path_));
+        (root_ / std::filesystem::path(url_encode(path_))).string();
     api->download_file(encoded_path_, local_dir_ / temp_file_);
   }
 

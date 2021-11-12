@@ -9,7 +9,7 @@
 
 using namespace FDP;
 
-DataPipelineImpl_ *init_pipeline(bool use_local = false) {
+DataPipelineImpl_ *init_pipeline(bool use_local = true) {
   if (std::filesystem::exists(std::filesystem::path(TESTDIR) /
                               std::filesystem::path("datastore"))) {
     std::filesystem::remove_all(std::filesystem::path(TESTDIR) /

@@ -169,11 +169,11 @@ public:
 
   friend bool operator==(const version &v1, const version &v2) {
     bool same_ = v1.major_ == v2.major_;
-    same_ += v1.minor_ == v2.minor_;
-    same_ += v1.patch_ == v2.patch_;
-    same_ += v1.meta_tag_ == v2.meta_tag_;
-    same_ += v1.tag_v_ == v2.tag_v_;
-    same_ += v1.meta_data_ == v2.meta_data_;
+    same_ = same_ && (v1.minor_ == v2.minor_);
+    same_ = same_ && (v1.patch_ == v2.patch_);
+    same_ = same_ && (v1.meta_tag_ == v2.meta_tag_);
+    same_ = same_ && (v1.tag_v_ == v2.tag_v_);
+    same_ = same_ && (v1.meta_data_ == v2.meta_data_);
     return same_;
   }
 
