@@ -140,7 +140,7 @@ std::filesystem::path create_table(const DataTable *table,
                      int_col.first);
     char *col_unit_ =
         new char[int_col.second->unit_of_measurement().length() + 1];
-    strcpy_s(col_unit_, int_col.second->unit_of_measurement().size() + 1, int_col.second->unit_of_measurement().c_str());
+    strcpy(col_unit_, int_col.second->unit_of_measurement().c_str());
     col_units_.push_back(col_unit_);
     comp_type_.AddMember<int>(int_col.first);
   }
@@ -150,7 +150,7 @@ std::filesystem::path create_table(const DataTable *table,
                      float_col.first);
     char *col_unit_ =
         new char[float_col.second->unit_of_measurement().length() + 1];
-    strcpy_s(col_unit_, float_col.second->unit_of_measurement().size() + 1, float_col.second->unit_of_measurement().c_str());
+    strcpy(col_unit_, float_col.second->unit_of_measurement().c_str());
     col_units_.push_back(col_unit_);
     comp_type_.AddMember<float>(float_col.first);
   }
@@ -160,7 +160,7 @@ std::filesystem::path create_table(const DataTable *table,
                      str_col.first);
     char *col_unit_ =
         new char[str_col.second->unit_of_measurement().length() + 1];
-    strcpy_s(col_unit_, str_col.second->unit_of_measurement().size() + 1, str_col.second->unit_of_measurement().c_str());
+    strcpy(col_unit_, str_col.second->unit_of_measurement().c_str());
     col_units_.push_back(col_unit_);
     comp_type_.AddMember<char *>(str_col.first);
   }
@@ -200,7 +200,7 @@ std::filesystem::path create_table(const DataTable *table,
                      str_col.first);
     for (const std::string &value : str_col.second->values()) {
       char *str = new char[value.length() + 1];
-      strcpy_s(str, value.size() + 1, value.c_str());
+      strcpy(str, value.c_str());
       array_to_write_.SetValue<char *>(row_index_counter_, str_col.first, str);
       row_index_counter_ += 1;
     }
@@ -270,7 +270,7 @@ std::filesystem::path create_table(const DataTable *table,
   for (int i{0}; i < table->get_row_names().size(); ++i) {
     const std::string name_ = table->get_row_names()[i];
     char *row_name_ = new char[name_.length() + 1];
-    strcpy_s(row_name_, name_.size() + 1, name_.c_str());
+    strcpy(row_name_, name_.c_str());
     row_names_.push_back(row_name_);
   }
   const hsize_t str_dim_[1] = {table->get_row_names().size()};
