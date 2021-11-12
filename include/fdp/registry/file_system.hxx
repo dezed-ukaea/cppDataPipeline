@@ -387,7 +387,7 @@ std::filesystem::path create_array(const ArrayObject<T> *array,
 
     char* out_title_ = new char[title_.length() + 1];
 
-    strcpy_s(this->out_title_, this->title_.size() + 1, this->title_.c_str());
+    strcpy(out_title_, title_.c_str());
 
     StrType stype_(H5T_C_S1, title_.length() + 1);
 
