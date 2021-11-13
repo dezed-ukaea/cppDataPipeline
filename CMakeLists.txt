@@ -1,11 +1,26 @@
 CMAKE_MINIMUM_REQUIRED( VERSION 3.12 )
 
+
+IF (NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
+    set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "Choose the type of build." FORCE)
+    message(STATUS "CMake Build type not specified: Using ${CMAKE_BUILD_TYPE} by default")
+ENDIF()
+
 PROJECT( fdpapi
     VERSION 0.1.0
     DESCRIPTION "C++ API for the FAIR Data Pipeline"
     HOMEPAGE_URL ""
     LANGUAGES CXX C
 )
+
+IF( CMAKE_BUILD_TYPE MATCHES Debug )
+    set( LIB_POST_FIX "-d" CACHE STRING "Libarary Postfix" FORCE)
+    set( LIB_POST_FIX_MIN "d" CACHE STRING "Libarary Minimum Postfix" FORCE)
+    message(STATUS "Library Postfix set to ${LIB_POST_FIX}")
+ELSE()
+    set( LIB_POST_FIX "" CACHE STRING "Libarary Postfix" FORCE)
+    message(STATUS "Library Postfix set to ${LIB_POST_FIX}")
+ENDIF()
 
 INCLUDE( ExternalProject )
 INCLUDE( GNUInstallDirs )
