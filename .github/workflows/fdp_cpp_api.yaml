@@ -40,8 +40,6 @@ jobs:
   Build_Windows:
     name: Build Windows
     runs-on: windows-latest
-    env: 
-      HDF5_ROOT: ${{ runner.temp }}\HDF5_ROOT
     strategy:
       fail-fast: false
     steps:
@@ -58,5 +56,9 @@ jobs:
       - name: Configure Library
         run: |
           cmake -Bbuild -DFDPAPI_BUILD_TESTS=ON
+        env: 
+          HDF5_ROOT: ${{ runner.temp }}\HDF5_ROOT
       - name: Compile FDP-Cpp-API
         run: cmake --build build --config=Release
+        env: 
+          HDF5_ROOT: ${{ runner.temp }}\HDF5_ROOT
