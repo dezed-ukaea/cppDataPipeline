@@ -40,6 +40,8 @@ jobs:
   Build_Windows:
     name: Build Windows
     runs-on: windows-latest
+    env: 
+      HDF5_ROOT: ${{ RUNNER_TEMP }}\HDF5_ROOT
     strategy:
       fail-fast: false
     steps:
@@ -53,7 +55,6 @@ jobs:
           cd hdf
           msiexec /i HDF5-1.12.1-win64.msi /quiet /qn /norestart /log log.log INSTALL_ROOT="$Env:RUNNER_TEMP\HDF5_ROOT" | Out-Null
           gc log.log
-          refreshenv
       - name: Configure Library
         run: |
           cmake -Bbuild -DFDPAPI_BUILD_TESTS=ON
