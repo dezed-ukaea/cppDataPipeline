@@ -3,7 +3,7 @@ name: FDP C++ API
 on: [push]
 
 jobs:
-  Build Ubuntu:
+  Build_Ubuntu:
     name: Build
     runs-on: ubuntu-latest
     strategy:
@@ -53,7 +53,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-  Build MacOS:
+  Build_MacOS:
     name: Build
     runs-on: macOS-latest
     strategy:
