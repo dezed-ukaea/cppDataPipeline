@@ -55,19 +55,19 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
   Build MacOS:
     name: Build
-      runs-on: macOS-latest
-      strategy:
-        fail-fast: false
-      steps:
-        - uses: actions/checkout@v2
-        - name: Install Dependencies
-          run: |
-            brew install cmake
-            brew install hdf5
-            brew install curl
-        - name: Configure Library
-          run: |
-            cmake -Bbuild -DFDPAPI_BUILD_TESTS=ON
-        - name: Build Library
-          run: |
-            cmake --build build
+    runs-on: macOS-latest
+    strategy:
+      fail-fast: false
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install Dependencies
+        run: |
+          brew install cmake
+          brew install hdf5
+          brew install curl
+      - name: Configure Library
+        run: |
+          cmake -Bbuild -DFDPAPI_BUILD_TESTS=ON
+      - name: Build Library
+        run: |
+          cmake --build build
