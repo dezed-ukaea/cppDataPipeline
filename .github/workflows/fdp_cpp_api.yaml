@@ -51,7 +51,7 @@ jobs:
           wget -O hdf5.zip https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.12/hdf5-1.12.1/bin/windows/hdf5-1.12.1-Std-win10_64-vs14.zip
           tar -xf hdf5.zip
           cd hdf
-          msiexec /i HDF5-1.12.1-win64.msi /quiet /qn /norestart /log log.log INSTALL_ROOT="$RUNNER_TEMP\HDF5_ROOT" | Out-Null
+          msiexec /i HDF5-1.12.1-win64.msi /quiet /qn /norestart /log log.log INSTALL_ROOT="$Env:RUNNER_TEMP\HDF5_ROOT" | Out-Null
           gc log.log
           refreshenv
       - name: Configure Library
