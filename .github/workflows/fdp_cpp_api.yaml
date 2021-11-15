@@ -45,10 +45,6 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: ilammy/msvc-dev-cmd@v1
-      - name: grant Full Access to c:\windows\temp directory
-       run: |
-         icacls "C:\Windows\Temp" /q /c /t /grant Users:F /T
-
       - name: Install Dependencies
         run: |
           choco install wget
