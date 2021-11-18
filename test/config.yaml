@@ -2,11 +2,11 @@ fail_on_hash_mismatch: True
 run_metadata: 
   description: "A test model"
   remote_data_registry_url: https://data.scrc.uk/api/ 
-  local_data_registry_url: https://localhost:8000/api/
+  local_data_registry_url: http://127.0.0.1:8000/api/
   local_repo: 
   default_input_namespace: SCRC 
   default_output_namespace: EERA
-  default_data_store: "/datastore"
+  default_data_store: "/data_store"
   always_copy_to_store: False
 read:
   - data_product: fixed-parameters/T_lat

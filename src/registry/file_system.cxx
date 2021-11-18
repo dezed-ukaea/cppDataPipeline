@@ -44,7 +44,7 @@ std::filesystem::path LocalFileSystem::get_data_store() const {
     return data_dir_;
   } else {
     return std::filesystem::path(std::getenv("HOME")) /
-           std::filesystem::path("datastore");
+           std::filesystem::path("data_store");
   }
 }
 

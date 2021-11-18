@@ -2,4 +2,5 @@ build/
 .DS_STORE
 .vscode
 .bash_profile
-test/datastore/
+test/data_store/
+.fair

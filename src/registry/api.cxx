@@ -31,7 +31,7 @@ void Query::append(std::string key, std::string value) {
 std::filesystem::path Query::build_query() {
   APILogger->debug("API:Query: Building query string.");
   if (components_.empty()) {
-    std::string query_path_ = (std::filesystem::path(string_repr_) / fragments_).string();
+    std::string query_path_ = string_repr_ + "/" + fragments_.string();
     if (!fragments_.empty())
       query_path_ += "/";
     return query_path_;

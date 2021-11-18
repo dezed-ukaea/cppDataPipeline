@@ -21,6 +21,7 @@
 You can build and test the library using CMake, this implementation requires C++17 or later as it makes use of the `std::filesystem` library. 
 All dependencies are externally fetched except HDF5 which needs to be installed and HDF5_ROOT present as an environmental variable:
 - [HDF5](http://www.hdfgroup.org/ftp/HDF5/current/src/)
+
 It is recomended that you install CURL prior to installation of this API
 - [CURL](https://curl.se/libcurl/)
 

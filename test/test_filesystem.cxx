@@ -16,7 +16,7 @@ using namespace FDP;
 TEST(FDPAPITest, TestTOMLPERead) {
   APILogger->set_level(spdlog::level::debug);
   const std::filesystem::path test_file =
-      std::filesystem::path(TESTDIR) / std::filesystem::path("test_pe.toml");
+      std::filesystem::path(TESTDIR) / std::filesystem::path("data") / std::filesystem::path("test_pe.toml");
   ASSERT_EQ(read_point_estimate_from_toml(test_file), 11);
 }
 //! [TestTOMLPERead]
@@ -25,7 +25,7 @@ TEST(FDPAPITest, TestTOMLPERead) {
 TEST(FDPAPITest, TestTOMLDisRead) {
   APILogger->set_level(spdlog::level::debug);
   const std::filesystem::path test_file =
-      std::filesystem::path(TESTDIR) / std::filesystem::path("test_dis.toml");
+      std::filesystem::path(TESTDIR) / std::filesystem::path("data") / std::filesystem::path("test_dis.toml");
   Normal dis(*read_distribution_from_toml(test_file));
   ASSERT_EQ(dis.mean(), 2.675739);
   ASSERT_EQ(dis.standard_deviation(), 0.5719293);
@@ -36,7 +36,7 @@ TEST(FDPAPITest, TestTOMLDisRead) {
 TEST(FDPAPITest, TestArrayRead) {
   APILogger->set_level(spdlog::level::debug);
   const std::filesystem::path test_file =
-      std::filesystem::path(TESTDIR) / std::filesystem::path("test_array.h5");
+      std::filesystem::path(TESTDIR) / std::filesystem::path("data") / std::filesystem::path("test_array.h5");
   const std::filesystem::path key = "/contact_matrices/home";
 
   ArrayObject<double> *array_ = read_array<double>(test_file, key);
@@ -51,7 +51,7 @@ TEST(FDPAPITest, TestArrayRead) {
 TEST(FDPAPITest, TestTableReadColumn) {
   APILogger->set_level(spdlog::level::debug);
   const std::filesystem::path test_file =
-      std::filesystem::path(TESTDIR) / std::filesystem::path("test_table.h5");
+      std::filesystem::path(TESTDIR) / std::filesystem::path("data") / std::filesystem::path("test_table.h5");
   const std::filesystem::path key = "/conversiontable/scotland";
   const std::string column = "URcode";
 
