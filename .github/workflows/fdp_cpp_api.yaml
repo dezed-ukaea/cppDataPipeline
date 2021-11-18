@@ -20,7 +20,7 @@ jobs:
       - name: Compile FDP-Cpp-API
         run: cmake --build build
       - name: Run Unit Tests
-       run: |
+        run: |
          bash test/test_setup.sh
          cmake --build build --target test
          if [ $? -eq 0 ]; then
