@@ -61,7 +61,10 @@ jobs:
           unzip -q build-wrapper-linux-x86.zip          
           echo "${PWD}/build-wrapper-linux-x86" >> $GITHUB_PATH
       - name: Compile FDP-Cpp-API
-        run: cmake --build build
+        run: build-wrapper-linux-x86-64 --out-dir bw-outputs cmake --build build
+        env:
+          CIBuild: 1
+          BUILD_TESTS: True
       - name: Run Unit Tests
         run: |
          cmake --build build --target test
