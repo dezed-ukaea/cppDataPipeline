@@ -18,10 +18,12 @@
 #include <iterator>
 #include <json/reader.h>
 #include <map>
+#include <regex>
 #include <string>
 #include <vector>
 
 #include "fdp/exceptions.hxx"
+#include "fdp/objects/api_object.hxx"
 #include "fdp/utilities/json.hxx"
 #include "fdp/utilities/logging.hxx"
 
@@ -29,7 +31,7 @@ namespace FDP {
 /*! **************************************************************************
  * @enum RESTAPI
  * @brief selection of either local or remote pipeline running
- * @author K. Zarebski (UKAEA)
+ * @author K. Zarebski (UKAEA) & R. Field
  *
  ****************************************************************************/
 enum class RESTAPI {
@@ -101,14 +103,14 @@ public:
    *
    * @return std::filesystem::path the query as a URL
    **************************************************************************/
-  std::filesystem::path build_query();
+  std::string build_query();
 };
 
 /*! **************************************************************************
  * @class API
  * @brief a class which handles the fetching and posting of information to the
  * FDP data pipeline RestAPI
- * @author K. Zarebski (UKAEA)
+ * @author K. Zarebski (UKAEA) & R. Field
  *
  * The API class has know specific knowledge about the RestAPI but rather
  * provides the interface for sending/receiving data as JSON strings
@@ -121,18 +123,41 @@ public:
    *
    * @param url_root the root of the query address, e.g. localhost:8000/api
    ***************************************************************************/
-  API(std::string url_root) : url_root_(url_root) {}
+  API(std::string url_root)
+      : url_root_(API::appendWithForwardSlash(url_root)) {}
 
   /*! *************************************************************************
    * @brief sends the given 'packet' of information to the RestAPI
-   * @author K. Zarebski (UKAEA)
+   * @author K. Zarebski (UKAEA) & R. Field
    *
-   * @param addr_path the relative path within the RestAPI to send to
+   * @param addr_path the api endpoint a.k.a the table name e.g. "coderun"
    * @param expected_response the expected return HTTP code
-   * @return Json::Value JSON object containing the information for the request
+   * @return Json::Value JSON object containing the information returned by the
+   *request
    ***************************************************************************/
   Json::Value request(const std::filesystem::path &addr_path,
                       long expected_response = 200);
+
+  Json::Value request(const std::string &addr_path,
+                      long expected_response = 200);
+
+  Json::Value request(std::string addr_path, Json::Value &post_data,
+                      const std::string &key, long expected_response, bool PATCH = false);
+
+  Json::Value patch(std::string addr_path, Json::Value &post_data,
+                      const std::string &key, long expected_response = 200);
+    /*! *************************************************************************
+   * @brief post information from a JSON value object to the RestAPI
+   * @author K. Zarebski (UKAEA) & R. Field
+   *
+   * @param addr_path the api endpoint a.k.a the table name e.g. "coderun"
+   * @param post_data the data to transmit as a Json::Value object
+   * @param key api token
+   * @param expected_response the expected HTTP return code, default is 201
+   * @return the result of the API post as a JSON object
+   ***************************************************************************/
+  Json::Value post(const std::string addr_path, Json::Value &post_data,
+                   const std::string &key, long expected_response = 201);
 
   /*! *************************************************************************
    * @brief read a query object and send request to the RestAPI
@@ -143,19 +168,21 @@ public:
    ***************************************************************************/
   Json::Value query(Query query, long expected_response = 200);
 
-  /*! *************************************************************************
-   * @brief post information from a JSON value object to the RestAPI
-   * @author K. Zarebski (UKAEA)
+  Json::Value API::getByJsonQuery(const std::string &addr_path,
+                                  Json::Value &query_data,
+                                  const std::string &key,
+                                  long expected_response = 200);
+
+  /**
+   * @brief get an object from the api by it's id
    *
-   * @param addr_path relative URL path to post to
-   * @param post_data the data to transmit
-   * @param key authorisation key if required
-   * @param expected_response the expected HTTP return code
-   * @return the result of the API post as a JSON object
-   ***************************************************************************/
-  Json::Value post(const std::filesystem::path &addr_path,
-                   Json::Value &post_data, const std::string &key,
-                   long expected_response = 201);
+   * @param table Api endpoint (table)
+   * @param id id of the object
+   * @param expected_response expected responce of the request (default 200)
+   * @return Json::Value
+   */
+  Json::Value getById(std::string &table, int const &id,
+                      long expected_response = 200);
 
   /*! *************************************************************************
    * @brief returns the root URL for the RestAPI used by the API instance
@@ -175,10 +202,38 @@ public:
   void download_file(const std::filesystem::path &url,
                      std::filesystem::path out_path);
 
+  /**
+   * @brief Formats a json object into a string representation which can be used
+   * as a url endpoint query
+   *
+   * @param json_value the json object to be converted typically returned by the
+   * post method
+   * @return std::string
+   */
+  std::string API::jsonToQueryString(Json::Value &json_value);
+
+  /**
+   * @brief escapes space " " characters within a string with it's html
+   * character code (%20)
+   *
+   * @param str string containing space characters
+   * @return std::string string with space characters represented by html
+   * character code "%20"
+   */
+  std::string escapeSpace(std::string &str);
+  /**
+   * @brief Static function to append a given string with a "/" unless the
+   * string is empty or already ends with a "/"
+   *
+   * @param string String to be appended with "/"
+   * @return std::string Appended string
+   */
+  static std::string appendWithForwardSlash(std::string string);
+
 private:
   std::string url_root_;
-  CURL *setup_json_session_(const std::filesystem::path &addr_path,
-                            std::string *response);
+  CURL *setup_json_session_(std::string &addr_path, std::string *response,
+                            long &http_code);
   CURL *setup_download_session_(const std::filesystem::path &addr_path,
                                 FILE *file);
 };

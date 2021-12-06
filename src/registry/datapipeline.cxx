@@ -5,81 +5,59 @@ namespace FDP {
  DataPipelineImpl_::DataPipelineImpl_(const std::filesystem::path &config_file_path,
                     const std::filesystem::path &access_token_file,
                     spdlog::level::level_enum log_level,
-                    RESTAPI api_location)
-      : file_system(new LocalFileSystem(config_file_path)),
-        access_token_file_(access_token_file) {
-    const YAML::Node config_data_ = file_system->get_config_data();
+                    RESTAPI api_location) :
+                    config_(new Config(config_file_path, access_token_file, log_level, api_location))
+       {
 
-    if (!config_data_["run_metadata"]) {
-      APILogger->error(
-          "Failed to obtain run metadata, the key 'run_metadata' is not"
-          " present in the configuration");
-      throw config_parsing_error("No run metadata provided");
+         const YAML::Node api_endpoint_ = (api_location == RESTAPI::LOCAL)
+                                        ? config_->meta_data_()["local_data_registry_url"]
+                                        : config_->meta_data_()["remote_data_registry_url"];
+            const std::string api_root_ = api_endpoint_.as<std::string>();
+
+            api_ = new API(api_root_);
+
+            spdlog::set_default_logger(APILogger);
+            APILogger->set_level(log_level);
+
+            APILogger->info("\n[Configuration]\n\t- Config Path: {0}\n\t- API Root: "
+                            "{1}\n\t- FDP API Token File: {2}",
+                            config_file_path.string(), api_root_,
+                            (access_token_file.empty()) ? "None"
+                                                        : access_token_file.string());
     }
 
-    const YAML::Node run_metadata_ = config_data_["run_metadata"];
-
-    if (api_location == RESTAPI::LOCAL &&
-        !run_metadata_["local_data_registry_url"]) {
-      APILogger->error("Could not determine URL for local repository, key "
-                       "'local_data_registry_url' "
-                       "is absent from configuration");
-      throw config_parsing_error("Failed to read local repository url");
-    }
-
-    else if (api_location == RESTAPI::REMOTE &&
-             !run_metadata_["remote_data_registry_url"]) {
-      APILogger->error("Could not determine URL for remote repository, key "
-                       "'remote_data_registry_url' "
-                       "is absent from configuration");
-      throw config_parsing_error("Failed to read remote repository url");
-    }
-
-    const YAML::Node api_ = (api_location == RESTAPI::LOCAL)
-                                ? run_metadata_["local_data_registry_url"]
-                                : run_metadata_["remote_data_registry_url"];
-    //const std::filesystem::path api_root_ = api_.as<std::string>();
-    const std::string api_root_ = api_.as<std::string>();
-
-    api = new API(api_root_);
-
-    spdlog::set_default_logger(APILogger);
-    APILogger->set_level(log_level);
-
-    APILogger->info("\n[Configuration]\n\t- Config Path: {0}\n\t- API Root: "
-                    "{1}\n\t- FDP API Token File: {2}",
-                    config_file_path.string(), api_root_,
-                    (access_token_file.empty()) ? "None"
-                                                : access_token_file.string());
+  DataPipelineImpl_::~DataPipelineImpl_(){
+    delete config_;
+    delete api_;
   }
 
 Json::Value DataPipelineImpl_::fetch_all_objects() {
   APILogger->debug("DataPipelineImpl_: Fetching all objects from registry");
-  return api->query(ObjectQuery(""));
+  return api_->query(ObjectQuery(""));
 }
 
 Json::Value DataPipelineImpl_::fetch_all_data_products() {
-  return api->query(DataProductQuery(""));
+  return api_->query(DataProductQuery(""));
 }
 
 Json::Value DataPipelineImpl_::fetch_object_by_id(int identifier) {
-  return api->query(ObjectQuery(std::to_string(identifier)));
+  return api_->query(ObjectQuery(std::to_string(identifier)));
 }
 
 Json::Value DataPipelineImpl_::fetch_data_product_by_id(int identifier) {
-  return api->query(DataProductQuery(std::to_string(identifier)));
+  return api_->query(DataProductQuery(std::to_string(identifier)));
 }
 
 Json::Value DataPipelineImpl_::fetch_external_object_by_id(int identifier) {
-  return api->query(ExternalObjectQuery(std::to_string(identifier)));
+  return api_->query(ExternalObjectQuery(std::to_string(identifier)));
 }
 
 Json::Value DataPipelineImpl_::fetch_all_external_objects() {
-  return api->query(ExternalObjectQuery(""));
+  return api_->query(ExternalObjectQuery(""));
 }
 
 Json::Value DataPipelineImpl_::fetch_all_namespaces() {
-  return api->query(NamespaceQuery(""));
+  return api_->query(NamespaceQuery(""));
 }
 
 int DataPipelineImpl_::get_id_from_path(std::filesystem::path path) {
@@ -94,7 +72,7 @@ int DataPipelineImpl_::get_id_from_namespace(std::string name_space) {
 
   NamespaceQuery qnamespace_ = NamespaceQuery();
   qnamespace_.append("name", name_space);
-  Json::Value namespace_json_ = api->query(qnamespace_)[0];
+  Json::Value namespace_json_ = api_->query(qnamespace_)[0];
 
   std::string url_str_ = namespace_json_["url"].asString();
 
@@ -114,11 +92,11 @@ int DataPipelineImpl_::get_id_from_namespace(std::string name_space) {
 }
 
 Json::Value DataPipelineImpl_::fetch_data_store_by_id(int identifier) {
-  return api->query(StorageLocationQuery(std::to_string(identifier)));
+  return api_->query(StorageLocationQuery(std::to_string(identifier)));
 }
 
 Json::Value DataPipelineImpl_::fetch_store_root_by_id(int identifier) {
-  return api->query(StorageRootQuery(std::to_string(identifier)));
+  return api_->query(StorageRootQuery(std::to_string(identifier)));
 }
 
 std::filesystem::path DataPipelineImpl_::download_external_object(
@@ -134,7 +112,7 @@ std::filesystem::path DataPipelineImpl_::download_external_object(
 
   eoquery_.append("doi_or_unique_name", external_object->get_unique_id());
 
-  const Json::Value res_ = api->query(eoquery_);
+  const Json::Value res_ = api_->query(eoquery_);
 
   if (res_.size() == 0) {
     throw rest_apiquery_error("No external object found for '" +
@@ -175,7 +153,7 @@ std::filesystem::path DataPipelineImpl_::download_external_object(
                    (root_loc_ / rel_file_loc_).string());
 
   const std::filesystem::path download_loc_ =
-      (file_system->get_data_store() / rel_file_loc_).parent_path();
+      (config_->get_data_store() / rel_file_loc_).parent_path();
 
   if (std::filesystem::exists(download_loc_ / rel_file_loc_.filename())) {
     const std::string existing_hash_ =
@@ -197,7 +175,7 @@ std::filesystem::path DataPipelineImpl_::download_external_object(
     std::filesystem::create_directories(download_loc_);
   }
 
-  api->download_file(root_loc_ / rel_file_loc_,
+  api_->download_file(root_loc_ / rel_file_loc_,
                      download_loc_ / rel_file_loc_.filename());
 
   if (!std::filesystem::exists(download_loc_ / rel_file_loc_.filename())) {
@@ -222,7 +200,7 @@ std::filesystem::path DataPipelineImpl_::download_data_product(
 
   // Check if there is a namespace for the entry, else use the global default
   const std::string namespace_ =
-      (namespace_local_.empty()) ? file_system->get_default_input_namespace()
+      (namespace_local_.empty()) ? config_->get_default_input_namespace()
                                  : namespace_local_;
   const int ns_id_ = get_id_from_namespace(namespace_);
   const std::string reg_path_ = data_product->get_path().string();
@@ -231,7 +209,7 @@ std::filesystem::path DataPipelineImpl_::download_data_product(
   dpquery_.append("namespace", std::to_string(ns_id_));
   dpquery_.append("name", reg_path_);
 
-  const Json::Value res_ = api->query(dpquery_);
+  const Json::Value res_ = api_->query(dpquery_);
 
   if (res_.size() == 0) {
     throw rest_apiquery_error("No data product found for '" + namespace_ + ":" +
@@ -268,7 +246,7 @@ std::filesystem::path DataPipelineImpl_::download_data_product(
   APILogger->debug("DataPipeline: File download location '{0}'",
                    (root_loc_ / rel_file_loc_).string());
 
-  const std::filesystem::path download_loc_ = file_system->get_data_store() /
+  const std::filesystem::path download_loc_ = config_->get_data_store() /
                                               namespace_ /
                                               std::filesystem::path(reg_path_);
 
@@ -292,7 +270,7 @@ std::filesystem::path DataPipelineImpl_::download_data_product(
     std::filesystem::create_directories(download_loc_);
   }
 
-  api->download_file(root_loc_ / rel_file_loc_,
+  api_->download_file(root_loc_ / rel_file_loc_,
                      download_loc_ / rel_file_loc_.filename());
 
   if (!std::filesystem::exists(download_loc_ / rel_file_loc_.filename())) {
@@ -313,7 +291,7 @@ std::string DataPipelineImpl_::new_source(const YAML::Node &data) {
   post_data_["abbreviation"] = data["source_abbreviation"].as<std::string>();
   post_data_["website"] = data["source_website"].as<std::string>();
 
-  return api->post("source", post_data_, read_key())["url"].asString();
+  return api_->post("source", post_data_, read_key())["url"].asString();
 }
 
 std::string DataPipelineImpl_::new_storage_root(const YAML::Node &data) {
@@ -325,7 +303,7 @@ std::string DataPipelineImpl_::new_storage_root(const YAML::Node &data) {
   post_data_["accessibility"] =
       std::to_string(int(access_ == RegisterObject::Accessibility::CLOSED));
 
-  return api->post("storage_root", post_data_, read_key())["url"].asString();
+  return api_->post("storage_root", post_data_, read_key())["url"].asString();
 }
 
 std::string DataPipelineImpl_::new_storage_location(const YAML::Node &data) {
@@ -334,7 +312,7 @@ std::string DataPipelineImpl_::new_storage_location(const YAML::Node &data) {
   post_data_["hash"] = data["hash"].as<std::string>();
   post_data_["storage_root_id"] = data["storage_root_id"].as<std::string>();
 
-  return api->post("storage_location", post_data_, read_key())["url"]
+  return api_->post("storage_location", post_data_, read_key())["url"]
       .asString();
 }
 
@@ -350,25 +328,31 @@ std::string DataPipelineImpl_::new_external_object(const YAML::Node &data) {
   post_data_["source"] = data["source"].as<std::string>();
   post_data_["original_store"] = data["original_store"].as<std::string>();
 
-  return api->post("external_object", post_data_, read_key())["url"].asString();
+  return api_->post("external_object", post_data_, read_key())["url"].asString();
 }
 
-std::string DataPipelineImpl_::read_key() {
-  if (!std::filesystem::exists(access_token_file_)) {
-    throw std::runtime_error("Failed to find Authorisation token: '" +
-                             access_token_file_.string() + "'");
-  }
-
-  if (access_token_file_.empty()) {
-    APILogger->warn("API:Post: No access token provided for RestAPI POST");
-    return access_token_file_.string();
-  }
-
-  std::ifstream key_(access_token_file_, std::ios::in);
+std::string DataPipelineImpl_::read_token(const std::filesystem::path &token_path){
+  std::ifstream key_(token_path, std::ios::in);
   std::string key_str_;
   key_ >> key_str_;
   key_.close();
   return key_str_;
+}
+
+std::string DataPipelineImpl_::read_key() {
+  if (!std::filesystem::exists(config_->get_access_token_file())) {
+    throw std::runtime_error("Failed to find Authorisation token: '" +
+                             config_->get_access_token_file().string() + "'");
+  }
+
+  if (config_->get_access_token_file().empty()) {
+    APILogger->warn("API:Post: No access token provided for RestAPI POST");
+    return config_->get_access_token_file().string();
+  }
+
+  return read_token(config_->get_access_token_file());
+
+  
 }
 
 void DataPipelineImpl_::register_external_object(
@@ -381,8 +365,8 @@ void DataPipelineImpl_::register_external_object(
   const std::string product_name_ =
       register_entry["product_name"].as<std::string>();
   const std::filesystem::path local_dir_ =
-      file_system->get_data_store() /
-      file_system->get_default_output_namespace() / product_name_;
+      config_->get_data_store() /
+      config_->get_default_output_namespace() / product_name_;
   const std::string time_stamp_ = current_time_stamp();
   const std::filesystem::path temp_file_ =
       calculate_hash_from_string(time_stamp_) + "." + file_type_;
@@ -396,7 +380,7 @@ void DataPipelineImpl_::register_external_object(
 
     const std::string encoded_path_ =
         (root_ / std::filesystem::path(url_encode(path_))).string();
-    api->download_file(encoded_path_, local_dir_ / temp_file_);
+    api_->download_file(encoded_path_, local_dir_ / temp_file_);
   }
 
   const std::string file_hash_ =
@@ -425,7 +409,7 @@ void DataPipelineImpl_::register_external_object(
 }
 
 void DataPipelineImpl_::add_to_register(const std::string &alias) {
-  const YAML::Node config_data_ = file_system->get_config_data();
+  const YAML::Node config_data_ = config_->get_config_data();
 
   APILogger->info("Registering item '{0}'", alias);
 

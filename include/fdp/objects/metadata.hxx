@@ -37,6 +37,13 @@ std::string calculate_hash_from_file(const std::filesystem::path &);
  ****************************************************************************/
 std::string calculate_hash_from_string(const std::string &input);
 
+/**
+ * @brief Generate a random hash
+ * 
+ * @return std::string a random hash
+ */
+std::string generate_random_hash();
+
 /*! **************************************************************************
  * @brief generates a run identifier from configurations given in an API
  * config file

@@ -19,6 +19,7 @@
 #include "spdlog/spdlog.h"
 #include "json/json.h"
 
+#include "fdp/objects/config.hxx"
 #include "fdp/objects/metadata.hxx"
 #include "fdp/registry/api.hxx"
 #include "fdp/registry/data_object.hxx"
@@ -42,11 +43,12 @@ namespace FDP {
  *
  *****************************************************************************/
 class DataPipelineImpl_ {
-public:
-  const LocalFileSystem *file_system;
-  API *api = nullptr;
-  const std::filesystem::path access_token_file_;
+  private:
+    Config *config_;
+    API *api_ = nullptr;
 
+public:
+  
   /*! *************************************************************************
    * @brief construct a DataPipelineImpl_ instance from configurations and setup
    * @author K. Zarebski (UKAEA)
@@ -61,7 +63,15 @@ public:
                     spdlog::level::level_enum log_level = spdlog::level::info,
                     RESTAPI api_location = RESTAPI::LOCAL);
 
-  /*! ************************************************************************
+  /**
+   * @brief Destroy the Data Pipeline Impl_ object
+   * 
+   */
+  ~DataPipelineImpl_();
+
+  API *getApi(){return api_;}
+  
+/*! ************************************************************************
    * @brief Fetch all objects from the RestAPI matching the category 'object'
    * @author K. Zarebski (UKAEA)
    *
@@ -251,6 +261,8 @@ public:
    * @return the key as a string
    **************************************************************************/
   std::string read_key();
+
+  std::string static read_token(const std::filesystem::path &token_path);
 };
 
 /*! **************************************************************************

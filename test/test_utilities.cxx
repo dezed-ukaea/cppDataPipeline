@@ -1,3 +1,6 @@
+#ifndef TESTDIR
+#define TESTDIR ""
+#endif
 #include "fdp/exceptions.hxx"
 #include "fdp/utilities/doi.hxx"
 #include "fdp/utilities/json.hxx"

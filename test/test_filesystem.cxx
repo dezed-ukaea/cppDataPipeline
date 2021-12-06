@@ -1,3 +1,6 @@
+#ifndef TESTDIR
+#define TESTDIR ""
+#endif
 #include "H5Cpp.h"
 #include "fdp/objects/data.hxx"
 #include "fdp/objects/distributions.hxx"

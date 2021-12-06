@@ -1,3 +1,6 @@
+#ifndef TESTDIR
+#define TESTDIR ""
+#endif
 #include "fdp/fdp.hxx"
 #include "fdp/objects/metadata.hxx"
 #include "fdp/registry/datapipeline.hxx"
@@ -101,31 +104,31 @@ TEST(FDPAPITest, TestHashFile) {
   std::cout << "HASH: " << file_hash_ << std::endl;
 }
 
-TEST(FDPAPITest, DISABLED_TestDownloadTOMLFile) {
-  DataPipelineImpl_ *data_pipeline_ = init_pipeline();
-  const std::vector<ReadObject::DataProduct *> data_products_ =
-      data_pipeline_->file_system->read_data_products();
-  ASSERT_TRUE(data_products_[0]);
-  ASSERT_NO_THROW(data_pipeline_->download_data_product(data_products_[0]));
-}
+// TEST(FDPAPITest, DISABLED_TestDownloadTOMLFile) {
+//   DataPipelineImpl_ *data_pipeline_ = init_pipeline();
+//   const std::vector<ReadObject::DataProduct *> data_products_ =
+//       data_pipeline_->get_file_system()->read_data_products();
+//   ASSERT_TRUE(data_products_[0]);
+//   ASSERT_NO_THROW(data_pipeline_->download_data_product(data_products_[0]));
+// }
 
-TEST(FDPAPITest, DISABLED_TestDownloadHDF5File) {
-  DataPipelineImpl_ *data_pipeline_ = init_pipeline();
-  const std::vector<ReadObject::DataProduct *> data_products_ =
-      data_pipeline_->file_system->read_data_products();
-  ASSERT_NO_THROW(data_pipeline_->download_data_product(data_products_[1]));
-}
+// TEST(FDPAPITest, DISABLED_TestDownloadHDF5File) {
+//   DataPipelineImpl_ *data_pipeline_ = init_pipeline();
+//   const std::vector<ReadObject::DataProduct *> data_products_ =
+//       data_pipeline_->get_file_system()->read_data_products();
+//   ASSERT_NO_THROW(data_pipeline_->download_data_product(data_products_[1]));
+// }
 
-TEST(FDPAPITest, DISABLED_TestAddToRegister) {
-  DataPipelineImpl_ *data_pipeline_ = init_pipeline(true);
-  data_pipeline_->add_to_register("raw-mortality-data");
-}
+// TEST(FDPAPITest, DISABLED_TestAddToRegister) {
+//   DataPipelineImpl_ *data_pipeline_ = init_pipeline(true);
+//   data_pipeline_->add_to_register("raw-mortality-data");
+// }
 
-TEST(FDPAPITest, DISABLED_TestDownloadExternalObject) {
-  DataPipelineImpl_ *data_pipeline_ = init_pipeline();
-  const std::vector<ReadObject::ExternalObject *> external_objs =
-      data_pipeline_->file_system->read_external_objects();
+// TEST(FDPAPITest, DISABLED_TestDownloadExternalObject) {
+//   DataPipelineImpl_ *data_pipeline_ = init_pipeline();
+//   const std::vector<ReadObject::ExternalObject *> external_objs =
+//       data_pipeline_->get_file_system()->read_external_objects();
 
-  ASSERT_TRUE(external_objs[0]);
-  ASSERT_NO_THROW(data_pipeline_->download_external_object(external_objs[0]));
-}
+//   ASSERT_TRUE(external_objs[0]);
+//   ASSERT_NO_THROW(data_pipeline_->download_external_object(external_objs[0]));
+// }
