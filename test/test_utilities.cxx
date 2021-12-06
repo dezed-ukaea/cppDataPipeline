@@ -54,6 +54,7 @@ TEST(FDAPITest, TestRandomHash) {
   // Use a vector and a set to store 100 random hashes and ensure they are unique
   std::vector<std::string> random_hashes;
   std::set<std::string> unique_random_hashes;
+  std::string random_hash_;
   for(int i = 0; i <=1000; i++){
     std::string random_hash_ = generate_random_hash();
     random_hashes.push_back(random_hash_);
