@@ -20,11 +20,12 @@ std::string calculate_hash_from_string(const std::string &input) {
 }
 
 std::string generate_random_hash() {
-  // Set seed to time (random)
-  srand (std::time(nullptr));
-  // Calculate random hash using rand()
-  std::string rnd_ = calculate_hash_from_string(std::to_string(rand()));
-  return rnd_;
+  std::mt19937 generator{std::random_device{}()};
+  std::uniform_int_distribution<int> distribution{'a', '9'};
+  std::string rand_str(12, '\0');
+    for(auto& dis: rand_str)
+        dis = distribution(generator);
+  return calculate_hash_from_string(rand_str);
 }
 
 std::string generate_run_id(std::filesystem::path config_file_path) {
