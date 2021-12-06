@@ -17,11 +17,11 @@ protected:
   void SetUp() override {}
   std::string getHomeDirectory() {
     std::string HomeDirectory;
-    #ifdef unix
-        return getenv("HOME");
-    #elif defined(_WIN32)
+    #ifdef _WIN32
         HomeDirectory = getenv("HOMEDRIVE");
         HomeDirectory += getenv("HOMEPATH");
+    #else
+        HomeDirectory = getenv("HOME");
     #endif
     return HomeDirectory;
   }
