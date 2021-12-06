@@ -179,7 +179,7 @@ Json::Value API::getByJsonQuery(const std::string &addr_path,
   return query_data;
 }
 
-Json::Value API::getById(std::string &table, int const &id,
+Json::Value API::getById(const std::string &table, int const &id,
                          long expected_response) {
   std::string query = table + "/" + std::to_string(id) + "/";
   std::filesystem::path queryPath = query;

@@ -141,10 +141,10 @@ public:
   Json::Value request(const std::string &addr_path,
                       long expected_response = 200);
 
-  Json::Value request(std::string addr_path, Json::Value &post_data,
+  Json::Value request(const std::string addr_path, Json::Value &post_data,
                       const std::string &key, long expected_response, bool PATCH = false);
 
-  Json::Value patch(std::string addr_path, Json::Value &post_data,
+  Json::Value patch(const std::string addr_path, Json::Value &post_data,
                       const std::string &key, long expected_response = 200);
     /*! *************************************************************************
    * @brief post information from a JSON value object to the RestAPI
@@ -181,7 +181,7 @@ public:
    * @param expected_response expected responce of the request (default 200)
    * @return Json::Value
    */
-  Json::Value getById(std::string &table, int const &id,
+  Json::Value getById(const std::string &table, int const &id,
                       long expected_response = 200);
 
   /*! *************************************************************************
