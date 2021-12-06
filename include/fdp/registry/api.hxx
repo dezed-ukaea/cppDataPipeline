@@ -168,7 +168,7 @@ public:
    ***************************************************************************/
   Json::Value query(Query query, long expected_response = 200);
 
-  Json::Value API::getByJsonQuery(const std::string &addr_path,
+  Json::Value getByJsonQuery(const std::string &addr_path,
                                   Json::Value &query_data,
                                   const std::string &key,
                                   long expected_response = 200);
@@ -210,7 +210,7 @@ public:
    * post method
    * @return std::string
    */
-  std::string API::jsonToQueryString(Json::Value &json_value);
+  std::string jsonToQueryString(Json::Value &json_value);
 
   /**
    * @brief escapes space " " characters within a string with it's html
