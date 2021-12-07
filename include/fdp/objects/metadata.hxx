@@ -17,6 +17,7 @@
 #include <iostream>
 #include <sstream>
 #include <random>
+#include <chrono>
 
 #include "digestpp.hpp"
 

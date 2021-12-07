@@ -20,12 +20,33 @@ std::string calculate_hash_from_string(const std::string &input) {
 }
 
 std::string generate_random_hash() {
-  std::mt19937 generator{std::random_device{}()};
-  std::uniform_int_distribution<int> distribution{'a', '9'};
-  std::string rand_str(12, '\0');
-    for(auto& dis: rand_str)
-        dis = distribution(generator);
-  return calculate_hash_from_string(rand_str);
+  std::string random_string;
+
+  // Use Both the random_device and chrono high resolution clock to generate
+  // a good random seed
+
+  std::random_device rd;
+  std::mt19937::result_type seed =
+      rd() ^
+      ((std::mt19937::result_type)
+           std::chrono::duration_cast<std::chrono::seconds>(
+               std::chrono::system_clock::now().time_since_epoch())
+               .count() +
+       (std::mt19937::result_type)
+           std::chrono::duration_cast<std::chrono::microseconds>(
+               std::chrono::high_resolution_clock::now().time_since_epoch())
+               .count());
+
+  // Using mt19937 and a uniform distribution generate a 24 character random
+  // string
+  std::mt19937 gen(seed);
+  std::uniform_int_distribution<unsigned> distrib('a', '9');
+
+  for (unsigned long j = 0; j < 24; ++j) {
+    random_string += distrib(gen);
+  }
+
+  return calculate_hash_from_string(random_string);
 }
 
 std::string generate_run_id(std::filesystem::path config_file_path) {

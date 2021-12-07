@@ -59,7 +59,7 @@ TEST(FDAPITest, TestRandomHash) {
     std::string random_hash_ = generate_random_hash();
     random_hashes.push_back(random_hash_);
     unique_random_hashes.insert(random_hash_);
-    //APILogger->info("Generated Random Hash: {0}", random_hash_);
+    APILogger->info("Generated Random Hash: {0}", random_hash_);
   }
   ASSERT_EQ(random_hashes.size(), unique_random_hashes.size());
 }
