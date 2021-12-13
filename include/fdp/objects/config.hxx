@@ -15,9 +15,11 @@
 #include <string>
 #include <filesystem>
 #include <yaml-cpp/yaml.h>
+#include <regex>
 
 #include "fdp/registry/file_system.hxx"
 #include "fdp/registry/api.hxx"
+#include "fdp/objects/api_object.hxx"
 
 namespace FDP {
     /**
@@ -29,16 +31,33 @@ namespace FDP {
         private:            
             const std::filesystem::path config_file_path_;
             const std::filesystem::path config_dir_;
-            const YAML::Node config_data_;
             const std::filesystem::path script_file_path_;
-            const std::string api_url_;
-            const std::string token_;
-            const std::filesystem::path access_token_file_;
+            YAML::Node config_data_;            
+            std::string api_url_;
+            std::string token_;
+            std::shared_ptr<API> api_;
+
+            std::unique_ptr<ApiObject> user_;
+            std::unique_ptr<ApiObject> author_;
+
+            std::unique_ptr<ApiObject> config_storage_root_;
+            std::unique_ptr<ApiObject> config_storage_location_;
+            std::unique_ptr<ApiObject> config_file_type_;
+            std::unique_ptr<ApiObject> config_obj_;
+
+            std::unique_ptr<ApiObject> script_storage_root_;
+            std::unique_ptr<ApiObject> script_storage_location_;
+            std::unique_ptr<ApiObject> script_file_type_;
+            std::unique_ptr<ApiObject> script_obj_;
+
+            std::unique_ptr<ApiObject> code_repo_storage_root_;
+            std::unique_ptr<ApiObject> code_repo_storage_location_;
+            std::unique_ptr<ApiObject> code_repo_;
+            
 
         public:
             Config(const std::filesystem::path &config_file_path,
-            const std::filesystem::path &access_token_file,
-            spdlog::level::level_enum log_level,
+            const std::string &token,
             RESTAPI api_location);
 
             ~Config();
@@ -46,15 +65,21 @@ namespace FDP {
             YAML::Node meta_data_() const;
 
             std::filesystem::path get_config_file_path() const {return config_file_path_;}
-            std::filesystem::path get_access_token_file() const {return access_token_file_;}
+            std::string get_token() const {return token_;}
+            std::string get_api_url() const {return api_url_;}
             std::filesystem::path get_data_store() const;
 
             std::string get_default_input_namespace() const;
             std::string get_default_output_namespace() const;
 
+            void initialise(RESTAPI api_location);
+            void validate_config(std::filesystem::path yaml_path, RESTAPI api_location);
+
             static YAML::Node parse_yaml(std::filesystem::path yaml_path);
-            YAML::Node validated_config(std::filesystem::path yaml_path, RESTAPI api_location) const;
+            
             YAML::Node get_config_data() const {return config_data_;}
+
+            std::shared_ptr<API> get_api(){return api_;}
 
     };
 };

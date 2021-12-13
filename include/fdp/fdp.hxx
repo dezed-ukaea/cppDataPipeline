@@ -6,9 +6,9 @@ public:
   // 'initialise' method for the API
   explicit DataPipeline(
       const std::filesystem::path &config_file_path,
-      const std::filesystem::path &access_token_file = "",
+      std::string token = "",
       spdlog::level::level_enum log_level = spdlog::level::info)
-      : pimpl_(new DataPipelineImpl_(config_file_path, access_token_file,
+      : pimpl_(new DataPipelineImpl_(config_file_path, token,
                                      log_level)),
         session_id_(generate_run_id(config_file_path)) {
     if (!std::filesystem::exists(config_file_path)) {

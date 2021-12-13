@@ -45,7 +45,6 @@ namespace FDP {
 class DataPipelineImpl_ {
   private:
     Config *config_;
-    API *api_ = nullptr;
 
 public:
   
@@ -59,7 +58,7 @@ public:
    * @param api_location whether to use local/remote RestAPI endpoint
    ***************************************************************************/
   DataPipelineImpl_(const std::filesystem::path &config_file_path,
-                    const std::filesystem::path &access_token_file,
+                    const std::string token,
                     spdlog::level::level_enum log_level = spdlog::level::info,
                     RESTAPI api_location = RESTAPI::LOCAL);
 
@@ -68,8 +67,6 @@ public:
    * 
    */
   ~DataPipelineImpl_();
-
-  API *getApi(){return api_;}
   
 /*! ************************************************************************
    * @brief Fetch all objects from the RestAPI matching the category 'object'
@@ -260,7 +257,6 @@ public:
    *
    * @return the key as a string
    **************************************************************************/
-  std::string read_key();
 
   std::string static read_token(const std::filesystem::path &token_path);
 };

@@ -12,69 +12,78 @@
 
 using namespace FDP;
 
-DataPipelineImpl_ *init_pipeline(bool use_local = true) {
-  // if (std::filesystem::exists(std::filesystem::path(TESTDIR) /
-  //                             std::filesystem::path("datastore"))) {
-  //   std::filesystem::remove_all(std::filesystem::path(TESTDIR) /
-  //                               std::filesystem::path("datastore"));
-  // }
+class RegistryTest : public ::testing::Test {
+protected:
+  void SetUp() override {}
+  std::string getHomeDirectory() {
+    std::string HomeDirectory;
+#ifdef _WIN32
+    HomeDirectory = getenv("HOMEDRIVE");
+    HomeDirectory += getenv("HOMEPATH");
+#else
+    HomeDirectory = getenv("HOME");
+#endif
+    return HomeDirectory;
+  }
 
+  DataPipelineImpl_ *init_pipeline(bool use_local = true) {
+
+    const std::filesystem::path config_path_ =
+        std::filesystem::path(TESTDIR) / "config.yaml";
+    APILogger->set_level(spdlog::level::debug);
+
+    return new DataPipelineImpl_(config_path_, token, spdlog::level::debug,
+                                 static_cast<RESTAPI>(use_local));
+  }
+
+  std::string token =
+      DataPipelineImpl_::read_token(std::filesystem::path(getHomeDirectory()) /
+                                    ".fair" / "registry" / "token");
+  void TearDown() override {}
+};
+
+TEST_F(RegistryTest, TestDataPipelineInit) {
   const std::filesystem::path config_path_ =
       std::filesystem::path(TESTDIR) / "config.yaml";
   APILogger->set_level(spdlog::level::debug);
-
-  return new DataPipelineImpl_(config_path_, "", spdlog::level::debug,
-                               static_cast<RESTAPI>(use_local));
+  DataPipeline(config_path_, token, spdlog::level::debug);
 }
 
-TEST(FDPAPITest, TestDataPipelineInit) {
-  // if (std::filesystem::exists(std::filesystem::path(TESTDIR) /
-  //                             std::filesystem::path("datastore"))) {
-  //   std::filesystem::remove_all(std::filesystem::path(TESTDIR) /
-  //                               std::filesystem::path("datastore"));
-  // }
-
-  const std::filesystem::path config_path_ =
-      std::filesystem::path(TESTDIR) / "config.yaml";
-  APILogger->set_level(spdlog::level::debug);
-  DataPipeline(config_path_, "", spdlog::level::debug);
-}
-
-TEST(FDPAPITest, TestLogLevelSet) {
+TEST_F(RegistryTest, TestLogLevelSet) {
   init_pipeline();
   ASSERT_EQ(spdlog::get_level(), spdlog::level::debug);
 }
 
-TEST(FDPAPITest, TestURLEncode) {
+TEST_F(RegistryTest, TestURLEncode) {
   const std::string start_string_ = "fixed-parameters/T_lat";
   const std::string expected_ = "fixed-parameters%2FT_lat";
 
   ASSERT_EQ(url_encode(start_string_), expected_);
 }
 
-TEST(FDPAPITest, TestAccessObjectRegistry) {
+TEST_F(RegistryTest, TestAccessObjectRegistry) {
   ASSERT_NO_THROW(init_pipeline()->fetch_all_objects());
 }
 
-TEST(FDPAPITest, DISABLED_TestAccessObject) {
+TEST_F(RegistryTest, DISABLED_TestAccessObject) {
   ASSERT_NO_THROW(init_pipeline()->fetch_object_by_id(72974));
 }
 
-TEST(FDPAPITest, TestAccessDataRegistry) {
+TEST_F(RegistryTest, TestAccessDataRegistry) {
   ASSERT_NO_THROW(init_pipeline()->fetch_all_data_products());
 }
 
-TEST(FDPAPITest, DISABLED_TestAccessData) {
+TEST_F(RegistryTest, DISABLED_TestAccessData) {
   ASSERT_NO_THROW(init_pipeline()->fetch_object_by_id(3337));
 }
 
-TEST(FDPAPITest, TestFileSystemSetup) {
+TEST_F(RegistryTest, TestFileSystemSetup) {
   LocalFileSystem(std::filesystem::path(TESTDIR) / "config.yaml");
   ASSERT_TRUE(
       std::filesystem::exists(std::filesystem::path(TESTDIR) / "data_store"));
 }
 
-TEST(FDPAPITest, TestGetConfigDataTOML) {
+TEST_F(RegistryTest, TestGetConfigDataTOML) {
   LocalFileSystem *fs_ =
       new LocalFileSystem(std::filesystem::path(TESTDIR) / "config.yaml");
   const std::vector<ReadObject::DataProduct *> data_products_ =
@@ -86,7 +95,7 @@ TEST(FDPAPITest, TestGetConfigDataTOML) {
   ASSERT_EQ(path_, "fixed-parameters/T_lat");
 }
 
-TEST(FDPAPITest, TestGetConfigDataHDF5) {
+TEST_F(RegistryTest, TestGetConfigDataHDF5) {
   LocalFileSystem *fs_ =
       new LocalFileSystem(std::filesystem::path(TESTDIR) / "config.yaml");
   const std::vector<ReadObject::DataProduct *> data_products_ =
@@ -98,7 +107,7 @@ TEST(FDPAPITest, TestGetConfigDataHDF5) {
   ASSERT_EQ(path_, "prob_hosp_and_cfr/data_for_scotland");
 }
 
-TEST(FDPAPITest, TestHashFile) {
+TEST_F(RegistryTest, TestHashFile) {
   const std::string file_hash_ =
       calculate_hash_from_file(std::filesystem::path(TESTDIR) / "config.yaml");
   std::cout << "HASH: " << file_hash_ << std::endl;

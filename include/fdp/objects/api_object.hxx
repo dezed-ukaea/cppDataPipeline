@@ -3,6 +3,7 @@
 
 #include <string>
 #include <cstddef>
+#include <json/value.h>
 
 #include "fdp/utilities/logging.hxx"
 
@@ -13,14 +14,14 @@ namespace FDP {
      */
     class ApiObject {
         private:
-            std::string uri_;
+            Json::Value obj_;
         public:
             /**
              * @brief Construct a new Api Object object
              * 
              * @param uri uri of the api object e.g. http://127.0.0.1/object/1
              */
-            ApiObject(std::string uri) : uri_(uri){}
+            ApiObject(Json::Value obj) : obj_(obj){}
             /**
              * @brief Get the object id from the uri
              * 
@@ -42,7 +43,14 @@ namespace FDP {
              * 
              * @return std::string the uri of the object e.g. http://127.0.0.1/object/1
              */
-            std::string get_uri() const {return uri_;}
+            std::string get_uri() const;
+
+            std::string get_value_as_string(std::string key) const;
+            int get_value_as_int(std::string key) const;
+
+            Json::Value get_object(){return obj_;}
+
+            bool is_empty();
     };
 };
 

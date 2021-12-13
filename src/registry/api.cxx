@@ -30,8 +30,8 @@ void Query::append(std::string key, std::string value) {
 std::string Query::build_query() {
   APILogger->debug("API:Query: Building query string.");
   if (components_.empty()) {
-    std::string query_path_ = API::appendWithForwardSlash(string_repr_) +
-                              API::appendWithForwardSlash(fragments_.string());
+    std::string query_path_ = API::append_with_forward_slash(string_repr_) +
+                              API::append_with_forward_slash(fragments_.string());
     APILogger->debug("API:Query: Built query string: {0}", query_path_);
     return query_path_;
   }
@@ -58,8 +58,8 @@ std::string Query::build_query() {
     // Add '?' to state it is a query
     query_str_ = "?" + as_strs_[0];
   }
-  const std::string query_out_ = API::appendWithForwardSlash(string_repr_) +
-                                 API::appendWithForwardSlash(query_str_);
+  const std::string query_out_ = API::append_with_forward_slash(string_repr_) +
+                                 API::append_with_forward_slash(query_str_);
 
   APILogger->debug("API:Query: Built query string: {0}", query_out_);
 
@@ -72,8 +72,18 @@ std::string url_encode(std::string url) {
 }
 
 CURL *API::setup_json_session_(std::string &addr_path, std::string *response,
-                               long &http_code) {
+                               long &http_code, std::string token) {
   CURL *curl_ = curl_easy_init();
+
+
+  if (!token.empty()) {
+    APILogger->debug("Adding token: {0} to headers", token);
+    struct curl_slist *headers = NULL;
+    headers = curl_slist_append(
+        headers, (std::string("Authorization: token ") + token).c_str());
+    curl_easy_setopt(curl_, CURLOPT_HTTPHEADER, headers);
+  }
+
   APILogger->debug("API:JSONSession: Attempting to access: " + addr_path);
   curl_easy_setopt(curl_, CURLOPT_URL, addr_path.c_str());
   curl_easy_setopt(curl_, CURLOPT_NOPROGRESS, 1);
@@ -119,12 +129,12 @@ CURL *API::setup_download_session_(const std::filesystem::path &addr_path,
   return curl_;
 }
 
-Json::Value API::request(const std::filesystem::path &addr_path,
-                         long expected_response) {
-  return request(addr_path.string(), expected_response);
+Json::Value API::get_request(const std::filesystem::path &addr_path,
+                         long expected_response, std::string token) {
+  return get_request(addr_path.string(), expected_response);
 }
 
-Json::Value API::request(const std::string &addr_path, long expected_response) {
+Json::Value API::get_request(const std::string &addr_path, long expected_response, std::string token) {
   Json::Value root_;
   Json::CharReaderBuilder json_charbuilder_;
 
@@ -134,7 +144,7 @@ Json::Value API::request(const std::string &addr_path, long expected_response) {
 
   std::string response_str_;
 
-  auto *session_ = setup_json_session_(search_str_, &response_str_, http_code);
+  auto *session_ = setup_json_session_(search_str_, &response_str_, http_code, token);
 
   const std::unique_ptr<Json::CharReader> json_reader_(
       json_charbuilder_.newCharReader());
@@ -168,25 +178,26 @@ Json::Value API::request(const std::string &addr_path, long expected_response) {
 }
 
 Json::Value API::query(Query query, long expected_response) {
-  return request(query.build_query(), expected_response);
+  return get_request(query.build_query(), expected_response);
 }
 
-Json::Value API::getByJsonQuery(const std::string &addr_path,
-                                Json::Value &query_data, const std::string &key,
-                                long expected_response) {
+Json::Value API::get_by_json_query(const std::string &addr_path,
+                                Json::Value &query_data,
+                                long expected_response, std::string token) {
 
   // Check for API root in urls
-  return query_data;
+  std::string q_ = append_with_forward_slash(addr_path) + json_to_query_string(query_data);
+  return get_request(q_, expected_response, token);
 }
 
-Json::Value API::getById(const std::string &table, int const &id,
-                         long expected_response) {
+Json::Value API::get_by_id(const std::string &table, int const &id,
+                         long expected_response, std::string token) {
   std::string query = table + "/" + std::to_string(id) + "/";
   std::filesystem::path queryPath = query;
-  return request(queryPath, expected_response);
+  return get_request(queryPath, expected_response, token);
 }
 
-std::string API::jsonToQueryString(Json::Value &json_value) {
+std::string API::json_to_query_string(Json::Value &json_value) {
   // Start the string with a ?
   std::string rtn = "?";
   // Need to remove the api address from any values using regex
@@ -219,29 +230,29 @@ std::string API::jsonToQueryString(Json::Value &json_value) {
     }
   }
   // Return the string with spaces converted to html characters
-  return escapeSpace(rtn);
+  return escape_space(rtn);
 }
 
-std::string API::escapeSpace(std::string &str) {
+std::string API::escape_space(std::string &str) {
   // Using regex replace space with html character (%20)
   return std::string(std::regex_replace(str, std::regex(" "), "%20"));
 }
 
 Json::Value API::post(std::string addr_path, Json::Value &post_data,
-                      const std::string &key, long expected_response) {
-  return API::request(addr_path, post_data, key, expected_response, false);
+                      const std::string &token, long expected_response) {
+  return API::post_patch_request(addr_path, post_data, token, expected_response, false);
 }
 
 Json::Value API::patch(std::string addr_path, Json::Value &post_data,
-                       const std::string &key, long expected_response) {
-  return API::request(addr_path, post_data, key, expected_response, false);
+                       const std::string &token, long expected_response) {
+  return API::post_patch_request(addr_path, post_data, token, expected_response, false);
 }
 
-Json::Value API::request(std::string addr_path, Json::Value &post_data,
-                         const std::string &key, long expected_response,
+Json::Value API::post_patch_request(std::string addr_path, Json::Value &post_data,
+                         const std::string &token, long expected_response,
                          bool PATCH) {
   const std::string url_path_ =
-      url_root_ + API::appendWithForwardSlash(addr_path);
+      url_root_ + API::append_with_forward_slash(addr_path);
   const std::string data_ = json_to_string(post_data);
   APILogger->debug("API:Post: Post Data\n{0}", data_);
   long return_code_;
@@ -251,10 +262,10 @@ Json::Value API::request(std::string addr_path, Json::Value &post_data,
   struct curl_slist *headers = NULL;
   headers = curl_slist_append(headers, "Content-Type: application/json");
 
-  if (!key.empty()) {
-    APILogger->debug("Adding token: {0} to headers", key);
+  if (!token.empty()) {
+    APILogger->debug("Adding token: {0} to headers", token);
     headers = curl_slist_append(
-        headers, (std::string("Authorization: token ") + key).c_str());
+        headers, (std::string("Authorization: token ") + token).c_str());
   }
 
   curl_easy_setopt(curl_, CURLOPT_URL, url_path_.c_str());
@@ -288,8 +299,8 @@ Json::Value API::request(std::string addr_path, Json::Value &post_data,
 
   else if (http_code == 409) {
     APILogger->info("API:Post Entry Exists attempting to return entry");
-    return request(API::appendWithForwardSlash(addr_path) +
-                   jsonToQueryString(post_data))[0];
+    return get_request(API::append_with_forward_slash(addr_path) +
+                   json_to_query_string(post_data))[0];
   }
 
   else if (http_code != expected_response) {
@@ -322,7 +333,7 @@ Json::Value API::request(std::string addr_path, Json::Value &post_data,
   return results_;
 }
 
-std::string API::appendWithForwardSlash(std::string str) {
+std::string API::append_with_forward_slash(std::string str) {
   if (str.empty()) {
     return str;
   }

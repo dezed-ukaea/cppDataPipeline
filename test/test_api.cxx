@@ -38,10 +38,10 @@ protected:
 
 //! [TestGetById]
 TEST_F(ApiTest, TestGetById) {
-  Json::Value author = api_->request(std::string("author/?name=Interface%20Test"))[0]["url"];
+  Json::Value author = api_->get_request(std::string("author/?name=Interface%20Test"))[0]["url"];
   APILogger->info("Author: {0}", author.asString());
   int author_id_ = ApiObject::get_id_from_string( author.asString() );
-  ASSERT_EQ(api_->getById(std::string("author"), author_id_)["name"].asString(), std::string("Interface Test"));
+  ASSERT_EQ(api_->get_by_id(std::string("author"), author_id_)["name"].asString(), std::string("Interface Test"));
 } //! [TestGetById]
 
 //![TestGetEntry409]

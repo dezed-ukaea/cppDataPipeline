@@ -7,6 +7,7 @@ run_metadata:
   default_input_namespace: SCRC 
   default_output_namespace: EERA
   default_data_store: "/data_store"
+  write_data_store: "/data_store"
   always_copy_to_store: False
 read:
   - data_product: fixed-parameters/T_lat

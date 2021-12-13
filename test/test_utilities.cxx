@@ -51,7 +51,7 @@ TEST(FDPAPITest, TestJSONString) {
 //! [TestJSONString]
 
 TEST(FDAPITest, TestRandomHash) {
-  // Use a set to store 1000 random hashes and ensure they are unique
+  // Use a set to store 1001 random hashes and ensure they are unique
   std::set<std::string> unique_random_hashes;
   for(int i = 0; i <=1000; i++){
     std::string random_hash_ = generate_random_hash();
