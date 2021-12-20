@@ -52,11 +52,14 @@ namespace FDP {
 
             std::unique_ptr<ApiObject> code_repo_storage_root_;
             std::unique_ptr<ApiObject> code_repo_storage_location_;
-            std::unique_ptr<ApiObject> code_repo_;
+            std::unique_ptr<ApiObject> code_repo_obj_;
+
+            std::unique_ptr<ApiObject> code_run_;
             
 
         public:
             Config(const std::filesystem::path &config_file_path,
+            const std::filesystem::path &script_file_path,
             const std::string &token,
             RESTAPI api_location);
 
@@ -71,6 +74,9 @@ namespace FDP {
 
             std::string get_default_input_namespace() const;
             std::string get_default_output_namespace() const;
+
+            std::string get_config_directory() const;
+            std::string get_code_run_uuid() const;
 
             void initialise(RESTAPI api_location);
             void validate_config(std::filesystem::path yaml_path, RESTAPI api_location);

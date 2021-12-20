@@ -3,12 +3,13 @@
 namespace FDP {
 
  DataPipelineImpl_::DataPipelineImpl_(const std::filesystem::path &config_file_path,
+                    const std::filesystem::path &script_file_path,
                     const std::string token,
                     spdlog::level::level_enum log_level,
                     RESTAPI api_location)
        {
 
-         config_ = new Config(config_file_path, token, api_location);
+         config_ = new Config(config_file_path, script_file_path, token, api_location);
          const YAML::Node api_endpoint_ = (api_location == RESTAPI::LOCAL)
                                         ? config_->meta_data_()["local_data_registry_url"]
                                         : config_->meta_data_()["remote_data_registry_url"];

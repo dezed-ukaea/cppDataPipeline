@@ -75,4 +75,10 @@ std::string current_time_stamp(bool file_name) {
 
   return oss_.str();
 }
+
+bool FileExists( const std::string &Filename )
+{
+    return access( Filename.c_str(), 0 ) == 0;
+}
+
 }; // namespace FDP

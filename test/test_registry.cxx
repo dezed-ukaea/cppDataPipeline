@@ -30,9 +30,11 @@ protected:
 
     const std::filesystem::path config_path_ =
         std::filesystem::path(TESTDIR) / "config.yaml";
+    const std::filesystem::path script_path_ =
+        std::filesystem::path(TESTDIR) / "test_script.sh";
     APILogger->set_level(spdlog::level::debug);
 
-    return new DataPipelineImpl_(config_path_, token, spdlog::level::debug,
+    return new DataPipelineImpl_(config_path_, script_path_, token, spdlog::level::debug,
                                  static_cast<RESTAPI>(use_local));
   }
 
@@ -45,8 +47,10 @@ protected:
 TEST_F(RegistryTest, TestDataPipelineInit) {
   const std::filesystem::path config_path_ =
       std::filesystem::path(TESTDIR) / "config.yaml";
+  const std::filesystem::path script_path_ =
+      std::filesystem::path(TESTDIR) / "test_script.sh";
   APILogger->set_level(spdlog::level::debug);
-  DataPipeline(config_path_, token, spdlog::level::debug);
+  DataPipeline(config_path_, script_path_, token, spdlog::level::debug);
 }
 
 TEST_F(RegistryTest, TestLogLevelSet) {

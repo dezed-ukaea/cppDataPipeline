@@ -21,6 +21,13 @@
 
 #include "digestpp.hpp"
 
+#ifdef _WIN32
+   #include <io.h> 
+   #define access    _access_s
+#else
+   #include <unistd.h>
+#endif
+
 namespace FDP {
 /*! **************************************************************************
  * @brief calculates a hash from a given input file via SHA1
@@ -64,6 +71,8 @@ std::string generate_run_id(std::filesystem::path config_file_path);
  * @return timestamp for the current time
  ***************************************************************************/
 std::string current_time_stamp(bool file_name = false);
+
+bool FileExists( const std::string &Filename );
 
 }; // namespace FDP
 

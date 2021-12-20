@@ -58,6 +58,7 @@ public:
    * @param api_location whether to use local/remote RestAPI endpoint
    ***************************************************************************/
   DataPipelineImpl_(const std::filesystem::path &config_file_path,
+                    const std::filesystem::path &file_system_path,
                     const std::string token,
                     spdlog::level::level_enum log_level = spdlog::level::info,
                     RESTAPI api_location = RESTAPI::LOCAL);
