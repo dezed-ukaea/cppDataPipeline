@@ -76,8 +76,12 @@ std::string current_time_stamp(bool file_name) {
   return oss_.str();
 }
 
-std::string remove_local_from_root(std::string &root){
+std::string remove_local_from_root(const std::string &root){
   return std::regex_replace(root, std::regex(std::string("file:\\/\\/")), "");
+}
+
+std::string remove_backslash_from_path(const std::string &path){
+  return std::regex_replace(path, std::regex(std::string("\\\\")), "/");
 }
 
 bool FileExists( const std::string &Filename )

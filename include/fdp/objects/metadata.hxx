@@ -73,7 +73,9 @@ std::string generate_run_id(std::filesystem::path config_file_path);
  ***************************************************************************/
 std::string current_time_stamp(bool file_name = false);
 
-std::string remove_local_from_root(std::string &root);
+std::string remove_local_from_root(const std::string &root);
+
+std::string remove_backslash_from_path(const std::string &path);
 
 bool FileExists( const std::string &Filename );
 

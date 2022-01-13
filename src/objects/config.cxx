@@ -214,6 +214,7 @@ void FDP::Config::initialise(RESTAPI api_location) {
   else {
     config_storage_location_value_["path"] = config_file_path_.string();
   }
+  config_storage_location_value_["path"] = remove_backslash_from_path(config_storage_location_value_["path"].asString());
   config_storage_location_value_["public"] = true;  
   config_storage_location_value_["hash"] = calculate_hash_from_file(config_file_path_);
   config_storage_location_value_["storage_root"] = config_storage_root_->get_uri();
@@ -250,7 +251,7 @@ void FDP::Config::initialise(RESTAPI api_location) {
   else {
     script_storage_location_value_["path"] = script_file_path_.string();
   }
-
+  script_storage_location_value_["path"] = remove_backslash_from_path(script_storage_location_value_["path"].asString());
   script_storage_location_value_["hash"] = calculate_hash_from_file(script_file_path_);
   script_storage_location_value_["public"] = true;
   script_storage_location_value_["storage_root"] = config_storage_root_->get_uri();
@@ -290,6 +291,7 @@ void FDP::Config::initialise(RESTAPI api_location) {
   repo_storage_location_value_["public"] = true;
   repo_storage_location_value_["storage_root"] = code_repo_storage_root_->get_uri();
   repo_storage_location_value_["path"] = meta_data_()["remote_repo"].as<std::string>();
+  repo_storage_location_value_["path"] = remove_backslash_from_path(repo_storage_location_value_["path"].asString());
 
   std::unique_ptr<ApiObject> code_repo_location_ptr(new ApiObject(
    api_->post("storage_location", repo_storage_location_value_, token_)));
@@ -562,6 +564,7 @@ void FDP::Config::finalise(){
         std::filesystem::path str_path =  std::filesystem::path(currentWrite.get_use_namespace()) / currentWrite.get_use_data_product() / newFileName;
 
         storageData["path"] = str_path.string();
+        storageData["path"] = remove_backslash_from_path(storageData["path"].asString());
         storageData["storage_root"] = config_storage_root_->get_uri();
 
         storageLocationObj = ApiObject(api_->post("storage_location", storageData, token_));
