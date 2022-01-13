@@ -1,4 +1,5 @@
 #include "fdp/registry/file_system.hxx"
+#include <ghc/filesystem.hpp>
 namespace FDP {
 YAML::Node parse_yaml_(std::filesystem::path yaml_path) {
   APILogger->debug("LocalFileSystem: Reading configuration file '{0}'",
@@ -16,7 +17,7 @@ LocalFileSystem::LocalFileSystem(std::filesystem::path config_file_path)
   if (!std::filesystem::exists(data_directory_path_)) {
     APILogger->info("Creating data directory at '{0}'",
                     data_directory_path_.string());
-    std::filesystem::create_directory(data_directory_path_);
+    ghc::filesystem::create_directory(data_directory_path_.string());
   }
 }
 
