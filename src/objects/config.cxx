@@ -23,6 +23,44 @@ YAML::Node FDP::Config::meta_data_() const {
   return config_data_["run_metadata"];
 }
 
+YAML::Node FDP::Config::config_writes_() const{
+  return config_data_["write"];
+}
+
+YAML::Node FDP::Config::config_reads_() const{
+  return config_data_["read"];
+}
+
+bool FDP::Config::config_has_writes() const{
+  if(config_data_["write"]){
+    return true;
+  }
+  return false;
+}
+
+bool FDP::Config::config_has_reads() const{
+  if(config_data_["read"]){
+    return true;
+  }
+  return false;
+}
+
+bool FDP::Config::has_writes() const{
+  return ! writes_.empty();
+}
+
+bool FDP::Config::has_reads() const{
+  return ! reads_.empty();
+}
+
+bool FDP::Config::has_inputs() const{
+  return ! inputs_.empty();
+}
+
+bool FDP::Config::has_outputs() const{
+  return ! outputs_.empty();
+}
+
 std::filesystem::path FDP::Config::get_data_store() const {
   return std::filesystem::path(
       FDP::Config::meta_data_()["write_data_store"].as<std::string>());
@@ -100,6 +138,22 @@ void FDP::Config::validate_config(std::filesystem::path yaml_path,
     APILogger->error("Submission script: {0} does not exist", script_file_path_.string());
     throw std::runtime_error("Submission script: " + script_file_path_.string() + " does not exist");
   }
+
+  if(!meta_data_()["public"]){
+    meta_data_()["public"] = "true";
+  }
+  else{
+    try
+    {
+      meta_data_()["public"].as<bool>();
+    }
+    catch(const std::exception& e)
+    {
+      meta_data_()["public"] = "true";
+    }
+    
+  }
+
 }
 
 void FDP::Config::initialise(RESTAPI api_location) {
@@ -147,7 +201,7 @@ void FDP::Config::initialise(RESTAPI api_location) {
   config_storage_root_value_["root"] = meta_data_()["write_data_store"].as<std::string>();
   config_storage_root_value_["local"] = api_location == RESTAPI::LOCAL; 
   std::unique_ptr<ApiObject> config_storage_root_ptr_(new ApiObject(
-    api_->post("storage_root", config_storage_root_value_, token_)));
+    api_->post_storage_root(config_storage_root_value_, token_)));
   config_storage_root_ = std::move(config_storage_root_ptr_);
 
   // Remove the Write Data Store from config file path
@@ -262,7 +316,7 @@ void FDP::Config::initialise(RESTAPI api_location) {
   APILogger->info("Writing new code run to registry");
 
   std::unique_ptr<ApiObject> code_run_ptr(new ApiObject(
-   api_->post("object", code_run_value_, token_)));
+   api_->post("code_run", code_run_value_, token_)));
   code_run_ = std::move(code_run_ptr);
 
   APILogger->info("Code run {0} successfully generated", code_run_->get_value_as_string("uuid"));
@@ -276,5 +330,340 @@ std::string Config::get_config_directory() const{
 std::string Config::get_code_run_uuid() const{
   return code_run_->get_value_as_string("uuid");
 };
+
+
+std::filesystem::path Config::link_write(std::string &data_product){
+  if (!config_has_writes()){
+    APILogger->error("Config Error: Write has not been specified in the given config file");
+    throw config_parsing_error("Config Error: Write has not been specified in the given config file");
+  }
+
+  //APILogger->info("Node Type: {0}", config_writes_().Type());
+  
+  YAML::Node currentWrite;
+
+  if(config_writes_().IsSequence()){
+    for (YAML::const_iterator it = config_writes_().begin(); it != config_writes_().end(); ++it) {
+      YAML::Node write_ = *it;
+
+      if(write_["data_product"]){
+        if(write_["data_product"].as<std::string>() == data_product)
+        {
+          currentWrite = write_;
+        }
+      }
+
+    }
+  }
+  else{
+    APILogger->error("Config Error: Write has not been specified in the given config file");
+    throw config_parsing_error("Config Error: Write has not been specified in the given config file");
+  }
+
+  if(!currentWrite)
+  {
+    APILogger->error("Config Error: Cannot Find {0} in writes", data_product);
+    throw config_parsing_error("Config Error: cannot find " + data_product + "in writes");
+  }
+
+  if(!currentWrite["description"])
+  {
+    APILogger->error("Config Error: Cannot Find description of {0} in writes", data_product);
+    throw config_parsing_error("Config Error: cannot find description of " + data_product + "in writes");
+  }
+
+  if(!currentWrite["file_type"])
+  {
+    APILogger->error("Config Error: Cannot Find file_type of {0} in writes", data_product);
+    throw config_parsing_error("Config Error: cannot find file_type of " + data_product + "in writes");
+  }
+
+  if(!currentWrite["use"]["version"]){
+    APILogger->info("Use: Version not found in {0}, using version 0.0.1 by default", data_product);
+    currentWrite["use"]["version"] = "0.0.1";
+  }
+
+  if(!currentWrite["use"]["data_product"]){
+    currentWrite["use"]["data_product"] = currentWrite["data_product"].as<std::string>();
+  }
+
+    if(!currentWrite["use"]["namespace"]){
+    currentWrite["use"]["namespace"] = meta_data_()["default_output_namespace"].as<std::string>();
+  }
+
+  std::string filename_("dat-" + generate_random_hash() + "." + currentWrite["file_type"].as<std::string>());
+  std::filesystem::path path_ = std::filesystem::path(meta_data_()["write_data_store"].as<std::string>()) / currentWrite["use"]["namespace"].as<std::string>() / currentWrite["use"]["data_product"].as<std::string>() / filename_;
+
+  APILogger->info("Link Path: {0}", path_.string());
+
+  // Create Directory
+  ghc::filesystem::create_directories(path_.parent_path().string());
+
+  writes_[data_product] = IOObject(data_product, 
+    currentWrite["data_product"].as<std::string>(),
+    currentWrite["use"]["version"].as<std::string>(),
+    currentWrite["use"]["namespace"].as<std::string>(),
+    path_,
+    currentWrite["description"].as<std::string>(),
+    meta_data_()["public"].as<bool>()
+    );
+  return path_;
+
+}
+
+std::filesystem::path FDP::Config::link_read(std::string &data_product){
+  YAML::Node currentRead;
+
+  auto it = inputs_.find("data_product");
+  if (it != inputs_.end()) {
+      return it->second.get_path();
+  }
+
+  if(config_reads_().IsSequence()){
+    for (YAML::const_iterator it = config_reads_().begin(); it != config_reads_().end(); ++it) {
+      YAML::Node read_ = *it;
+
+      if(read_["data_product"]){
+        if(read_["data_product"].as<std::string>() == data_product)
+        {
+          currentRead = read_;
+        }
+      }
+
+    }
+  }
+  else{
+    APILogger->error("Config Error: Write has not been specified in the given config file");
+    throw config_parsing_error("Config Error: Write has not been specified in the given config file");
+  }
+
+  if(!currentRead)
+  {
+    APILogger->error("Config Error: Cannot Find {0} in reads", data_product);
+    throw config_parsing_error("Config Error: cannot find " + data_product + "in reads");
+  }
+
+  if(!currentRead["use"]["version"]){
+    APILogger->info("Use: Version not found in {0}, using version 0.0.1 by default", data_product);
+    currentRead["use"]["version"] = "0.0.1";
+  }
+
+  if(!currentRead["use"]["data_product"]){
+    currentRead["use"]["data_product"] = currentRead["data_product"].as<std::string>();
+  }
+
+  if(!currentRead["use"]["namespace"]){
+    currentRead["use"]["namespace"] = meta_data_()["default_input_namespace"].as<std::string>();
+  }
+
+  Json::Value namespaceData;
+  namespaceData["name"] = currentRead["use"]["namespace"].as<std::string>();
+  ApiObject namespaceObj = ApiObject(api_->get_by_json_query("namespace", namespaceData)[0]);
+
+  if (namespaceObj.is_empty()){
+    APILogger->error("Namespace Error: could not find namespace {0} in registry", currentRead["use"]["namespace"].as<std::string>());
+    throw std::runtime_error("Namespace Error: could not find namespace " + currentRead["use"]["namespace"].as<std::string>() + " in Registry");
+  }
+
+  Json::Value dataProductData;
+  dataProductData["name"] = currentRead["use"]["data_product"].as<std::string>();
+  dataProductData["version"] = currentRead["use"]["version"].as<std::string>();
+  dataProductData["namespace"] = namespaceObj.get_id();
+  ApiObject dataProductObj = ApiObject(api_->get_by_json_query("data_product", dataProductData)[0]);
+
+  if (dataProductObj.is_empty()){
+    APILogger->error("data_product Error: could not find data_product {0} in registry", currentRead["use"]["data_product"].as<std::string>());
+    throw std::runtime_error("Namespace Error: could not find data_product " + currentRead["use"]["data_product"].as<std::string>() + " in Registry");
+  }
+
+  ApiObject obj = ApiObject(api_->get_by_id("object", ApiObject::get_id_from_string(dataProductObj.get_value_as_string("object"))));
+
+  if (obj.is_empty()){
+    APILogger->error("data_product Error: could not find data_product object {0} in registry", dataProductObj.get_value_as_string("object"));
+    throw std::runtime_error("Namespace Error: could not find data_product object " + dataProductObj.get_value_as_string("object") + " in Registry");
+  }
+
+  Json::Value componentData;
+  componentData["object"] = obj.get_id();
+  ApiObject componentObj = ApiObject(api_->get_by_json_query("object_component", componentData)[0]);
+
+  if (componentObj.is_empty()){
+    APILogger->error("data_product object Error: could not find data_product component_object for {0} in registry", obj.get_value_as_string("object"));
+    throw std::runtime_error("data_product object Error: could not find data_product component_object for " + obj.get_value_as_string("object") + " in Registry");
+  }
+
+  ApiObject storageLocationObj = ApiObject(api_->get_by_id("storage_location", ApiObject::get_id_from_string(obj.get_value_as_string("storage_location"))));
+  if (storageLocationObj.is_empty()){
+    APILogger->error("data_product object Error: could not find storage_location for {0} in registry", obj.get_value_as_string("object"));
+    throw std::runtime_error("data_product object Error: could not find storage_location for " + obj.get_value_as_string("object") + " in Registry");
+  }
+
+  ApiObject storageRootObj = ApiObject(api_->get_by_id("storage_root",  ApiObject::get_id_from_string(storageLocationObj.get_value_as_string("storage_root"))));
+  if (storageRootObj.is_empty()){
+    APILogger->error("data_product object Error: could not find storage_root for {0} in registry", obj.get_value_as_string("object"));
+    throw std::runtime_error("data_product object Error: could not find storage_root for " + obj.get_value_as_string("object") + " in Registry");
+  } 
+
+  std::filesystem::path path_ = std::filesystem::path(remove_local_from_root(storageRootObj.get_value_as_string("root"))) / 
+    API::remove_leading_forward_slash(storageLocationObj.get_value_as_string("path"));
+
+  reads_[data_product] = IOObject(data_product, 
+    currentRead["data_product"].as<std::string>(),
+    currentRead["use"]["version"].as<std::string>(),
+    currentRead["use"]["namespace"].as<std::string>(),
+    path_,
+    componentObj,
+    dataProductObj
+    );
+
+  return path_;
+}
+
+void FDP::Config::finalise(){
+
+  if(has_writes()){
+    std::map<std::string, IOObject>::iterator it;
+    for (it = writes_.begin(); it != writes_.end(); it++){
+      IOObject currentWrite = it->second;
+
+      if(! FileExists(currentWrite.get_path().string())){
+        APILogger->error("File Error: Cannot Find file for write", currentWrite.get_use_data_product());
+        throw std::runtime_error("File Error Cannot Find file for write: " + currentWrite.get_use_data_product());
+      }
+
+      Json::Value storageData;
+      storageData["hash"] = calculate_hash_from_file(currentWrite.get_path());
+      storageData["storage_root"] = config_storage_root_->get_id();
+      storageData["public"] = currentWrite.is_public();
+
+
+      ApiObject storageLocationObj = ApiObject(api_->get_by_json_query("storage_location", storageData)[0]);
+      ApiObject StorageRootObj;
+
+      std::filesystem::path newPath;
+      std::string extension = currentWrite.get_path().extension().string();
+
+      if (!storageLocationObj.is_empty()){
+        remove(currentWrite.get_path());
+
+        StorageRootObj = ApiObject(api_->get_by_id("storage_root", ApiObject::get_id_from_string(storageLocationObj.get_value_as_string("storage_root"))));
+
+        newPath = std::filesystem::path(remove_local_from_root(StorageRootObj.get_value_as_string("root"))) / storageLocationObj.get_value_as_string("path");
+
+      }
+      else {
+        std::filesystem::path tmpFilename = currentWrite.get_path().filename();
+        std::filesystem::path newFileName = std::filesystem::path(storageData["hash"].asString() + extension);
+
+        newPath = std::filesystem::path(remove_local_from_root(get_data_store().string())) / currentWrite.get_use_namespace() / currentWrite.get_use_data_product() / newFileName;
+
+        ghc::filesystem::rename(currentWrite.get_path().string(), newPath.string());
+
+        std::filesystem::path str_path =  std::filesystem::path(currentWrite.get_use_namespace()) / currentWrite.get_use_data_product() / newFileName;
+
+        storageData["path"] = str_path.string();
+        storageData["storage_root"] = config_storage_root_->get_uri();
+
+        storageLocationObj = ApiObject(api_->post("storage_location", storageData, token_));
+
+      }
+
+      Json::Value filetypeData;
+      filetypeData["name"] = extension;
+      filetypeData["extension"] = extension;
+      ApiObject filetypeObj = ApiObject(api_->post("file_type", filetypeData, token_));
+
+      Json::Value namespaceData;
+      namespaceData["name"] = currentWrite.get_use_namespace();
+
+      ApiObject namespaceObj = ApiObject(api_->get_by_json_query("namespace", namespaceData)[0]);
+      if (namespaceObj.is_empty()){
+        namespaceObj = ApiObject(api_->post("namespace", namespaceData, token_));
+      }
+
+      Json::Value dataproductData;
+      dataproductData["name"] = currentWrite.get_use_data_product();
+      dataproductData["version"] = currentWrite.get_use_version();
+      dataproductData["namespace"] = namespaceObj.get_uri();
+
+      ApiObject dataProductObj = ApiObject(api_->get_by_json_query("data_product", dataproductData)[0]);
+      ApiObject obj;
+      std::string componentUrl;
+
+      if(!dataProductObj.is_empty()){
+        obj = ApiObject(api_->get_by_id("object", ApiObject::get_id_from_string(dataProductObj.get_value_as_string("object"))));
+        componentUrl = obj.get_first_component();
+      }
+      else{
+        Json::Value objData;
+        objData["description"] = currentWrite.get_data_product_description();
+        objData["storage_location"] = storageLocationObj.get_uri();
+        Json::Value author_id_ = author_->get_uri();
+        objData["authors"].append(author_id_);
+        objData["file_type"] = filetypeObj.get_uri();
+        obj = ApiObject(api_->post("object", objData, token_));
+
+        if (currentWrite.get_use_component() != "None"){
+          //@todo allow use_component
+          componentUrl = obj.get_first_component();
+        }
+        else{        
+          componentUrl = obj.get_first_component();
+        }
+
+        dataproductData["object"] = obj.get_uri();
+
+        dataProductObj = ApiObject(api_->post("data_product", dataproductData, token_));
+
+      }
+
+      ApiObject componentObj = ApiObject(api_->get_by_id("object_component", ApiObject::get_id_from_string(componentUrl)));
+
+      currentWrite.set_component_object(componentObj);
+      currentWrite.set_data_product_object(dataProductObj);
+
+      outputs_[currentWrite.get_data_product()] = currentWrite;      
+
+    }
+  }
+
+  if(has_reads()){
+    std::map<std::string, IOObject>::iterator it;
+    for (it = reads_.begin(); it != reads_.end(); it++){
+      IOObject currentRead = it->second;
+      inputs_[currentRead.get_data_product()] = currentRead;
+    }
+  }
+
+  Json::Value patch_data;
+
+  if(has_outputs()){
+    std::map<std::string, IOObject>::iterator it;
+    for (it = outputs_.begin(); it != outputs_.end(); it++){
+      IOObject currentOutput = it->second;
+      Json::Value output = currentOutput.get_component_object()->get_uri();
+      patch_data["outputs"].append(output);
+      APILogger->info("Writing {} to local registry", currentOutput.get_use_data_product());
+    }
+  }
+
+  if(has_inputs()){
+    std::map<std::string, IOObject>::iterator it;
+    for (it = inputs_.begin(); it != inputs_.end(); it++){
+      IOObject currentInput = it->second;
+      Json::Value input = currentInput.get_component_object()->get_uri();
+      patch_data["inputs"].append(input);
+      APILogger->info("Writing {} to local registry", currentInput.get_use_data_product());
+    }
+  }
+
+  std::string code_run_endpoint = "code_run/" + std::to_string(code_run_->get_id());
+  APILogger->info("Code Run: {0}", code_run_endpoint);
+
+  std::unique_ptr<ApiObject> code_run_ptr(new ApiObject(
+   api_->patch(code_run_endpoint, patch_data, token_)));
+  code_run_ = std::move(code_run_ptr);  
+
+}
 
 }; // namespace FDP

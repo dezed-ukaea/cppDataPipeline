@@ -159,6 +159,8 @@ public:
   Json::Value post(const std::string addr_path, Json::Value &post_data,
                    const std::string &token, long expected_response = 201);
 
+  Json::Value post_storage_root(Json::Value &post_data, const std::string &token);
+
   /*! *************************************************************************
    * @brief read a query object and send request to the RestAPI
    * @author K. Zarebski (UKAEA)
@@ -229,6 +231,8 @@ public:
    * @return std::string Appended string
    */
   static std::string append_with_forward_slash(std::string string);
+
+  static std::string remove_leading_forward_slash(std::string str);
 
 private:
   std::string url_root_;

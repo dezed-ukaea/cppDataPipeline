@@ -68,12 +68,16 @@ std::string current_time_stamp(bool file_name) {
   std::ostringstream oss_;
 
   if (!file_name) {
-    oss_ << std::put_time(&tm_, "%Y-%m-%d %H:%M:%S %Z");
+    oss_ << std::put_time(&tm_, "%Y-%m-%d %H:%M:%S");
   } else {
     oss_ << std::put_time(&tm_, "%Y%m%d-%H%M%S");
   }
 
   return oss_.str();
+}
+
+std::string remove_local_from_root(std::string &root){
+  return std::regex_replace(root, std::regex(std::string("file:\\/\\/")), "");
 }
 
 bool FileExists( const std::string &Filename )

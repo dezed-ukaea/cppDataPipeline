@@ -59,3 +59,7 @@ TEST(FDAPITest, TestRandomHash) {
   }
   ASSERT_EQ(unique_random_hashes.size(), 1001);
 }
+
+TEST(FDAPITest, TestRemoveLocalFromRoot) {
+  ASSERT_EQ(remove_local_from_root(std::string("file://test")), "test");
+}

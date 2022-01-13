@@ -47,4 +47,8 @@ namespace FDP {
         }
         return false;
     }
+
+    std::string ApiObject::get_first_component() const{
+        return obj_["components"][0].asString();
+    }
 };

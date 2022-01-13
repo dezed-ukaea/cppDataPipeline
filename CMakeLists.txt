@@ -69,6 +69,7 @@ INCLUDE( external/curl.cmake )
 INCLUDE( external/yaml_cpp.cmake )
 INCLUDE( external/spdlog.cmake )
 INCLUDE( external/toml11.cmake )
+INCLUDE( external/ghc.cmake )
 
 # Add the src dirctory compiling it's CMakeLists.txt
 ADD_SUBDIRECTORY( src )

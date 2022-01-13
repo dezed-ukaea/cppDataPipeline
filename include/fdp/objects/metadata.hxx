@@ -18,6 +18,7 @@
 #include <sstream>
 #include <random>
 #include <chrono>
+#include <regex>
 
 #include "digestpp.hpp"
 
@@ -71,6 +72,8 @@ std::string generate_run_id(std::filesystem::path config_file_path);
  * @return timestamp for the current time
  ***************************************************************************/
 std::string current_time_stamp(bool file_name = false);
+
+std::string remove_local_from_root(std::string &root);
 
 bool FileExists( const std::string &Filename );
 

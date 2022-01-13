@@ -243,9 +243,18 @@ Json::Value API::post(std::string addr_path, Json::Value &post_data,
   return API::post_patch_request(addr_path, post_data, token, expected_response, false);
 }
 
+Json::Value API::post_storage_root(Json::Value &post_data, const std::string &token){
+  if (post_data["local"]){
+    if(post_data["local"].as<bool>()){
+        post_data["root"] = "file://" + post_data["root"].as<std::string>();
+    }
+  }
+  return API::post_patch_request("storage_root", post_data, token, 201, false);
+}
+
 Json::Value API::patch(std::string addr_path, Json::Value &post_data,
                        const std::string &token, long expected_response) {
-  return API::post_patch_request(addr_path, post_data, token, expected_response, false);
+  return API::post_patch_request(addr_path, post_data, token, expected_response, true);
 }
 
 Json::Value API::post_patch_request(std::string addr_path, Json::Value &post_data,
@@ -344,6 +353,19 @@ std::string API::append_with_forward_slash(std::string str) {
     return str.substr(0, str.size() - 1) + "/";
   }
   return str + "/";
+}
+
+std::string API::remove_leading_forward_slash(std::string str) {
+  if (str.empty()) {
+    return str;
+  }
+  switch (str.front()) {
+  case '/':
+    return str.substr(1, str.size());
+  case '\\':
+    return str.substr(1, str.size());
+  }
+  return str;
 }
 
 }; // namespace FDP

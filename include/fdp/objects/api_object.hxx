@@ -16,6 +16,7 @@ namespace FDP {
         private:
             Json::Value obj_;
         public:
+            ApiObject() : obj_(Json::Value()){};
             /**
              * @brief Construct a new Api Object object
              * 
@@ -47,6 +48,8 @@ namespace FDP {
 
             std::string get_value_as_string(std::string key) const;
             int get_value_as_int(std::string key) const;
+
+            std::string get_first_component() const;
 
             Json::Value get_object(){return obj_;}
 
