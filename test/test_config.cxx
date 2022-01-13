@@ -62,7 +62,8 @@ TEST_F(ConfigTest, TestMetaData) {
 
 TEST_F(ConfigTest, TestLinkWrite){
   Config *cnf = config();
-  std::filesystem::path currentLink = cnf->link_write(std::string("test/csv"));
+  std::string data_product = "test/csv";
+  std::filesystem::path currentLink = std::filesystem::path(cnf->link_write(data_product));
   EXPECT_GT(currentLink.string().size(), 1);
 
   std::ofstream testCSV;
@@ -76,7 +77,8 @@ TEST_F(ConfigTest, TestLinkWrite){
 
 TEST_F(ConfigTest, TestLinkRead){
   Config *cnf = config(true, "read_csv.yaml");
-  std::filesystem::path currentLink = cnf->link_read(std::string("test/csv"));
+  std::string data_product = "test/csv";
+  std::filesystem::path currentLink = cnf->link_read(data_product);
   EXPECT_GT(currentLink.string().size(), 1);
 
   cnf->finalise();
