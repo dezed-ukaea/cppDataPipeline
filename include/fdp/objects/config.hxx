@@ -20,7 +20,7 @@
 #include <ghc/filesystem.hpp>
 #include <stdio.h>
 
-#include "fdp/registry/data_io.hxx"
+#include "fdp/objects/metadata.hxx"
 #include "fdp/registry/api.hxx"
 #include "fdp/objects/api_object.hxx"
 #include "fdp/objects/io_object.hxx"

@@ -23,8 +23,8 @@
 
 #include <iostream>
 
+#include "fdp/objects/config.hxx"
 #include "fdp/objects/data.hxx"
-#include "fdp/registry/data_io.hxx"
 #include "fdp/objects/distributions.hxx"
 #include "fdp/objects/metadata.hxx"
 #include "fdp/registry/data_object.hxx"
@@ -50,7 +50,6 @@ using namespace H5; // Use the HDF5 library
 
 namespace FDP {
 
-  class Config;
 /*! **************************************************************************
  * @brief parse the configuration file
  * @author K. Zarebski (UKAEA)
@@ -127,9 +126,10 @@ template <typename T>
 std::filesystem::path create_estimate(T &value,
                                       const std::filesystem::path &data_product,
                                       const Versioning::version &version_num,
-                                      const Config *config) {
+                                      const Config *config
+                                      ) {
   const std::string param_name_ = data_product.stem().string();
-  const std::string namespace_ = config->get_default_output_namespace();
+  const std::string namespace_ = config.get_default_output_namespace();
   const std::filesystem::path data_store_ = config->get_data_store();
   const toml::value data_{
       {param_name_, {{"type", "point-estimate"}, {"value", value}}}};
