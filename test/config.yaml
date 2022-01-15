@@ -6,8 +6,8 @@ run_metadata:
   local_repo: 
   default_input_namespace: SCRC 
   default_output_namespace: EERA
-  default_data_store: "/data_store"
-  write_data_store: "/data_store"
+  default_data_store: "data_store"
+  write_data_store: "data_store"
   always_copy_to_store: False
   latest_commit: 52008720d240693150e96021ea34ac6fffe05870
   remote_repo: https://github.com/FAIRDataPipeline/cppDataPipeline
