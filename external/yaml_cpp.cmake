@@ -1,30 +1,12 @@
-SET( YAML_CPP "yaml-cpp" )
-find_package( yaml-cpp QUIET )
-SET( YAMLCPP_TAG "yaml-cpp-0.6.3" )
-SET( YAMLCPP_URL "https://github.com/jbeder/yaml-cpp.git" )
+SET( YAMLCPP_URL "https://github.com/jbeder/yaml-cpp/archive/refs/tags/yaml-cpp-0.7.0.zip" )
 
 MESSAGE( STATUS "[YAML-cpp]" )
+MESSAGE( STATUS "\tYAML-cpp Will be installed." )
+MESSAGE( STATUS "\tURL: ${YAMLCPP_URL}" )
 
-IF( NOT YAMLCPP_INCLUDE_DIR )
-    MESSAGE( STATUS "\tYAML-cpp not installed on this system and so will be downloaded." )
-    MESSAGE( STATUS "\tURL: ${YAMLCPP_URL}" )
-    MESSAGE( STATUS "\tTAG: ${YAMLCPP_TAG}" )
-    ExternalProject_Add(
-        ${YAML_CPP}_src
-        GIT_REPOSITORY ${YAMLCPP_URL}
-        GIT_TAG ${YAMLCPP_TAG}
-        GIT_SHALLOW TRUE
-        INSTALL_COMMAND ""
-        CMAKE_CACHE_ARGS
-            -DYAML_CPP_BUILD_TESTS:BOOL=OFF
-            -DYAML_BUILD_SHARED_LIBS:BOOL=ON
-    )
-
-    ExternalProject_Get_Property( ${YAML_CPP}_src binary_dir )
-    ExternalProject_Get_Property( ${YAML_CPP}_src source_dir )
-    SET( YAMLCPP_INCLUDE_DIR ${source_dir}/include )
-    SET( YAMLCPP_LIBRARY ${binary_dir}/lib${YAML_CPP}${CMAKE_SHARED_LIBRARY_SUFFIX} )
-ELSE()
-    MESSAGE( STATUS "\tInclude Directory: ${YAMLCPP_INCLUDE_DIR}" )
-    MESSAGE( STATUS "\tLibraries: ${YAMLCPP_LIBRARY}" )
-ENDIF()
+include(FetchContent)
+FetchContent_Declare(
+    YAMLCPP
+    URL ${YAMLCPP_URL}
+)
+FetchContent_MakeAvailable(YAMLCPP)

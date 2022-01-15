@@ -1,25 +1,22 @@
+# Try and find CURL
 FIND_PACKAGE( CURL QUIET )
-
 MESSAGE( STATUS "[Curl]" )
 
-SET( CURL_URL "https://github.com/curl/curl.git" )
-SET( CURL_TAG "curl-7_75_0" )
-
+# If CURL is not Found, Install it
 IF(NOT CURL_FOUND)
-    MESSAGE( STATUS "\tCurl not installed on this system and so will be downloaded." )
-    MESSAGE( STATUS "\tURL: ${CURL_URL}" )
-    MESSAGE( STATUS "\tTAG: ${CURL_TAG}" )
-    ExternalProject_Add(curl_src
-        GIT_REPOSITORY ${CURL_URL}
-        GIT_TAG ${CURL_TAG}
-        GIT_SHALLOW TRUE
-        INSTALL_COMMAND ""
-    )
 
-    ExternalProject_Get_Property( curl_src source_dir )
-    ExternalProject_Get_Property( curl_src binary_dir )
-    SET( CURL_INCLUDE_DIRS ${source_dir}/include )
-    SET( CURL_LIBRARIES ${binary_dir}/lib/libcurl${CMAKE_SHARED_LIBRARY_SUFFIX} )
+    SET( CURL_URL "https://github.com/curl/curl/archive/refs/tags/curl-7_80_0.zip" )
+
+    MESSAGE( STATUS "\tCURL Will be installed." )
+    MESSAGE( STATUS "\tURL: ${CURL_URL}" )
+    include(FetchContent)
+    FetchContent_Declare(
+        CURL
+        URL ${CURL_URL}
+    )
+    FetchContent_MakeAvailable(CURL)
+    SET(CURL_INCLUDE_DIRS = ${curl_SOURCE_DIR}/include)
+    SET(CURL_LIBRARIES libcurl)
 ELSE()
     MESSAGE( STATUS "\tInclude Directory: ${CURL_INCLUDE_DIRS}" )
     MESSAGE( STATUS "\tLibraries: ${CURL_LIBRARIES}" )

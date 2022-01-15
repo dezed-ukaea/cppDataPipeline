@@ -1,25 +1,27 @@
 SET( DIGESTCPP_URL "https://github.com/kerukuro/digestpp.git" )
 SET( DIGESTCPP_COMMIT "34ff2eeae397ed744d972d86b5a20f603b029fbd" )
 
+
+# windows.h will conflict with min functions in digestcpp
+# Because of macro definitions of min and max
+# So tell the compiler to exclude min and max macros in windows
+IF(WIN32)
+    add_definitions(-DNOMINMAX)
+ENDIF()
+
 MESSAGE( STATUS "[DigestCPP]" )
 
-MESSAGE( STATUS "\tDigestCpp not installed on this system and so will be downloaded." )
+MESSAGE( STATUS "\tDigestCpp Will be installed." )
 MESSAGE( STATUS "\tURL: ${DIGESTCPP_URL}" )
 MESSAGE( STATUS "\tCOMMIT HASH: ${DIGESTCPP_COMMIT}" )
 
-ExternalProject_Add(
-  digestpp_src
-  GIT_REPOSITORY ${DIGESTCPP_URL}
-  GIT_TAG ${DIGESTCPP_COMMIT}
-  CONFIGURE_COMMAND ""
-  BUILD_COMMAND ""
-  GIT_SHALLOW TRUE
-  INSTALL_COMMAND ""
+include(FetchContent)
+FetchContent_Declare(
+    DIGESTPP
+    GIT_REPOSITORY ${DIGESTCPP_URL}
+    GIT_TAG ${DIGESTCPP_COMMIT}
 )
+FetchContent_MakeAvailable(DIGESTPP)
 
-ExternalProject_Get_Property( digestpp_src source_dir )
-SET( DIGESTPP_INCLUDE_DIRS ${source_dir} )
-
-SET( DIGESTPP digestpp )
-ADD_LIBRARY( ${DIGESTPP} INTERFACE )
-TARGET_INCLUDE_DIRECTORIES( ${DIGESTPP} INTERFACE ${DIGESTPP_INCLUDE_DIRS} )
+ADD_LIBRARY( digestpp INTERFACE )
+TARGET_INCLUDE_DIRECTORIES( digestpp INTERFACE ${digestpp_SOURCE_DIR} )

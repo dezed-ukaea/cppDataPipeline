@@ -7,6 +7,9 @@
  * The tests contained within this file check functionality and validate
  * method associated with the data classes
  ****************************************************************************/
+#ifndef TESTDIR
+#define TESTDIR ""
+#endif
 #include "fdp/objects/data.hxx"
 #include "gtest/gtest.h"
 

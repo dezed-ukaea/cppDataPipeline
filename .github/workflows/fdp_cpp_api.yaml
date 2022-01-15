@@ -3,18 +3,49 @@ name: FDP C++ API
 on: [push]
 
 jobs:
-  build:
-    name: Build and Test
+  Build_Ubuntu:
+    name: Build Ubuntu
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
     steps:
       - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with: 
+          python-version: "3.9"
+          architecture: "x64"
+      - name: Install graphviz
+        run:  |
+              sudo apt-get install graphviz
+      - name: Install local registry
+        run: curl -fsSL https://data.scrc.uk/static/localregistry.sh | /bin/bash -s -- -b main
+      - name: Checkout FAIRDataPipeline/FAIR-CLI
+        uses: actions/checkout@v2
+        with:
+          repository: FAIRDataPipeline/FAIR-CLI
+          path: FAIR-CLI
+      - name: Move FAIR-CLI
+        run: mv FAIR-CLI ../FAIR-CLI
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+        with:
+          virtualenvs-create: true
+          virtualenvs-in-project: true
+      - name: Install and initialise FAIR CLI
+        run: |
+          cd ../FAIR-CLI
+          poetry install
+          source .venv/bin/activate
+          cd ${{ github.workspace }}
+          fair init --ci
+          fair registry start
       - name: Install Dependencies
         run: |
           sudo apt update
           sudo apt install -y lcov libjsoncpp-dev curl libcurl4-openssl-dev libyaml-cpp-dev libhdf5-dev
       - name: Configure Library
         run: |
-          cmake . -Bbuild -DFDPAPI_BUILD_TESTS=ON
+          cmake -Bbuild -DFDPAPI_BUILD_TESTS=ON
       - name: Fetch cache
         uses: actions/cache@v2.1.5
         with:
@@ -36,18 +67,60 @@ jobs:
           BUILD_TESTS: True
       - name: Run Unit Tests
         run: |
-          bash test/test_setup.sh
-          cmake --build build --target test
-          if [ $? -eq 0 ]; then
-            echo "Unit tests completed successfully"
-            exit 0
-          else
-            echo "Unit tests failed"
-            exit 1
-          fi
+         cmake --build build --target test
+         if [ $? -eq 0 ]; then
+           echo "Unit tests completed successfully"
+           exit 0
+         else
+           echo "Unit tests failed"
+           exit 1
+         fi
       - name: SonarCloud Scan
         run: |
           sonar-scanner -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=$SONAR_TOKEN -X
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+  Build_MacOS:
+    name: Build MacOS
+    runs-on: macOS-latest
+    strategy:
+      fail-fast: false
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install Dependencies
+        run: |
+          brew install cmake
+          brew install hdf5
+          brew install curl
+      - name: Configure Library
+        run: |
+          cmake -Bbuild -DFDPAPI_BUILD_TESTS=ON
+      - name: Build Library
+        run: |
+          cmake --build build
+  Build_Windows:
+    name: Build Windows
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ilammy/msvc-dev-cmd@v1
+      - name: Install Dependencies
+        run: |
+          choco install wget
+          wget -O hdf5.zip https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.12/hdf5-1.12.1/bin/windows/hdf5-1.12.1-Std-win10_64-vs14.zip
+          tar -xf hdf5.zip
+          cd hdf
+          msiexec /i HDF5-1.12.1-win64.msi /quiet /qn /norestart /log log.log INSTALL_ROOT="$Env:RUNNER_TEMP\HDF5_ROOT" | Out-Null
+          gc log.log
+      - name: Configure Library
+        run: |
+          cmake -Bbuild -DFDPAPI_BUILD_TESTS=ON
+        env: 
+          HDF5_ROOT: ${{ runner.temp }}\HDF5_ROOT
+      - name: Compile FDP-Cpp-API
+        run: cmake --build build --config=Release
+        env: 
+          HDF5_ROOT: ${{ runner.temp }}\HDF5_ROOT

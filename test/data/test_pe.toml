@@ -1,0 +1,5 @@
+[meanLatentPeriod]
+type = "point-estimate"
+distribution = "Lognormal"
+value = 11
+

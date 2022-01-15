@@ -16,8 +16,18 @@
 #include <iomanip>
 #include <iostream>
 #include <sstream>
+#include <random>
+#include <chrono>
+#include <regex>
 
 #include "digestpp.hpp"
+
+#ifdef _WIN32
+   #include <io.h> 
+   #define access    _access_s
+#else
+   #include <unistd.h>
+#endif
 
 namespace FDP {
 /*! **************************************************************************
@@ -37,6 +47,13 @@ std::string calculate_hash_from_file(const std::filesystem::path &);
  ****************************************************************************/
 std::string calculate_hash_from_string(const std::string &input);
 
+/**
+ * @brief Generate a random hash
+ * 
+ * @return std::string a random hash
+ */
+std::string generate_random_hash();
+
 /*! **************************************************************************
  * @brief generates a run identifier from configurations given in an API
  * config file
@@ -55,6 +72,14 @@ std::string generate_run_id(std::filesystem::path config_file_path);
  * @return timestamp for the current time
  ***************************************************************************/
 std::string current_time_stamp(bool file_name = false);
+
+std::string remove_local_from_root(const std::string &root);
+
+std::string remove_backslash_from_path(const std::string &path);
+
+bool FileExists( const std::string &Filename );
+
+std::string read_token(const std::filesystem::path &token_path);
 
 }; // namespace FDP
 

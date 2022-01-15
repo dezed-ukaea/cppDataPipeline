@@ -1,2 +1,6 @@
 build/
 .DS_STORE
+.vscode
+.bash_profile
+test/data_store/
+.fair
