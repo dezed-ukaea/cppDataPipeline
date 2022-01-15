@@ -5,7 +5,8 @@ FDP::Config::Config(const std::filesystem::path &config_file_path,
                     const std::filesystem::path &script_file_path,
                     const std::string &token, 
                     RESTAPI api_location)
-    : token_(token), config_file_path_(config_file_path), script_file_path_(script_file_path) {
+    : token_(token), config_file_path_(config_file_path), script_file_path_(script_file_path),
+    rest_api_location_(api_location) {
   validate_config(config_file_path, api_location);
   initialise(api_location);
 }

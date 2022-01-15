@@ -4,7 +4,9 @@
 #include "H5Cpp.h"
 #include "fdp/objects/data.hxx"
 #include "fdp/objects/distributions.hxx"
-#include "fdp/registry/file_system.hxx"
+#include "fdp/registry/data_io.hxx"
+#include "fdp/registry/api.hxx"
+#include "fdp/registry/datapipeline.hxx"
 #include "fdp/utilities/hdf5.hxx"
 #include "fdp/utilities/logging.hxx"
 #include "fdp/utilities/semver.hxx"
@@ -14,6 +16,39 @@
 #include <vector>
 
 using namespace FDP;
+
+class DataTest : public ::testing::Test {
+protected:
+  void SetUp() override {}
+  std::string getHomeDirectory() {
+    std::string HomeDirectory;
+#ifdef _WIN32
+    HomeDirectory = getenv("HOMEDRIVE");
+    HomeDirectory += getenv("HOMEPATH");
+#else
+    HomeDirectory = getenv("HOME");
+#endif
+    return HomeDirectory;
+  }
+
+  Config *config(bool use_local = true, std::string config = "config.yaml") {
+
+    const std::filesystem::path config_path_ =
+        std::filesystem::path(TESTDIR) / config;
+    const std::filesystem::path script_path_ =
+        std::filesystem::path(TESTDIR) / "test_script.sh";
+    APILogger->set_level(spdlog::level::debug);
+
+    return new Config(config_path_, script_path_, token,
+                                 static_cast<RESTAPI>(use_local));
+  }
+
+  std::string token =
+      read_token(std::filesystem::path(getHomeDirectory()) /
+                                    ".fair" / "registry" / "token");
+  void TearDown() override {}
+};
+
 
 //! [TestTOMLPERead]
 TEST(FDPAPITest, TestTOMLPERead) {
@@ -66,11 +101,8 @@ TEST(FDPAPITest, TestTableReadColumn) {
 //! [TestTableReadColumn]
 
 //! [TestWriteArray]
-TEST(FDPAPITest, TestWriteArray) {
+TEST_F(DataTest, TestWriteArray) {
   APILogger->set_level(spdlog::level::debug);
-  std::filesystem::path config_path_ =
-      std::filesystem::path(TESTDIR) / "config.yaml";
-  LocalFileSystem *file_system_ = new LocalFileSystem(config_path_);
   std::filesystem::path data_product_ = "test_writeout";
   std::filesystem::path component_ = "nd_array";
   std::vector<std::string> titles_ = {"dim_1", "dim_2", "dim_3"};
@@ -87,7 +119,7 @@ TEST(FDPAPITest, TestWriteArray) {
       new ArrayObject<int>(titles_, dim_names_, dimensions_, elements_);
 
   const std::filesystem::path output_file_ =
-      create_array(arr_, data_product_, component_, file_system_);
+      create_array(arr_, data_product_, component_, config());
 
   ASSERT_TRUE(std::filesystem::exists(output_file_));
   ArrayObject<int> *array_ = read_array<int>(output_file_, "nd_array");
@@ -98,12 +130,8 @@ TEST(FDPAPITest, TestWriteArray) {
 //! [TestWriteArray]
 
 //! [TestWriteTable]
-TEST(FDPAPITest, TestWriteTable) {
+TEST_F(DataTest, TestWriteTable) {
   APILogger->set_level(spdlog::level::debug);
-  std::filesystem::path config_path_ =
-      std::filesystem::path(TESTDIR) / "config.yaml";
-  LocalFileSystem *file_system_ = new LocalFileSystem(config_path_);
-
   DataTable *data_ = new DataTable;
 
   const std::vector<std::string> names_ = {"John", "Patrick", "Sarah",
@@ -116,23 +144,20 @@ TEST(FDPAPITest, TestWriteTable) {
   data_->add_column("height", heights_, "cm");
 
   ASSERT_NO_THROW(
-      create_table(data_, "demo/population", "sample", file_system_));
+      create_table(data_, "demo/population", "sample", config()));
 }
 //! [TestWriteTable]
 
 //! [TestWritePointEstimate]
-TEST(FDPAPITest, TestWritePointEstimate) {
+TEST_F(DataTest, TestWritePointEstimate) {
   APILogger->set_level(spdlog::level::debug);
-  std::filesystem::path config_path_ =
-      std::filesystem::path(TESTDIR) / "config.yaml";
-  LocalFileSystem *file_system_ = new LocalFileSystem(config_path_);
   const Versioning::version v_;
 
   const int value_ = 10;
   const std::string component_ = "demo_val/param";
 
   const std::filesystem::path output_file_ =
-      create_estimate(value_, component_, v_, file_system_);
+      create_estimate(value_, component_, v_, config());
 
   ASSERT_TRUE(std::filesystem::exists(output_file_));
   ASSERT_EQ(read_point_estimate_from_toml(output_file_), value_);
@@ -140,18 +165,15 @@ TEST(FDPAPITest, TestWritePointEstimate) {
 //! [TestWritePointEstimate]
 
 //! [TestWriteDistribution]
-TEST(FDPAPITest, TestWriteDistribution) {
+TEST_F(DataTest, TestWriteDistribution) {
   APILogger->set_level(spdlog::level::debug);
-  std::filesystem::path config_path_ =
-      std::filesystem::path(TESTDIR) / "config.yaml";
-  LocalFileSystem *file_system_ = new LocalFileSystem(config_path_);
   const Versioning::version v_;
   const std::string component_ = "demo_val/dist";
 
   Normal *norm_dist_ = new Normal(5.8, 0.1);
 
   const std::filesystem::path output_file_ =
-      create_distribution(norm_dist_, component_, v_, file_system_);
+      create_distribution(norm_dist_, component_, v_, config());
   ASSERT_TRUE(std::filesystem::exists(output_file_));
   ASSERT_EQ(read_distribution_from_toml(output_file_)->get_params()["mu"], 5.8);
 }

@@ -1,5 +1,5 @@
 /*! **************************************************************************
- * @file fdp/registry/file_system.hxx
+ * @file fdp/registry/config.hxx
  * @author K. Zarebski (UKAEA)
  * @date 2021-05-06
  * @brief File containing classes for interacting with the local file system
@@ -8,8 +8,8 @@
  * local file system. These include the reading of configurations, and
  * the reading/writing of data to locally.
  ****************************************************************************/
-#ifndef __FDP_FILESYSTEM_HXX__
-#define __FDP_FILESYSTEM_HXX__
+#ifndef __FDP_DATA_IO_HXX__
+#define __FDP_DATA_IO_HXX__
 
 #include "H5Cpp.h"
 #include "toml.hpp"
@@ -19,10 +19,12 @@
 #include <string>
 #include <vector>
 #include <yaml-cpp/yaml.h>
+#include <ghc/filesystem.hpp>
 
 #include <iostream>
 
 #include "fdp/objects/data.hxx"
+#include "fdp/registry/data_io.hxx"
 #include "fdp/objects/distributions.hxx"
 #include "fdp/objects/metadata.hxx"
 #include "fdp/registry/data_object.hxx"
@@ -47,6 +49,8 @@ using namespace H5; // Use the HDF5 library
             */
 
 namespace FDP {
+
+  class Config;
 /*! **************************************************************************
  * @brief parse the configuration file
  * @author K. Zarebski (UKAEA)
@@ -55,92 +59,13 @@ namespace FDP {
  *****************************************************************************/
 YAML::Node parse_config_();
 /*! ***************************************************************************
- * @class LocalFileSystem
+ * @class Config
  * @brief class for handling interaction with the local file system
  *
  * This class contains methods for interacting with the configuration file and
  * retrieving the information required to read/write data objects
  *****************************************************************************/
-class LocalFileSystem {
-private:
-  const std::filesystem::path config_path_;
-  const YAML::Node config_data_;
-  YAML::Node meta_data_() const;
 
-public:
-  /*! *************************************************************************
-   * @brief construct a LocalFileSystem instance using the given configuration
-   * @author K. Zarebski (UKAEA)
-   *
-   * @param config_file_path FDP Pipeline configuration YAML file path
-   ***************************************************************************/
-  LocalFileSystem(std::filesystem::path config_file_path);
-
-  /*! *************************************************************************
-   * @brief retrieve the data store location from the configuration file
-   * @author K. Zarebski (UKAEA)
-   *
-   * @return path of the local data store folder
-   ***************************************************************************/
-  std::filesystem::path get_data_store() const;
-
-  /*! *************************************************************************
-   * @brief read all data product entries listed in the configuration file
-   * @author K. Zarebski (UKAEA)
-   *
-   * @return objects representing the metadata for the read data products
-   ***************************************************************************/
-  std::vector<ReadObject::DataProduct *> read_data_products() const;
-
-  /*! *************************************************************************
-   * @brief read all external object entries listed in the configuration file
-   * @author K. Zarebski (UKAEA)
-   *
-   * @return objects representing the metadata for the read external objects
-   ***************************************************************************/
-  std::vector<ReadObject::ExternalObject *> read_external_objects() const;
-
-  /*! *************************************************************************
-   * @brief retrieve the default input namespace from the configuration file
-   * @author K. Zarebski (UKAEA)
-   *
-   * @return the default input namespace
-   ***************************************************************************/
-  std::string get_default_input_namespace() const;
-
-  /*! *************************************************************************
-   * @brief retrieve the default output namespace from the configuration file
-   * @author K. Zarebski (UKAEA)
-   *
-   * @return the default output namespace
-   ***************************************************************************/
-  std::string get_default_output_namespace() const;
-
-  /*! *************************************************************************
-   * @brief retrieve all configurations from the configuration file
-   * @author K. Zarebski (UKAEA)
-   *
-   * @return a YAML::Node object containing all configuration entries
-   ***************************************************************************/
-  YAML::Node get_config_data() const { return config_data_; }
-};
-
-/*! ***************************************************************************
- * @brief retrieves the first key from the given TOML data
- * @author K. Zarebski (UKAEA)
- *
- * @param data_table data read from a TOML file
- * @return std::string the first key within the given data set
- *****************************************************************************/
-std::string get_first_key_(const toml::value data_table);
-
-/*! ***************************************************************************
- * @brief construct a Distribution from the given extracted TOML data
- * @author K. Zarebski (UKAEA)
- *
- * @param data_table data read from a TOML file
- * @return distribution object matching the specification
- *****************************************************************************/
 Distribution *construct_dis_(const toml::value data_table);
 
 /*! ***************************************************************************
@@ -187,7 +112,7 @@ read_distribution_from_toml(const std::filesystem::path var_address);
  * @param value the value to save as a point estimate
  * @param data_product the address/label for the created data product
  * @param version_num the version associated with the value
- * @param file_system a local file system instance to use for writing
+ * @param config a local file system instance to use for writing
  * @return std::filesystem::path the output file location
  *
  * @paragraph testcases Test Case
@@ -202,10 +127,10 @@ template <typename T>
 std::filesystem::path create_estimate(T &value,
                                       const std::filesystem::path &data_product,
                                       const Versioning::version &version_num,
-                                      const LocalFileSystem *file_system) {
+                                      const Config *config) {
   const std::string param_name_ = data_product.stem().string();
-  const std::string namespace_ = file_system->get_default_output_namespace();
-  const std::filesystem::path data_store_ = file_system->get_data_store();
+  const std::string namespace_ = config->get_default_output_namespace();
+  const std::filesystem::path data_store_ = config->get_data_store();
   const toml::value data_{
       {param_name_, {{"type", "point-estimate"}, {"value", value}}}};
 
@@ -241,7 +166,7 @@ std::filesystem::path create_estimate(T &value,
  * @param distribution the distribution object to convert
  * @param data_product the address/label for the created data product
  * @param version_num the version associated with the value
- * @param file_system a local file system instance to use for writing
+ * @param config a local file system instance to use for writing
  * @return std::filesystem::path the output file location
  *
  * @paragraph testcases Test Case
@@ -254,7 +179,7 @@ std::filesystem::path create_estimate(T &value,
  *****************************************************************************/
 std::filesystem::path create_distribution(
     const Distribution *distribution, const std::filesystem::path &data_product,
-    const Versioning::version &version_num, const LocalFileSystem *file_system);
+    const Versioning::version &version_num, const Config *config);
 
 /*! ***************************************************************************
  * @brief Save a constructed data table to a HDF5 file
@@ -263,7 +188,7 @@ std::filesystem::path create_distribution(
  * @param table the data table to store
  * @param data_product the address/label for the created data product
  * @param component the name of the component/key to save to within the file
- * @param file_system a local file system instance to use for writing
+ * @param config a local file system instance to use for writing
  * @return std::filesystem::path the output file location
  *
  * @paragraph testcases Test Case
@@ -277,7 +202,7 @@ std::filesystem::path create_distribution(
 std::filesystem::path create_table(const DataTable *table,
                                    const std::filesystem::path &data_product,
                                    const std::filesystem::path &component,
-                                   const LocalFileSystem *file_system);
+                                   const Config *config);
 
 /*! ***************************************************************************
  * @brief Save a constructed array to a HDF5 file
@@ -287,7 +212,7 @@ std::filesystem::path create_table(const DataTable *table,
  * @param array values for saving to the file
  * @param data_product the address/label for the created data product
  * @param component the name of the component/key to save to within the file
- * @param file_system a local file system instance to use for writing
+ * @param config a local file system instance to use for writing
  * @return std::filesystem::path the output file location
  *
  * @paragraph testcases Test Case
@@ -302,12 +227,12 @@ template <typename T>
 std::filesystem::path create_array(const ArrayObject<T> *array,
                                    const std::filesystem::path &data_product,
                                    const std::filesystem::path &component,
-                                   const LocalFileSystem *file_system) {
+                                   const Config *config) {
   const PredType *dtype_ = HDF5::get_hdf5_type<T>();
 
   const std::filesystem::path name_space_ =
-      file_system->get_default_output_namespace();
-  const std::filesystem::path data_store_ = file_system->get_data_store();
+      config->get_default_output_namespace();
+  const std::filesystem::path data_store_ = config->get_data_store();
 
   const std::string output_file_name_ = current_time_stamp(true) + ".h5";
   const std::filesystem::path output_dir_ =
@@ -611,6 +536,9 @@ DataTableColumn<T> *read_table_column(const std::filesystem::path var_address,
 
   return new DataTableColumn<T>(column, unit_, row_names_, container_);
 }
+
+std::string get_first_key_(const toml::value data_table);
+
 }; // namespace FDP
 
 #endif

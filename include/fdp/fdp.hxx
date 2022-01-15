@@ -9,23 +9,14 @@ public:
       const std::filesystem::path &script_file_path,
       std::string token = "",
       spdlog::level::level_enum log_level = spdlog::level::info)
-      : pimpl_(new DataPipelineImpl_(config_file_path, script_file_path, token,
-                                     log_level)),
-        session_id_(generate_run_id(config_file_path)) {
-    if (!std::filesystem::exists(config_file_path)) {
-      APILogger->error("DataPipeline: Failed to retrieve configuration file "
-                       "'{0}', file does not exist",
-                       config_file_path.string());
-      throw config_parsing_error("No configuration file found");
-    }
-    APILogger->debug("DataPipeline: Initialising session '{0}'", session_id_);
+      : pimpl_(std::make_shared<DataPipelineImpl_>(config_file_path, script_file_path, token,
+                                     log_level)) {
+          
+    APILogger->debug("DataPipeline: Initialising session '{0}'", Pimpl()->get_code_run_uuid());
   }
 
   // 'finalise' method for the API
   ~DataPipeline();
-
-  void add_to_register(std::string &item);
-  double read_point_estimate(const std::filesystem::path &data_product);
 
   DataPipeline(DataPipeline &&rhs) noexcept;
   DataPipeline &operator=(DataPipeline &&rhs) noexcept;
@@ -33,8 +24,14 @@ public:
   DataPipeline(const DataPipeline &rhs);
   DataPipeline &operator=(const DataPipeline &rhs);
 
+  std::filesystem::path link_read(std::string &data_product);
+  std::filesystem::path link_write(std::string &data_product);
+  void finalise();
+
 private:
-  std::unique_ptr<DataPipelineImpl_> pimpl_;
-  const std::string session_id_;
+  const DataPipelineImpl_* Pimpl() const {return pimpl_.get();}
+  DataPipelineImpl_* Pimpl() {return pimpl_.get();}
+  
+  std::shared_ptr<DataPipelineImpl_> pimpl_;
 };
 }; // namespace FDP

@@ -20,7 +20,7 @@
 #include <ghc/filesystem.hpp>
 #include <stdio.h>
 
-#include "fdp/registry/file_system.hxx"
+#include "fdp/registry/data_io.hxx"
 #include "fdp/registry/api.hxx"
 #include "fdp/objects/api_object.hxx"
 #include "fdp/objects/io_object.hxx"
@@ -66,7 +66,8 @@ namespace FDP {
             std::map<std::string, IOObject> outputs_;
             std::map<std::string, IOObject> inputs_;
 
-            
+            RESTAPI rest_api_location_ = RESTAPI::LOCAL;
+
             bool config_has_writes() const;
             bool config_has_reads() const;
 
@@ -88,6 +89,7 @@ namespace FDP {
             bool has_inputs() const;
 
             std::filesystem::path get_config_file_path() const {return config_file_path_;}
+            std::filesystem::path get_script_file_path() const {return script_file_path_;}
             std::string get_token() const {return token_;}
             std::string get_api_url() const {return api_url_;}
             std::filesystem::path get_data_store() const;
@@ -110,6 +112,8 @@ namespace FDP {
             YAML::Node get_config_data() const {return config_data_;}
 
             std::shared_ptr<API> get_api(){return api_;}
+
+            RESTAPI get_rest_api_location(){return rest_api_location_;}
 
     };
 };

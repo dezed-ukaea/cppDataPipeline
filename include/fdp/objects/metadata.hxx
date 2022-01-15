@@ -79,6 +79,8 @@ std::string remove_backslash_from_path(const std::string &path);
 
 bool FileExists( const std::string &Filename );
 
+std::string read_token(const std::filesystem::path &token_path);
+
 }; // namespace FDP
 
 #endif

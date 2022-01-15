@@ -42,7 +42,7 @@ protected:
   }
 
   std::string token =
-      DataPipelineImpl_::read_token(std::filesystem::path(getHomeDirectory()) /
+      read_token(std::filesystem::path(getHomeDirectory()) /
                                     ".fair" / "registry" / "token");
   void TearDown() override {}
 };

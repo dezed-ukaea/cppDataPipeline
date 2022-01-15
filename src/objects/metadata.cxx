@@ -89,4 +89,12 @@ bool FileExists( const std::string &Filename )
     return access( Filename.c_str(), 0 ) == 0;
 }
 
+std::string read_token(const std::filesystem::path &token_path){
+  std::ifstream key_(token_path, std::ios::in);
+  std::string key_str_;
+  key_ >> key_str_;
+  key_.close();
+  return key_str_;
+}
+
 }; // namespace FDP

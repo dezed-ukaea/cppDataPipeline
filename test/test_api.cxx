@@ -29,7 +29,7 @@ protected:
   std::string api_url_ = "http://127.0.0.1:8000/api";
   FDP::API *api_ = new FDP::API(api_url_);
   std::string token =
-      DataPipelineImpl_::read_token(std::filesystem::path(getHomeDirectory()) /
+      read_token(std::filesystem::path(getHomeDirectory()) /
                                     ".fair" / "registry" / "token");
   void TearDown() override {
     delete api_;
