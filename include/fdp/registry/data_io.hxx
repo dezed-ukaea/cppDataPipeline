@@ -129,7 +129,7 @@ std::filesystem::path create_estimate(T &value,
                                       const Config *config
                                       ) {
   const std::string param_name_ = data_product.stem().string();
-  const std::string namespace_ = config.get_default_output_namespace();
+  const std::string namespace_ = config->get_default_output_namespace();
   const std::filesystem::path data_store_ = config->get_data_store();
   const toml::value data_{
       {param_name_, {{"type", "point-estimate"}, {"value", value}}}};
