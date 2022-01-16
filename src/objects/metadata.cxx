@@ -1,8 +1,8 @@
 #include "fdp/objects/metadata.hxx"
 
 namespace FDP {
-std::string calculate_hash_from_file(const std::filesystem::path &file_path) {
-  if (!std::filesystem::exists(file_path)) {
+std::string calculate_hash_from_file(const ghc::filesystem::path &file_path) {
+  if (!ghc::filesystem::exists(file_path)) {
     throw std::invalid_argument("File '" + file_path.string() + "' not found");
   }
 
@@ -49,7 +49,7 @@ std::string generate_random_hash() {
   return calculate_hash_from_string(random_string);
 }
 
-std::string generate_run_id(std::filesystem::path config_file_path) {
+std::string generate_run_id(ghc::filesystem::path config_file_path) {
   const std::string config_hash_ = calculate_hash_from_file(config_file_path);
   auto t_ = std::time(nullptr);
   auto tm_ = *std::gmtime(&t_);
@@ -89,7 +89,7 @@ bool FileExists( const std::string &Filename )
     return access( Filename.c_str(), 0 ) == 0;
 }
 
-std::string read_token(const std::filesystem::path &token_path){
+std::string read_token(const ghc::filesystem::path &token_path){
   std::ifstream key_(token_path, std::ios::in);
   std::string key_str_;
   key_ >> key_str_;

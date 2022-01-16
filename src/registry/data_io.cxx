@@ -1,32 +1,32 @@
 #include "fdp/registry/data_io.hxx"
 #include "fdp/objects/config.hxx"
 namespace FDP {
-YAML::Node parse_yaml_(std::filesystem::path yaml_path) {
+YAML::Node parse_yaml_(ghc::filesystem::path yaml_path) {
   APILogger->debug("LocalFileSystem: Reading configuration file '{0}'",
                    yaml_path.string().c_str());
   return YAML::LoadFile(yaml_path.string().c_str());
 }
 
-std::filesystem::path create_table(const DataTable *table,
-                                   const std::filesystem::path &data_product,
-                                   const std::filesystem::path &component,
+ghc::filesystem::path create_table(const DataTable *table,
+                                   const ghc::filesystem::path &data_product,
+                                   const ghc::filesystem::path &component,
                                    const Config *config) {
-  const std::filesystem::path name_space_ =
+  const ghc::filesystem::path name_space_ =
       config->get_default_output_namespace();
-  const std::filesystem::path data_store_ = config->get_data_store();
+  const ghc::filesystem::path data_store_ = config->get_data_store();
 
   const std::string output_file_name_ = current_time_stamp(true) + ".h5";
-  const std::filesystem::path output_dir_ =
+  const ghc::filesystem::path output_dir_ =
       data_store_ / name_space_ / data_product;
-  const std::filesystem::path output_path_ = output_dir_ / output_file_name_;
+  const ghc::filesystem::path output_path_ = output_dir_ / output_file_name_;
   const std::string arr_name_ = std::string(TABLE);
 
   if (output_path_.extension() != ".h5") {
     throw std::invalid_argument("Output file name for array must be HDF5");
   }
 
-  if (!std::filesystem::exists(output_dir_))
-    std::filesystem::create_directories(output_dir_);
+  if (!ghc::filesystem::exists(output_dir_))
+    ghc::filesystem::create_directories(output_dir_);
 
   H5File *output_file_ = new H5File(output_path_.string(), H5F_ACC_TRUNC);
 
@@ -141,7 +141,7 @@ std::filesystem::path create_table(const DataTable *table,
   delete dataset_;
   delete output_file_;
 
-  if (!std::filesystem::exists(output_path_)) {
+  if (!ghc::filesystem::exists(output_path_)) {
     APILogger->error("Failed to create output HDF5 file '{0}' for object '{1}'",
                      output_path_.string(), data_product.string());
     throw std::runtime_error("Failed to write output");
@@ -198,14 +198,14 @@ std::filesystem::path create_table(const DataTable *table,
   return output_path_;
 }
 
-std::filesystem::path
+ghc::filesystem::path
 create_distribution(const Distribution *distribution,
-                    const std::filesystem::path &data_product,
+                    const ghc::filesystem::path &data_product,
                     const Versioning::version &version_num,
                     const Config *config) {
   const std::string param_name_ = data_product.stem().string();
   const std::string namespace_ = config->get_default_output_namespace();
-  const std::filesystem::path data_store_ = config->get_data_store();
+  const ghc::filesystem::path data_store_ = config->get_data_store();
   toml::value data_{
       {param_name_,
        {{"type", "distribution"}, {"distribution", distribution->get_name()}}}};
@@ -214,13 +214,13 @@ create_distribution(const Distribution *distribution,
     data_[param_name_][param.first] = param.second;
   }
 
-  const std::filesystem::path output_filename_ =
+  const ghc::filesystem::path output_filename_ =
       data_store_ / namespace_ / data_product.parent_path() /
       std::string(version_num.to_string() + ".toml");
   std::ofstream toml_out_;
 
-  if (!std::filesystem::exists(output_filename_.parent_path())) {
-    std::filesystem::create_directories(output_filename_.parent_path());
+  if (!ghc::filesystem::exists(output_filename_.parent_path())) {
+    ghc::filesystem::create_directories(output_filename_.parent_path());
   }
 
   toml_out_.open(output_filename_);
@@ -239,8 +239,8 @@ create_distribution(const Distribution *distribution,
   return output_filename_;
 }
 
-double read_point_estimate_from_toml(const std::filesystem::path var_address) {
-  if (!std::filesystem::exists(var_address)) {
+double read_point_estimate_from_toml(const ghc::filesystem::path var_address) {
+  if (!ghc::filesystem::exists(var_address)) {
     throw std::runtime_error("File '" + var_address.string() +
                              "' could not be opened as it does not exist");
   }
@@ -303,8 +303,8 @@ Distribution *construct_dis_(const toml::value data_table) {
 }
 
 Distribution *
-read_distribution_from_toml(const std::filesystem::path var_address) {
-  if (!std::filesystem::exists(var_address)) {
+read_distribution_from_toml(const ghc::filesystem::path var_address) {
+  if (!ghc::filesystem::exists(var_address)) {
     throw std::runtime_error("File '" + var_address.string() +
                              "' could not be opened as it does not exist");
   }
@@ -328,8 +328,8 @@ read_distribution_from_toml(const std::filesystem::path var_address) {
 }
 
 std::string get_first_key_(const toml::value data_table) {
-  for (const auto &[k, v] : data_table.as_table()) {
-    return k;
+  for (auto const& i : data_table.as_table()) {
+    return i.first;
   }
 
   return "";

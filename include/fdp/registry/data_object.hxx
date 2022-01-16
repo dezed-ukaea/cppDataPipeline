@@ -12,7 +12,7 @@
 
 #include <ctime>
 #include <exception>
-#include <filesystem>
+#include <ghc/filesystem.hpp>
 #include <yaml-cpp/yaml.h>
 
 #include "fdp/exceptions.hxx"
@@ -42,8 +42,8 @@ class DataProduct {
 private:
   const std::string namespace_;
   const Versioning::version version_;
-  const std::filesystem::path registry_path_;
-  const std::filesystem::path cache_ = std::filesystem::path();
+  const ghc::filesystem::path registry_path_;
+  const ghc::filesystem::path cache_ = ghc::filesystem::path();
   const std::string title_ = "";
 
 public:
@@ -59,7 +59,7 @@ public:
    *************************************************************************/
   DataProduct(std::string registry_path, std::string version,
               std::string name_space = "", std::string title = "",
-              std::filesystem::path cache_path = "")
+              ghc::filesystem::path cache_path = "")
       : registry_path_(registry_path), version_(version),
         namespace_(name_space), title_(title), cache_(cache_path) {}
 
@@ -69,7 +69,7 @@ public:
    * @return path of the data product within the registry
    *
    ************************************************************************/
-  std::filesystem::path get_path() const { return registry_path_; }
+  ghc::filesystem::path get_path() const { return registry_path_; }
 
   /*! **********************************************************************
    * @brief Get the version of the data product as a version object
@@ -120,7 +120,7 @@ private:
   const DOI *doi_ = nullptr;
   const std::string name_ = "";
   const std::string title_ = "";
-  std::filesystem::path cache_location_ = std::filesystem::path();
+  ghc::filesystem::path cache_location_ = ghc::filesystem::path();
 
 public:
   /*! ***********************************************************************
@@ -134,7 +134,7 @@ public:
    *************************************************************************/
   ExternalObject(const std::string &title = "", const DOI *doi = nullptr,
                  const std::string &name = "",
-                 std::filesystem::path cache_path = "")
+                 ghc::filesystem::path cache_path = "")
       : title_(title), doi_(doi), name_(name), cache_location_(cache_path) {}
 
   /*! ***********************************************************************
@@ -223,7 +223,7 @@ private:
   const std::string title_ = "";
   const std::string description_ = "";
   const std::string unique_name_ = "";
-  const std::filesystem::path product_name_ = "";
+  const ghc::filesystem::path product_name_ = "";
   const std::string file_type_ = "";
   const tm release_date_;
   const Versioning::version version_ = Versioning::version();
@@ -276,7 +276,7 @@ public:
 namespace WriteObject {
 class DataProduct {
 private:
-  const std::filesystem::path registry_path_;
+  const ghc::filesystem::path registry_path_;
   const std::string component_;
 };
 }; // namespace WriteObject

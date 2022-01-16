@@ -81,8 +81,8 @@ protected:
   const std::string name_;
   friend std::ostream &operator<<(std::ostream &os, const Distribution &d) {
     os << d.name_ << "(";
-    for (const auto &[k, v] : d.parameters_) {
-      os << k << "=" << v << ",";
+    for (auto const& i : d.parameters_) {
+      os << i.first << "=" << i.second << ",";
     }
 
     os << ")";

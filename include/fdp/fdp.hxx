@@ -5,11 +5,11 @@ class DataPipeline {
 public:
   // 'initialise' method for the API
   explicit DataPipeline(
-      const std::filesystem::path &config_file_path,
-      const std::filesystem::path &script_file_path,
+      const std::string &config_file_path,
+      const std::string &script_file_path,
       std::string token = "",
       spdlog::level::level_enum log_level = spdlog::level::info)
-      : pimpl_(std::make_shared<DataPipelineImpl_>(config_file_path, script_file_path, token,
+      : pimpl_(std::make_shared<DataPipelineImpl_>(ghc::filesystem::path(config_file_path), ghc::filesystem::path(script_file_path), token,
                                      log_level)) {
           
     APILogger->debug("DataPipeline: Initialising session '{0}'", Pimpl()->get_code_run_uuid());
@@ -24,8 +24,8 @@ public:
   DataPipeline(const DataPipeline &rhs);
   DataPipeline &operator=(const DataPipeline &rhs);
 
-  std::filesystem::path link_read(std::string &data_product);
-  std::filesystem::path link_write(std::string &data_product);
+  ghc::filesystem::path link_read(std::string &data_product);
+  ghc::filesystem::path link_write(std::string &data_product);
   void finalise();
 
 private:

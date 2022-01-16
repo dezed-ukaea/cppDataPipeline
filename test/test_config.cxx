@@ -31,10 +31,10 @@ protected:
 
   Config *config(bool use_local = true, std::string config = "write_csv.yaml") {
 
-    const std::filesystem::path config_path_ =
-        std::filesystem::path(TESTDIR) / "data" / config;
-    const std::filesystem::path script_path_ =
-        std::filesystem::path(TESTDIR) / "test_script.sh";
+    const ghc::filesystem::path config_path_ =
+        ghc::filesystem::path(TESTDIR) / "data" / config;
+    const ghc::filesystem::path script_path_ =
+        ghc::filesystem::path(TESTDIR) / "test_script.sh";
     APILogger->set_level(spdlog::level::debug);
 
     return new Config(config_path_, script_path_, token,
@@ -42,7 +42,7 @@ protected:
   }
 
   std::string token =
-      read_token(std::filesystem::path(getHomeDirectory()) /
+      read_token(ghc::filesystem::path(getHomeDirectory()) /
                                     ".fair" / "registry" / "token");
   void TearDown() override {}
 };
@@ -63,7 +63,7 @@ TEST_F(ConfigTest, TestMetaData) {
 TEST_F(ConfigTest, TestLinkWrite){
   Config *cnf = config();
   std::string data_product = "test/csv";
-  std::filesystem::path currentLink = std::filesystem::path(cnf->link_write(data_product));
+  ghc::filesystem::path currentLink = ghc::filesystem::path(cnf->link_write(data_product));
   EXPECT_GT(currentLink.string().size(), 1);
 
   std::ofstream testCSV;
@@ -78,7 +78,7 @@ TEST_F(ConfigTest, TestLinkWrite){
 TEST_F(ConfigTest, TestLinkRead){
   Config *cnf = config(true, "read_csv.yaml");
   std::string data_product = "test/csv";
-  std::filesystem::path currentLink = cnf->link_read(data_product);
+  ghc::filesystem::path currentLink = cnf->link_read(data_product);
   EXPECT_GT(currentLink.string().size(), 1);
 
   cnf->finalise();

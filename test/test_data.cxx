@@ -33,10 +33,10 @@ protected:
 
   Config *config(bool use_local = true, std::string config = "config.yaml") {
 
-    const std::filesystem::path config_path_ =
-        std::filesystem::path(TESTDIR) / config;
-    const std::filesystem::path script_path_ =
-        std::filesystem::path(TESTDIR) / "test_script.sh";
+    const ghc::filesystem::path config_path_ =
+        ghc::filesystem::path(TESTDIR) / config;
+    const ghc::filesystem::path script_path_ =
+        ghc::filesystem::path(TESTDIR) / "test_script.sh";
     APILogger->set_level(spdlog::level::debug);
 
     return new Config(config_path_, script_path_, token,
@@ -44,7 +44,7 @@ protected:
   }
 
   std::string token =
-      read_token(std::filesystem::path(getHomeDirectory()) /
+      read_token(ghc::filesystem::path(getHomeDirectory()) /
                                     ".fair" / "registry" / "token");
   void TearDown() override {}
 };
@@ -53,8 +53,8 @@ protected:
 //! [TestTOMLPERead]
 TEST(FDPAPITest, TestTOMLPERead) {
   APILogger->set_level(spdlog::level::debug);
-  const std::filesystem::path test_file =
-      std::filesystem::path(TESTDIR) / std::filesystem::path("data") / std::filesystem::path("test_pe.toml");
+  const ghc::filesystem::path test_file =
+      ghc::filesystem::path(TESTDIR) / ghc::filesystem::path("data") / ghc::filesystem::path("test_pe.toml");
   ASSERT_EQ(read_point_estimate_from_toml(test_file), 11);
 }
 //! [TestTOMLPERead]
@@ -62,8 +62,8 @@ TEST(FDPAPITest, TestTOMLPERead) {
 //! [TestTOMLDisRead]
 TEST(FDPAPITest, TestTOMLDisRead) {
   APILogger->set_level(spdlog::level::debug);
-  const std::filesystem::path test_file =
-      std::filesystem::path(TESTDIR) / std::filesystem::path("data") / std::filesystem::path("test_dis.toml");
+  const ghc::filesystem::path test_file =
+      ghc::filesystem::path(TESTDIR) / ghc::filesystem::path("data") / ghc::filesystem::path("test_dis.toml");
   Normal dis(*read_distribution_from_toml(test_file));
   ASSERT_EQ(dis.mean(), 2.675739);
   ASSERT_EQ(dis.standard_deviation(), 0.5719293);
@@ -73,9 +73,9 @@ TEST(FDPAPITest, TestTOMLDisRead) {
 //! [TestArrayRead]
 TEST(FDPAPITest, TestArrayRead) {
   APILogger->set_level(spdlog::level::debug);
-  const std::filesystem::path test_file =
-      std::filesystem::path(TESTDIR) / std::filesystem::path("data") / std::filesystem::path("test_array.h5");
-  const std::filesystem::path key = "/contact_matrices/home";
+  const ghc::filesystem::path test_file =
+      ghc::filesystem::path(TESTDIR) / ghc::filesystem::path("data") / ghc::filesystem::path("test_array.h5");
+  const ghc::filesystem::path key = "/contact_matrices/home";
 
   ArrayObject<double> *array_ = read_array<double>(test_file, key);
 
@@ -88,9 +88,9 @@ TEST(FDPAPITest, TestArrayRead) {
 //! [TestTableReadColumn]
 TEST(FDPAPITest, TestTableReadColumn) {
   APILogger->set_level(spdlog::level::debug);
-  const std::filesystem::path test_file =
-      std::filesystem::path(TESTDIR) / std::filesystem::path("data") / std::filesystem::path("test_table.h5");
-  const std::filesystem::path key = "/conversiontable/scotland";
+  const ghc::filesystem::path test_file =
+      ghc::filesystem::path(TESTDIR) / ghc::filesystem::path("data") / ghc::filesystem::path("test_table.h5");
+  const ghc::filesystem::path key = "/conversiontable/scotland";
   const std::string column = "URcode";
 
   DataTableColumn<double> *column_ =
@@ -103,8 +103,8 @@ TEST(FDPAPITest, TestTableReadColumn) {
 //! [TestWriteArray]
 TEST_F(DataTest, TestWriteArray) {
   APILogger->set_level(spdlog::level::debug);
-  std::filesystem::path data_product_ = "test_writeout";
-  std::filesystem::path component_ = "nd_array";
+  ghc::filesystem::path data_product_ = "test_writeout";
+  ghc::filesystem::path component_ = "nd_array";
   std::vector<std::string> titles_ = {"dim_1", "dim_2", "dim_3"};
   std::vector<std::vector<std::string>> dim_names_ = {
       {"a1", "a2", "a3"}, {"b1", "b2", "b3"}, {"c1", "c2", "c3"}};
@@ -118,10 +118,10 @@ TEST_F(DataTest, TestWriteArray) {
   ArrayObject<int> *arr_ =
       new ArrayObject<int>(titles_, dim_names_, dimensions_, elements_);
 
-  const std::filesystem::path output_file_ =
+  const ghc::filesystem::path output_file_ =
       create_array(arr_, data_product_, component_, config());
 
-  ASSERT_TRUE(std::filesystem::exists(output_file_));
+  ASSERT_TRUE(ghc::filesystem::exists(output_file_));
   ArrayObject<int> *array_ = read_array<int>(output_file_, "nd_array");
   ASSERT_EQ(array_->get_title(0), "dim_1");
   ASSERT_EQ(array_->get_dimension_names(0)[0], "a1");
@@ -156,10 +156,10 @@ TEST_F(DataTest, TestWritePointEstimate) {
   const int value_ = 10;
   const std::string component_ = "demo_val/param";
 
-  const std::filesystem::path output_file_ =
+  const ghc::filesystem::path output_file_ =
       create_estimate(value_, component_, v_, config());
 
-  ASSERT_TRUE(std::filesystem::exists(output_file_));
+  ASSERT_TRUE(ghc::filesystem::exists(output_file_));
   ASSERT_EQ(read_point_estimate_from_toml(output_file_), value_);
 }
 //! [TestWritePointEstimate]
@@ -172,9 +172,9 @@ TEST_F(DataTest, TestWriteDistribution) {
 
   Normal *norm_dist_ = new Normal(5.8, 0.1);
 
-  const std::filesystem::path output_file_ =
+  const ghc::filesystem::path output_file_ =
       create_distribution(norm_dist_, component_, v_, config());
-  ASSERT_TRUE(std::filesystem::exists(output_file_));
+  ASSERT_TRUE(ghc::filesystem::exists(output_file_));
   ASSERT_EQ(read_distribution_from_toml(output_file_)->get_params()["mu"], 5.8);
 }
 //! [TestWriteDistribution]

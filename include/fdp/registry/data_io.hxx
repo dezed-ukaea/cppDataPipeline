@@ -14,7 +14,7 @@
 #include "H5Cpp.h"
 #include "toml.hpp"
 #include <cstdlib>
-#include <filesystem>
+#include <ghc/filesystem.hpp>
 #include <stdexcept>
 #include <string>
 #include <vector>
@@ -82,7 +82,7 @@ Distribution *construct_dis_(const toml::value data_table);
  *    @snippet `test/test_filesystem.cxx TestTOMLPERead
  *
  *****************************************************************************/
-double read_point_estimate_from_toml(const std::filesystem::path var_address);
+double read_point_estimate_from_toml(const ghc::filesystem::path var_address);
 
 /*! ***************************************************************************
  * @brief read parameters for a distribution from a given TOML file and
@@ -101,7 +101,7 @@ double read_point_estimate_from_toml(const std::filesystem::path var_address);
  *
  *****************************************************************************/
 Distribution *
-read_distribution_from_toml(const std::filesystem::path var_address);
+read_distribution_from_toml(const ghc::filesystem::path var_address);
 
 /*! ***************************************************************************
  * @brief Create a point estimate and save it to a TOML file
@@ -112,7 +112,7 @@ read_distribution_from_toml(const std::filesystem::path var_address);
  * @param data_product the address/label for the created data product
  * @param version_num the version associated with the value
  * @param config a local file system instance to use for writing
- * @return std::filesystem::path the output file location
+ * @return ghc::filesystem::path the output file location
  *
  * @paragraph testcases Test Case
  *    `test/test_filesystem.cxx`: TestWritePointEstimate
@@ -123,24 +123,24 @@ read_distribution_from_toml(const std::filesystem::path var_address);
  *
  *****************************************************************************/
 template <typename T>
-std::filesystem::path create_estimate(T &value,
-                                      const std::filesystem::path &data_product,
+ghc::filesystem::path create_estimate(T &value,
+                                      const ghc::filesystem::path &data_product,
                                       const Versioning::version &version_num,
                                       const Config *config
                                       ) {
   const std::string param_name_ = data_product.stem().string();
   const std::string namespace_ = config->get_default_output_namespace();
-  const std::filesystem::path data_store_ = config->get_data_store();
+  const ghc::filesystem::path data_store_ = config->get_data_store();
   const toml::value data_{
       {param_name_, {{"type", "point-estimate"}, {"value", value}}}};
 
-  const std::filesystem::path output_filename_ =
+  const ghc::filesystem::path output_filename_ =
       data_store_ / namespace_ / data_product.parent_path() /
       std::string(version_num.to_string() + ".toml");
   std::ofstream toml_out_;
 
-  if (!std::filesystem::exists(output_filename_.parent_path())) {
-    std::filesystem::create_directories(output_filename_.parent_path());
+  if (!ghc::filesystem::exists(output_filename_.parent_path())) {
+    ghc::filesystem::create_directories(output_filename_.parent_path());
   }
 
   toml_out_.open(output_filename_);
@@ -167,7 +167,7 @@ std::filesystem::path create_estimate(T &value,
  * @param data_product the address/label for the created data product
  * @param version_num the version associated with the value
  * @param config a local file system instance to use for writing
- * @return std::filesystem::path the output file location
+ * @return ghc::filesystem::path the output file location
  *
  * @paragraph testcases Test Case
  *    `test/test_filesystem.cxx`: TestWriteDistribution
@@ -177,8 +177,8 @@ std::filesystem::path create_estimate(T &value,
  *    @snippet `test/test_filesystem.cxx TestWriteDistribution
  *
  *****************************************************************************/
-std::filesystem::path create_distribution(
-    const Distribution *distribution, const std::filesystem::path &data_product,
+ghc::filesystem::path create_distribution(
+    const Distribution *distribution, const ghc::filesystem::path &data_product,
     const Versioning::version &version_num, const Config *config);
 
 /*! ***************************************************************************
@@ -189,7 +189,7 @@ std::filesystem::path create_distribution(
  * @param data_product the address/label for the created data product
  * @param component the name of the component/key to save to within the file
  * @param config a local file system instance to use for writing
- * @return std::filesystem::path the output file location
+ * @return ghc::filesystem::path the output file location
  *
  * @paragraph testcases Test Case
  *    `test/test_filesystem.cxx`: TestWriteTable
@@ -199,9 +199,9 @@ std::filesystem::path create_distribution(
  *    @snippet `test/test_filesystem.cxx TestWriteTable
  *
  *****************************************************************************/
-std::filesystem::path create_table(const DataTable *table,
-                                   const std::filesystem::path &data_product,
-                                   const std::filesystem::path &component,
+ghc::filesystem::path create_table(const DataTable *table,
+                                   const ghc::filesystem::path &data_product,
+                                   const ghc::filesystem::path &component,
                                    const Config *config);
 
 /*! ***************************************************************************
@@ -213,7 +213,7 @@ std::filesystem::path create_table(const DataTable *table,
  * @param data_product the address/label for the created data product
  * @param component the name of the component/key to save to within the file
  * @param config a local file system instance to use for writing
- * @return std::filesystem::path the output file location
+ * @return ghc::filesystem::path the output file location
  *
  * @paragraph testcases Test Case
  *    `test/test_filesystem.cxx`: TestWriteArray
@@ -224,28 +224,28 @@ std::filesystem::path create_table(const DataTable *table,
  *
  *****************************************************************************/
 template <typename T>
-std::filesystem::path create_array(const ArrayObject<T> *array,
-                                   const std::filesystem::path &data_product,
-                                   const std::filesystem::path &component,
+ghc::filesystem::path create_array(const ArrayObject<T> *array,
+                                   const ghc::filesystem::path &data_product,
+                                   const ghc::filesystem::path &component,
                                    const Config *config) {
   const PredType *dtype_ = HDF5::get_hdf5_type<T>();
 
-  const std::filesystem::path name_space_ =
+  const ghc::filesystem::path name_space_ =
       config->get_default_output_namespace();
-  const std::filesystem::path data_store_ = config->get_data_store();
+  const ghc::filesystem::path data_store_ = config->get_data_store();
 
   const std::string output_file_name_ = current_time_stamp(true) + ".h5";
-  const std::filesystem::path output_dir_ =
+  const ghc::filesystem::path output_dir_ =
       data_store_ / name_space_ / data_product;
-  const std::filesystem::path output_path_ = output_dir_ / output_file_name_;
+  const ghc::filesystem::path output_path_ = output_dir_ / output_file_name_;
   const std::string arr_name_ = std::string(ARRAY);
 
   if (output_path_.extension() != ".h5") {
     throw std::invalid_argument("Output file name for array must be HDF5");
   }
 
-  if (!std::filesystem::exists(output_dir_))
-    std::filesystem::create_directories(output_dir_);
+  if (!ghc::filesystem::exists(output_dir_))
+    ghc::filesystem::create_directories(output_dir_);
 
   H5File *output_file_ = new H5File(output_path_.string().c_str(), H5F_ACC_TRUNC);
 
@@ -381,11 +381,11 @@ std::filesystem::path create_array(const ArrayObject<T> *array,
  *
  *******************************************************************/
 template <typename T>
-ArrayObject<T> *read_array(const std::filesystem::path var_address,
-                           const std::filesystem::path key) {
+ArrayObject<T> *read_array(const ghc::filesystem::path var_address,
+                           const ghc::filesystem::path key) {
   APILogger->debug("FileSystem:ReadArray: Opening file '{0}'",
                    var_address.string());
-  if (!std::filesystem::exists(var_address)) {
+  if (!ghc::filesystem::exists(var_address)) {
     throw std::runtime_error("Could not open HDF5 file '" +
                              var_address.string() + "', file does not exist.");
   }
@@ -393,8 +393,8 @@ ArrayObject<T> *read_array(const std::filesystem::path var_address,
   const H5File *file_ = new H5File(var_address.string().c_str(), H5F_ACC_RDONLY);
 
   // ------------- ARRAY RETRIEVAL -------------- //
-
-  const std::string array_key_ = key.string() + "/" + std::string(ARRAY);
+  std::string key_ = std::regex_replace(key.string(), std::regex(std::string("\\\\")), "/");
+  const std::string array_key_ = key_ + "/" + std::string(ARRAY);
   APILogger->debug("FileSystem:ReadArray: Reading key '{0}'", array_key_);
 
   DataSet *data_set_ = new DataSet(file_->openDataSet(array_key_.c_str()));
@@ -431,7 +431,7 @@ ArrayObject<T> *read_array(const std::filesystem::path var_address,
 
   for (int i{0}; i < n_titles_; ++i) {
     const std::string title_key_ =
-        key.string() + "/" + std::string(DIMENSION_PREFIX) +
+        key_ + "/" + std::string(DIMENSION_PREFIX) +
         std::to_string(i + 1) + std::string(DIM_TITLE_SUFFIX);
     titles_.push_back(
         HDF5::read_hdf5_object<std::string>(var_address, title_key_));
@@ -445,7 +445,7 @@ ArrayObject<T> *read_array(const std::filesystem::path var_address,
 
   for (int i{0}; i < n_name_sets_; ++i) {
     const std::string names_key_ =
-        key.string() + "/" + std::string(DIMENSION_PREFIX) +
+        key_ + "/" + std::string(DIMENSION_PREFIX) +
         std::to_string(i + 1) + std::string(DIM_NAME_SUFFIX);
     const std::vector<std::string> names_i_str_ =
         HDF5::read_hdf5_as_str_vector(var_address, names_key_);
@@ -487,12 +487,12 @@ ArrayObject<T> *read_array(const std::filesystem::path var_address,
  *
  *******************************************************************/
 template <typename T>
-DataTableColumn<T> *read_table_column(const std::filesystem::path var_address,
-                                      const std::filesystem::path key,
+DataTableColumn<T> *read_table_column(const ghc::filesystem::path var_address,
+                                      const ghc::filesystem::path key,
                                       const std::string column) {
   APILogger->debug("FileSystem:ReadArray: Opening file '{0}'",
                    var_address.string());
-  if (!std::filesystem::exists(var_address)) {
+  if (!ghc::filesystem::exists(var_address)) {
     throw std::runtime_error("Could not open HDF5 file '" +
                              var_address.string() + "', file does not exist.");
   }
@@ -500,15 +500,15 @@ DataTableColumn<T> *read_table_column(const std::filesystem::path var_address,
   const H5File *file_ = new H5File(var_address.string().c_str(), H5F_ACC_RDONLY);
 
   // ------------ COLUMN RETRIEVAL ----------- //
-
-  const std::string array_key_ = key.string() + "/" + std::string(TABLE);
+  std::string key_ = std::regex_replace(key.string(), std::regex(std::string("\\\\")), "/");
+  const std::string array_key_ = key_ + "/" + std::string(TABLE);
 
   const std::vector<T> container_ =
       HDF5::read_hdf5_comp_type_member<T>(var_address, array_key_, column);
 
   // ------------ UNITS RETRIEVAL ------------ //
 
-  const std::string units_key_ = key.string() + "/" + std::string(COLUMN_UNITS);
+  const std::string units_key_ = key_ + "/" + std::string(COLUMN_UNITS);
 
   const int col_index_ =
       HDF5::get_comptype(var_address, array_key_)->getMemberIndex(column);
@@ -527,7 +527,7 @@ DataTableColumn<T> *read_table_column(const std::filesystem::path var_address,
   // ------ ROW NAMES RETRIEVAL ---- //
 
   const std::string row_names_key_ =
-      key.string() + "/" + std::string(ROW_NAMES);
+      key_ + "/" + std::string(ROW_NAMES);
 
   const std::vector<std::string> row_names_ =
       HDF5::read_hdf5_as_str_vector(var_address, row_names_key_);

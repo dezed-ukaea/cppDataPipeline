@@ -11,7 +11,7 @@
 #define __FDP_METADATA_HXX__
 
 #include <ctime>
-#include <filesystem>
+#include <ghc/filesystem.hpp>
 #include <fstream>
 #include <iomanip>
 #include <iostream>
@@ -36,7 +36,7 @@ namespace FDP {
  *
  * @return the hash obtained from the file contents
  ****************************************************************************/
-std::string calculate_hash_from_file(const std::filesystem::path &);
+std::string calculate_hash_from_file(const ghc::filesystem::path &);
 
 /*! **************************************************************************
  * @brief calculates a hash from a given string via SHA1
@@ -62,7 +62,7 @@ std::string generate_random_hash();
  * @param config_file_path path to the FDP API configuration file
  * @return identifier generated for the code run
  ***************************************************************************/
-std::string generate_run_id(std::filesystem::path config_file_path);
+std::string generate_run_id(ghc::filesystem::path config_file_path);
 
 /*! *************************************************************************
  * @brief returns the current time as a timestamp
@@ -79,7 +79,7 @@ std::string remove_backslash_from_path(const std::string &path);
 
 bool FileExists( const std::string &Filename );
 
-std::string read_token(const std::filesystem::path &token_path);
+std::string read_token(const ghc::filesystem::path &token_path);
 
 }; // namespace FDP
 
