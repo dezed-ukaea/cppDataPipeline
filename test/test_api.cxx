@@ -25,11 +25,11 @@ protected:
     #endif
     return HomeDirectory;
   }
-  std::filesystem::path read_csv_config = std::filesystem::path(TESTDIR) / "data" / "read_csv.yaml";
+  ghc::filesystem::path read_csv_config = ghc::filesystem::path(TESTDIR) / "data" / "read_csv.yaml";
   std::string api_url_ = "http://127.0.0.1:8000/api";
   FDP::API *api_ = new FDP::API(api_url_);
   std::string token =
-      read_token(std::filesystem::path(getHomeDirectory()) /
+      read_token(ghc::filesystem::path(getHomeDirectory()) /
                                     ".fair" / "registry" / "token");
   void TearDown() override {
     delete api_;

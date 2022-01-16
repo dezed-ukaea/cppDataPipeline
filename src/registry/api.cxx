@@ -101,8 +101,8 @@ CURL *API::setup_json_session_(std::string &addr_path, std::string *response,
   return curl_;
 }
 
-void API::download_file(const std::filesystem::path &url,
-                        std::filesystem::path out_path) {
+void API::download_file(const ghc::filesystem::path &url,
+                        ghc::filesystem::path out_path) {
   CURL *curl_ = curl_easy_init();
   FILE *file_ = fopen(out_path.string().c_str(), "wb");
   APILogger->debug("API: Downloading file '{0}' -> '{1}'", url.string(),
@@ -114,7 +114,7 @@ void API::download_file(const std::filesystem::path &url,
   fclose(file_);
 }
 
-CURL *API::setup_download_session_(const std::filesystem::path &addr_path,
+CURL *API::setup_download_session_(const ghc::filesystem::path &addr_path,
                                    FILE *file) {
   CURL *curl_ = curl_easy_init();
   APILogger->debug("API:DownloadSession: Attempting to access: " +
@@ -129,9 +129,10 @@ CURL *API::setup_download_session_(const std::filesystem::path &addr_path,
   return curl_;
 }
 
-Json::Value API::get_request(const std::filesystem::path &addr_path,
+Json::Value API::get_request(const ghc::filesystem::path &addr_path,
                          long expected_response, std::string token) {
-  return get_request(addr_path.string(), expected_response);
+  std::string addr_path_ = std::regex_replace(addr_path.string(), std::regex(std::string("\\\\")), "/");
+  return get_request(addr_path_, expected_response);
 }
 
 Json::Value API::get_request(const std::string &addr_path, long expected_response, std::string token) {
@@ -193,7 +194,7 @@ Json::Value API::get_by_json_query(const std::string &addr_path,
 Json::Value API::get_by_id(const std::string &table, int const &id,
                          long expected_response, std::string token) {
   std::string query = table + "/" + std::to_string(id) + "/";
-  std::filesystem::path queryPath = query;
+  ghc::filesystem::path queryPath = query;
   return get_request(queryPath, expected_response, token);
 }
 

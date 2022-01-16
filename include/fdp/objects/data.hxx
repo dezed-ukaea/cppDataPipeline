@@ -444,12 +444,15 @@ public:
    * @return unit of measurement
    **************************************************************************/
   std::string get_column_unit(const std::string &col_name) const {
-    if (auto iter = int_cols_.find(col_name); iter != int_cols_.end()) {
+    auto iter = int_cols_.find(col_name);
+    auto iter2 = float_cols_.find(col_name);
+    auto iter3 = str_cols_.find(col_name); 
+               
+    if (iter != int_cols_.end()) {
       return iter->second->unit_of_measurement();
-    } else if (auto iter = float_cols_.find(col_name);
-               iter != float_cols_.end()) {
+    } else if (iter2 != float_cols_.end()) {
       return iter->second->unit_of_measurement();
-    } else if (auto iter = str_cols_.find(col_name); iter != str_cols_.end()) {
+    } else if (iter3 != str_cols_.end()) {
       return iter->second->unit_of_measurement();
     }
     APILogger->error("Failed to retrieve unit of measurement for column '{0}',"

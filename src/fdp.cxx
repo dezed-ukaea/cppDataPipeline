@@ -17,10 +17,10 @@ DataPipeline& DataPipeline::operator=(const DataPipeline& rhs) {
     return *this;
 }
 
-std::filesystem::path FDP::DataPipeline::link_read(std::string &data_product){
+ghc::filesystem::path FDP::DataPipeline::link_read(std::string &data_product){
     return Pimpl()->link_read(data_product);
   }
-  std::filesystem::path FDP::DataPipeline::link_write(std::string &data_product){
+  ghc::filesystem::path FDP::DataPipeline::link_write(std::string &data_product){
     return Pimpl()->link_write(data_product);
   }
   void FDP::DataPipeline::finalise(){

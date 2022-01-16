@@ -46,8 +46,8 @@ class DataPipelineImpl_ {
   private:
     std::unique_ptr<Config> config_;
 
-    std::filesystem::path config_file_path_() const {return config_->get_config_file_path();}
-    std::filesystem::path script_file_path_() const {return config_->get_script_file_path();}
+    ghc::filesystem::path config_file_path_() const {return config_->get_config_file_path();}
+    ghc::filesystem::path script_file_path_() const {return config_->get_script_file_path();}
     std::string token_() const {return config_->get_token();}
     RESTAPI api_location_() {return config_->get_rest_api_location();}
 public:
@@ -61,8 +61,8 @@ public:
    * @param log_level level for the output logging statements
    * @param api_location whether to use local/remote RestAPI endpoint
    ***************************************************************************/
-  DataPipelineImpl_(const std::filesystem::path &config_file_path,
-                    const std::filesystem::path &file_system_path,
+  DataPipelineImpl_(const ghc::filesystem::path &config_file_path,
+                    const ghc::filesystem::path &file_system_path,
                     const std::string token,
                     spdlog::level::level_enum log_level = spdlog::level::info,
                     RESTAPI api_location = RESTAPI::LOCAL);
@@ -80,8 +80,8 @@ public:
 
 
 
-  std::filesystem::path link_read(std::string &data_product);
-  std::filesystem::path link_write(std::string &data_product);
+  ghc::filesystem::path link_read(std::string &data_product);
+  ghc::filesystem::path link_write(std::string &data_product);
   void finalise();
 
   std::string get_code_run_uuid();

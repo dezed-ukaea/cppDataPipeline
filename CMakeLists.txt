@@ -50,7 +50,7 @@ INCLUDE( ExternalProject )
 INCLUDE( GNUInstallDirs )
 
 # Set C++ Standard to 17
-SET( CMAKE_CXX_STANDARD 17 )
+SET( CMAKE_CXX_STANDARD 11 )
 SET( CMAKE_CXX_STANDARD_REQUIRED ON )
 
 # Set Include and Header Variables

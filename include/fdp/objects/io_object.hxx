@@ -20,7 +20,7 @@ namespace FDP {
             std::string use_component_ = "None";
             std::string use_version_;
             std::string use_namespace_;
-            std::filesystem::path path_;
+            ghc::filesystem::path path_;
             std::string data_product_description_ = "None";
             std::string component_description_ = "None";
             bool public_ = false;
@@ -34,7 +34,7 @@ namespace FDP {
                         std::string use_data_product,
                         std::string use_version,
                         std::string use_namespace,
-                        std::filesystem::path path,
+                        ghc::filesystem::path path,
                         std::string data_product_description,
                         bool isPublic):
                         data_product_(data_product),
@@ -49,7 +49,7 @@ namespace FDP {
                         std::string use_data_product,
                         std::string use_version,
                         std::string use_namespace,
-                        std::filesystem::path path,
+                        ghc::filesystem::path path,
                         ApiObject &component_obj,
                         ApiObject &data_product_obj):
                         data_product_(data_product),
@@ -65,7 +65,7 @@ namespace FDP {
             std::string get_use_component() {return use_component_;}
             std::string get_use_version() {return use_version_;}
             std::string get_use_namespace() {return use_namespace_;}
-            std::filesystem::path get_path() {return path_;}
+            ghc::filesystem::path get_path() {return path_;}
             std::string get_data_product_description() {return data_product_description_;}
             std::string get_component_description() {return component_description_;}
             bool is_public() {return public_;}

@@ -2,8 +2,8 @@
 
 namespace FDP {
 
- DataPipelineImpl_::DataPipelineImpl_(const std::filesystem::path &config_file_path,
-                    const std::filesystem::path &script_file_path,
+ DataPipelineImpl_::DataPipelineImpl_(const ghc::filesystem::path &config_file_path,
+                    const ghc::filesystem::path &script_file_path,
                     const std::string token,
                     spdlog::level::level_enum log_level,
                     RESTAPI api_location)
@@ -22,10 +22,10 @@ namespace FDP {
                             token);
     }
 
-  std::filesystem::path FDP::DataPipelineImpl_::link_read(std::string &data_product){
+  ghc::filesystem::path FDP::DataPipelineImpl_::link_read(std::string &data_product){
     return config_->link_read(data_product);
   }
-  std::filesystem::path FDP::DataPipelineImpl_::link_write(std::string &data_product){
+  ghc::filesystem::path FDP::DataPipelineImpl_::link_write(std::string &data_product){
     return config_->link_write(data_product);
   }
   void FDP::DataPipelineImpl_::finalise(){

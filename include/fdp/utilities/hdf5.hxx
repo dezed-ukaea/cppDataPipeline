@@ -12,7 +12,7 @@
 #define __FDP_HDF5__
 
 #include "H5Cpp.h"
-#include <filesystem>
+#include <ghc/filesystem.hpp>
 #include <map>
 #include <stdexcept>
 #include <string>
@@ -233,16 +233,16 @@ struct CompValueArray {
 };
 
 const std::vector<std::string>
-read_hdf5_as_str_vector(const std::filesystem::path file_name,
+read_hdf5_as_str_vector(const ghc::filesystem::path file_name,
                         const std::string key);
 
 template <typename T>
-const T read_hdf5_object(const std::filesystem::path file_name,
+const T read_hdf5_object(const ghc::filesystem::path file_name,
                          std::string key) {
   APILogger->debug("Utilities:HDF5:ReadObject: Opening file '{0}'",
                    file_name.string());
 
-  if (!std::filesystem::exists(file_name)) {
+  if (!ghc::filesystem::exists(file_name)) {
     throw std::runtime_error("Could not open HDF5 file '" + file_name.string() +
                              "', file does not exist.");
   }
@@ -268,12 +268,12 @@ const T read_hdf5_object(const std::filesystem::path file_name,
 
 template <typename T>
 const std::vector<T>
-read_hdf5_comp_type_member(const std::filesystem::path file_name,
+read_hdf5_comp_type_member(const ghc::filesystem::path file_name,
                            std::string key, std::string member) {
   APILogger->debug("Utilities:HDF5:ReadCompTypeMember: Opening file '{0}'",
                    file_name.string());
 
-  if (!std::filesystem::exists(file_name)) {
+  if (!ghc::filesystem::exists(file_name)) {
     throw std::runtime_error("Could not open HDF5 file '" + file_name.string() +
                              "', file does not exist.");
   }
@@ -308,7 +308,7 @@ read_hdf5_comp_type_member(const std::filesystem::path file_name,
   return container_;
 }
 
-const H5::CompType *get_comptype(const std::filesystem::path file_name,
+const H5::CompType *get_comptype(const ghc::filesystem::path file_name,
                                  std::string key);
 }; // namespace HDF5
 }; // namespace FDP

@@ -6,7 +6,7 @@
 #include "fdp/registry/datapipeline.hxx"
 #include "fdp/registry/data_io.hxx"
 #include "gtest/gtest.h"
-#include <filesystem>
+#include <ghc/filesystem.hpp>
 #include <ostream>
 #include <vector>
 
@@ -28,10 +28,10 @@ protected:
 
   DataPipelineImpl_ *init_pipeline(bool use_local = true) {
 
-    const std::filesystem::path config_path_ =
-        std::filesystem::path(TESTDIR) / "config.yaml";
-    const std::filesystem::path script_path_ =
-        std::filesystem::path(TESTDIR) / "test_script.sh";
+    const ghc::filesystem::path config_path_ =
+        ghc::filesystem::path(TESTDIR) / "config.yaml";
+    const ghc::filesystem::path script_path_ =
+        ghc::filesystem::path(TESTDIR) / "test_script.sh";
     APILogger->set_level(spdlog::level::debug);
 
     return new DataPipelineImpl_(config_path_, script_path_, token, spdlog::level::debug,
@@ -39,18 +39,18 @@ protected:
   }
 
   std::string token =
-      read_token(std::filesystem::path(getHomeDirectory()) /
+      read_token(ghc::filesystem::path(getHomeDirectory()) /
                                     ".fair" / "registry" / "token");
   void TearDown() override {}
 };
 
 TEST_F(RegistryTest, TestDataPipelineInit) {
-  const std::filesystem::path config_path_ =
-      std::filesystem::path(TESTDIR) / "config.yaml";
-  const std::filesystem::path script_path_ =
-      std::filesystem::path(TESTDIR) / "test_script.sh";
+  const ghc::filesystem::path config_path_ =
+      ghc::filesystem::path(TESTDIR) / "config.yaml";
+  const ghc::filesystem::path script_path_ =
+      ghc::filesystem::path(TESTDIR) / "test_script.sh";
   APILogger->set_level(spdlog::level::debug);
-  DataPipeline(config_path_, script_path_, token, spdlog::level::debug);
+  DataPipeline(config_path_.string(), script_path_.string(), token, spdlog::level::debug);
 }
 
 TEST_F(RegistryTest, TestLogLevelSet) {
@@ -67,6 +67,6 @@ TEST_F(RegistryTest, TestURLEncode) {
 
 TEST_F(RegistryTest, TestHashFile) {
   const std::string file_hash_ =
-      calculate_hash_from_file(std::filesystem::path(TESTDIR) / "config.yaml");
+      calculate_hash_from_file(ghc::filesystem::path(TESTDIR) / "config.yaml");
   std::cout << "HASH: " << file_hash_ << std::endl;
 }

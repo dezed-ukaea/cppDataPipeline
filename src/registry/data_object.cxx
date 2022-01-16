@@ -61,7 +61,7 @@ ExternalObject *external_object_from_yaml(YAML::Node yaml_data) {
                                  ? use_node_["title"].as<std::string>()
                                  : unique_name_;
 
-  const std::filesystem::path cache_path_ =
+  const ghc::filesystem::path cache_path_ =
       (use_node_["cache"]) ? use_node_["cache"].as<std::string>() : "";
 
   const std::string version_print_ = (version_) ? version_->to_string() : "";

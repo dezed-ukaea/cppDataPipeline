@@ -13,7 +13,7 @@
 
 #include <algorithm>
 #include <curl/curl.h>
-#include <filesystem>
+#include <ghc/filesystem.hpp>
 #include <iostream>
 #include <iterator>
 #include <json/reader.h>
@@ -64,7 +64,7 @@ private:
   const std::vector<std::string> valid_filters_;
   std::string string_repr_;
   std::map<std::string, std::string> components_;
-  const std::filesystem::path fragments_;
+  const ghc::filesystem::path fragments_;
 
 public:
   /*! ************************************************************************
@@ -84,7 +84,7 @@ public:
    * @param string_repr the RestAPI query type, e.g. 'object'
    * @param query_path a path for narrowing/filtering the query
    **************************************************************************/
-  Query(std::string string_repr, std::filesystem::path query_path)
+  Query(std::string string_repr, ghc::filesystem::path query_path)
       : string_repr_(string_repr), fragments_(query_path) {}
 
   /*! ************************************************************************
@@ -101,7 +101,7 @@ public:
    * @brief assembles the query into a URL to be requested from
    * @author K. Zarebski (UKAEA)
    *
-   * @return std::filesystem::path the query as a URL
+   * @return ghc::filesystem::path the query as a URL
    **************************************************************************/
   std::string build_query();
 };
@@ -135,7 +135,7 @@ public:
    * @return Json::Value JSON object containing the information returned by the
    *request
    ***************************************************************************/
-  Json::Value get_request(const std::filesystem::path &addr_path,
+  Json::Value get_request(const ghc::filesystem::path &addr_path,
                       long expected_response = 200, std::string token = "");
 
   Json::Value get_request(const std::string &addr_path,
@@ -201,8 +201,8 @@ public:
    * @param url the relative address to the data pipeline object
    * @param out_path the path to download the file to on the local system
    ***************************************************************************/
-  void download_file(const std::filesystem::path &url,
-                     std::filesystem::path out_path);
+  void download_file(const ghc::filesystem::path &url,
+                     ghc::filesystem::path out_path);
 
   /**
    * @brief Formats a json object into a string representation which can be used
@@ -238,7 +238,7 @@ private:
   std::string url_root_;
   CURL *setup_json_session_(std::string &addr_path, std::string *response,
                             long &http_code, std::string token = "");
-  CURL *setup_download_session_(const std::filesystem::path &addr_path,
+  CURL *setup_download_session_(const ghc::filesystem::path &addr_path,
                                 FILE *file);
 };
 

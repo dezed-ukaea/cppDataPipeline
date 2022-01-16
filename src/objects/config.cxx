@@ -1,8 +1,8 @@
 #include "fdp/objects/config.hxx"
 
 namespace FDP {
-FDP::Config::Config(const std::filesystem::path &config_file_path,
-                    const std::filesystem::path &script_file_path,
+FDP::Config::Config(const ghc::filesystem::path &config_file_path,
+                    const ghc::filesystem::path &script_file_path,
                     const std::string &token, 
                     RESTAPI api_location)
     : token_(token), config_file_path_(config_file_path), script_file_path_(script_file_path),
@@ -14,7 +14,7 @@ Config::~Config() {
   // delete api;
 }
 
-YAML::Node FDP::Config::parse_yaml(std::filesystem::path yaml_path) {
+YAML::Node FDP::Config::parse_yaml(ghc::filesystem::path yaml_path) {
   APILogger->debug("[Config]: Reading configuration file '{0}'",
                    yaml_path.string().c_str());
   return YAML::LoadFile(yaml_path.string().c_str());
@@ -62,8 +62,8 @@ bool FDP::Config::has_outputs() const{
   return ! outputs_.empty();
 }
 
-std::filesystem::path FDP::Config::get_data_store() const {
-  return std::filesystem::path(
+ghc::filesystem::path FDP::Config::get_data_store() const {
+  return ghc::filesystem::path(
       FDP::Config::meta_data_()["write_data_store"].as<std::string>());
 }
 
@@ -75,7 +75,7 @@ std::string FDP::Config::get_default_output_namespace() const {
   return meta_data_()["default_output_namespace"].as<std::string>();
 }
 
-void FDP::Config::validate_config(std::filesystem::path yaml_path,
+void FDP::Config::validate_config(ghc::filesystem::path yaml_path,
                                   RESTAPI api_location) {
   config_data_ = parse_yaml(yaml_path);
   if (!config_data_["run_metadata"]) {
@@ -335,7 +335,7 @@ std::string Config::get_code_run_uuid() const{
 };
 
 
-std::filesystem::path Config::link_write(std::string &data_product){
+ghc::filesystem::path Config::link_write(std::string &data_product){
   if (!config_has_writes()){
     APILogger->error("Config Error: Write has not been specified in the given config file");
     throw config_parsing_error("Config Error: Write has not been specified in the given config file");
@@ -395,7 +395,7 @@ std::filesystem::path Config::link_write(std::string &data_product){
   }
 
   std::string filename_("dat-" + generate_random_hash() + "." + currentWrite["file_type"].as<std::string>());
-  std::filesystem::path path_ = std::filesystem::path(meta_data_()["write_data_store"].as<std::string>()) / currentWrite["use"]["namespace"].as<std::string>() / currentWrite["use"]["data_product"].as<std::string>() / filename_;
+  ghc::filesystem::path path_ = ghc::filesystem::path(meta_data_()["write_data_store"].as<std::string>()) / currentWrite["use"]["namespace"].as<std::string>() / currentWrite["use"]["data_product"].as<std::string>() / filename_;
 
   APILogger->info("Link Path: {0}", path_.string());
 
@@ -414,7 +414,7 @@ std::filesystem::path Config::link_write(std::string &data_product){
 
 }
 
-std::filesystem::path FDP::Config::link_read(std::string &data_product){
+ghc::filesystem::path FDP::Config::link_read(std::string &data_product){
   YAML::Node currentRead;
 
   auto it = inputs_.find("data_product");
@@ -507,7 +507,7 @@ std::filesystem::path FDP::Config::link_read(std::string &data_product){
     throw std::runtime_error("data_product object Error: could not find storage_root for " + obj.get_value_as_string("object") + " in Registry");
   } 
 
-  std::filesystem::path path_ = std::filesystem::path(remove_local_from_root(storageRootObj.get_value_as_string("root"))) / 
+  ghc::filesystem::path path_ = ghc::filesystem::path(remove_local_from_root(storageRootObj.get_value_as_string("root"))) / 
     API::remove_leading_forward_slash(storageLocationObj.get_value_as_string("path"));
 
   reads_[data_product] = IOObject(data_product, 
@@ -543,7 +543,7 @@ void FDP::Config::finalise(){
       ApiObject storageLocationObj = ApiObject(api_->get_by_json_query("storage_location", storageData)[0]);
       ApiObject StorageRootObj;
 
-      std::filesystem::path newPath;
+      ghc::filesystem::path newPath;
       std::string extension = currentWrite.get_path().extension().string();
 
       if (!storageLocationObj.is_empty()){
@@ -551,18 +551,18 @@ void FDP::Config::finalise(){
 
         StorageRootObj = ApiObject(api_->get_by_id("storage_root", ApiObject::get_id_from_string(storageLocationObj.get_value_as_string("storage_root"))));
 
-        newPath = std::filesystem::path(remove_local_from_root(StorageRootObj.get_value_as_string("root"))) / storageLocationObj.get_value_as_string("path");
+        newPath = ghc::filesystem::path(remove_local_from_root(StorageRootObj.get_value_as_string("root"))) / storageLocationObj.get_value_as_string("path");
 
       }
       else {
-        std::filesystem::path tmpFilename = currentWrite.get_path().filename();
-        std::filesystem::path newFileName = std::filesystem::path(storageData["hash"].asString() + extension);
+        ghc::filesystem::path tmpFilename = currentWrite.get_path().filename();
+        ghc::filesystem::path newFileName = ghc::filesystem::path(storageData["hash"].asString() + extension);
 
-        newPath = std::filesystem::path(remove_local_from_root(get_data_store().string())) / currentWrite.get_use_namespace() / currentWrite.get_use_data_product() / newFileName;
+        newPath = ghc::filesystem::path(remove_local_from_root(get_data_store().string())) / currentWrite.get_use_namespace() / currentWrite.get_use_data_product() / newFileName;
 
         ghc::filesystem::rename(currentWrite.get_path().string(), newPath.string());
 
-        std::filesystem::path str_path =  std::filesystem::path(currentWrite.get_use_namespace()) / currentWrite.get_use_data_product() / newFileName;
+        ghc::filesystem::path str_path =  ghc::filesystem::path(currentWrite.get_use_namespace()) / currentWrite.get_use_data_product() / newFileName;
 
         storageData["path"] = str_path.string();
         storageData["path"] = remove_backslash_from_path(storageData["path"].asString());
