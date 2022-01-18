@@ -9,8 +9,7 @@ authors:
     given-names: Kristian
     orcid: "https://orcid.org/0000-0002-4424-9890"
 cff-version: 1.2.0
-keywords: "FAIR, C++, data"
-license: "Other (Open)"
+keywords: "FAIR, C++, data
 message: "If you use this software, please cite it using these metadata."
 repository-code: "https://github.com/FAIRDataPipeline/cppDataPipeline"
 title: "FAIR Data Pipeline C++ API"
