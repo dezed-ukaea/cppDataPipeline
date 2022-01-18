@@ -225,7 +225,7 @@ void FDP::Config::initialise(RESTAPI api_location) {
 
   Json::Value config_value_;
   config_value_["description"] = "Working config.yaml in datastore";
-  config_value_["storage_location"] = "";
+  config_value_["storage_location"] = config_storage_location_->get_uri();
   Json::Value author_id_ = author_->get_uri();
   config_value_["authors"].append(author_id_);
 
@@ -292,7 +292,6 @@ void FDP::Config::initialise(RESTAPI api_location) {
   repo_storage_location_value_["public"] = true;
   repo_storage_location_value_["storage_root"] = code_repo_storage_root_->get_uri();
   repo_storage_location_value_["path"] = meta_data_()["remote_repo"].as<std::string>();
-  repo_storage_location_value_["path"] = remove_backslash_from_path(repo_storage_location_value_["path"].asString());
 
   std::unique_ptr<ApiObject> code_repo_location_ptr(new ApiObject(
    api_->post("storage_location", repo_storage_location_value_, token_)));
