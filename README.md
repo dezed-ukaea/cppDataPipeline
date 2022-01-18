@@ -1,25 +1,18 @@
 # FAIR Data Pipeline C++ API
 
-**NOTE:** Currently this API implementation consists of components, assembly of these will depend on the final structure of the API itself.
+[![FDP C++ API](https://github.com/FAIRDataPipeline/cppDataPipeline/actions/workflows/fdp_cpp_api.yaml/badge.svg)](https://github.com/FAIRDataPipeline/cppDataPipeline/actions/workflows/fdp_cpp_api.yaml)
+[![License: LGPL v3](https://img.shields.io/badge/License-LGPL_v3-blue.svg)](https://www.gnu.org/licenses/lgpl-3.0)
+[![software-checklist][https://img.shields.io/badge/software-checklist-3891A6]][https://github.com/FAIRDataPipeline/cppDataPipeline/blob/main/software-checklist.md]
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.5874670.svg)](https://doi.org/10.5281/zenodo.5874670)
 
 ## Contents
   - [Installation](#installation)
   - [Outline](#outline)
-  - [API Backend Components](#api-backend-components)
-    - [API](#api)
-    - [LocalFileSystem](#localfilesystem)
-      - [Reading an Estimate](#reading-an-estimate)
-      - [Reading an Array](#reading-an-array)
-      - [Reading a Data Table Column](#reading-a-data-table-column)
-      - [Reading a Distribution](#reading-a-distribution)
-      - [Creating an Estimate](#creating-an-estimate)
-      - [Creating a Distribution](#creating-a-distribution)
-      - [Creating an Array](#creating-an-array)
   - [Unit Tests](#unit-tests)
 
 ## Installation
-You can build and test the library using CMake, this implementation requires C++17 or later as it makes use of the `ghc::filesystem` library. 
-All dependencies are externally fetched except HDF5 which needs to be installed and HDF5_ROOT present as an environmental variable:
+You can build and test the library using CMake, this implementation requires `C++11`.
+All dependencies are externally fetched except HDF5 which needs to be installed and `HDF5_ROOT` present as an environmental variable:
 - [HDF5](http://www.hdfgroup.org/ftp/HDF5/current/src/)
 
 It is recomended that you install CURL prior to installation of this API
@@ -43,14 +36,15 @@ The main class the user will interact with is `DataPipeline` which has only the 
 
 
 ## Unit Tests
-The unit tests connect to the [FDP remote registry API](https://data.scrc.uk), and so will not work if this service is no longer available.
+The unit tests use the local registry, this needs to be running prior to running the tests see: [the CLI documentation](https://github.com/FAIRDataPipeline/FAIR-CLI#registry)
 
-Before running the tests you will need to download the test data sets by running:
-
-```
-$ bash test/test_setup.sh
-```
-you can then launch the GTest binary created during compilation:
+Tests can be lauched using the following command:
+### Unix
 ```
 $ ./build/bin/fdpapi-tests
+```
+
+### Windows
+```
+$ build\bin\Release\fdpapi-tests.exe
 ```
