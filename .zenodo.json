@@ -1,0 +1,26 @@
+{
+    "title": "C++ Implementation of the API for the FAIR Data Pipeline.",
+    "description": "A c++ api to interact with the FAIR Data Pipeline",
+    "upload_type": "software",
+    "creators": [
+      {
+        "affiliation": "University of Glasgow",
+        "name": "Field, Ryan",
+        "orcid": "0000-0002-4424-9890"
+      }
+    ],
+    "access_right": "open",
+    "license": "GNU LGPL-3.0",
+    "related_identifiers": [
+      {
+        "scheme": "url",
+        "identifier": "https://github.com/FAIRDataPipeline/cppDataPipeline",
+        "relation": "isIdenticalTo"
+      }
+    ],
+    "keywords": [
+      "FAIR",
+      "c++",
+      "data"
+    ]
+  }
