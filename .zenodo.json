@@ -7,10 +7,15 @@
         "affiliation": "University of Glasgow",
         "name": "Field, Ryan",
         "orcid": "0000-0002-4424-9890"
+      },
+      {
+        "affiliation": "United Kingdom Atomic Energy Authority",
+        "name": "Zarebski, Kristian",
+        "orcid": "0000-0002-6773-1049"
       }
     ],
     "access_right": "open",
-    "license": "GNU LGPL-3.0",
+    "license": "other-open",
     "related_identifiers": [
       {
         "scheme": "url",
