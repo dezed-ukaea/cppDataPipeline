@@ -216,6 +216,7 @@ void FDP::Config::initialise(RESTAPI api_location) {
     config_storage_location_value_["path"] = config_file_path_.string();
   }
   config_storage_location_value_["path"] = remove_backslash_from_path(config_storage_location_value_["path"].asString());
+  config_storage_location_value_["path"] = API::remove_leading_forward_slash(config_storage_location_value_["path"].asString());
   config_storage_location_value_["public"] = true;  
   config_storage_location_value_["hash"] = calculate_hash_from_file(config_file_path_);
   config_storage_location_value_["storage_root"] = config_storage_root_->get_uri();
@@ -253,6 +254,7 @@ void FDP::Config::initialise(RESTAPI api_location) {
     script_storage_location_value_["path"] = script_file_path_.string();
   }
   script_storage_location_value_["path"] = remove_backslash_from_path(script_storage_location_value_["path"].asString());
+  script_storage_location_value_["path"] = API::remove_leading_forward_slash(script_storage_location_value_["path"].asString());
   script_storage_location_value_["hash"] = calculate_hash_from_file(script_file_path_);
   script_storage_location_value_["public"] = true;
   script_storage_location_value_["storage_root"] = config_storage_root_->get_uri();
@@ -567,6 +569,7 @@ void FDP::Config::finalise(){
 
         storageData["path"] = str_path.string();
         storageData["path"] = remove_backslash_from_path(storageData["path"].asString());
+        storageData["path"] = API::remove_leading_forward_slash(storageData["path"].asString());
         storageData["storage_root"] = config_storage_root_->get_uri();
 
         storageLocationObj = ApiObject(api_->post("storage_location", storageData, token_));
