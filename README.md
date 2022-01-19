@@ -2,7 +2,7 @@
 
 [![FDP C++ API](https://github.com/FAIRDataPipeline/cppDataPipeline/actions/workflows/fdp_cpp_api.yaml/badge.svg)](https://github.com/FAIRDataPipeline/cppDataPipeline/actions/workflows/fdp_cpp_api.yaml)
 [![License: LGPL v3](https://img.shields.io/badge/License-LGPL_v3-blue.svg)](https://www.gnu.org/licenses/lgpl-3.0)
-[![software-checklist][https://img.shields.io/badge/software-checklist-3891A6]][https://github.com/FAIRDataPipeline/cppDataPipeline/blob/main/software-checklist.md]
+[![software-checklist](https://img.shields.io/badge/software-checklist-3891A6)](https://github.com/FAIRDataPipeline/cppDataPipeline/blob/main/software-checklist.md)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.5874670.svg)](https://doi.org/10.5281/zenodo.5874670)
 
 ## Contents
