@@ -280,18 +280,20 @@ void FDP::Config::initialise(RESTAPI api_location) {
   script_obj_ = std::move(script_obj_ptr);
 
   Json::Value repo_storage_root_value_;
-  repo_storage_root_value_["root"] = "https://github.com";
+  repo_storage_root_value_["root"] = "https://github.com/";
   repo_storage_root_value_["local"] = false;
 
   std::unique_ptr<ApiObject> code_repo_root_ptr(new ApiObject(
    api_->post("storage_root", repo_storage_root_value_, token_)));
   code_repo_storage_root_ = std::move(code_repo_root_ptr);
 
+  std::string repo_storage_path_ = std::regex_replace(meta_data_()["remote_repo"].as<std::string>(), std::regex(repo_storage_root_value_["root"].asString()), "");
+
   Json::Value repo_storage_location_value_;
   repo_storage_location_value_["hash"] = meta_data_()["latest_commit"].as<std::string>();
   repo_storage_location_value_["public"] = true;
   repo_storage_location_value_["storage_root"] = code_repo_storage_root_->get_uri();
-  repo_storage_location_value_["path"] = meta_data_()["remote_repo"].as<std::string>();
+  repo_storage_location_value_["path"] = repo_storage_path_;
 
   std::unique_ptr<ApiObject> code_repo_location_ptr(new ApiObject(
    api_->post("storage_location", repo_storage_location_value_, token_)));
