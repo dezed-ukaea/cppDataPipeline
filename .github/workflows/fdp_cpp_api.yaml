@@ -25,11 +25,6 @@ jobs:
           local_registry: default
           remote_registry: registry_remote
 
-      - name: Run Registries
-        run: |
-          fair registry start
-          registry_remote/scripts/start_fair_registry -p 8001
-
       - name: Install Dependencies
         run: |
           sudo apt update
