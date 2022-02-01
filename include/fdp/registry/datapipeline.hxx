@@ -8,8 +8,8 @@
  * with the FDP FAIR Data pipeline. They contain methods which parse
  * configurations and control calls to the RestAPI itself.
  ****************************************************************************/
-#ifndef __FDP_DATAPIPELINE_HXX__
-#define __FDP_DATAPIPELINE_HXX__
+#ifndef __FDP_DATAPIPELINE_IMP_HXX__
+#define __FDP_DATAPIPELINE_IMP_HXX__
 
 #include <algorithm>
 #include <fstream>
@@ -18,6 +18,8 @@
 
 #include "spdlog/spdlog.h"
 #include "json/json.h"
+
+#include "fdp/fdp.hxx"
 
 #include "fdp/objects/config.hxx"
 #include "fdp/objects/metadata.hxx"
@@ -42,51 +44,6 @@ namespace FDP {
  * but rather via an FDP::DataPipeline instance.
  *
  *****************************************************************************/
-class DataPipelineImpl_ {
-  private:
-    std::unique_ptr<Config> config_;
-
-    ghc::filesystem::path config_file_path_() const {return config_->get_config_file_path();}
-    ghc::filesystem::path script_file_path_() const {return config_->get_script_file_path();}
-    std::string token_() const {return config_->get_token();}
-    RESTAPI api_location_() {return config_->get_rest_api_location();}
-public:
-  
-  /*! *************************************************************************
-   * @brief construct a DataPipelineImpl_ instance from configurations and setup
-   * @author K. Zarebski (UKAEA)
-   *
-   * @param config_file_path location of the local configuration file
-   * @param access_token_file API authorisation token where required
-   * @param log_level level for the output logging statements
-   * @param api_location whether to use local/remote RestAPI endpoint
-   ***************************************************************************/
-  DataPipelineImpl_(const ghc::filesystem::path &config_file_path,
-                    const ghc::filesystem::path &file_system_path,
-                    const std::string token,
-                    spdlog::level::level_enum log_level = spdlog::level::info,
-                    RESTAPI api_location = RESTAPI::LOCAL);
-
-  DataPipelineImpl_(const DataPipelineImpl_ &dp){
-    DataPipelineImpl_(dp.config_file_path_(), dp.script_file_path_(), token_(), spdlog::level::info, api_location_());}
-
-  /**
-   * @brief Destroy the Data Pipeline Impl_ object
-   * 
-   */
-  ~DataPipelineImpl_() = default;
-  
-  //DataPipelineImpl_& operator=(DataPipelineImpl_ dp);
-
-
-
-  ghc::filesystem::path link_read(std::string &data_product);
-  ghc::filesystem::path link_write(std::string &data_product);
-  void finalise();
-
-  std::string get_code_run_uuid();
-
-};
 }; // namespace FDP
 
 #endif

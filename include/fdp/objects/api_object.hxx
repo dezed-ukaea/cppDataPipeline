@@ -16,6 +16,10 @@ namespace FDP {
         private:
             Json::Value obj_;
         public:
+
+            typedef std::unique_ptr< ApiObject > uptr;
+            typedef std::shared_ptr< ApiObject > sptr;
+
             ApiObject() : obj_(Json::Value()){};
             /**
              * @brief Construct a new Api Object object

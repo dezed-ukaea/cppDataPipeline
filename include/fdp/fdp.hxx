@@ -1,22 +1,25 @@
+#ifndef __FDP__
+#define __FDP__
+
+#include <ghc/filesystem.hpp>
+
 #include "fdp/registry/datapipeline.hxx"
 
 namespace FDP {
+
 class DataPipeline {
+
 public:
   // 'initialise' method for the API
+
+  ~DataPipeline();
+
   explicit DataPipeline(
       const std::string &config_file_path,
       const std::string &script_file_path,
       std::string token = "",
-      spdlog::level::level_enum log_level = spdlog::level::info)
-      : pimpl_(std::make_shared<DataPipelineImpl_>(ghc::filesystem::path(config_file_path), ghc::filesystem::path(script_file_path), token,
-                                     log_level)) {
-          
-    APILogger->debug("DataPipeline: Initialising session '{0}'", Pimpl()->get_code_run_uuid());
-  }
+      spdlog::level::level_enum log_level = spdlog::level::info);
 
-  // 'finalise' method for the API
-  ~DataPipeline();
 
   DataPipeline(DataPipeline &&rhs) noexcept;
   DataPipeline &operator=(DataPipeline &&rhs) noexcept;
@@ -29,9 +32,10 @@ public:
   void finalise();
 
 private:
-  const DataPipelineImpl_* Pimpl() const {return pimpl_.get();}
-  DataPipelineImpl_* Pimpl() {return pimpl_.get();}
-  
-  std::shared_ptr<DataPipelineImpl_> pimpl_;
+   class impl;
+ 
+   std::shared_ptr< DataPipeline::impl > pimpl_;
 };
 }; // namespace FDP
+
+#endif

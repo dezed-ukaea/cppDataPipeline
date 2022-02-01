@@ -26,7 +26,7 @@ protected:
     return HomeDirectory;
   }
 
-  DataPipelineImpl_ *init_pipeline(bool use_local = true) {
+  DataPipeline *init_pipeline(bool use_local = true) {
 
     const ghc::filesystem::path config_path_ =
         ghc::filesystem::path(TESTDIR) / "config.yaml";
@@ -34,8 +34,11 @@ protected:
         ghc::filesystem::path(TESTDIR) / "test_script.sh";
     APILogger->set_level(spdlog::level::debug);
 
-    return new DataPipelineImpl_(config_path_, script_path_, token, spdlog::level::debug,
-                                 static_cast<RESTAPI>(use_local));
+    return new DataPipeline(
+        config_path_,
+        script_path_,
+        token,
+        spdlog::level::debug );
   }
 
   std::string token =

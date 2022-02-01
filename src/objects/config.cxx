@@ -175,7 +175,7 @@ void FDP::Config::initialise(RESTAPI api_location) {
   // Get the admin user from registry
   Json::Value user_json_;
   user_json_["username"] = "admin";
-  std::unique_ptr<ApiObject> user_ptr_(new ApiObject(
+  ApiObject::uptr user_ptr_(new ApiObject(
       api_->get_by_json_query("users", user_json_, 200, token_)[0]));
   user_ = std::move(user_ptr_);
   if (user_->is_empty()) {
@@ -187,7 +187,7 @@ void FDP::Config::initialise(RESTAPI api_location) {
   Json::Value user_author_json_;
   user_author_json_["user"] = user_->get_id();
   Json::Value user_author_ = api_->get_by_json_query("user_author", user_author_json_, 200, token_)[0];
-  std::unique_ptr<ApiObject> author_ptr_(new ApiObject(
+  ApiObject::uptr author_ptr_(new ApiObject(
       api_->get_by_id("author", ApiObject::get_id_from_string(user_author_["author"].asString()), 200, token_)));
   author_ = std::move(author_ptr_);
   if (author_->is_empty()) {
@@ -201,7 +201,7 @@ void FDP::Config::initialise(RESTAPI api_location) {
   Json::Value config_storage_root_value_;
   config_storage_root_value_["root"] = meta_data_()["write_data_store"].as<std::string>();
   config_storage_root_value_["local"] = api_location == RESTAPI::LOCAL; 
-  std::unique_ptr<ApiObject> config_storage_root_ptr_(new ApiObject(
+  ApiObject::uptr config_storage_root_ptr_(new ApiObject(
     api_->post_storage_root(config_storage_root_value_, token_)));
   config_storage_root_ = std::move(config_storage_root_ptr_);
 
@@ -220,7 +220,7 @@ void FDP::Config::initialise(RESTAPI api_location) {
   config_storage_location_value_["public"] = true;  
   config_storage_location_value_["hash"] = calculate_hash_from_file(config_file_path_);
   config_storage_location_value_["storage_root"] = config_storage_root_->get_uri();
-  std::unique_ptr<ApiObject> config_storage_location_ptr_(new ApiObject(
+  ApiObject::uptr config_storage_location_ptr_(new ApiObject(
     api_->post("storage_location", config_storage_location_value_, token_)));
   config_storage_location_ = std::move(config_storage_location_ptr_);
 
@@ -239,7 +239,7 @@ void FDP::Config::initialise(RESTAPI api_location) {
 
   APILogger->info("Writing config file {0} to registry", config_file_path_.string());
 
-  std::unique_ptr<ApiObject> config_obj_ptr(new ApiObject(
+  ApiObject::uptr config_obj_ptr(new ApiObject(
     api_->post("object", config_value_, token_)));
   config_obj_ = std::move(config_obj_ptr);
 
@@ -259,7 +259,7 @@ void FDP::Config::initialise(RESTAPI api_location) {
   script_storage_location_value_["public"] = true;
   script_storage_location_value_["storage_root"] = config_storage_root_->get_uri();
 
-  std::unique_ptr<ApiObject> script_storage_location_ptr_(new ApiObject(
+  ApiObject::uptr script_storage_location_ptr_(new ApiObject(
     api_->post("storage_location", script_storage_location_value_, token_)));
   script_storage_location_ = std::move(script_storage_location_ptr_);
 
@@ -277,7 +277,7 @@ void FDP::Config::initialise(RESTAPI api_location) {
 
   APILogger->info("Writing script file {0} to registry", script_file_path_.string());
 
-  std::unique_ptr<ApiObject> script_obj_ptr(new ApiObject(
+  ApiObject::uptr script_obj_ptr(new ApiObject(
     api_->post("object", script_value_, token_)));
   script_obj_ = std::move(script_obj_ptr);
 
@@ -285,7 +285,7 @@ void FDP::Config::initialise(RESTAPI api_location) {
   repo_storage_root_value_["root"] = "https://github.com/";
   repo_storage_root_value_["local"] = false;
 
-  std::unique_ptr<ApiObject> code_repo_root_ptr(new ApiObject(
+  ApiObject::uptr code_repo_root_ptr(new ApiObject(
    api_->post("storage_root", repo_storage_root_value_, token_)));
   code_repo_storage_root_ = std::move(code_repo_root_ptr);
 
@@ -297,7 +297,7 @@ void FDP::Config::initialise(RESTAPI api_location) {
   repo_storage_location_value_["storage_root"] = code_repo_storage_root_->get_uri();
   repo_storage_location_value_["path"] = repo_storage_path_;
 
-  std::unique_ptr<ApiObject> code_repo_location_ptr(new ApiObject(
+  ApiObject::uptr code_repo_location_ptr(new ApiObject(
    api_->post("storage_location", repo_storage_location_value_, token_)));
   code_repo_storage_location_ = std::move(code_repo_location_ptr);
 
@@ -306,7 +306,7 @@ void FDP::Config::initialise(RESTAPI api_location) {
   code_repo_obj_value_["storage_location"] = code_repo_storage_location_->get_uri();
   code_repo_obj_value_["authors"].append(author_id_);
 
-  std::unique_ptr<ApiObject> code_repo_obj_ptr(new ApiObject(
+  ApiObject::uptr code_repo_obj_ptr(new ApiObject(
    api_->post("object", code_repo_obj_value_, token_)));
   code_repo_obj_ = std::move(code_repo_obj_ptr);
 
@@ -321,7 +321,7 @@ void FDP::Config::initialise(RESTAPI api_location) {
 
   APILogger->info("Writing new code run to registry");
 
-  std::unique_ptr<ApiObject> code_run_ptr(new ApiObject(
+  ApiObject::uptr code_run_ptr(new ApiObject(
    api_->post("code_run", code_run_value_, token_)));
   code_run_ = std::move(code_run_ptr);
 
@@ -625,7 +625,7 @@ void FDP::Config::finalise(){
 
       }
 
-      ApiObject componentObj = ApiObject(api_->get_by_id("object_component", ApiObject::get_id_from_string(componentUrl)));
+      ApiObject  componentObj = ApiObject(api_->get_by_id("object_component", ApiObject::get_id_from_string(componentUrl)));
 
       currentWrite.set_component_object(componentObj);
       currentWrite.set_data_product_object(dataProductObj);
@@ -668,7 +668,7 @@ void FDP::Config::finalise(){
   std::string code_run_endpoint = "code_run/" + std::to_string(code_run_->get_id());
   APILogger->info("Code Run: {0}", code_run_endpoint);
 
-  std::unique_ptr<ApiObject> code_run_ptr(new ApiObject(
+  ApiObject::uptr code_run_ptr(new ApiObject(
    api_->patch(code_run_endpoint, patch_data, token_)));
   code_run_ = std::move(code_run_ptr);  
 

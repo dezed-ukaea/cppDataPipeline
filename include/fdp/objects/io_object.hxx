@@ -25,25 +25,26 @@ namespace FDP {
             std::string component_description_ = "None";
             bool public_ = false;
 
-            std::shared_ptr<ApiObject> component_obj_;
-            std::shared_ptr<ApiObject> data_product_obj_;
+            ApiObject::sptr component_obj_;
+            ApiObject::sptr data_product_obj_;
 
         public:
             IOObject(){};
             IOObject(std::string data_product,
-                        std::string use_data_product,
-                        std::string use_version,
-                        std::string use_namespace,
-                        ghc::filesystem::path path,
-                        std::string data_product_description,
-                        bool isPublic):
-                        data_product_(data_product),
-                        use_data_product_(use_data_product),
-                        use_version_(use_version),
-                        use_namespace_(use_namespace),
-                        path_(path),
-                        data_product_description_(data_product_description),
-                        public_(isPublic){};
+                    std::string use_data_product,
+                    std::string use_version,
+                    std::string use_namespace,
+                    ghc::filesystem::path path,
+                    std::string data_product_description,
+                    bool isPublic)
+                :
+                    data_product_(data_product),
+                    use_data_product_(use_data_product),
+                    use_version_(use_version),
+                    use_namespace_(use_namespace),
+                    path_(path),
+                    data_product_description_(data_product_description),
+                    public_(isPublic){};
 
             IOObject(std::string data_product,
                         std::string use_data_product,
@@ -51,14 +52,15 @@ namespace FDP {
                         std::string use_namespace,
                         ghc::filesystem::path path,
                         ApiObject &component_obj,
-                        ApiObject &data_product_obj):
-                        data_product_(data_product),
-                        use_data_product_(use_data_product),
-                        use_version_(use_version),
-                        use_namespace_(use_namespace),
-                        path_(path),
-                        component_obj_(std::make_shared<ApiObject>(component_obj)),
-                        data_product_obj_(std::make_shared<ApiObject>(data_product_obj)){};
+                        ApiObject &data_product_obj) 
+                :
+                    data_product_(data_product),
+                    use_data_product_(use_data_product),
+                    use_version_(use_version),
+                    use_namespace_(use_namespace),
+                    path_(path),
+                    component_obj_(std::make_shared<ApiObject>(component_obj)),
+                    data_product_obj_(std::make_shared<ApiObject>(data_product_obj)){};
 
             std::string get_data_product() {return data_product_;}
             std::string get_use_data_product() {return use_data_product_;}
@@ -70,10 +72,10 @@ namespace FDP {
             std::string get_component_description() {return component_description_;}
             bool is_public() {return public_;}
 
-            std::shared_ptr<ApiObject> get_component_object() {return component_obj_;}
-            std::shared_ptr<ApiObject> get_data_product_object() {return data_product_obj_;}
+            ApiObject::sptr get_component_object() {return component_obj_;}
+            ApiObject::sptr get_data_product_object() {return data_product_obj_;}
 
-            void set_component_object(ApiObject &component_obj){component_obj_ = std::make_shared<ApiObject>(component_obj);}
+            void set_component_object(ApiObject& component_obj){component_obj_ = std::make_shared<ApiObject>(component_obj);}
             void set_data_product_object(ApiObject &data_product_obj){data_product_obj_ = std::make_shared<ApiObject>(data_product_obj);}
     };
 };

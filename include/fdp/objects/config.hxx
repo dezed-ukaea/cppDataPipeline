@@ -41,24 +41,24 @@ namespace FDP {
             std::string token_;
             std::shared_ptr<API> api_;
 
-            std::unique_ptr<ApiObject> user_;
-            std::unique_ptr<ApiObject> author_;
+            ApiObject::uptr user_;
+            ApiObject::uptr author_;
 
-            std::unique_ptr<ApiObject> config_storage_root_;
-            std::unique_ptr<ApiObject> config_storage_location_;
-            std::unique_ptr<ApiObject> config_file_type_;
-            std::unique_ptr<ApiObject> config_obj_;
+            ApiObject::uptr config_storage_root_;
+            ApiObject::uptr config_storage_location_;
+            ApiObject::uptr config_file_type_;
+            ApiObject::uptr config_obj_;
 
-            std::unique_ptr<ApiObject> script_storage_root_;
-            std::unique_ptr<ApiObject> script_storage_location_;
-            std::unique_ptr<ApiObject> script_file_type_;
-            std::unique_ptr<ApiObject> script_obj_;
+            ApiObject::uptr script_storage_root_;
+            ApiObject::uptr script_storage_location_;
+            ApiObject::uptr script_file_type_;
+            ApiObject::uptr script_obj_;
 
-            std::unique_ptr<ApiObject> code_repo_storage_root_;
-            std::unique_ptr<ApiObject> code_repo_storage_location_;
-            std::unique_ptr<ApiObject> code_repo_obj_;
+            ApiObject::uptr code_repo_storage_root_;
+            ApiObject::uptr code_repo_storage_location_;
+            ApiObject::uptr code_repo_obj_;
 
-            std::unique_ptr<ApiObject> code_run_;
+            ApiObject::uptr code_run_;
             
             std::map<std::string, IOObject> writes_;
             std::map<std::string, IOObject> reads_;
@@ -72,6 +72,8 @@ namespace FDP {
             bool config_has_reads() const;
 
         public:
+            typedef std::unique_ptr< Config > uptr;
+
             Config(const ghc::filesystem::path &config_file_path,
             const ghc::filesystem::path &script_file_path,
             const std::string &token,
