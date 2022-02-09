@@ -3,7 +3,14 @@
 namespace FDP {
 class DataPipeline {
 public:
-  // 'initialise' method for the API
+  /**
+   * @brief Construct a new Data Pipeline (PIMPL)
+   * 
+   * @param config_file_path 
+   * @param script_file_path 
+   * @param token 
+   * @param log_level 
+   */
   explicit DataPipeline(
       const std::string &config_file_path,
       const std::string &script_file_path,
@@ -15,7 +22,10 @@ public:
     APILogger->debug("DataPipeline: Initialising session '{0}'", Pimpl()->get_code_run_uuid());
   }
 
-  // 'finalise' method for the API
+  /**
+   * @brief Destroy the Data Pipeline object
+   * 
+   */
   ~DataPipeline();
 
   DataPipeline(DataPipeline &&rhs) noexcept;
@@ -24,8 +34,30 @@ public:
   DataPipeline(const DataPipeline &rhs);
   DataPipeline &operator=(const DataPipeline &rhs);
 
+  /**
+   * @brief Return a path to a given data product
+   * Whilst recording it's meta data for the code run
+   * 
+   * @param data_product 
+   * @return ghc::filesystem::path 
+   */
   ghc::filesystem::path link_read(std::string &data_product);
+
+  /**
+   * @brief Return a path to be used for a given data product
+   * whilst recording it's meta data
+   * 
+   * @param data_product 
+   * @return ghc::filesystem::path 
+   */
   ghc::filesystem::path link_write(std::string &data_product);
+
+  /**
+   * @brief Finalise the pipeline
+   * Record all data products and meta data to the registry
+   * update the code run with all appropriate meta data
+   * 
+   */
   void finalise();
 
 private:

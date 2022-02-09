@@ -2,7 +2,6 @@
 #define TESTDIR ""
 #endif
 #include "fdp/exceptions.hxx"
-#include "fdp/utilities/doi.hxx"
 #include "fdp/utilities/json.hxx"
 #include "fdp/utilities/semver.hxx"
 #include "fdp/objects/metadata.hxx"
@@ -11,14 +10,6 @@
 #include "json/reader.h"
 
 using namespace FDP;
-
-TEST(FDPAPITest, TestDOIPass) {
-  ASSERT_NO_THROW(doi_from_string("10.1111/ddi.12887"));
-}
-
-TEST(FDPAPITest, TestDOIFail) {
-  ASSERT_THROW(doi_from_string("10.Asdfa/eya/ddi7"), validation_error);
-}
 
 TEST(FDPAPITest, TestSemVerComparisons) {
   Versioning::version v1{1, 4, 5};

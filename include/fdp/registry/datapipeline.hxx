@@ -30,7 +30,6 @@ namespace FDP {
 /*! **************************************************************************
  * @class DataPipelineImpl_
  * @brief private pointer-to-implementation class containing all backend methods
- * @author K. Zarebski (UKAEA)
  *
  * This class performs all behind the scenes operations acting as the backend to
  * the user called FDP::DataPipeline class.
@@ -53,7 +52,6 @@ public:
   
   /*! *************************************************************************
    * @brief construct a DataPipelineImpl_ instance from configurations and setup
-   * @author K. Zarebski (UKAEA)
    *
    * @param config_file_path location of the local configuration file
    * @param access_token_file API authorisation token where required
@@ -70,19 +68,42 @@ public:
     DataPipelineImpl_(dp.config_file_path_(), dp.script_file_path_(), token_(), spdlog::level::info, api_location_());}
 
   /**
-   * @brief Destroy the Data Pipeline Impl_ object
+   * @brief Default Destructor
    * 
    */
   ~DataPipelineImpl_() = default;
-  
-  //DataPipelineImpl_& operator=(DataPipelineImpl_ dp);
 
-
-
+  /**
+   * @brief Return a path to a given data product
+   * Whilst recording it's meta data for the code run
+   * 
+   * @param data_product 
+   * @return ghc::filesystem::path 
+   */
   ghc::filesystem::path link_read(std::string &data_product);
+
+  /**
+   * @brief Return a path to be used for a given data product
+   * whilst recording it's meta data
+   * 
+   * @param data_product 
+   * @return ghc::filesystem::path 
+   */
   ghc::filesystem::path link_write(std::string &data_product);
+
+  /**
+   * @brief Finalise the pipeline
+   * Record all data products and meta data to the registry
+   * update the code run with all appropriate meta data
+   * 
+   */
   void finalise();
 
+  /**
+   * @brief Get the code run uuid
+   * 
+   * @return std::string 
+   */
   std::string get_code_run_uuid();
 
 };

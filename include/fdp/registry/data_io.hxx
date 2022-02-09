@@ -29,21 +29,6 @@
 
 namespace FDP {
 
-/*! **************************************************************************
- * @brief parse the configuration file
- * @author K. Zarebski (UKAEA)
- *
- * @return a YAML::Node object containing all of the extracted metadata
- *****************************************************************************/
-YAML::Node parse_config_();
-/*! ***************************************************************************
- * @class Config
- * @brief class for handling interaction with the local file system
- *
- * This class contains methods for interacting with the configuration file and
- * retrieving the information required to read/write data objects
- *****************************************************************************/
-
 /*! ***************************************************************************
  * @brief read the value of a point estimate from a given TOML file
  * @author K. Zarebski (UKAEA)
@@ -61,6 +46,16 @@ YAML::Node parse_config_();
  *****************************************************************************/
 double read_point_estimate_from_toml(const ghc::filesystem::path var_address);
 
+/**
+ * @brief Create an estimate
+ * 
+ * @tparam T 
+ * @param value 
+ * @param data_product 
+ * @param version_num 
+ * @param config 
+ * @return ghc::filesystem::path 
+ */
 template <typename T>
 ghc::filesystem::path create_estimate(T &value,
                                       const ghc::filesystem::path &data_product,
@@ -98,6 +93,12 @@ ghc::filesystem::path create_estimate(T &value,
   return output_filename_;
 }
 
+/**
+ * @brief Get the first key of a given toml value
+ * 
+ * @param data_table 
+ * @return std::string 
+ */
 std::string get_first_key_(const toml::value data_table);
 
 }; // namespace FDP

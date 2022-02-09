@@ -135,7 +135,7 @@ void FDP::Config::validate_config(ghc::filesystem::path yaml_path,
     throw config_parsing_error("Failed to Read: [\"description\"] from " + yaml_path.string());
   }
 
-  if (!FileExists(script_file_path_.string())) {
+  if (!file_exists(script_file_path_.string())) {
     APILogger->error("Submission script: {0} does not exist", script_file_path_.string());
     throw std::runtime_error("Submission script: " + script_file_path_.string() + " does not exist");
   }
@@ -532,7 +532,7 @@ void FDP::Config::finalise(){
     for (it = writes_.begin(); it != writes_.end(); it++){
       IOObject currentWrite = it->second;
 
-      if(! FileExists(currentWrite.get_path().string())){
+      if(! file_exists(currentWrite.get_path().string())){
         APILogger->error("File Error: Cannot Find file for write", currentWrite.get_use_data_product());
         throw std::runtime_error("File Error Cannot Find file for write: " + currentWrite.get_use_data_product());
       }
