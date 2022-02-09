@@ -70,13 +70,6 @@ namespace FDP {
             std::string get_first_component() const;
 
             /**
-             * @brief Get the object as a Json::Value
-             * 
-             * @return Json::Value 
-             */
-            Json::Value get_object(){return obj_;}
-
-            /**
              * @brief Check to see if the object is empty
              * 
              * @return true the object does not contain any data
