@@ -1,6 +1,11 @@
 #include "fdp/registry/datapipeline.hxx"
 
 namespace FDP {
+/**
+ * @brief DataPipeline Class:
+ * A PIMPL Class for interacting the the FAIR Data Pipeline
+ * 
+ */
 class DataPipeline {
 public:
   /**
