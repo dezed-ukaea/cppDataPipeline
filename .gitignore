@@ -5,3 +5,4 @@ build/
 test/data_store/
 data_store/
 .fair
+venv/

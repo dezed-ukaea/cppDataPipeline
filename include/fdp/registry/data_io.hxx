@@ -27,9 +27,9 @@
 #include "fdp/objects/data.hxx"
 #include "fdp/objects/distributions.hxx"
 #include "fdp/objects/metadata.hxx"
-#include "fdp/registry/data_object.hxx"
 #include "fdp/utilities/hdf5.hxx"
 #include "fdp/utilities/logging.hxx"
+#include "fdp/utilities/semver.hxx"
 
 using namespace H5; // Use the HDF5 library
 

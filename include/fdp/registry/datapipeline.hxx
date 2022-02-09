@@ -22,7 +22,6 @@
 #include "fdp/objects/config.hxx"
 #include "fdp/objects/metadata.hxx"
 #include "fdp/registry/api.hxx"
-#include "fdp/registry/data_object.hxx"
 #include "fdp/registry/data_io.hxx"
 #include "fdp/utilities/logging.hxx"
 
