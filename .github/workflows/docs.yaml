@@ -19,7 +19,7 @@ jobs:
     - name: build docs
       uses: mattnotmitt/doxygen-action@v1.9.2
       with:
-        doxyfile-path: 'doxygen'
+        doxyfile-path: 'Doxyfile'
     - name: Deploy
       uses: peaceiris/actions-gh-pages@v3
       with:
