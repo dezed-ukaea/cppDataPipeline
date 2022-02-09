@@ -26,20 +26,6 @@ PROJECT( fdpapi
 
 set( FDPAPI fdpapi )
 
-# Use HDF5 Static Libraries on Windows
-if ( WIN32 )
-    SET (HDF5_USE_STATIC_LIBRARIES TRUE)
-ENDIF()
-
-# Find HDF5 Package
-find_package(HDF5 COMPONENTS C CXX)
-
-# If the HDF5 Package is not found stop
-if (NOT HDF5_FOUND)
-    message( FATAL_ERROR "HDF5 Library Not Found, 
-        Please install it and ensure the Environment Variable HDF5_ROOT is set")
-ENDIF()
-
 # Set Output Directories to avoid issues on multi release compilers
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)

@@ -42,7 +42,7 @@ jobs:
       - name: Install Dependencies
         run: |
           sudo apt update
-          sudo apt install -y lcov libjsoncpp-dev curl libcurl4-openssl-dev libyaml-cpp-dev libhdf5-dev
+          sudo apt install -y lcov libjsoncpp-dev curl libcurl4-openssl-dev libyaml-cpp-dev
       - name: Configure Library
         run: |
           cmake -Bbuild -DFDPAPI_BUILD_TESTS=ON
@@ -91,7 +91,6 @@ jobs:
       - name: Install Dependencies
         run: |
           brew install cmake
-          brew install hdf5
           brew install curl
       - name: Configure Library
         run: |
@@ -107,20 +106,8 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: ilammy/msvc-dev-cmd@v1
-      - name: Install Dependencies
-        run: |
-          choco install wget
-          wget -O hdf5.zip https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.12/hdf5-1.12.1/bin/windows/hdf5-1.12.1-Std-win10_64-vs14.zip
-          tar -xf hdf5.zip
-          cd hdf
-          msiexec /i HDF5-1.12.1-win64.msi /quiet /qn /norestart /log log.log INSTALL_ROOT="$Env:RUNNER_TEMP\HDF5_ROOT" | Out-Null
-          gc log.log
       - name: Configure Library
         run: |
           cmake -Bbuild -DFDPAPI_BUILD_TESTS=ON
-        env: 
-          HDF5_ROOT: ${{ runner.temp }}\HDF5_ROOT
       - name: Compile FDP-Cpp-API
         run: cmake --build build --config=Release
-        env: 
-          HDF5_ROOT: ${{ runner.temp }}\HDF5_ROOT
