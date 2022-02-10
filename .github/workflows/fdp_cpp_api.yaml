@@ -45,7 +45,7 @@ jobs:
           sudo apt install -y lcov libjsoncpp-dev curl libcurl4-openssl-dev libyaml-cpp-dev
       - name: Configure Library
         run: |
-          cmake -Bbuild -DFDPAPI_BUILD_TESTS=ON
+          cmake -Bbuild -DFDPAPI_BUILD_TESTS=ON -DFDPAPI_CODE_COVERAGE=ON
       - name: Fetch cache
         uses: actions/cache@v2.1.5
         with:
