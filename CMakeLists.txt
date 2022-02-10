@@ -16,6 +16,12 @@ ELSE()
     set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Release")
 ENDIF()
 
+IF( FDPAPI_CODE_COVERAGE )
+    set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -O0 --coverage")
+    message("CXX Flags: ${CMAKE_CXX_FLAGS}")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O0")
+ENDIF()
+
 # Define Project
 PROJECT( fdpapi
     VERSION 0.1.0
@@ -80,9 +86,6 @@ IF( FDPAPI_CODE_COVERAGE AND FDPAPI_BUILD_TESTS )
         LIST(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake_modules")
         include(CodeCoverage)
         APPEND_COVERAGE_COMPILER_FLAGS()
-
-        set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -O0 --coverage")
-        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O0")
 
         #set(COVERAGE_EXCLUDES 'build/*' 'usr/*')
         #set(Coverage_BASE_DIRECTORY ${CMAKE_SOURCE_DIR})
