@@ -76,49 +76,19 @@ ENDIF()
 
 # Compile Code Coverage if Specified with Tests
 IF( FDPAPI_CODE_COVERAGE AND FDPAPI_BUILD_TESTS )
-    MESSAGE( STATUS "[Coverage]")
-    SET( COVERAGE_COMPILER_FLAGS "--coverage -fprofile-arcs -ftest-coverage" )
-	SET( CMAKE_CXX_FLAGS "-std=gnu++17 -O0 -Wall -Wextra -Werror ${COVERAGE_COMPILER_FLAGS} ${CMAKE_CXX_FLAGS}" )
-    SET( CMAKE_C_FLAGS "-O0 -Wall -Wextra ${COVERAGE_COMPILER_FLAGS} ${CMAKE_C_FLAGS}" )
-    MESSAGE( "\t CMAKE_CXX_FLAGS: ${CMAKE_CXX_FLAGS}" )
-    MESSAGE( "\t CMAKE_C_FLAGS: ${CMAKE_C_FLAGS}" )
-    
+    if(CMAKE_COMPILER_IS_GNUCXX)
+        LIST(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake_modules")
+        include(CodeCoverage)
+        APPEND_COVERAGE_COMPILER_FLAGS()
 
-	find_program( LCOV_PATH  NAMES lcov lcov.bat lcov.exe lcov.perl)
-	find_program( GCOV_PATH gcov )
-	
-	set(LCOV_EXCLUDES "build/*" "/usr*")
-	
-	add_custom_target(coverage
-	
-        # Cleanup lcov
-        COMMAND ${LCOV_PATH} --gcov-tool ${GCOV_PATH} -directory . -b ${PROJECT_SOURCE_DIR} --zerocounters
-	
-	    # Create baseline to make sure untouched files show up in the report
-		COMMAND ${LCOV_PATH} --gcov-tool ${GCOV_PATH} -c -i -d . -b ${PROJECT_SOURCE_DIR} -o ${FDPAPI}.base
-	
-	    # Run executables
-		COMMAND ${CMAKE_BINARY_DIR}/test/${FDPAPI}-tests ${COV_TEST_FLAGS}
-	
-	    # Capturing lcov counters and generating report
-		COMMAND ${LCOV_PATH} --gcov-tool ${GCOV_PATH} --directory . -b ${PROJECT_SOURCE_DIR} --capture --output-file ${FDPAPI}.capture
-	
-	    # add baseline counters
-		COMMAND ${LCOV_PATH} --gcov-tool ${GCOV_PATH} -a ${FDPAPI}.base -a ${FDPAPI}.capture --output-file ${FDPAPI}.total
-	
-	    # filter collected data to final coverage report and merge outputs
-		COMMAND ${LCOV_PATH} --gcov-tool ${GCOV_PATH} --remove ${FDPAPI}.total ${LCOV_EXCLUDES} --output-file ${FDPAPI}.info
-	
-        # Set output files as GENERATED (will be removed on 'make clean')
-        BYPRODUCTS
-            ${FDPAPI}.base
-            ${FDPAPI}.capture
-            ${FDPAPI}.total
-            ${FDPAPI}.info
-            ${FDPAPI}  # report directory
+        set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -O0 --coverage")
+        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O0")
 
-        WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
-        VERBATIM # Protect arguments to commands
-        COMMENT "Resetting code coverage counters to zero.\nProcessing code coverage counters and generating report."
-	)
+        #set(COVERAGE_EXCLUDES 'build/*' 'usr/*')
+        #set(Coverage_BASE_DIRECTORY ${CMAKE_SOURCE_DIR})
+        setup_target_for_coverage_gcovr_sonar(NAME coverage
+                              EXECUTABLE bin/${FDPAPI}-tests
+                              DEPENDENCIES ${FDPAPI}-tests
+                              BASE_DIRECTORY ${CMAKE_SOURCE_DIR})
+    endif()
 ENDIF()
