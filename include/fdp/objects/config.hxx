@@ -39,7 +39,7 @@ namespace FDP {
             YAML::Node config_data_;            
             std::string api_url_;
             std::string token_;
-            std::shared_ptr<API> api_;
+            API::sptr api_;
 
             ApiObject::uptr user_;
             ApiObject::uptr author_;
@@ -113,7 +113,7 @@ namespace FDP {
             
             YAML::Node get_config_data() const {return config_data_;}
 
-            std::shared_ptr<API> get_api(){return api_;}
+            API::sptr get_api(){return api_;}
 
             RESTAPI get_rest_api_location(){return rest_api_location_;}
 

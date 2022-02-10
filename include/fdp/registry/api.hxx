@@ -117,6 +117,8 @@ public:
  *****************************************************************************/
 class API {
 public:
+    typedef std::shared_ptr< API > sptr;
+
   /*! *************************************************************************
    * @brief construct an API object using the given URL as the root
    * @author K. Zarebski (UKAEA)

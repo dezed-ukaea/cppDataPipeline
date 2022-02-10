@@ -1,6 +1,72 @@
 #include "fdp/objects/api_object.hxx"
 
 namespace FDP {
+
+    ApiObject::ApiObject() : obj_(Json::Value() )
+    {
+    }
+
+    ApiObject::uptr ApiObject::from_json( const Json::Value& j )
+    {
+       // ApiObject::uptr pobj = std::unique_ptr< ApiObject >( new ApiObject( j ) );
+
+        ApiObject::uptr pobj = ApiObject::construct();
+        pobj->obj_ = j;
+
+        return pobj;
+    }
+
+    ApiObject::uptr ApiObject::construct(void)
+    {
+        ApiObject::uptr pobj = std::unique_ptr< ApiObject >( new ApiObject() );
+        return pobj;
+    }
+#if 0
+    ApiObject::uptr ApiObject::copy( const ApiObject& src )
+    {
+        ApiObject::uptr pobj = std::unique_ptr< ApiObject >( new ApiObject() );
+
+        pobj->obj_.copy( src.obj_ );
+        return obj;
+    }
+#endif
+    int ApiObject::add( const std::string& key, int value )
+    {
+        this->obj_[ key ] = value;
+        return 0;
+    }
+    int ApiObject::add( const std::string& key, float value )
+    {
+        this->obj_[ key ] = value;
+        return 0;
+    }
+
+    int ApiObject::add( const std::string& key, double value )
+    {
+        this->obj_[ key ] = value;
+        return 0;
+    }
+
+    int ApiObject::add( const std::string& key, const std::string& value )
+    {
+        this->obj_[ key ] = value;
+        return 0;
+    }
+
+    int ApiObject::add( const std::string& key, const ApiObject& value )
+    {
+        this->obj_[ key ] = value.obj_;
+        return 0;
+    }
+
+
+    int ApiObject::remove( const std::string& key )
+    {
+        this->obj_.removeMember( key );
+        return 0;
+    }
+
+
     /**
      * @brief Returns the object id from the object uri_
      * 

@@ -12,6 +12,7 @@ namespace FDP {
       std::string token_() const {return config_->get_token();}
       RESTAPI api_location_() {return config_->get_rest_api_location();}
   public:
+      typedef std::shared_ptr< impl > sptr;
   
   /*! *************************************************************************
    * @brief construct a DataPipelineImpl_ instance from configurations and setup
