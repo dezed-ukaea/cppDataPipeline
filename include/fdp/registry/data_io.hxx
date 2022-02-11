@@ -18,7 +18,6 @@
 #include <string>
 #include <vector>
 #include <yaml-cpp/yaml.h>
-#include <ghc/filesystem.hpp>
 
 #include <iostream>
 
@@ -48,20 +47,18 @@ double read_point_estimate_from_toml(const ghc::filesystem::path var_address);
 
 /**
  * @brief Create an estimate
- * 
- * @tparam T 
- * @param value 
- * @param data_product 
- * @param version_num 
- * @param config 
- * @return ghc::filesystem::path 
+ *
+ * @tparam T
+ * @param value
+ * @param data_product
+ * @param version_num
+ * @param config
+ * @return ghc::filesystem::path
  */
 template <typename T>
-ghc::filesystem::path create_estimate(T &value,
-                                      const ghc::filesystem::path &data_product,
-                                      const Versioning::version &version_num,
-                                      const Config *config
-                                      ) {
+ghc::filesystem::path
+create_estimate(T &value, const ghc::filesystem::path &data_product,
+                const Versioning::version &version_num, const Config *config) {
   const std::string param_name_ = data_product.stem().string();
   const std::string namespace_ = config->get_default_output_namespace();
   const ghc::filesystem::path data_store_ = config->get_data_store();
@@ -95,9 +92,9 @@ ghc::filesystem::path create_estimate(T &value,
 
 /**
  * @brief Get the first key of a given toml value
- * 
- * @param data_table 
- * @return std::string 
+ *
+ * @param data_table
+ * @return std::string
  */
 std::string get_first_key_(const toml::value data_table);
 

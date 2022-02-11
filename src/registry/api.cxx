@@ -1,7 +1,8 @@
 #include "fdp/registry/api.hxx"
 
 namespace FDP {
-static size_t write_str_(void *ptr, size_t size, size_t nmemb, std::string *data) {
+static size_t write_str_(void *ptr, size_t size, size_t nmemb,
+                         std::string *data) {
   data->append((char *)ptr, size * nmemb);
   return size * nmemb;
 }
@@ -19,7 +20,6 @@ std::string url_encode(std::string url) {
 CURL *API::setup_json_session_(std::string &addr_path, std::string *response,
                                long &http_code, std::string token) {
   CURL *curl_ = curl_easy_init();
-
 
   if (!token.empty()) {
     APILogger->debug("Adding token: {0} to headers", token);
@@ -76,12 +76,14 @@ CURL *API::setup_download_session_(const ghc::filesystem::path &addr_path,
 }
 
 Json::Value API::get_request(const ghc::filesystem::path &addr_path,
-                         long expected_response, std::string token) {
-  std::string addr_path_ = std::regex_replace(addr_path.string(), std::regex(std::string("\\\\")), "/");
+                             long expected_response, std::string token) {
+  std::string addr_path_ = std::regex_replace(
+      addr_path.string(), std::regex(std::string("\\\\")), "/");
   return get_request(addr_path_, expected_response);
 }
 
-Json::Value API::get_request(const std::string &addr_path, long expected_response, std::string token) {
+Json::Value API::get_request(const std::string &addr_path,
+                             long expected_response, std::string token) {
   Json::Value root_;
   Json::CharReaderBuilder json_charbuilder_;
 
@@ -91,7 +93,8 @@ Json::Value API::get_request(const std::string &addr_path, long expected_respons
 
   std::string response_str_;
 
-  auto *session_ = setup_json_session_(search_str_, &response_str_, http_code, token);
+  auto *session_ =
+      setup_json_session_(search_str_, &response_str_, http_code, token);
 
   const std::unique_ptr<Json::CharReader> json_reader_(
       json_charbuilder_.newCharReader());
@@ -125,16 +128,17 @@ Json::Value API::get_request(const std::string &addr_path, long expected_respons
 }
 
 Json::Value API::get_by_json_query(const std::string &addr_path,
-                                Json::Value &query_data,
-                                long expected_response, std::string token) {
+                                   Json::Value &query_data,
+                                   long expected_response, std::string token) {
 
   // Check for API root in urls
-  std::string q_ = append_with_forward_slash(addr_path) + json_to_query_string(query_data);
+  std::string q_ =
+      append_with_forward_slash(addr_path) + json_to_query_string(query_data);
   return get_request(q_, expected_response, token);
 }
 
 Json::Value API::get_by_id(const std::string &table, int const &id,
-                         long expected_response, std::string token) {
+                           long expected_response, std::string token) {
   std::string query = table + "/" + std::to_string(id) + "/";
   ghc::filesystem::path queryPath = query;
   return get_request(queryPath, expected_response, token);
@@ -183,13 +187,15 @@ std::string API::escape_space(std::string &str) {
 
 Json::Value API::post(std::string addr_path, Json::Value &post_data,
                       const std::string &token, long expected_response) {
-  return API::post_patch_request(addr_path, post_data, token, expected_response, false);
+  return API::post_patch_request(addr_path, post_data, token, expected_response,
+                                 false);
 }
 
-Json::Value API::post_storage_root(Json::Value &post_data, const std::string &token){
-  if (post_data["local"]){
-    if(post_data["local"].as<bool>()){
-        post_data["root"] = "file://" + post_data["root"].as<std::string>();
+Json::Value API::post_storage_root(Json::Value &post_data,
+                                   const std::string &token) {
+  if (post_data["local"]) {
+    if (post_data["local"].as<bool>()) {
+      post_data["root"] = "file://" + post_data["root"].as<std::string>();
     }
   }
   return API::post_patch_request("storage_root", post_data, token, 201, false);
@@ -197,12 +203,14 @@ Json::Value API::post_storage_root(Json::Value &post_data, const std::string &to
 
 Json::Value API::patch(std::string addr_path, Json::Value &post_data,
                        const std::string &token, long expected_response) {
-  return API::post_patch_request(addr_path, post_data, token, expected_response, true);
+  return API::post_patch_request(addr_path, post_data, token, expected_response,
+                                 true);
 }
 
-Json::Value API::post_patch_request(std::string addr_path, Json::Value &post_data,
-                         const std::string &token, long expected_response,
-                         bool PATCH) {
+Json::Value API::post_patch_request(std::string addr_path,
+                                    Json::Value &post_data,
+                                    const std::string &token,
+                                    long expected_response, bool PATCH) {
   const std::string url_path_ =
       url_root_ + API::append_with_forward_slash(addr_path);
   const std::string data_ = json_to_string(post_data);
@@ -252,7 +260,7 @@ Json::Value API::post_patch_request(std::string addr_path, Json::Value &post_dat
   else if (http_code == 409) {
     APILogger->info("API:Post Entry Exists attempting to return entry");
     return get_request(API::append_with_forward_slash(addr_path) +
-                   json_to_query_string(post_data))[0];
+                       json_to_query_string(post_data))[0];
   }
 
   else if (http_code != expected_response) {

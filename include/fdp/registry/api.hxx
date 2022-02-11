@@ -62,7 +62,7 @@ size_t write_func_(void *ptr, size_t size, size_t nmemb, std::string *data);
  *****************************************************************************/
 class API {
 public:
-    typedef std::shared_ptr< API > sptr;
+  typedef std::shared_ptr<API> sptr;
 
   /*! *************************************************************************
    * @brief construct an API object using the given URL as the root
@@ -75,19 +75,19 @@ public:
 
   /**
    * @brief sends the given 'packet' of information to the RestAPI
-   * 
+   *
    * @param addr_path the api endpoint a.k.a the table name e.g. "coderun"
    * @param expected_response the expected return HTTP code
-   * @param token 
+   * @param token
    * @return Json::Value JSON object containing the information returned by the
    *request
    */
   Json::Value get_request(const std::string &addr_path,
-                      long expected_response = 200, std::string token = "");
+                          long expected_response = 200, std::string token = "");
 
   Json::Value patch(const std::string addr_path, Json::Value &post_data,
-                      const std::string &token, long expected_response = 200);
-    /*! *************************************************************************
+                    const std::string &token, long expected_response = 200);
+  /*! *************************************************************************
    * @brief post information from a JSON value object to the RestAPI
    * @author K. Zarebski (UKAEA) & R. Field
    *
@@ -100,12 +100,13 @@ public:
   Json::Value post(const std::string addr_path, Json::Value &post_data,
                    const std::string &token, long expected_response = 201);
 
-  Json::Value post_storage_root(Json::Value &post_data, const std::string &token);
+  Json::Value post_storage_root(Json::Value &post_data,
+                                const std::string &token);
 
   Json::Value get_by_json_query(const std::string &addr_path,
-                                  Json::Value &query_data,
-                                  long expected_response = 200,
-                                  std::string token = "");
+                                Json::Value &query_data,
+                                long expected_response = 200,
+                                std::string token = "");
 
   /**
    * @brief get an object from the api by it's id
@@ -116,7 +117,7 @@ public:
    * @return Json::Value
    */
   Json::Value get_by_id(const std::string &table, int const &id,
-                      long expected_response = 200, std::string token = "");
+                        long expected_response = 200, std::string token = "");
 
   /*! *************************************************************************
    * @brief returns the root URL for the RestAPI used by the API instance
@@ -157,9 +158,9 @@ public:
 
   /**
    * @brief Remove the leading forward slash from a given string
-   * 
-   * @param str 
-   * @return std::string 
+   *
+   * @param str
+   * @return std::string
    */
   static std::string remove_leading_forward_slash(std::string str);
 
@@ -168,14 +169,16 @@ private:
   CURL *setup_json_session_(std::string &addr_path, std::string *response,
                             long &http_code, std::string token = "");
   CURL *setup_download_session_(const ghc::filesystem::path &addr_path,
-                                FILE *file);  
-                      
-  Json::Value post_patch_request(const std::string addr_path, Json::Value &post_data,
-                      const std::string &token, long expected_response, bool PATCH = false);
+                                FILE *file);
+
+  Json::Value post_patch_request(const std::string addr_path,
+                                 Json::Value &post_data,
+                                 const std::string &token,
+                                 long expected_response, bool PATCH = false);
 
   // Legacy Method
   Json::Value get_request(const ghc::filesystem::path &addr_path,
-                      long expected_response = 200, std::string token = "");
+                          long expected_response = 200, std::string token = "");
 
   void download_file(const ghc::filesystem::path &url,
                      ghc::filesystem::path out_path);

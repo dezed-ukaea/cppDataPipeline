@@ -64,20 +64,19 @@ std::string current_time_stamp(bool file_name) {
   return oss_.str();
 }
 
-std::string remove_local_from_root(const std::string &root){
+std::string remove_local_from_root(const std::string &root) {
   return std::regex_replace(root, std::regex(std::string("file:\\/\\/")), "");
 }
 
-std::string remove_backslash_from_path(const std::string &path){
+std::string remove_backslash_from_path(const std::string &path) {
   return std::regex_replace(path, std::regex(std::string("\\\\")), "/");
 }
 
-bool file_exists( const std::string &Filename )
-{
-    return access( Filename.c_str(), 0 ) == 0;
+bool file_exists(const std::string &Filename) {
+  return access(Filename.c_str(), 0) == 0;
 }
 
-std::string read_token(const ghc::filesystem::path &token_path){
+std::string read_token(const ghc::filesystem::path &token_path) {
   std::ifstream key_(token_path, std::ios::in);
   std::string key_str_;
   key_ >> key_str_;
