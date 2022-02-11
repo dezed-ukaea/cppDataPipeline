@@ -30,7 +30,7 @@ protected:
     return HomeDirectory;
   }
 
-  Config *config(bool use_local = true, std::string config = "write_csv.yaml") {
+  Config::sptr config(bool use_local = true, std::string config = "write_csv.yaml") {
 
     const ghc::filesystem::path config_path_ =
         ghc::filesystem::path(TESTDIR) / "data" / config;
@@ -38,8 +38,8 @@ protected:
         ghc::filesystem::path(TESTDIR) / "test_script.sh";
     APILogger->set_level(spdlog::level::debug);
 
-    return new Config(config_path_, script_path_, token,
-                                 static_cast<RESTAPI>(use_local));
+    return Config::construct(config_path_, script_path_, token,
+            static_cast<RESTAPI>(use_local));
   }
 
   std::string token =
@@ -62,7 +62,7 @@ TEST_F(ConfigTest, TestMetaData) {
 }
 
 TEST_F(ConfigTest, TestLinkWrite){
-  Config *cnf = config();
+    Config::sptr cnf = config();
   std::string data_product = "test/csv";
   ghc::filesystem::path currentLink = ghc::filesystem::path(cnf->link_write(data_product));
   EXPECT_GT(currentLink.string().size(), 1);
@@ -77,7 +77,7 @@ TEST_F(ConfigTest, TestLinkWrite){
 }
 
 TEST_F(ConfigTest, TestLinkRead){
-  Config *cnf = config(true, "read_csv.yaml");
+    Config::sptr cnf = config(true, "read_csv.yaml");
   std::string data_product = "test/csv";
   ghc::filesystem::path currentLink = cnf->link_read(data_product);
   EXPECT_GT(currentLink.string().size(), 1);

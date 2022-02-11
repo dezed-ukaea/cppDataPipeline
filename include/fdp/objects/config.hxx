@@ -30,7 +30,6 @@ namespace FDP {
      * @brief class for interacting with confifurations
      * 
      */
-
     class Config {
         private:            
             const ghc::filesystem::path config_file_path_;
@@ -41,24 +40,24 @@ namespace FDP {
             std::string token_;
             API::sptr api_;
 
-            ApiObject::uptr user_;
-            ApiObject::uptr author_;
+            ApiObject::sptr user_;
+            ApiObject::sptr author_;
 
-            ApiObject::uptr config_storage_root_;
-            ApiObject::uptr config_storage_location_;
-            ApiObject::uptr config_file_type_;
-            ApiObject::uptr config_obj_;
+            ApiObject::sptr config_storage_root_;
+            ApiObject::sptr config_storage_location_;
+            ApiObject::sptr config_file_type_;
+            ApiObject::sptr config_obj_;
 
-            ApiObject::uptr script_storage_root_;
-            ApiObject::uptr script_storage_location_;
-            ApiObject::uptr script_file_type_;
-            ApiObject::uptr script_obj_;
+            ApiObject::sptr script_storage_root_;
+            ApiObject::sptr script_storage_location_;
+            ApiObject::sptr script_file_type_;
+            ApiObject::sptr script_obj_;
 
-            ApiObject::uptr code_repo_storage_root_;
-            ApiObject::uptr code_repo_storage_location_;
-            ApiObject::uptr code_repo_obj_;
+            ApiObject::sptr code_repo_storage_root_;
+            ApiObject::sptr code_repo_storage_location_;
+            ApiObject::sptr code_repo_obj_;
 
-            ApiObject::uptr code_run_;
+            ApiObject::sptr code_run_;
             
             std::map<std::string, IOObject> writes_;
             std::map<std::string, IOObject> reads_;
@@ -73,11 +72,6 @@ namespace FDP {
             
             void initialise(RESTAPI api_location);
             void validate_config(ghc::filesystem::path yaml_path, RESTAPI api_location);
-
-        public:
-            typedef std::unique_ptr< Config > uptr;
-
-
             /**
              * @brief Construct a new Config object
              * 
@@ -87,9 +81,19 @@ namespace FDP {
              * @param api_location whether or not the api is local
              */
             Config(const ghc::filesystem::path &config_file_path,
-            const ghc::filesystem::path &script_file_path,
-            const std::string &token,
-            RESTAPI api_location);
+                    const ghc::filesystem::path &script_file_path,
+                    const std::string &token,
+                    RESTAPI api_location);
+
+
+        public:
+            typedef std::shared_ptr< Config > sptr;
+
+            static Config::sptr construct(const ghc::filesystem::path &config_file_path,
+                    const ghc::filesystem::path &script_file_path,
+                    const std::string &token,
+                    RESTAPI api_location);
+
 
             /**
              * @brief Destroy the Config object

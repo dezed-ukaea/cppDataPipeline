@@ -30,7 +30,7 @@ namespace FDP {
     class DataPipeline::impl {
 
   private:
-      Config::uptr config_;
+      Config::sptr config_;
 
       ghc::filesystem::path config_file_path_() const {return config_->get_config_file_path();}
       ghc::filesystem::path script_file_path_() const {return config_->get_script_file_path();}
@@ -117,8 +117,7 @@ DataPipeline::impl::impl(const ghc::filesystem::path &config_file_path,
                     spdlog::level::level_enum log_level,
                     RESTAPI api_location)
 {
-    Config::uptr configPtr(new Config(config_file_path, script_file_path, token, api_location));
-    config_ = std::move(configPtr);
+    this->config_  = Config::construct(config_file_path, script_file_path, token, api_location);
 
     const std::string api_root_ = config_->get_api_url();
 

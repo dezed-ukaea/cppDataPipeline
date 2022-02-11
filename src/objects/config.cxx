@@ -1,6 +1,22 @@
 #include "fdp/objects/config.hxx"
 
 namespace FDP {
+
+    Config::sptr Config::construct(const ghc::filesystem::path &config_file_path,
+                    const ghc::filesystem::path &script_file_path,
+                    const std::string &token,
+                    RESTAPI api_location)
+    {
+        Config::sptr pobj = std::shared_ptr< Config >( new Config( 
+                    config_file_path
+                    , script_file_path
+                    , token
+                    , api_location ) );
+        return pobj;
+    }
+
+
+
 FDP::Config::Config(const ghc::filesystem::path &config_file_path,
                     const ghc::filesystem::path &script_file_path,
                     const std::string &token, 
@@ -176,19 +192,8 @@ void FDP::Config::initialise(RESTAPI api_location) {
   Json::Value user_json_;
   user_json_["username"] = "admin";
 
-
-#if 1
   Json::Value j = api_->get_by_json_query("users", user_json_, 200, token_);
-  ApiObject::uptr user_ptr_ = ApiObject::from_json( j [0]);
-
-#else
-  ApiObject::uptr user_ptr_(new ApiObject( 
-      api_->get_by_json_query("users", user_json_, 200, token_)[0]));
-
-#endif
-
-  user_ = std::move(user_ptr_);
-
+  this->user_ = ApiObject::from_json( j [0]);
 
   if (user_->is_empty()) {
     APILogger->error("User: Admin Not Found");
@@ -200,18 +205,10 @@ void FDP::Config::initialise(RESTAPI api_location) {
   user_author_json_["user"] = user_->get_id();
   Json::Value user_author_ = api_->get_by_json_query("user_author", user_author_json_, 200, token_)[0];
 
-#if 1
   Json::Value j_author = api_->get_by_id("author", ApiObject::get_id_from_string(user_author_["author"].asString()), 200, token_);
 
-  ApiObject::uptr author_ptr_ = ApiObject::from_json( j_author );
-#else
-  ApiObject::uptr author_ptr_(new ApiObject(
-      api_->get_by_id("author", ApiObject::get_id_from_string(user_author_["author"].asString()), 200, token_)));
+  this->author_ = ApiObject::from_json( j_author );
 
-
-#endif
-
-  author_ = std::move(author_ptr_);
   if (author_->is_empty()) {
     APILogger->error(
         "Author for User Admin not found please ensure you have run fair init");
@@ -224,16 +221,8 @@ void FDP::Config::initialise(RESTAPI api_location) {
   config_storage_root_value_["root"] = meta_data_()["write_data_store"].as<std::string>();
   config_storage_root_value_["local"] = api_location == RESTAPI::LOCAL; 
 
-#if 1
   Json::Value j_storage_root = api_->post_storage_root(config_storage_root_value_, token_);
-  ApiObject::uptr config_storage_root_ptr_  = ApiObject::from_json( j_storage_root );
-#else
-  ApiObject::uptr config_storage_root_ptr_(new ApiObject(
-    api_->post_storage_root(config_storage_root_value_, token_)));
-#endif
-
-
-  config_storage_root_ = std::move(config_storage_root_ptr_);
+  this->config_storage_root_  = ApiObject::from_json( j_storage_root );
 
   // Remove the Write Data Store from config file path
   Json::Value config_storage_location_value_;
@@ -252,16 +241,8 @@ void FDP::Config::initialise(RESTAPI api_location) {
   config_storage_location_value_["storage_root"] = config_storage_root_->get_uri();
 
 
-#if 1
-
   Json::Value j_storage_location = api_->post("storage_location", config_storage_location_value_, token_);
-  ApiObject::uptr config_storage_location_ptr_ = ApiObject::from_json( j_storage_location );
-#else
-  ApiObject::uptr config_storage_location_ptr_(new ApiObject(
-    api_->post("storage_location", config_storage_location_value_, token_)));
-#endif
-
-  config_storage_location_ = std::move(config_storage_location_ptr_);
+  this->config_storage_location_ = ApiObject::from_json( j_storage_location );
 
   Json::Value config_value_;
   config_value_["description"] = "Working config.yaml in datastore";
@@ -278,16 +259,9 @@ void FDP::Config::initialise(RESTAPI api_location) {
 
   APILogger->info("Writing config file {0} to registry", config_file_path_.string());
 
-#if 1
   Json::Value j_config_obj = api_->post("object", config_value_, token_);
  
-  ApiObject::uptr config_obj_ptr = ApiObject::from_json( j_config_obj );
-#else
-  ApiObject::uptr config_obj_ptr(new ApiObject(
-    api_->post("object", config_value_, token_)));
-#endif
-
-  config_obj_ = std::move(config_obj_ptr);
+  this->config_obj_ = ApiObject::from_json( j_config_obj );
 
     Json::Value script_storage_location_value_;
 
@@ -305,16 +279,9 @@ void FDP::Config::initialise(RESTAPI api_location) {
   script_storage_location_value_["public"] = true;
   script_storage_location_value_["storage_root"] = config_storage_root_->get_uri();
 
-#if 1
   Json::Value j_script_storage_location = api_->post("storage_location", script_storage_location_value_, token_);
 
-  ApiObject::uptr script_storage_location_ptr_ = ApiObject::from_json( j_script_storage_location );
-#else
-    ApiObject::uptr script_storage_location_ptr_(new ApiObject(
-    api_->post("storage_location", script_storage_location_value_, token_)));
-#endif
-
-  script_storage_location_ = std::move(script_storage_location_ptr_);
+  this->script_storage_location_ = ApiObject::from_json( j_script_storage_location );
 
   // @todo What happens if a unix executable without and extension is given
   Json::Value script_file_type_value_;
@@ -330,30 +297,15 @@ void FDP::Config::initialise(RESTAPI api_location) {
 
   APILogger->info("Writing script file {0} to registry", script_file_path_.string());
 
-#if 1
   Json::Value j_script_obj = api_->post("object", script_value_, token_);
-  ApiObject::uptr script_obj_ptr = ApiObject::from_json( j_script_obj );
-#else
-   ApiObject::uptr script_obj_ptr(new ApiObject(
-    api_->post("object", script_value_, token_)));
-
-#endif
-
-  script_obj_ = std::move(script_obj_ptr);
+  this->script_obj_ = ApiObject::from_json( j_script_obj );
 
   Json::Value repo_storage_root_value_;
   repo_storage_root_value_["root"] = "https://github.com/";
   repo_storage_root_value_["local"] = false;
 
-#if 1
   Json::Value j_code_repo_root = api_->post("storage_root", repo_storage_root_value_, token_);
-  ApiObject::uptr code_repo_root_ptr = ApiObject::from_json( j_code_repo_root );
-#else
-  ApiObject::uptr code_repo_root_ptr(new ApiObject(
-   api_->post("storage_root", repo_storage_root_value_, token_)));
-#endif
-
-  code_repo_storage_root_ = std::move(code_repo_root_ptr);
+  this->code_repo_storage_root_ = ApiObject::from_json( j_code_repo_root );
 
   std::string repo_storage_path_ = std::regex_replace(meta_data_()["remote_repo"].as<std::string>(), std::regex(repo_storage_root_value_["root"].asString()), "");
 
@@ -363,30 +315,16 @@ void FDP::Config::initialise(RESTAPI api_location) {
   repo_storage_location_value_["storage_root"] = code_repo_storage_root_->get_uri();
   repo_storage_location_value_["path"] = repo_storage_path_;
 
-#if 1
   Json::Value j_code_repo_location = api_->post("storage_location", repo_storage_location_value_, token_);
-  ApiObject::uptr code_repo_location_ptr = ApiObject::from_json( j_code_repo_location );
-#else
-  ApiObject::uptr code_repo_location_ptr(new ApiObject(
-   api_->post("storage_location", repo_storage_location_value_, token_)));
-#endif
-
-  code_repo_storage_location_ = std::move(code_repo_location_ptr);
+  this->code_repo_storage_location_ = ApiObject::from_json( j_code_repo_location );
 
   Json::Value code_repo_obj_value_;
   code_repo_obj_value_["description"] = "Processing Script Location";
   code_repo_obj_value_["storage_location"] = code_repo_storage_location_->get_uri();
   code_repo_obj_value_["authors"].append(author_id_);
 
-#if 1
   Json::Value j_code_repo_obj = api_->post("object", code_repo_obj_value_, token_);
-  ApiObject::uptr code_repo_obj_ptr = ApiObject::from_json( j_code_repo_obj );
-#else
-  ApiObject::uptr code_repo_obj_ptr(new ApiObject(
-   api_->post("object", code_repo_obj_value_, token_)));
-#endif
-
-  code_repo_obj_ = std::move(code_repo_obj_ptr);
+  this->code_repo_obj_ = ApiObject::from_json( j_code_repo_obj );
 
   Json::Value code_run_value_;
   code_run_value_["run_date"] = current_time_stamp();
@@ -399,17 +337,10 @@ void FDP::Config::initialise(RESTAPI api_location) {
 
   APILogger->info("Writing new code run to registry");
 
-#if 1
   Json::Value j_code_run = api_->post("code_run", code_run_value_, token_);
-  ApiObject::uptr code_run_ptr = ApiObject::from_json( j_code_run );
-#else
-  ApiObject::uptr code_run_ptr(new ApiObject(
-   api_->post("code_run", code_run_value_, token_)));
-#endif
-  code_run_ = std::move(code_run_ptr);
+  this->code_run_ = ApiObject::from_json( j_code_run );
 
   APILogger->info("Code run {0} successfully generated", code_run_->get_value_as_string("uuid"));
-
 }
 
 std::string Config::get_config_directory() const{
@@ -543,13 +474,9 @@ ghc::filesystem::path FDP::Config::link_read(std::string &data_product){
 
   Json::Value namespaceData;
   namespaceData["name"] = currentRead["use"]["namespace"].as<std::string>();
-#if 1
 
   Json::Value j_namespace = api_->get_by_json_query("namespace", namespaceData)[0];
-  ApiObject::uptr namespaceObj = ApiObject::from_json( j_namespace );
-#else
-  ApiObject namespaceObj = ApiObject(api_->get_by_json_query("namespace", namespaceData)[0]);
-#endif
+  ApiObject::sptr namespaceObj = ApiObject::from_json( j_namespace );
 
   if (namespaceObj->is_empty()){
     APILogger->error("Namespace Error: could not find namespace {0} in registry", currentRead["use"]["namespace"].as<std::string>());
@@ -560,19 +487,17 @@ ghc::filesystem::path FDP::Config::link_read(std::string &data_product){
   dataProductData["name"] = currentRead["use"]["data_product"].as<std::string>();
   dataProductData["version"] = currentRead["use"]["version"].as<std::string>();
   dataProductData["namespace"] = namespaceObj->get_id();
-#if 1 
+  
   Json::Value j_data_prod_obj = api_->get_by_json_query("data_product", dataProductData)[0];
-  ApiObject::uptr dataProductObj = ApiObject::from_json( j_data_prod_obj );
-#else
-  ApiObject dataProductObj = ApiObject(api_->get_by_json_query("data_product", dataProductData)[0]);
-#endif
+  ApiObject::sptr dataProductObj = ApiObject::from_json( j_data_prod_obj );
+  //ApiObject dataProductObj = ApiObject(api_->get_by_json_query("data_product", dataProductData)[0]);
   if (dataProductObj->is_empty()){
     APILogger->error("data_product Error: could not find data_product {0} in registry", currentRead["use"]["data_product"].as<std::string>());
     throw std::runtime_error("Namespace Error: could not find data_product " + currentRead["use"]["data_product"].as<std::string>() + " in Registry");
   }
 
   Json::Value _j_ = api_->get_by_id("object", ApiObject::get_id_from_string(dataProductObj->get_value_as_string("object")));
-  ApiObject::uptr obj = ApiObject::from_json( _j_ );
+  ApiObject::sptr obj = ApiObject::from_json( _j_ );
 
   if (obj->is_empty()){
     APILogger->error("data_product Error: could not find data_product object {0} in registry", dataProductObj->get_value_as_string("object"));
@@ -582,7 +507,7 @@ ghc::filesystem::path FDP::Config::link_read(std::string &data_product){
   Json::Value componentData;
   componentData["object"] = obj->get_id();
   Json::Value j_obj_component = api_->get_by_json_query("object_component", componentData)[0];
-  ApiObject::uptr componentObj = ApiObject::from_json( j_obj_component );
+  ApiObject::sptr componentObj = ApiObject::from_json( j_obj_component );
 
   if (componentObj->is_empty()){
     APILogger->error("data_product object Error: could not find data_product component_object for {0} in registry", obj->get_value_as_string("object"));
@@ -592,7 +517,7 @@ ghc::filesystem::path FDP::Config::link_read(std::string &data_product){
     
   Json::Value j_tmp2 = api_->get_by_id("storage_location", ApiObject::get_id_from_string(obj->get_value_as_string("storage_location")));
 
-  ApiObject::uptr storageLocationObj = ApiObject::from_json( j_tmp2 );
+  ApiObject::sptr storageLocationObj = ApiObject::from_json( j_tmp2 );
 
   if (storageLocationObj->is_empty()){
     APILogger->error("data_product object Error: could not find storage_location for {0} in registry", obj->get_value_as_string("object"));
@@ -600,7 +525,7 @@ ghc::filesystem::path FDP::Config::link_read(std::string &data_product){
   }
 
   Json::Value j_tmp3 = api_->get_by_id("storage_root",  ApiObject::get_id_from_string(storageLocationObj->get_value_as_string("storage_root")));
-  ApiObject::uptr storageRootObj = ApiObject::from_json( j_tmp3 );
+  ApiObject::sptr storageRootObj = ApiObject::from_json( j_tmp3 );
 
   if (storageRootObj->is_empty()){
       std::string obj_str = obj->get_value_as_string("object");
@@ -641,8 +566,8 @@ void FDP::Config::finalise(){
       storageData["public"] = currentWrite.is_public();
 
 
-      ApiObject::uptr storageLocationObj = ApiObject::from_json(api_->get_by_json_query("storage_location", storageData)[0]);
-      ApiObject::uptr StorageRootObj;
+      ApiObject::sptr storageLocationObj = ApiObject::from_json(api_->get_by_json_query("storage_location", storageData)[0]);
+      ApiObject::sptr StorageRootObj;
 
       ghc::filesystem::path newPath;
       std::string extension = currentWrite.get_path().extension().string();
@@ -677,12 +602,12 @@ void FDP::Config::finalise(){
       Json::Value filetypeData;
       filetypeData["name"] = extension;
       filetypeData["extension"] = extension;
-      ApiObject::uptr filetypeObj = ApiObject::from_json(api_->post("file_type", filetypeData, token_));
+      ApiObject::sptr filetypeObj = ApiObject::from_json(api_->post("file_type", filetypeData, token_));
 
       Json::Value namespaceData;
       namespaceData["name"] = currentWrite.get_use_namespace();
 
-      ApiObject::uptr  namespaceObj = ApiObject::from_json( api_->get_by_json_query("namespace", namespaceData)[0]);
+      ApiObject::sptr  namespaceObj = ApiObject::from_json( api_->get_by_json_query("namespace", namespaceData)[0]);
       if (namespaceObj->is_empty()){
         namespaceObj = ApiObject::from_json(api_->post("namespace", namespaceData, token_));
       }
@@ -692,19 +617,15 @@ void FDP::Config::finalise(){
       dataproductData["version"] = currentWrite.get_use_version();
       dataproductData["namespace"] = namespaceObj->get_uri();
 
-     #if 1
       Json::Value j_dataProd = api_->get_by_json_query("data_product", dataproductData)[0];
 
-      ApiObject::uptr dataProductObj = ApiObject::from_json( j_dataProd );
-#else
-      ApiObject dataProductObj = ApiObject(api_->get_by_json_query("data_product", dataproductData)[0]);
-#endif
-      ApiObject::uptr obj;
+      ApiObject::sptr dataProductObj = ApiObject::from_json( j_dataProd );
+      ApiObject::sptr obj;
       std::string componentUrl;
 
       if(!dataProductObj->is_empty()){
           Json::Value _j_ = api_->get_by_id("object", ApiObject::get_id_from_string(dataProductObj->get_value_as_string("object")));
-        obj =std::move(  ApiObject::from_json( _j_ ));
+        obj = ApiObject::from_json( _j_ );
         componentUrl = obj->get_first_component();
       }
       else{
@@ -716,7 +637,7 @@ void FDP::Config::finalise(){
         objData["file_type"] = filetypeObj->get_uri();
         
         Json::Value j_tmp_obj = api_->post("object", objData, token_);
-        obj = std::move( ApiObject::from_json( j_tmp_obj ) );
+        obj = ApiObject::from_json( j_tmp_obj );
 
         if (currentWrite.get_use_component() != "None"){
           //@todo allow use_component
@@ -730,12 +651,12 @@ void FDP::Config::finalise(){
 
         
         Json::Value j_tmp = api_->post("data_product", dataproductData, token_);
-        dataProductObj =std::move(  ApiObject::from_json( j_tmp) );
+        dataProductObj = ApiObject::from_json( j_tmp);
 
       }
 
       Json::Value j_componen_obj = api_->get_by_id("object_component", ApiObject::get_id_from_string(componentUrl));
-      ApiObject::uptr  componentObj = ApiObject::from_json( j_componen_obj );
+      ApiObject::sptr  componentObj = ApiObject::from_json( j_componen_obj );
 
       currentWrite.set_component_object( *componentObj);
       currentWrite.set_data_product_object( *dataProductObj );
@@ -779,8 +700,7 @@ void FDP::Config::finalise(){
   APILogger->info("Code Run: {0}", code_run_endpoint);
 
   Json::Value j_code_run = api_->patch(code_run_endpoint, patch_data, token_);
-  ApiObject::uptr code_run_ptr = ApiObject::from_json( j_code_run );
-  code_run_ = std::move(code_run_ptr);  
+  this-> code_run_ = ApiObject::from_json( j_code_run );
 
 }
 

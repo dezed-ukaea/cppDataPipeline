@@ -6,30 +6,20 @@ namespace FDP {
     {
     }
 
-    ApiObject::uptr ApiObject::from_json( const Json::Value& j )
+    ApiObject::sptr ApiObject::from_json( const Json::Value& j )
     {
-       // ApiObject::uptr pobj = std::unique_ptr< ApiObject >( new ApiObject( j ) );
-
-        ApiObject::uptr pobj = ApiObject::construct();
+        ApiObject::sptr pobj = ApiObject::construct();
         pobj->obj_ = j;
 
         return pobj;
     }
 
-    ApiObject::uptr ApiObject::construct(void)
+    ApiObject::sptr ApiObject::construct(void)
     {
-        ApiObject::uptr pobj = std::unique_ptr< ApiObject >( new ApiObject() );
+        ApiObject::sptr pobj = std::shared_ptr< ApiObject >( new ApiObject() );
         return pobj;
     }
-#if 0
-    ApiObject::uptr ApiObject::copy( const ApiObject& src )
-    {
-        ApiObject::uptr pobj = std::unique_ptr< ApiObject >( new ApiObject() );
 
-        pobj->obj_.copy( src.obj_ );
-        return obj;
-    }
-#endif
     int ApiObject::add( const std::string& key, int value )
     {
         this->obj_[ key ] = value;

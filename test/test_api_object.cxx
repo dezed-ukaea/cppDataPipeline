@@ -15,9 +15,9 @@ protected:
     
   }
 
-  static ApiObject::uptr get_obj() {
+  static ApiObject::sptr get_obj() {
 
-      ApiObject::uptr test_object = ApiObject::construct();
+      ApiObject::sptr test_object = ApiObject::construct();
 
       test_object->add(  "url", std::string("http://127.0.0.1:8000/api/object/1") );
       test_object->add( "name", std::string("Test Name") );
@@ -27,7 +27,7 @@ protected:
       return test_object;
   }
 
-  ApiObject::uptr test_obj = get_obj();
+  ApiObject::sptr test_obj = get_obj();
   
   void TearDown() override {}
 };
@@ -54,7 +54,7 @@ TEST_F(ApiObjectTest, testGetValueAsInt) {
 
 TEST_F(ApiObjectTest, testIsEmpty){
   //Json::Value empty_;
-    ApiObject::uptr test_empty_obj = ApiObject::construct();
+    ApiObject::sptr test_empty_obj = ApiObject::construct();
   ASSERT_TRUE(test_empty_obj->is_empty());
 }
 

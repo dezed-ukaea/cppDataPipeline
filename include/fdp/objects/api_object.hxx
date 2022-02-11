@@ -20,10 +20,9 @@ namespace FDP {
 
         public:
 
-            typedef std::unique_ptr< ApiObject > uptr;
             typedef std::shared_ptr< ApiObject > sptr;
 
-            static uptr from_json( const Json::Value& j );
+            static sptr from_json( const Json::Value& j );
 
             //static copy( const ApiObject& src );
 
@@ -33,7 +32,7 @@ namespace FDP {
              * @param uri uri of the api object e.g. http://127.0.0.1/object/1
              */
 
-            static ApiObject::uptr construct( void );
+            static ApiObject::sptr construct( void );
 
             
             int add( const std::string& key, int value );
