@@ -49,18 +49,6 @@ std::string generate_random_hash() {
   return calculate_hash_from_string(random_string);
 }
 
-std::string generate_run_id(ghc::filesystem::path config_file_path) {
-  const std::string config_hash_ = calculate_hash_from_file(config_file_path);
-  auto t_ = std::time(nullptr);
-  auto tm_ = *std::gmtime(&t_);
-
-  std::ostringstream oss_;
-  oss_ << std::put_time(&tm_, "%Y%m%d%H%M%S");
-  const std::string time_str_ = oss_.str();
-
-  return config_hash_ + time_str_;
-}
-
 std::string current_time_stamp(bool file_name) {
   auto t_ = std::time(nullptr);
   auto tm_ = *std::localtime(&t_);
@@ -84,7 +72,7 @@ std::string remove_backslash_from_path(const std::string &path){
   return std::regex_replace(path, std::regex(std::string("\\\\")), "/");
 }
 
-bool FileExists( const std::string &Filename )
+bool file_exists( const std::string &Filename )
 {
     return access( Filename.c_str(), 0 ) == 0;
 }

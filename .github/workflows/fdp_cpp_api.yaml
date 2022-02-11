@@ -42,10 +42,10 @@ jobs:
       - name: Install Dependencies
         run: |
           sudo apt update
-          sudo apt install -y lcov libjsoncpp-dev curl libcurl4-openssl-dev libyaml-cpp-dev libhdf5-dev
+          sudo apt install -y lcov libjsoncpp-dev curl libcurl4-openssl-dev libyaml-cpp-dev gcovr
       - name: Configure Library
         run: |
-          cmake -Bbuild -DFDPAPI_BUILD_TESTS=ON
+          cmake -Bbuild -DFDPAPI_BUILD_TESTS=ON -DFDPAPI_CODE_COVERAGE=ON -DCMAKE_BUILD_TYPE=Debug
       - name: Fetch cache
         uses: actions/cache@v2.1.5
         with:
@@ -60,14 +60,9 @@ jobs:
           wget -nv https://sonarcloud.io/static/cpp/build-wrapper-linux-x86.zip
           unzip -q build-wrapper-linux-x86.zip          
           echo "${PWD}/build-wrapper-linux-x86" >> $GITHUB_PATH
-      - name: Compile FDP-Cpp-API
-        run: build-wrapper-linux-x86-64 --out-dir bw-outputs cmake --build build
-        env:
-          CIBuild: 1
-          BUILD_TESTS: True
-      - name: Run Unit Tests
+      - name: Build and Run Unit Tests
         run: |
-         cmake --build build --target test
+         build-wrapper-linux-x86-64 --out-dir bw-outputs cmake --build build --target coverage
          if [ $? -eq 0 ]; then
            echo "Unit tests completed successfully"
            exit 0
@@ -75,6 +70,9 @@ jobs:
            echo "Unit tests failed"
            exit 1
          fi
+        env:
+          CIBuild: 1
+          BUILD_TESTS: True 
       - name: SonarCloud Scan
         run: |
           sonar-scanner -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=$SONAR_TOKEN -X
@@ -91,7 +89,6 @@ jobs:
       - name: Install Dependencies
         run: |
           brew install cmake
-          brew install hdf5
           brew install curl
       - name: Configure Library
         run: |
@@ -107,20 +104,8 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: ilammy/msvc-dev-cmd@v1
-      - name: Install Dependencies
-        run: |
-          choco install wget
-          wget -O hdf5.zip https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.12/hdf5-1.12.1/bin/windows/hdf5-1.12.1-Std-win10_64-vs14.zip
-          tar -xf hdf5.zip
-          cd hdf
-          msiexec /i HDF5-1.12.1-win64.msi /quiet /qn /norestart /log log.log INSTALL_ROOT="$Env:RUNNER_TEMP\HDF5_ROOT" | Out-Null
-          gc log.log
       - name: Configure Library
         run: |
           cmake -Bbuild -DFDPAPI_BUILD_TESTS=ON
-        env: 
-          HDF5_ROOT: ${{ runner.temp }}\HDF5_ROOT
       - name: Compile FDP-Cpp-API
         run: cmake --build build --config=Release
-        env: 
-          HDF5_ROOT: ${{ runner.temp }}\HDF5_ROOT

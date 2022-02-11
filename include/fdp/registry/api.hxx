@@ -52,61 +52,6 @@ enum class RESTAPI {
 size_t write_func_(void *ptr, size_t size, size_t nmemb, std::string *data);
 
 /*! **************************************************************************
- * @class Query
- * @brief class for constructing queries to be sent to the RestAPI server
- * @author K. Zarebski (UKAEA)
- *
- * The Query class provides a base class for constructing query strings which
- * are then sent to the RestAPI to obtain information from the pipeline
- ****************************************************************************/
-class Query {
-private:
-  const std::vector<std::string> valid_filters_;
-  std::string string_repr_;
-  std::map<std::string, std::string> components_;
-  const ghc::filesystem::path fragments_;
-
-public:
-  /*! ************************************************************************
-   * @brief Construct a new query instance from a category and set of filters
-   * @author K. Zarebski (UKAEA)
-   *
-   * @param string_repr the RestAPI query type, e.g. 'object'
-   * @param filters a list of components for filtering the results
-   **************************************************************************/
-  Query(std::string string_repr, std::vector<std::string> filters)
-      : string_repr_(string_repr), valid_filters_(filters) {}
-
-  /*! ************************************************************************
-   * @brief Construct a new query instance from a category and a path
-   * @author K. Zarebski (UKAEA)
-   *
-   * @param string_repr the RestAPI query type, e.g. 'object'
-   * @param query_path a path for narrowing/filtering the query
-   **************************************************************************/
-  Query(std::string string_repr, ghc::filesystem::path query_path)
-      : string_repr_(string_repr), fragments_(query_path) {}
-
-  /*! ************************************************************************
-   * @brief append a key-value pair to the query for filtering results
-   * @author K. Zarebski (UKAEA)
-   *
-   * @param key the key to use, should be an available filter for the given
-   * RestAPI query category
-   * @param value the value to filter by
-   **************************************************************************/
-  void append(std::string key, std::string value);
-
-  /*! ************************************************************************
-   * @brief assembles the query into a URL to be requested from
-   * @author K. Zarebski (UKAEA)
-   *
-   * @return ghc::filesystem::path the query as a URL
-   **************************************************************************/
-  std::string build_query();
-};
-
-/*! **************************************************************************
  * @class API
  * @brief a class which handles the fetching and posting of information to the
  * FDP data pipeline RestAPI
@@ -128,23 +73,17 @@ public:
   API(std::string url_root)
       : url_root_(API::append_with_forward_slash(url_root)) {}
 
-  /*! *************************************************************************
+  /**
    * @brief sends the given 'packet' of information to the RestAPI
-   * @author K. Zarebski (UKAEA) & R. Field
-   *
+   * 
    * @param addr_path the api endpoint a.k.a the table name e.g. "coderun"
    * @param expected_response the expected return HTTP code
+   * @param token 
    * @return Json::Value JSON object containing the information returned by the
    *request
-   ***************************************************************************/
-  Json::Value get_request(const ghc::filesystem::path &addr_path,
-                      long expected_response = 200, std::string token = "");
-
+   */
   Json::Value get_request(const std::string &addr_path,
                       long expected_response = 200, std::string token = "");
-
-  Json::Value post_patch_request(const std::string addr_path, Json::Value &post_data,
-                      const std::string &token, long expected_response, bool PATCH = false);
 
   Json::Value patch(const std::string addr_path, Json::Value &post_data,
                       const std::string &token, long expected_response = 200);
@@ -162,15 +101,6 @@ public:
                    const std::string &token, long expected_response = 201);
 
   Json::Value post_storage_root(Json::Value &post_data, const std::string &token);
-
-  /*! *************************************************************************
-   * @brief read a query object and send request to the RestAPI
-   * @author K. Zarebski (UKAEA)
-   *
-   * @param query query object containing filters, and request information
-   * @param expected_response the expected HTTP code to be returned
-   ***************************************************************************/
-  Json::Value query(Query query, long expected_response = 200);
 
   Json::Value get_by_json_query(const std::string &addr_path,
                                   Json::Value &query_data,
@@ -196,16 +126,6 @@ public:
    ***************************************************************************/
   std::string get_url_root() const { return url_root_; }
 
-  /*! *************************************************************************
-   * @brief download a file returned by a RestAPI query
-   * @author K. Zarebski (UKAEA)
-   *
-   * @param url the relative address to the data pipeline object
-   * @param out_path the path to download the file to on the local system
-   ***************************************************************************/
-  void download_file(const ghc::filesystem::path &url,
-                     ghc::filesystem::path out_path);
-
   /**
    * @brief Formats a json object into a string representation which can be used
    * as a url endpoint query
@@ -225,6 +145,7 @@ public:
    * character code "%20"
    */
   std::string escape_space(std::string &str);
+
   /**
    * @brief Static function to append a given string with a "/" unless the
    * string is empty or already ends with a "/"
@@ -234,6 +155,12 @@ public:
    */
   static std::string append_with_forward_slash(std::string string);
 
+  /**
+   * @brief Remove the leading forward slash from a given string
+   * 
+   * @param str 
+   * @return std::string 
+   */
   static std::string remove_leading_forward_slash(std::string str);
 
 private:
@@ -241,7 +168,17 @@ private:
   CURL *setup_json_session_(std::string &addr_path, std::string *response,
                             long &http_code, std::string token = "");
   CURL *setup_download_session_(const ghc::filesystem::path &addr_path,
-                                FILE *file);
+                                FILE *file);  
+                      
+  Json::Value post_patch_request(const std::string addr_path, Json::Value &post_data,
+                      const std::string &token, long expected_response, bool PATCH = false);
+
+  // Legacy Method
+  Json::Value get_request(const ghc::filesystem::path &addr_path,
+                      long expected_response = 200, std::string token = "");
+
+  void download_file(const ghc::filesystem::path &url,
+                     ghc::filesystem::path out_path);
 };
 
 std::string url_encode(std::string url);

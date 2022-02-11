@@ -11,61 +11,6 @@ static size_t write_file_(void *ptr, size_t size, size_t nmemb, FILE *stream) {
   return written_n_;
 }
 
-void Query::append(std::string key, std::string value) {
-  if (std::find(valid_filters_.begin(), valid_filters_.end(), key) ==
-      valid_filters_.end()) {
-    throw std::invalid_argument("Search term '" + key +
-                                "' is not a valid filter for type '" +
-                                string_repr_ + "'");
-  }
-
-  if (value.empty()) {
-    throw std::invalid_argument("Assigning an empty string to query tag '" +
-                                key + "' is not allowed");
-  }
-
-  components_[key] = value;
-}
-
-std::string Query::build_query() {
-  APILogger->debug("API:Query: Building query string.");
-  if (components_.empty()) {
-    std::string query_path_ = API::append_with_forward_slash(string_repr_) +
-                              API::append_with_forward_slash(fragments_.string());
-    APILogger->debug("API:Query: Built query string: {0}", query_path_);
-    return query_path_;
-  }
-
-  std::stringstream out_url_query_;
-  std::vector<std::string> as_strs_;
-
-  for (auto &component : components_) {
-    as_strs_.push_back(component.first + "=" + url_encode(component.second));
-  }
-
-  std::string query_str_;
-
-  // Check if the number of query components is greater than 1, if it is
-  // combine them with '&'
-  if (as_strs_.size() > 1) {
-    std::copy(as_strs_.begin(), as_strs_.end(),
-              std::ostream_iterator<std::string>(out_url_query_, "&"));
-
-    // Add '?' to state it is a query and remove last added '&' from end of URL
-    query_str_ =
-        "?" + out_url_query_.str().substr(0, out_url_query_.str().size() - 1);
-  } else {
-    // Add '?' to state it is a query
-    query_str_ = "?" + as_strs_[0];
-  }
-  const std::string query_out_ = API::append_with_forward_slash(string_repr_) +
-                                 API::append_with_forward_slash(query_str_);
-
-  APILogger->debug("API:Query: Built query string: {0}", query_out_);
-
-  return query_out_;
-}
-
 std::string url_encode(std::string url) {
   CURL *curl_ = curl_easy_init();
   return curl_easy_escape(curl_, url.c_str(), 0);
@@ -177,10 +122,6 @@ Json::Value API::get_request(const std::string &addr_path, long expected_respons
   }
 
   return (root_.isMember("results")) ? root_["results"] : root_;
-}
-
-Json::Value API::query(Query query, long expected_response) {
-  return get_request(query.build_query(), expected_response);
 }
 
 Json::Value API::get_by_json_query(const std::string &addr_path,

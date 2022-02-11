@@ -66,13 +66,35 @@ namespace FDP {
              */
             std::string get_uri() const;
 
+            /**
+             * @brief Get the value of a given key as string object
+             * 
+             * @param key 
+             * @return std::string 
+             */
             std::string get_value_as_string(std::string key) const;
+
+            /**
+             * @brief Get the value of a given key as int object
+             * 
+             * @param key 
+             * @return int 
+             */
             int get_value_as_int(std::string key) const;
 
+            /**
+             * @brief Get the first component of the object
+             * 
+             * @return std::string 
+             */
             std::string get_first_component() const;
 
-            Json::Value get_object(){return obj_;}
-
+            /**
+             * @brief Check to see if the object is empty
+             * 
+             * @return true the object does not contain any data
+             * @return false the object contains data
+             */
             bool is_empty();
     };
 };

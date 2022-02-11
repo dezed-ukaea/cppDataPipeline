@@ -135,7 +135,7 @@ void FDP::Config::validate_config(ghc::filesystem::path yaml_path,
     throw config_parsing_error("Failed to Read: [\"description\"] from " + yaml_path.string());
   }
 
-  if (!FileExists(script_file_path_.string())) {
+  if (!file_exists(script_file_path_.string())) {
     APILogger->error("Submission script: {0} does not exist", script_file_path_.string());
     throw std::runtime_error("Submission script: " + script_file_path_.string() + " does not exist");
   }
@@ -433,12 +433,10 @@ ghc::filesystem::path Config::link_write(std::string &data_product){
 
   if(config_writes_().IsSequence()){
     for (YAML::const_iterator it = config_writes_().begin(); it != config_writes_().end(); ++it) {
-      YAML::Node write_ = *it;
-
-      if(write_["data_product"]){
-        if(write_["data_product"].as<std::string>() == data_product)
+      if(it->as<YAML::Node>()["data_product"]){
+        if(it->as<YAML::Node>()["data_product"].as<std::string>() == data_product)
         {
-          currentWrite = write_;
+          currentWrite = it->as<YAML::Node>();
         }
       }
 
@@ -510,12 +508,10 @@ ghc::filesystem::path FDP::Config::link_read(std::string &data_product){
 
   if(config_reads_().IsSequence()){
     for (YAML::const_iterator it = config_reads_().begin(); it != config_reads_().end(); ++it) {
-      YAML::Node read_ = *it;
-
-      if(read_["data_product"]){
-        if(read_["data_product"].as<std::string>() == data_product)
+      if(it->as<YAML::Node>()["data_product"]){
+        if(it->as<YAML::Node>()["data_product"].as<std::string>() == data_product)
         {
-          currentRead = read_;
+          currentRead = it->as<YAML::Node>();
         }
       }
 
@@ -634,7 +630,7 @@ void FDP::Config::finalise(){
     for (it = writes_.begin(); it != writes_.end(); it++){
       IOObject currentWrite = it->second;
 
-      if(! FileExists(currentWrite.get_path().string())){
+      if(! file_exists(currentWrite.get_path().string())){
         APILogger->error("File Error: Cannot Find file for write", currentWrite.get_use_data_product());
         throw std::runtime_error("File Error Cannot Find file for write: " + currentWrite.get_use_data_product());
       }
