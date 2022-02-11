@@ -83,9 +83,6 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-types" name="pub-types"></a>
 Public Types</h2></td></tr>
-<tr class="memitem:a66d7804e619bdf653face300c5bd6e8c"><td class="memItemLeft" align="right" valign="top"><a id="a66d7804e619bdf653face300c5bd6e8c" name="a66d7804e619bdf653face300c5bd6e8c"></a>
-typedef std::unique_ptr&lt; <a class="el" href="class_f_d_p_1_1_api_object.html">ApiObject</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>uptr</b></td></tr>
-<tr class="separator:a66d7804e619bdf653face300c5bd6e8c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9a0f611de466177b6ee96975d9cc9ef8"><td class="memItemLeft" align="right" valign="top"><a id="a9a0f611de466177b6ee96975d9cc9ef8" name="a9a0f611de466177b6ee96975d9cc9ef8"></a>
 typedef std::shared_ptr&lt; <a class="el" href="class_f_d_p_1_1_api_object.html">ApiObject</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>sptr</b></td></tr>
 <tr class="separator:a9a0f611de466177b6ee96975d9cc9ef8"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -134,12 +131,12 @@ int&#160;</td><td class="memItemRight" valign="bottom"><b>remove</b> (const std:
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-static-methods" name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
-<tr class="memitem:aea876af7dc6644eadaeebd0ca577398f"><td class="memItemLeft" align="right" valign="top"><a id="aea876af7dc6644eadaeebd0ca577398f" name="aea876af7dc6644eadaeebd0ca577398f"></a>
-static uptr&#160;</td><td class="memItemRight" valign="bottom"><b>from_json</b> (const Json::Value &amp;j)</td></tr>
-<tr class="separator:aea876af7dc6644eadaeebd0ca577398f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae19e1f23b43148b04fcb3d92cfd11217"><td class="memItemLeft" align="right" valign="top">static ApiObject::uptr&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_d_p_1_1_api_object.html#ae19e1f23b43148b04fcb3d92cfd11217">construct</a> (void)</td></tr>
-<tr class="memdesc:ae19e1f23b43148b04fcb3d92cfd11217"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct a new Api Object object.  <a href="class_f_d_p_1_1_api_object.html#ae19e1f23b43148b04fcb3d92cfd11217">More...</a><br /></td></tr>
-<tr class="separator:ae19e1f23b43148b04fcb3d92cfd11217"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a945fdaba9cbc944f7138751bd235e2f9"><td class="memItemLeft" align="right" valign="top"><a id="a945fdaba9cbc944f7138751bd235e2f9" name="a945fdaba9cbc944f7138751bd235e2f9"></a>
+static sptr&#160;</td><td class="memItemRight" valign="bottom"><b>from_json</b> (const Json::Value &amp;j)</td></tr>
+<tr class="separator:a945fdaba9cbc944f7138751bd235e2f9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a52db6cca9c94d6bed3b00166c3c04b9c"><td class="memItemLeft" align="right" valign="top">static ApiObject::sptr&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_d_p_1_1_api_object.html#a52db6cca9c94d6bed3b00166c3c04b9c">construct</a> (void)</td></tr>
+<tr class="memdesc:a52db6cca9c94d6bed3b00166c3c04b9c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct a new Api Object object.  <a href="class_f_d_p_1_1_api_object.html#a52db6cca9c94d6bed3b00166c3c04b9c">More...</a><br /></td></tr>
+<tr class="separator:a52db6cca9c94d6bed3b00166c3c04b9c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2f34316403d1e24821031897216a4604"><td class="memItemLeft" align="right" valign="top">static int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_d_p_1_1_api_object.html#a2f34316403d1e24821031897216a4604">get_id_from_string</a> (std::string url)</td></tr>
 <tr class="memdesc:a2f34316403d1e24821031897216a4604"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the object type from the uri.  <a href="class_f_d_p_1_1_api_object.html#a2f34316403d1e24821031897216a4604">More...</a><br /></td></tr>
 <tr class="separator:a2f34316403d1e24821031897216a4604"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -147,8 +144,8 @@ static uptr&#160;</td><td class="memItemRight" valign="bottom"><b>from_json</b> 
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p >Class for <a class="el" href="class_f_d_p_1_1_a_p_i.html" title="a class which handles the fetching and posting of information to the FDP data pipeline RestAPI">API</a> objects. </p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
-<a id="ae19e1f23b43148b04fcb3d92cfd11217" name="ae19e1f23b43148b04fcb3d92cfd11217"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae19e1f23b43148b04fcb3d92cfd11217">&#9670;&nbsp;</a></span>construct()</h2>
+<a id="a52db6cca9c94d6bed3b00166c3c04b9c" name="a52db6cca9c94d6bed3b00166c3c04b9c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a52db6cca9c94d6bed3b00166c3c04b9c">&#9670;&nbsp;</a></span>construct()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -157,7 +154,7 @@ static uptr&#160;</td><td class="memItemRight" valign="bottom"><b>from_json</b> 
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">ApiObject::uptr FDP::ApiObject::construct </td>
+          <td class="memname">ApiObject::sptr FDP::ApiObject::construct </td>
           <td>(</td>
           <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>

@@ -83,15 +83,12 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-types" name="pub-types"></a>
 Public Types</h2></td></tr>
-<tr class="memitem:a84af180df52c6ddae2d65bfbc00862ce"><td class="memItemLeft" align="right" valign="top"><a id="a84af180df52c6ddae2d65bfbc00862ce" name="a84af180df52c6ddae2d65bfbc00862ce"></a>
-typedef std::unique_ptr&lt; <a class="el" href="class_f_d_p_1_1_config.html">Config</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>uptr</b></td></tr>
-<tr class="separator:a84af180df52c6ddae2d65bfbc00862ce"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3e576bcc8b0b5439a1591e817057f4ac"><td class="memItemLeft" align="right" valign="top"><a id="a3e576bcc8b0b5439a1591e817057f4ac" name="a3e576bcc8b0b5439a1591e817057f4ac"></a>
+typedef std::shared_ptr&lt; <a class="el" href="class_f_d_p_1_1_config.html">Config</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>sptr</b></td></tr>
+<tr class="separator:a3e576bcc8b0b5439a1591e817057f4ac"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a3428bf5e0bf7158d4e6b98ab088e034f"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_d_p_1_1_config.html#a3428bf5e0bf7158d4e6b98ab088e034f">Config</a> (const ghc::filesystem::path &amp;config_file_path, const ghc::filesystem::path &amp;script_file_path, const std::string &amp;token, <a class="el" href="api_8hxx.html#ab547adecdcdf31fbb64fd808caa0a45f">RESTAPI</a> api_location)</td></tr>
-<tr class="memdesc:a3428bf5e0bf7158d4e6b98ab088e034f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct a new <a class="el" href="class_f_d_p_1_1_config.html" title="class for interacting with confifurations">Config</a> object.  <a href="class_f_d_p_1_1_config.html#a3428bf5e0bf7158d4e6b98ab088e034f">More...</a><br /></td></tr>
-<tr class="separator:a3428bf5e0bf7158d4e6b98ab088e034f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5078af487531c263fef8fbe08a4191df"><td class="memItemLeft" align="right" valign="top"><a id="a5078af487531c263fef8fbe08a4191df" name="a5078af487531c263fef8fbe08a4191df"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><b>~Config</b> ()</td></tr>
 <tr class="memdesc:a5078af487531c263fef8fbe08a4191df"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destroy the <a class="el" href="class_f_d_p_1_1_config.html" title="class for interacting with confifurations">Config</a> object. <br /></td></tr>
@@ -166,65 +163,16 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>finalise</b> ()</td><
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-static-methods" name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
+<tr class="memitem:af45790ed4291cf316ce57e60ae11fab4"><td class="memItemLeft" align="right" valign="top"><a id="af45790ed4291cf316ce57e60ae11fab4" name="af45790ed4291cf316ce57e60ae11fab4"></a>
+static Config::sptr&#160;</td><td class="memItemRight" valign="bottom"><b>construct</b> (const ghc::filesystem::path &amp;config_file_path, const ghc::filesystem::path &amp;script_file_path, const std::string &amp;token, <a class="el" href="api_8hxx.html#ab547adecdcdf31fbb64fd808caa0a45f">RESTAPI</a> api_location)</td></tr>
+<tr class="separator:af45790ed4291cf316ce57e60ae11fab4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a12c5d3bb7298854078dfb5bf70e31443"><td class="memItemLeft" align="right" valign="top">static YAML::Node&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_d_p_1_1_config.html#a12c5d3bb7298854078dfb5bf70e31443">parse_yaml</a> (ghc::filesystem::path yaml_path)</td></tr>
 <tr class="memdesc:a12c5d3bb7298854078dfb5bf70e31443"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read a given yaml file into a Yaml Node.  <a href="class_f_d_p_1_1_config.html#a12c5d3bb7298854078dfb5bf70e31443">More...</a><br /></td></tr>
 <tr class="separator:a12c5d3bb7298854078dfb5bf70e31443"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p >class for interacting with confifurations </p>
-</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="a3428bf5e0bf7158d4e6b98ab088e034f" name="a3428bf5e0bf7158d4e6b98ab088e034f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3428bf5e0bf7158d4e6b98ab088e034f">&#9670;&nbsp;</a></span>Config()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">FDP::Config::Config </td>
-          <td>(</td>
-          <td class="paramtype">const ghc::filesystem::path &amp;&#160;</td>
-          <td class="paramname"><em>config_file_path</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const ghc::filesystem::path &amp;&#160;</td>
-          <td class="paramname"><em>script_file_path</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const std::string &amp;&#160;</td>
-          <td class="paramname"><em>token</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="api_8hxx.html#ab547adecdcdf31fbb64fd808caa0a45f">RESTAPI</a>&#160;</td>
-          <td class="paramname"><em>api_location</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Construct a new <a class="el" href="class_f_d_p_1_1_config.html" title="class for interacting with confifurations">Config</a> object. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">config_file_path</td><td>the path to the config file </td></tr>
-    <tr><td class="paramname">script_file_path</td><td>the path to the script file </td></tr>
-    <tr><td class="paramname">token</td><td>the <a class="el" href="class_f_d_p_1_1_a_p_i.html" title="a class which handles the fetching and posting of information to the FDP data pipeline RestAPI">API</a> token as a String </td></tr>
-    <tr><td class="paramname">api_location</td><td>whether or not the api is local </td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
-<h2 class="groupheader">Member Function Documentation</h2>
+</div><h2 class="groupheader">Member Function Documentation</h2>
 <a id="ae6d8d51e4e85cf56bf6073176a7a9aad" name="ae6d8d51e4e85cf56bf6073176a7a9aad"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ae6d8d51e4e85cf56bf6073176a7a9aad">&#9670;&nbsp;</a></span>config_reads_()</h2>
 
