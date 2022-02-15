@@ -3,7 +3,7 @@ name: C++ Test Simple Model
 on: [push]
 
 jobs:
-  Build_Ubuntu:
+  Test_Simple_Model:
     name: Build Ubuntu Simple Model
     runs-on: ubuntu-latest
     strategy:
