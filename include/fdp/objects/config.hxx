@@ -214,7 +214,7 @@ namespace FDP {
             /**
              * @brief Get the code run uuid
              * 
-             * @return std::string 
+             * @return const std::string&
              */
             std::string get_code_run_uuid() const;
 

@@ -90,10 +90,10 @@ namespace FDP {
         return obj_["url"].asString();
     }
 
-    std::string ApiObject::get_value_as_string(std::string key) const{
+    std::string ApiObject::get_value_as_string( const std::string& key) const{
         return obj_[key].asString();
     }
-    int ApiObject::get_value_as_int(std::string key) const{
+    int ApiObject::get_value_as_int(const std::string& key) const{
         return obj_[key].asInt();
     }
 
@@ -107,4 +107,15 @@ namespace FDP {
     std::string ApiObject::get_first_component() const{
         return obj_["components"][0].asString();
     }
+
+    ApiMetadata::ApiMetadata() : ApiObject()
+    {
+    }
+
+    ApiMetadata::sptr ApiMetadata::construct(void)
+    {
+        ApiMetadata::sptr pobj = ApiMetadata::sptr( new ApiMetadata() );
+        return pobj;
+    }
+
 };
