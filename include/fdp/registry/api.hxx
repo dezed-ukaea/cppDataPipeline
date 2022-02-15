@@ -62,6 +62,8 @@ size_t write_func_(void *ptr, size_t size, size_t nmemb, std::string *data);
  *****************************************************************************/
 class API {
 public:
+    typedef std::shared_ptr< API > sptr;
+
   /*! *************************************************************************
    * @brief construct an API object using the given URL as the root
    * @author K. Zarebski (UKAEA)

@@ -3,7 +3,8 @@
 #endif
 
 #include "fdp/registry/api.hxx"
-#include "fdp/registry/datapipeline.hxx"
+#include "fdp/fdp.hxx"
+#include "fdp/objects/metadata.hxx"
 #include "gtest/gtest.h"
 #include "fdp/utilities/json.hxx"
 #include "fdp/utilities/logging.hxx"
