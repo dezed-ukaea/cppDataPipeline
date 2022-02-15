@@ -1,4 +1,10 @@
-#include "fdp/registry/datapipeline.hxx"
+#ifndef __FDP__
+#define __FDP__
+
+#include "spdlog/spdlog.h"
+#include <ghc/filesystem.hpp>
+
+//#include "fdp/registry/datapipeline.hxx"
 
 namespace FDP {
 /**
@@ -6,8 +12,9 @@ namespace FDP {
  * A PIMPL Class for interacting the the FAIR Data Pipeline
  * 
  */
-class DataPipeline {
-public:
+    class DataPipeline {
+
+        public:
   /**
    * @brief Construct a new Data Pipeline (PIMPL)
    * 
@@ -16,28 +23,23 @@ public:
    * @param token 
    * @param log_level 
    */
-  explicit DataPipeline(
-      const std::string &config_file_path,
-      const std::string &script_file_path,
-      std::string token = "",
-      spdlog::level::level_enum log_level = spdlog::level::info)
-      : pimpl_(std::make_shared<DataPipelineImpl_>(ghc::filesystem::path(config_file_path), ghc::filesystem::path(script_file_path), token,
-                                     log_level)) {
-          
-    APILogger->debug("DataPipeline: Initialising session '{0}'", Pimpl()->get_code_run_uuid());
-  }
+            explicit DataPipeline(
+                    const std::string &config_file_path,
+                    const std::string &script_file_path,
+                    std::string token = "",
+                    spdlog::level::level_enum log_level = spdlog::level::info);
 
   /**
    * @brief Destroy the Data Pipeline object
    * 
    */
-  ~DataPipeline();
+            ~DataPipeline();
 
-  DataPipeline(DataPipeline &&rhs) noexcept;
-  DataPipeline &operator=(DataPipeline &&rhs) noexcept;
+            DataPipeline(DataPipeline &&rhs) noexcept;
+            DataPipeline &operator=(DataPipeline &&rhs) noexcept;
 
-  DataPipeline(const DataPipeline &rhs);
-  DataPipeline &operator=(const DataPipeline &rhs);
+            DataPipeline(const DataPipeline &rhs);
+            DataPipeline &operator=(const DataPipeline &rhs);
 
   /**
    * @brief Return a path to a given data product
@@ -46,7 +48,7 @@ public:
    * @param data_product 
    * @return ghc::filesystem::path 
    */
-  ghc::filesystem::path link_read(std::string &data_product);
+            ghc::filesystem::path link_read(std::string &data_product);
 
   /**
    * @brief Return a path to be used for a given data product
@@ -55,7 +57,7 @@ public:
    * @param data_product 
    * @return ghc::filesystem::path 
    */
-  ghc::filesystem::path link_write(std::string &data_product);
+            ghc::filesystem::path link_write(std::string &data_product);
 
   /**
    * @brief Finalise the pipeline
@@ -63,12 +65,13 @@ public:
    * update the code run with all appropriate meta data
    * 
    */
-  void finalise();
+            void finalise();
 
-private:
-  const DataPipelineImpl_* Pimpl() const {return pimpl_.get();}
-  DataPipelineImpl_* Pimpl() {return pimpl_.get();}
-  
-  std::shared_ptr<DataPipelineImpl_> pimpl_;
-};
+        private:
+            class impl;
+
+            std::shared_ptr< DataPipeline::impl > pimpl_;
+    };
 }; // namespace FDP
+
+#endif

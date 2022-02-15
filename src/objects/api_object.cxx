@@ -1,6 +1,62 @@
 #include "fdp/objects/api_object.hxx"
 
 namespace FDP {
+
+    ApiObject::ApiObject() : obj_(Json::Value() )
+    {
+    }
+
+    ApiObject::sptr ApiObject::from_json( const Json::Value& j )
+    {
+        ApiObject::sptr pobj = ApiObject::construct();
+        pobj->obj_ = j;
+
+        return pobj;
+    }
+
+    ApiObject::sptr ApiObject::construct(void)
+    {
+        ApiObject::sptr pobj = std::shared_ptr< ApiObject >( new ApiObject() );
+        return pobj;
+    }
+
+    int ApiObject::add( const std::string& key, int value )
+    {
+        this->obj_[ key ] = value;
+        return 0;
+    }
+    int ApiObject::add( const std::string& key, float value )
+    {
+        this->obj_[ key ] = value;
+        return 0;
+    }
+
+    int ApiObject::add( const std::string& key, double value )
+    {
+        this->obj_[ key ] = value;
+        return 0;
+    }
+
+    int ApiObject::add( const std::string& key, const std::string& value )
+    {
+        this->obj_[ key ] = value;
+        return 0;
+    }
+
+    int ApiObject::add( const std::string& key, const ApiObject& value )
+    {
+        this->obj_[ key ] = value.obj_;
+        return 0;
+    }
+
+
+    int ApiObject::remove( const std::string& key )
+    {
+        this->obj_.removeMember( key );
+        return 0;
+    }
+
+
     /**
      * @brief Returns the object id from the object uri_
      * 

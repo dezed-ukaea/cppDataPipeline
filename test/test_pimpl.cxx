@@ -1,11 +1,16 @@
 #ifndef TESTDIR
 #define TESTDIR ""
 #endif
-#include "fdp/fdp.hxx"
-#include "gtest/gtest.h"
 
 #include <iostream>
 #include <fstream>
+
+#include "fdp/fdp.hxx"
+#include "fdp/objects/metadata.hxx"
+#include "fdp/utilities/logging.hxx"
+
+#include "gtest/gtest.h"
+
 
 using namespace FDP;
 

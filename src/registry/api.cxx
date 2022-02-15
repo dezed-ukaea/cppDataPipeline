@@ -1,12 +1,12 @@
 #include "fdp/registry/api.hxx"
 
 namespace FDP {
-size_t write_str_(void *ptr, size_t size, size_t nmemb, std::string *data) {
+static size_t write_str_(void *ptr, size_t size, size_t nmemb, std::string *data) {
   data->append((char *)ptr, size * nmemb);
   return size * nmemb;
 }
 
-size_t write_file_(void *ptr, size_t size, size_t nmemb, FILE *stream) {
+static size_t write_file_(void *ptr, size_t size, size_t nmemb, FILE *stream) {
   size_t written_n_ = fwrite(ptr, size, nmemb, stream);
   return written_n_;
 }
@@ -50,6 +50,7 @@ void API::download_file(const ghc::filesystem::path &url,
                         ghc::filesystem::path out_path) {
   CURL *curl_ = curl_easy_init();
   FILE *file_ = fopen(out_path.string().c_str(), "wb");
+
   APILogger->debug("API: Downloading file '{0}' -> '{1}'", url.string(),
                    out_path.string());
   curl_easy_setopt(curl_, CURLOPT_URL, url.c_str());
@@ -94,7 +95,7 @@ Json::Value API::get_request(const std::string &addr_path, long expected_respons
 
   const std::unique_ptr<Json::CharReader> json_reader_(
       json_charbuilder_.newCharReader());
-  const auto response_str_len_ = static_cast<int>(response_str_.length());
+  const auto response_str_len_ = response_str_.length();
   JSONCPP_STRING err;
 
   if (http_code == 0) {
@@ -264,7 +265,7 @@ Json::Value API::post_patch_request(std::string addr_path, Json::Value &post_dat
   Json::Value root_;
   Json::CharReaderBuilder json_charbuilder_;
 
-  const auto response_str_len_ = static_cast<int>(response_.length());
+  const auto response_str_len_ = response_.length();
   const std::unique_ptr<Json::CharReader> json_reader_(
       json_charbuilder_.newCharReader());
   JSONCPP_STRING err;

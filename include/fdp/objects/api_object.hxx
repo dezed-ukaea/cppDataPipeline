@@ -15,14 +15,33 @@ namespace FDP {
     class ApiObject {
         private:
             Json::Value obj_;
+
+            ApiObject();
+
         public:
-            ApiObject() : obj_(Json::Value()){};
+
+            typedef std::shared_ptr< ApiObject > sptr;
+
+            static sptr from_json( const Json::Value& j );
+
+            //static copy( const ApiObject& src );
+
             /**
              * @brief Construct a new Api Object object
              * 
              * @param uri uri of the api object e.g. http://127.0.0.1/object/1
              */
-            ApiObject(Json::Value obj) : obj_(obj){}
+
+            static ApiObject::sptr construct( void );
+
+            
+            int add( const std::string& key, int value );
+            int add( const std::string& key, float value );
+            int add( const std::string& key, double value );
+            int add( const std::string& key, const std::string& value );
+            int add( const std::string& key, const ApiObject& value );
+
+            int remove( const std::string& key );
             /**
              * @brief Get the object id from the uri
              * 
