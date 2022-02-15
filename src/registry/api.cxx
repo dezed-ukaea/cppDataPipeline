@@ -13,12 +13,14 @@ static size_t write_file_(void *ptr, size_t size, size_t nmemb, FILE *stream) {
 
 std::string url_encode(std::string url) {
   CURL *curl_ = curl_easy_init();
+  curl_easy_setopt(curl_, CURLOPT_SSLVERSION, CURL_SSLVERSION_TLSv1_2);
   return curl_easy_escape(curl_, url.c_str(), 0);
 }
 
 CURL *API::setup_json_session_(std::string &addr_path, std::string *response,
                                long &http_code, std::string token) {
   CURL *curl_ = curl_easy_init();
+  curl_easy_setopt(curl_, CURLOPT_SSLVERSION, CURL_SSLVERSION_TLSv1_2);
 
 
   if (!token.empty()) {
@@ -53,6 +55,7 @@ void API::download_file(const ghc::filesystem::path &url,
 
   APILogger->debug("API: Downloading file '{0}' -> '{1}'", url.string(),
                    out_path.string());
+  curl_easy_setopt(curl_, CURLOPT_SSLVERSION, CURL_SSLVERSION_TLSv1_2);                 
   curl_easy_setopt(curl_, CURLOPT_URL, url.c_str());
   curl_easy_setopt(curl_, CURLOPT_WRITEFUNCTION, write_file_);
   curl_easy_setopt(curl_, CURLOPT_WRITEDATA, file_);
@@ -219,7 +222,7 @@ Json::Value API::post_patch_request(std::string addr_path, Json::Value &post_dat
     headers = curl_slist_append(
         headers, (std::string("Authorization: token ") + token).c_str());
   }
-
+  curl_easy_setopt(curl_, CURLOPT_SSLVERSION, CURL_SSLVERSION_TLSv1_2);
   curl_easy_setopt(curl_, CURLOPT_URL, url_path_.c_str());
   curl_easy_setopt(curl_, CURLOPT_HTTPHEADER, headers);
   if (PATCH) {
