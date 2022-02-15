@@ -1,0 +1,62 @@
+name: C++ Test Simple Model
+
+on: [push]
+
+jobs:
+  Build_Ubuntu:
+    name: Build Ubuntu Simple Model
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with: 
+          python-version: "3.9"
+          architecture: "x64"
+      - name: Install graphviz
+        run:  |
+              sudo apt-get install graphviz              
+              sudo apt-get install -y gnuplot
+      - name: Install local registry
+        run: curl -fsSL https://data.scrc.uk/static/localregistry.sh | /bin/bash -s -- -b main
+      - name: Checkout Simple
+        uses: actions/checkout@v2
+        with:
+          repository: FAIRDataPipeline/cppSimpleModel
+          path: simpleModel
+      - name: Move simpleModel
+        run: mv simpleModel ../simpleModel
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+        with:
+          virtualenvs-create: true
+          virtualenvs-in-project: true
+      - name: Install Dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y lcov libjsoncpp-dev curl libcurl4-openssl-dev libyaml-cpp-dev
+      - name: Build and run seirs example
+        run: |
+          cd ../simpleModel
+          python3 -m venv venv
+          source .venv/bin/activate
+          pip3 install fair cli
+          cmake -Bbuild -DCPPDATAPIPELINEREF="${GITHUB_REF/refs\/heads\//}"
+          cmake --build build
+          fair init --ci
+          fair pull data/seirs_config.yaml
+          fair run data/seirs_config.yaml          
+        if: startsWith(github.ref, 'refs/tags/') != true
+      - name: Build and run seirs example on tagged release
+        run: |
+          cd ../simpleModel
+          python3 -m venv venv
+          source .venv/bin/activate
+          pip3 install fair cli
+          cmake -Bbuild -DCPPDATAPIPELINEREF="${GITHUB_REF/refs\/tags\//}"
+          cmake --build build
+          fair init --ci
+          fair pull data/seirs_config.yaml
+          fair run data/seirs_config.yaml          
+        if: startsWith(github.ref, 'refs/tags/')
