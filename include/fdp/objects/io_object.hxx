@@ -33,7 +33,7 @@ namespace FDP {
              * @brief Construct a new IOObject object (empty constructor)
              * 
              */
-            IOObject(){};
+            IOObject() = default;
             /**
              * @brief Construct a new IOObject object
              * Used to store inputs and outputs for in the config
@@ -46,7 +46,7 @@ namespace FDP {
              * @param data_product_description data product description
              * @param isPublic whether or not the data product should be public
              */
-            IOObject(std::string data_product,
+            IOObject (const std::string& data_product,
                     const std::string& use_data_product,
                     const std::string& use_version,
                     const std::string& use_namespace,
@@ -74,10 +74,10 @@ namespace FDP {
              * @param component_obj the data_product component object as a shared pointer
              * @param data_product_obj the data_product object as a shared pointer
              */
-            IOObject(std::string data_product,
-                        std::string use_data_product,
-                        std::string use_version,
-                        std::string use_namespace,
+            IOObject( const std::string& data_product,
+                       const  std::string& use_data_product,
+                       const  std::string& use_version,
+                        const std::string& use_namespace,
                         ghc::filesystem::path path,
                         ApiObject &component_obj,
                         ApiObject &data_product_obj) 
@@ -159,7 +159,7 @@ namespace FDP {
              * 
              * @return std::shared_ptr<ApiObject> 
              */
-             ApiObject::sptr get_component_object() {return component_obj_;}
+             ApiObject::sptr get_component_object() const {return component_obj_;}
              
 
             /**
@@ -167,7 +167,7 @@ namespace FDP {
              * 
              * @return std::shared_ptr<ApiObject> 
              */
-             ApiObject::sptr get_data_product_object() {return data_product_obj_;}
+             ApiObject::sptr get_data_product_object() const {return data_product_obj_;}
 
             /**
              * @brief Set the component object object
