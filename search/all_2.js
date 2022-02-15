@@ -8,6 +8,5 @@ var searchData=
   ['config_5freads_5f_5',['config_reads_',['../class_f_d_p_1_1_config.html#ae6d8d51e4e85cf56bf6073176a7a9aad',1,'FDP::Config']]],
   ['config_5fwrites_5f_6',['config_writes_',['../class_f_d_p_1_1_config.html#a11e0003de1809e4d2acbcc86a75c1236',1,'FDP::Config']]],
   ['construct_7',['construct',['../class_f_d_p_1_1_api_object.html#a52db6cca9c94d6bed3b00166c3c04b9c',1,'FDP::ApiObject']]],
-  ['create_5flogger_5f_8',['create_logger_',['../logging_8hxx.html#a8d53e714640efd0381241689a58d039d',1,'FDP']]],
-  ['current_5ftime_5fstamp_9',['current_time_stamp',['../metadata_8hxx.html#a0f9f5711fdb2e85d991b5a6c606f9b1e',1,'FDP']]]
+  ['current_5ftime_5fstamp_8',['current_time_stamp',['../metadata_8hxx.html#a0f9f5711fdb2e85d991b5a6c606f9b1e',1,'FDP']]]
 ];

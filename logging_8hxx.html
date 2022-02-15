@@ -68,7 +68,7 @@ $(function() {
 </div><!-- top -->
 <div class="header">
   <div class="summary">
-<a href="#func-members">Functions</a> &#124;
+<a href="#nested-classes">Classes</a> &#124;
 <a href="#var-members">Variables</a>  </div>
   <div class="headertitle"><div class="title">logging.hxx File Reference</div></div>
 </div><!--header-->
@@ -81,17 +81,16 @@ $(function() {
 </div>
 <p><a href="logging_8hxx_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
-Functions</h2></td></tr>
-<tr class="memitem:a8d53e714640efd0381241689a58d039d"><td class="memItemLeft" align="right" valign="top">std::shared_ptr&lt; spdlog::logger &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="logging_8hxx.html#a8d53e714640efd0381241689a58d039d">FDP::create_logger_</a> ()</td></tr>
-<tr class="memdesc:a8d53e714640efd0381241689a58d039d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a the global logger pointer.  <a href="logging_8hxx.html#a8d53e714640efd0381241689a58d039d">More...</a><br /></td></tr>
-<tr class="separator:a8d53e714640efd0381241689a58d039d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="nested-classes" name="nested-classes"></a>
+Classes</h2></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_d_p_1_1logger.html">FDP::logger</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="var-members" name="var-members"></a>
 Variables</h2></td></tr>
-<tr class="memitem:a86cb9217b28d11ce2d889dbbe92bcb2b"><td class="memItemLeft" align="right" valign="top">const std::shared_ptr&lt; spdlog::logger &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="logging_8hxx.html#a86cb9217b28d11ce2d889dbbe92bcb2b">FDP::APILogger</a> = create_logger_()</td></tr>
-<tr class="memdesc:a86cb9217b28d11ce2d889dbbe92bcb2b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Global logger used across all FDP scripts.  <a href="logging_8hxx.html#a86cb9217b28d11ce2d889dbbe92bcb2b">More...</a><br /></td></tr>
-<tr class="separator:a86cb9217b28d11ce2d889dbbe92bcb2b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a88c65a4f48c8dde03f5d414f29ac4b7a"><td class="memItemLeft" align="right" valign="top">const logger::sptr&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="logging_8hxx.html#a88c65a4f48c8dde03f5d414f29ac4b7a">FDP::APILogger</a> = create_logger()</td></tr>
+<tr class="memdesc:a88c65a4f48c8dde03f5d414f29ac4b7a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Global logger used across all FDP scripts.  <a href="logging_8hxx.html#a88c65a4f48c8dde03f5d414f29ac4b7a">More...</a><br /></td></tr>
+<tr class="separator:a88c65a4f48c8dde03f5d414f29ac4b7a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p >File contains pointers for creating global logger during session. </p>
@@ -99,38 +98,15 @@ Variables</h2></td></tr>
 <dl class="section author"><dt>Author</dt><dd>K. Zarebski (UKAEA) </dd></dl>
 <dl class="section date"><dt>Date</dt><dd>2021-05-06</dd></dl>
 <p>This file should be included in all FDP header files as it allows all debug/error information to be output to the same logger and hence the same terminal session. It uses the SPDLog library. </p>
-</div><h2 class="groupheader">Function Documentation</h2>
-<a id="a8d53e714640efd0381241689a58d039d" name="a8d53e714640efd0381241689a58d039d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8d53e714640efd0381241689a58d039d">&#9670;&nbsp;</a></span>create_logger_()</h2>
+</div><h2 class="groupheader">Variable Documentation</h2>
+<a id="a88c65a4f48c8dde03f5d414f29ac4b7a" name="a88c65a4f48c8dde03f5d414f29ac4b7a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a88c65a4f48c8dde03f5d414f29ac4b7a">&#9670;&nbsp;</a></span>APILogger</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">std::shared_ptr&lt; spdlog::logger &gt; FDP::create_logger_ </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Create a the global logger pointer. </p>
-<hr  />
- <dl class="section author"><dt>Author</dt><dd>K. Zarebski (UKAEA)</dd></dl>
-<dl class="section return"><dt>Returns</dt><dd>a shared pointer to the global logger instance </dd></dl>
-
-</div>
-</div>
-<h2 class="groupheader">Variable Documentation</h2>
-<a id="a86cb9217b28d11ce2d889dbbe92bcb2b" name="a86cb9217b28d11ce2d889dbbe92bcb2b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a86cb9217b28d11ce2d889dbbe92bcb2b">&#9670;&nbsp;</a></span>APILogger</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">const std::shared_ptr&lt;spdlog::logger&gt; FDP::APILogger = create_logger_()</td>
+          <td class="memname">const logger::sptr FDP::APILogger = create_logger()</td>
         </tr>
       </table>
 </div><div class="memdoc">

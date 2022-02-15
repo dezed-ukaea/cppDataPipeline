@@ -78,14 +78,22 @@ $(function() {
 <div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span><span class="preprocessor">#include &quot;spdlog/spdlog.h&quot;</span></div>
 <div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span> </div>
 <div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span><span class="keyword">namespace </span>FDP {</div>
-<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span>std::shared_ptr&lt;spdlog::logger&gt; <a class="code hl_function" href="logging_8hxx.html#a8d53e714640efd0381241689a58d039d">create_logger_</a>();</div>
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span> </div>
+<div class="line"><a id="l00019" name="l00019"></a><span class="lineno"><a class="line" href="class_f_d_p_1_1logger.html">   19</a></span>    <span class="keyword">class </span><a class="code hl_class" href="class_f_d_p_1_1logger.html">logger</a></div>
+<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span>    {</div>
+<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span>        <span class="keyword">public</span>:</div>
+<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span>            <span class="keyword">typedef</span> std::shared_ptr&lt;spdlog::logger&gt; sptr;</div>
+<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span>        <span class="keyword">private</span>:</div>
+<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span>    };</div>
 <div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span> </div>
-<div class="line"><a id="l00031" name="l00031"></a><span class="lineno"><a class="line" href="logging_8hxx.html#a86cb9217b28d11ce2d889dbbe92bcb2b">   31</a></span><span class="keyword">const</span> std::shared_ptr&lt;spdlog::logger&gt; <a class="code hl_variable" href="logging_8hxx.html#a86cb9217b28d11ce2d889dbbe92bcb2b">APILogger</a> = <a class="code hl_function" href="logging_8hxx.html#a8d53e714640efd0381241689a58d039d">create_logger_</a>();</div>
+<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span>    <span class="keyword">extern</span> <span class="keyword">const</span> logger::sptr <a class="code hl_variable" href="logging_8hxx.html#a88c65a4f48c8dde03f5d414f29ac4b7a">APILogger</a>;</div>
 <div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span>} <span class="comment">// namespace FDP</span></div>
 <div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span> </div>
-<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span><span class="preprocessor">#endif</span></div>
-<div class="ttc" id="alogging_8hxx_html_a86cb9217b28d11ce2d889dbbe92bcb2b"><div class="ttname"><a href="logging_8hxx.html#a86cb9217b28d11ce2d889dbbe92bcb2b">FDP::APILogger</a></div><div class="ttdeci">const std::shared_ptr&lt; spdlog::logger &gt; APILogger</div><div class="ttdoc">Global logger used across all FDP scripts.</div><div class="ttdef"><b>Definition:</b> logging.hxx:31</div></div>
-<div class="ttc" id="alogging_8hxx_html_a8d53e714640efd0381241689a58d039d"><div class="ttname"><a href="logging_8hxx.html#a8d53e714640efd0381241689a58d039d">FDP::create_logger_</a></div><div class="ttdeci">std::shared_ptr&lt; spdlog::logger &gt; create_logger_()</div><div class="ttdoc">Create a the global logger pointer.</div><div class="ttdef"><b>Definition:</b> logging.cxx:4</div></div>
+<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span> </div>
+<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span> </div>
+<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span><span class="preprocessor">#endif</span></div>
+<div class="ttc" id="aclass_f_d_p_1_1logger_html"><div class="ttname"><a href="class_f_d_p_1_1logger.html">FDP::logger</a></div><div class="ttdef"><b>Definition:</b> logging.hxx:20</div></div>
+<div class="ttc" id="alogging_8hxx_html_a88c65a4f48c8dde03f5d414f29ac4b7a"><div class="ttname"><a href="logging_8hxx.html#a88c65a4f48c8dde03f5d414f29ac4b7a">FDP::APILogger</a></div><div class="ttdeci">const logger::sptr APILogger</div><div class="ttdoc">Global logger used across all FDP scripts.</div><div class="ttdef"><b>Definition:</b> logging.cxx:19</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
