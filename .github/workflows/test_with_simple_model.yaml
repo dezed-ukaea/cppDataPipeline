@@ -41,7 +41,7 @@ jobs:
           cd ../simpleModel
           python3 -m venv venv
           source venv/bin/activate
-          pip3 install fair cli
+          pip3 install fair-cli
           cmake -Bbuild -DCPPDATAPIPELINEREF="${GITHUB_REF/refs\/heads\//}"
           cmake --build build
           fair init --ci
@@ -53,7 +53,7 @@ jobs:
           cd ../simpleModel
           python3 -m venv venv
           source venv/bin/activate
-          pip3 install fair cli
+          pip3 install fair-cli
           cmake -Bbuild -DCPPDATAPIPELINEREF="${GITHUB_REF/refs\/tags\//}"
           cmake --build build
           fair init --ci
