@@ -42,7 +42,7 @@ jobs:
           python3 -m venv venv
           source venv/bin/activate
           pip3 install fair-cli
-          cmake -Bbuild -DCPPDATAPIPELINEREF="${GITHUB_REF/refs\/heads\//}"
+          cmake -Bbuild -DCPPDATAPIPELINEREF="heads/${GITHUB_REF/refs\/heads\//}"
           cmake --build build
           fair init --ci
           fair pull data/seirs_config.yaml
@@ -54,7 +54,7 @@ jobs:
           python3 -m venv venv
           source venv/bin/activate
           pip3 install fair-cli
-          cmake -Bbuild -DCPPDATAPIPELINEREF="${GITHUB_REF/refs\/tags\//}"
+          cmake -Bbuild -DCPPDATAPIPELINEREF="tags/${GITHUB_REF/refs\/tags\//}"
           cmake --build build
           fair init --ci
           fair pull data/seirs_config.yaml
