@@ -36,10 +36,6 @@ double read_point_estimate_from_toml(const ghc::filesystem::path var_address) {
 }
 
 std::string get_first_key_(const toml::value data_table) {
-  for (auto const& i : data_table.as_table()) {
-    return i.first;
-  }
-
-  return "";
+  return data_table.as_table().begin()->first;
 }
 }; // namespace FDP

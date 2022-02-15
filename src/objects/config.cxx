@@ -350,12 +350,10 @@ ghc::filesystem::path Config::link_write(std::string &data_product){
 
   if(config_writes_().IsSequence()){
     for (YAML::const_iterator it = config_writes_().begin(); it != config_writes_().end(); ++it) {
-      YAML::Node write_ = *it;
-
-      if(write_["data_product"]){
-        if(write_["data_product"].as<std::string>() == data_product)
+      if(it->as<YAML::Node>()["data_product"]){
+        if(it->as<YAML::Node>()["data_product"].as<std::string>() == data_product)
         {
-          currentWrite = write_;
+          currentWrite = it->as<YAML::Node>();
         }
       }
 
@@ -427,12 +425,10 @@ ghc::filesystem::path FDP::Config::link_read(std::string &data_product){
 
   if(config_reads_().IsSequence()){
     for (YAML::const_iterator it = config_reads_().begin(); it != config_reads_().end(); ++it) {
-      YAML::Node read_ = *it;
-
-      if(read_["data_product"]){
-        if(read_["data_product"].as<std::string>() == data_product)
+      if(it->as<YAML::Node>()["data_product"]){
+        if(it->as<YAML::Node>()["data_product"].as<std::string>() == data_product)
         {
-          currentRead = read_;
+          currentRead = it->as<YAML::Node>();
         }
       }
 
