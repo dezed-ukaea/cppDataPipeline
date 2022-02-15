@@ -34,8 +34,8 @@ protected:
     APILogger->set_level(spdlog::level::debug);
 
     return new DataPipeline(
-        config_path_,
-        script_path_,
+        config_path_.string(),
+        script_path_.string(),
         token,
         spdlog::level::debug );
   }
