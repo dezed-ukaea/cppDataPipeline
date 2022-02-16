@@ -86,6 +86,9 @@ Public Types</h2></td></tr>
 <tr class="memitem:a3e576bcc8b0b5439a1591e817057f4ac"><td class="memItemLeft" align="right" valign="top"><a id="a3e576bcc8b0b5439a1591e817057f4ac" name="a3e576bcc8b0b5439a1591e817057f4ac"></a>
 typedef std::shared_ptr&lt; <a class="el" href="class_f_d_p_1_1_config.html">Config</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>sptr</b></td></tr>
 <tr class="separator:a3e576bcc8b0b5439a1591e817057f4ac"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3671af499929a6c7f7f8a59eebdaf13b"><td class="memItemLeft" align="right" valign="top"><a id="a3671af499929a6c7f7f8a59eebdaf13b" name="a3671af499929a6c7f7f8a59eebdaf13b"></a>
+typedef std::map&lt; std::string, <a class="el" href="class_f_d_p_1_1_i_o_object.html">IOObject</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>map_type</b></td></tr>
+<tr class="separator:a3671af499929a6c7f7f8a59eebdaf13b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
@@ -141,12 +144,12 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a9e0b8f3d9b007fd973786f4aad510e11"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_d_p_1_1_config.html#a9e0b8f3d9b007fd973786f4aad510e11">get_code_run_uuid</a> () const</td></tr>
 <tr class="memdesc:a9e0b8f3d9b007fd973786f4aad510e11"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the code run uuid.  <a href="class_f_d_p_1_1_config.html#a9e0b8f3d9b007fd973786f4aad510e11">More...</a><br /></td></tr>
 <tr class="separator:a9e0b8f3d9b007fd973786f4aad510e11"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aca288df67576372a7295f67f39776f68"><td class="memItemLeft" align="right" valign="top">ghc::filesystem::path&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_d_p_1_1_config.html#aca288df67576372a7295f67f39776f68">link_write</a> (std::string &amp;data_product)</td></tr>
-<tr class="memdesc:aca288df67576372a7295f67f39776f68"><td class="mdescLeft">&#160;</td><td class="mdescRight">Provide a tempory file path for a given data product to be written whilst recording metadata.  <a href="class_f_d_p_1_1_config.html#aca288df67576372a7295f67f39776f68">More...</a><br /></td></tr>
-<tr class="separator:aca288df67576372a7295f67f39776f68"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a794593eb3a2ad1d6fdf8659a5853e66c"><td class="memItemLeft" align="right" valign="top">ghc::filesystem::path&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_d_p_1_1_config.html#a794593eb3a2ad1d6fdf8659a5853e66c">link_read</a> (std::string &amp;data_product)</td></tr>
-<tr class="memdesc:a794593eb3a2ad1d6fdf8659a5853e66c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the filepath to a given data product.  <a href="class_f_d_p_1_1_config.html#a794593eb3a2ad1d6fdf8659a5853e66c">More...</a><br /></td></tr>
-<tr class="separator:a794593eb3a2ad1d6fdf8659a5853e66c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad3fcbf6bbf65d32536762e5336cf5eb7"><td class="memItemLeft" align="right" valign="top">ghc::filesystem::path&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_d_p_1_1_config.html#ad3fcbf6bbf65d32536762e5336cf5eb7">link_write</a> (const std::string &amp;data_product)</td></tr>
+<tr class="memdesc:ad3fcbf6bbf65d32536762e5336cf5eb7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Provide a tempory file path for a given data product to be written whilst recording metadata.  <a href="class_f_d_p_1_1_config.html#ad3fcbf6bbf65d32536762e5336cf5eb7">More...</a><br /></td></tr>
+<tr class="separator:ad3fcbf6bbf65d32536762e5336cf5eb7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0b7d67692a8466de9f8f1c60fb721192"><td class="memItemLeft" align="right" valign="top">ghc::filesystem::path&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_d_p_1_1_config.html#a0b7d67692a8466de9f8f1c60fb721192">link_read</a> (const std::string &amp;data_product)</td></tr>
+<tr class="memdesc:a0b7d67692a8466de9f8f1c60fb721192"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the filepath to a given data product.  <a href="class_f_d_p_1_1_config.html#a0b7d67692a8466de9f8f1c60fb721192">More...</a><br /></td></tr>
+<tr class="separator:a0b7d67692a8466de9f8f1c60fb721192"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7a48b2a8da35c03e4f621b3a70aac705"><td class="memItemLeft" align="right" valign="top"><a id="a7a48b2a8da35c03e4f621b3a70aac705" name="a7a48b2a8da35c03e4f621b3a70aac705"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>finalise</b> ()</td></tr>
 <tr class="memdesc:a7a48b2a8da35c03e4f621b3a70aac705"><td class="mdescLeft">&#160;</td><td class="mdescRight">Finalise the pipeline Write any pending metadata to the registry Rename any pending writes to their new filename(s): &lt;file hash&gt;.&lt;extension&gt; <br /></td></tr>
@@ -599,8 +602,8 @@ false the config does not have writes </dd></dl>
 
 </div>
 </div>
-<a id="a794593eb3a2ad1d6fdf8659a5853e66c" name="a794593eb3a2ad1d6fdf8659a5853e66c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a794593eb3a2ad1d6fdf8659a5853e66c">&#9670;&nbsp;</a></span>link_read()</h2>
+<a id="a0b7d67692a8466de9f8f1c60fb721192" name="a0b7d67692a8466de9f8f1c60fb721192"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0b7d67692a8466de9f8f1c60fb721192">&#9670;&nbsp;</a></span>link_read()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -608,7 +611,7 @@ false the config does not have writes </dd></dl>
         <tr>
           <td class="memname">ghc::filesystem::path FDP::Config::link_read </td>
           <td>(</td>
-          <td class="paramtype">std::string &amp;&#160;</td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
           <td class="paramname"><em>data_product</em></td><td>)</td>
           <td></td>
         </tr>
@@ -626,8 +629,8 @@ false the config does not have writes </dd></dl>
 
 </div>
 </div>
-<a id="aca288df67576372a7295f67f39776f68" name="aca288df67576372a7295f67f39776f68"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aca288df67576372a7295f67f39776f68">&#9670;&nbsp;</a></span>link_write()</h2>
+<a id="ad3fcbf6bbf65d32536762e5336cf5eb7" name="ad3fcbf6bbf65d32536762e5336cf5eb7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad3fcbf6bbf65d32536762e5336cf5eb7">&#9670;&nbsp;</a></span>link_write()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -635,7 +638,7 @@ false the config does not have writes </dd></dl>
         <tr>
           <td class="memname">ghc::filesystem::path FDP::Config::link_write </td>
           <td>(</td>
-          <td class="paramtype">std::string &amp;&#160;</td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
           <td class="paramname"><em>data_product</em></td><td>)</td>
           <td></td>
         </tr>
