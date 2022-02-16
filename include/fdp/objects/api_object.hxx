@@ -98,15 +98,5 @@ namespace FDP {
             bool is_empty();
     };
 
-    class ApiMetadata : public ApiObject
-    {
-        public:
-            typedef std::shared_ptr< ApiMetadata > sptr;
-            static sptr construct(void);
-        protected:
-
-            ApiMetadata();
-        private:
-    };
 }
 #endif

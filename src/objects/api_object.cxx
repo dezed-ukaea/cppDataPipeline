@@ -107,15 +107,4 @@ namespace FDP {
     std::string ApiObject::get_first_component() const{
         return obj_["components"][0].asString();
     }
-
-    ApiMetadata::ApiMetadata() : ApiObject()
-    {
-    }
-
-    ApiMetadata::sptr ApiMetadata::construct(void)
-    {
-        ApiMetadata::sptr pobj = ApiMetadata::sptr( new ApiMetadata() );
-        return pobj;
-    }
-
 };
