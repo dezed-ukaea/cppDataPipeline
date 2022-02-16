@@ -123,7 +123,7 @@ namespace FDP {
              * 
              * @return const std::string& 
              */
-            const std::string& get_use_namespace() {return use_namespace_;}
+            const std::string& get_use_namespace() const {return use_namespace_;}
 
             /**
              * @brief Get the path of the data product
@@ -144,7 +144,7 @@ namespace FDP {
              * 
              * @return std::string 
              */
-            const std::string& get_component_description() {return component_description_;}
+            const std::string& get_component_description() const {return component_description_;}
 
             /**
              * @brief Check whether the data product is public

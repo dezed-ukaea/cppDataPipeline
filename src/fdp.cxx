@@ -35,7 +35,7 @@ namespace FDP {
       ghc::filesystem::path config_file_path_() const {return config_->get_config_file_path();}
       ghc::filesystem::path script_file_path_() const {return config_->get_script_file_path();}
       std::string token_() const {return config_->get_token();}
-      RESTAPI api_location_() {return config_->get_rest_api_location();}
+      RESTAPI api_location_() const {return config_->get_rest_api_location();}
 
       impl& operator=(const impl& ) = delete;
 
@@ -56,7 +56,7 @@ namespace FDP {
           spdlog::level::level_enum log_level = spdlog::level::info,
           RESTAPI api_location = RESTAPI::LOCAL);
 
-  //impl(const impl &dp) delete;
+  impl(const impl &dp) = default;
 
   /**
    * @brief Default Destructor
@@ -65,9 +65,6 @@ namespace FDP {
 
   ~impl() = default;
   
-  //DataPipelineImpl_& operator=(DataPipelineImpl_ dp);
-
-
   /**
    * @brief Return a path to a given data product
    * Whilst recording it's meta data for the code run

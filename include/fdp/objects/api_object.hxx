@@ -49,7 +49,7 @@ namespace FDP {
              * @return int object id e.g. if the uri is http://127.0.0.1/object/1 
              * the object id will be 1
              */
-            int get_id();
+            int get_id() const ;
             /**
              * @brief Get the object type from the uri
              * 
@@ -58,7 +58,7 @@ namespace FDP {
              */
             static int get_id_from_string(std::string url);
 
-            std::string get_type();
+            std::string get_type() const ;
             /**
              * @brief Get the object uri
              * 

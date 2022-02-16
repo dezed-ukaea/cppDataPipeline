@@ -20,7 +20,6 @@ namespace FDP {
     {
         public:
             typedef std::shared_ptr<spdlog::logger> sptr;
-        private:
     };
 
     /**
