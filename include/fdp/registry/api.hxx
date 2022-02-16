@@ -39,6 +39,7 @@ enum class RESTAPI {
   LOCAL   /*!< Run from local registry */
 };
 
+#if 0
 /*! **************************************************************************
  * @brief function for writing to file from a CURL call
  * @author K. Zarebski (UKAEA)
@@ -50,6 +51,7 @@ enum class RESTAPI {
  * @return size_t
  ****************************************************************************/
 size_t write_func_(void *ptr, size_t size, size_t nmemb, std::string *data);
+#endif 
 
 /*! **************************************************************************
  * @class API
@@ -70,7 +72,7 @@ public:
    *
    * @param url_root the root of the query address, e.g. localhost:8000/api
    ***************************************************************************/
-  API(std::string url_root)
+  API( const std::string& url_root)
       : url_root_(API::append_with_forward_slash(url_root)) {}
 
   /**

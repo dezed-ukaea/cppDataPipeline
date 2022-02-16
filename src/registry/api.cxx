@@ -1,14 +1,16 @@
 #include "fdp/registry/api.hxx"
 
 namespace FDP {
-static size_t write_str_(void *ptr, size_t size, size_t nmemb, std::string *data) {
-  data->append((char *)ptr, size * nmemb);
-  return size * nmemb;
+static size_t write_str_(char *ptr, size_t size, size_t nmemb, void* userdata ) {
+    std::string* data = static_cast< std::string* >( userdata );
+    data->append((char *)ptr, size * nmemb);
+    return size * nmemb;
 }
 
-static size_t write_file_(void *ptr, size_t size, size_t nmemb, FILE *stream) {
-  size_t written_n_ = fwrite(ptr, size, nmemb, stream);
-  return written_n_;
+static size_t write_file_(char*ptr, size_t size, size_t nmemb, void* userdata ) {
+    FILE* stream = static_cast< FILE* >( userdata );
+    size_t written_n_ = fwrite(ptr, size, nmemb, stream);
+    return written_n_;
 }
 
 std::string url_encode( const std::string& url) {
