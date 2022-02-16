@@ -16,6 +16,7 @@ namespace FDP {
         private:
             Json::Value obj_;
 
+        protected:
             ApiObject();
 
         public:
@@ -71,7 +72,7 @@ namespace FDP {
              * @param key 
              * @return std::string 
              */
-            std::string get_value_as_string(std::string key) const;
+            std::string get_value_as_string( const std::string& key) const;
 
             /**
              * @brief Get the value of a given key as int object
@@ -79,7 +80,7 @@ namespace FDP {
              * @param key 
              * @return int 
              */
-            int get_value_as_int(std::string key) const;
+            int get_value_as_int( const std::string& key) const;
 
             /**
              * @brief Get the first component of the object
@@ -96,6 +97,6 @@ namespace FDP {
              */
             bool is_empty();
     };
-};
 
+}
 #endif

@@ -214,7 +214,7 @@ namespace FDP {
             /**
              * @brief Get the code run uuid
              * 
-             * @return std::string 
+             * @return const std::string&
              */
             std::string get_code_run_uuid() const;
 
@@ -263,14 +263,14 @@ namespace FDP {
              * 
              * @return std::shared_ptr<API> 
              */
-             API::sptr get_api(){return api_;}
+             API::sptr get_api() const {return api_;}
 
             /**
              * @brief Get the rest api location (local / remote)
              * 
              * @return RESTAPI 
              */
-            RESTAPI get_rest_api_location(){return rest_api_location_;}
+            RESTAPI get_rest_api_location() const {return rest_api_location_;}
 
     };
 };

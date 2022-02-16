@@ -15,20 +15,22 @@
 #include "spdlog/spdlog.h"
 
 namespace FDP {
-/*! **************************************************************************
- * @brief Create a the global logger pointer
- * @author K. Zarebski (UKAEA)
- *
- * @return a shared pointer to the global logger instance
- ****************************************************************************/
-std::shared_ptr<spdlog::logger> create_logger_();
 
-/**
- * @brief Global logger used across all FDP scripts
- * @author K. Zarebski (UKAEA)
- *
- */
-const std::shared_ptr<spdlog::logger> APILogger = create_logger_();
+    class logger
+    {
+        public:
+            typedef std::shared_ptr<spdlog::logger> sptr;
+        private:
+    };
+
+    /**
+     * @brief Global logger used across all FDP scripts
+     * @author K. Zarebski (UKAEA)
+     *
+     */
+    extern const logger::sptr APILogger;
 } // namespace FDP
+
+
 
 #endif

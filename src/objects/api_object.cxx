@@ -90,10 +90,10 @@ namespace FDP {
         return obj_["url"].asString();
     }
 
-    std::string ApiObject::get_value_as_string(std::string key) const{
+    std::string ApiObject::get_value_as_string( const std::string& key) const{
         return obj_[key].asString();
     }
-    int ApiObject::get_value_as_int(std::string key) const{
+    int ApiObject::get_value_as_int(const std::string& key) const{
         return obj_[key].asInt();
     }
 

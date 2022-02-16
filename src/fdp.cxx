@@ -36,6 +36,9 @@ namespace FDP {
       ghc::filesystem::path script_file_path_() const {return config_->get_script_file_path();}
       std::string token_() const {return config_->get_token();}
       RESTAPI api_location_() {return config_->get_rest_api_location();}
+
+      impl& operator=(const impl& ) = delete;
+
   public:
       typedef std::shared_ptr< impl > sptr;
   
@@ -49,11 +52,11 @@ namespace FDP {
    ***************************************************************************/
   impl(const ghc::filesystem::path &config_file_path,
           const ghc::filesystem::path &file_system_path,
-          const std::string token,
+          const std::string& token,
           spdlog::level::level_enum log_level = spdlog::level::info,
           RESTAPI api_location = RESTAPI::LOCAL);
 
-  impl(const impl &dp);
+  //impl(const impl &dp) delete;
 
   /**
    * @brief Default Destructor
@@ -97,10 +100,10 @@ namespace FDP {
    * 
    * @return std::string 
    */
-  std::string get_code_run_uuid();
+  std::string get_code_run_uuid() const;
 
 };
-
+#if 0
 DataPipeline::impl::impl(const impl &dp)
 {
     impl( dp.config_file_path_()
@@ -109,11 +112,11 @@ DataPipeline::impl::impl(const impl &dp)
             , api_location_()
         );
 }
-
+#endif
 
 DataPipeline::impl::impl(const ghc::filesystem::path &config_file_path,
                     const ghc::filesystem::path &script_file_path,
-                    const std::string token,
+                    const std::string& token,
                     spdlog::level::level_enum log_level,
                     RESTAPI api_location)
 {
@@ -140,7 +143,7 @@ void FDP::DataPipeline::impl::finalise(){
     config_->finalise();
 }
 
-std::string FDP::DataPipeline::impl::get_code_run_uuid(){
+std::string FDP::DataPipeline::impl::get_code_run_uuid() const { 
     return config_->get_code_run_uuid();
 }
 

@@ -33,7 +33,7 @@ namespace FDP {
              * @brief Construct a new IOObject object (empty constructor)
              * 
              */
-            IOObject(){};
+            IOObject() = default;
             /**
              * @brief Construct a new IOObject object
              * Used to store inputs and outputs for in the config
@@ -46,12 +46,12 @@ namespace FDP {
              * @param data_product_description data product description
              * @param isPublic whether or not the data product should be public
              */
-            IOObject(std::string data_product,
-                    std::string use_data_product,
-                    std::string use_version,
-                    std::string use_namespace,
+            IOObject (const std::string& data_product,
+                    const std::string& use_data_product,
+                    const std::string& use_version,
+                    const std::string& use_namespace,
                     ghc::filesystem::path path,
-                    std::string data_product_description,
+                    const std::string& data_product_description,
                     bool isPublic)
                 :
                     data_product_(data_product),
@@ -74,10 +74,10 @@ namespace FDP {
              * @param component_obj the data_product component object as a shared pointer
              * @param data_product_obj the data_product object as a shared pointer
              */
-            IOObject(std::string data_product,
-                        std::string use_data_product,
-                        std::string use_version,
-                        std::string use_namespace,
+            IOObject( const std::string& data_product,
+                       const  std::string& use_data_product,
+                       const  std::string& use_version,
+                        const std::string& use_namespace,
                         ghc::filesystem::path path,
                         ApiObject &component_obj,
                         ApiObject &data_product_obj) 
@@ -93,58 +93,58 @@ namespace FDP {
             /**
              * @brief Get the data product as a string
              * 
-             * @return std::string 
+             * @return const std::string&
              */
-            std::string get_data_product() {return data_product_;}
+            const std::string& get_data_product() const {return data_product_;}
 
             /**
              * @brief Get the use data product  as a string
              * 
-             * @return std::string 
+             * @return const  std::string&
              */
-            std::string get_use_data_product() {return use_data_product_;}
+            const std::string& get_use_data_product() const {return use_data_product_;}
 
             /**
              * @brief Get the use component as a string
              * 
-             * @return std::string 
+             * @return const std::string&
              */
-            std::string get_use_component() {return use_component_;}
+            const std::string& get_use_component() const {return use_component_;}
 
             /**
              * @brief Get the use version  as a string
              * 
-             * @return std::string 
+             * @return const std::string&
              */
-            std::string get_use_version() {return use_version_;}
+            const std::string& get_use_version() const {return use_version_;}
 
             /**
              * @brief Get the use namespace as a string
              * 
-             * @return std::string 
+             * @return const std::string& 
              */
-            std::string get_use_namespace() {return use_namespace_;}
+            const std::string& get_use_namespace() {return use_namespace_;}
 
             /**
              * @brief Get the path of the data product
              * 
              * @return ghc::filesystem::path 
              */
-            ghc::filesystem::path get_path() {return path_;}
+            ghc::filesystem::path get_path() const {return path_;}
 
             /**
              * @brief Get the data product description as a string
              * 
              * @return std::string 
              */
-            std::string get_data_product_description() {return data_product_description_;}
+            const std::string& get_data_product_description() const {return data_product_description_;}
 
             /**
              * @brief Get the component description as a string
              * 
              * @return std::string 
              */
-            std::string get_component_description() {return component_description_;}
+            const std::string& get_component_description() {return component_description_;}
 
             /**
              * @brief Check whether the data product is public
@@ -152,14 +152,14 @@ namespace FDP {
              * @return true the data product is public
              * @return false the data product is not public
              */
-            bool is_public() {return public_;}
+            bool is_public() const {return public_;}
 
             /**
              * @brief Get the component object object
              * 
              * @return std::shared_ptr<ApiObject> 
              */
-             ApiObject::sptr get_component_object() {return component_obj_;}
+             ApiObject::sptr get_component_object() const {return component_obj_;}
              
 
             /**
@@ -167,7 +167,7 @@ namespace FDP {
              * 
              * @return std::shared_ptr<ApiObject> 
              */
-             ApiObject::sptr get_data_product_object() {return data_product_obj_;}
+             ApiObject::sptr get_data_product_object() const {return data_product_obj_;}
 
             /**
              * @brief Set the component object object
