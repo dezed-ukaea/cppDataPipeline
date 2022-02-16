@@ -11,7 +11,7 @@ static size_t write_file_(void *ptr, size_t size, size_t nmemb, FILE *stream) {
   return written_n_;
 }
 
-std::string url_encode(std::string url) {
+std::string url_encode( const std::string& url) {
   CURL *curl_ = curl_easy_init();
   curl_easy_setopt(curl_, CURLOPT_SSLVERSION, CURL_SSLVERSION_TLSv1_2);
   return curl_easy_escape(curl_, url.c_str(), 0);

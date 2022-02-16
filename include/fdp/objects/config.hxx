@@ -31,6 +31,11 @@ namespace FDP {
      * 
      */
     class Config {
+        public:
+            typedef std::shared_ptr< Config > sptr;
+
+            typedef std::map< std::string, IOObject > map_type;
+
         private:            
             const ghc::filesystem::path config_file_path_;
             const ghc::filesystem::path config_dir_;
@@ -59,11 +64,11 @@ namespace FDP {
 
             ApiObject::sptr code_run_;
             
-            std::map<std::string, IOObject> writes_;
-            std::map<std::string, IOObject> reads_;
+            map_type writes_;
+            map_type reads_;
 
-            std::map<std::string, IOObject> outputs_;
-            std::map<std::string, IOObject> inputs_;
+            map_type outputs_;
+            map_type inputs_;
 
             RESTAPI rest_api_location_ = RESTAPI::LOCAL;
 
@@ -87,7 +92,6 @@ namespace FDP {
 
 
         public:
-            typedef std::shared_ptr< Config > sptr;
 
             static Config::sptr construct(const ghc::filesystem::path &config_file_path,
                     const ghc::filesystem::path &script_file_path,
@@ -225,7 +229,7 @@ namespace FDP {
              * @param data_product 
              * @return ghc::filesystem::path 
              */
-            ghc::filesystem::path link_write(std::string &data_product);
+            ghc::filesystem::path link_write( const std::string &data_product);
 
             /**
              * @brief Return the filepath to a given data product
@@ -233,7 +237,7 @@ namespace FDP {
              * @param data_product 
              * @return ghc::filesystem::path 
              */
-            ghc::filesystem::path link_read(std::string &data_product);
+            ghc::filesystem::path link_read(const std::string& data_product);
 
             /**
              * @brief Finalise the pipeline

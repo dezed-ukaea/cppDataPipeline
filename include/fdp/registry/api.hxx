@@ -181,7 +181,7 @@ private:
                      ghc::filesystem::path out_path);
 };
 
-std::string url_encode(std::string url);
+std::string url_encode(const std::string& url);
 
 }; // namespace FDP
 

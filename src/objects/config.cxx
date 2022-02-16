@@ -352,7 +352,7 @@ std::string Config::get_code_run_uuid() const{
 };
 
 
-ghc::filesystem::path Config::link_write(std::string &data_product){
+ghc::filesystem::path Config::link_write( const std::string& data_product){
   if (!config_has_writes()){
     APILogger->error("Config Error: Write has not been specified in the given config file");
     throw config_parsing_error("Config Error: Write has not been specified in the given config file");
@@ -429,7 +429,7 @@ ghc::filesystem::path Config::link_write(std::string &data_product){
 
 }
 
-ghc::filesystem::path FDP::Config::link_read(std::string &data_product){
+ghc::filesystem::path FDP::Config::link_read( const std::string &data_product){
   YAML::Node currentRead;
 
   auto it = inputs_.find("data_product");
@@ -551,9 +551,9 @@ ghc::filesystem::path FDP::Config::link_read(std::string &data_product){
 void FDP::Config::finalise(){
 
   if(has_writes()){
-    std::map<std::string, IOObject>::iterator it;
+      Config::map_type::iterator it;
     for (it = writes_.begin(); it != writes_.end(); it++){
-      IOObject currentWrite = it->second;
+      IOObject& currentWrite = it->second;
 
       if(! file_exists(currentWrite.get_path().string())){
         APILogger->error("File Error: Cannot Find file for write", currentWrite.get_use_data_product());
@@ -667,9 +667,9 @@ void FDP::Config::finalise(){
   }
 
   if(has_reads()){
-    std::map<std::string, IOObject>::iterator it;
+    map_type::iterator it;
     for (it = reads_.begin(); it != reads_.end(); it++){
-      IOObject currentRead = it->second;
+      IOObject& currentRead = it->second;
       inputs_[currentRead.get_data_product()] = currentRead;
     }
   }
@@ -677,9 +677,9 @@ void FDP::Config::finalise(){
   Json::Value patch_data;
 
   if(has_outputs()){
-    std::map<std::string, IOObject>::iterator it;
+    map_type::iterator it;
     for (it = outputs_.begin(); it != outputs_.end(); it++){
-      IOObject currentOutput = it->second;
+      IOObject& currentOutput = it->second;
       Json::Value output = currentOutput.get_component_object()->get_uri();
       patch_data["outputs"].append(output);
       APILogger->info("Writing {} to local registry", currentOutput.get_use_data_product());
@@ -687,9 +687,9 @@ void FDP::Config::finalise(){
   }
 
   if(has_inputs()){
-    std::map<std::string, IOObject>::iterator it;
+   map_type::iterator it;
     for (it = inputs_.begin(); it != inputs_.end(); it++){
-      IOObject currentInput = it->second;
+      IOObject& currentInput = it->second;
       Json::Value input = currentInput.get_component_object()->get_uri();
       patch_data["inputs"].append(input);
       APILogger->info("Writing {} to local registry", currentInput.get_use_data_product());
