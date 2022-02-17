@@ -70,7 +70,7 @@ $(function() {
   <div class="headertitle"><div class="title">metadata.hxx</div></div>
 </div><!--header-->
 <div class="contents">
-<a href="metadata_8hxx.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span> </div>
+<div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span> </div>
 <div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="preprocessor">#ifndef __FDP_METADATA_HXX__</span></div>
 <div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span><span class="preprocessor">#define __FDP_METADATA_HXX__</span></div>
 <div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span> </div>
@@ -93,34 +93,26 @@ $(function() {
 <div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span><span class="preprocessor">   #include &lt;unistd.h&gt;</span></div>
 <div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span><span class="preprocessor">#endif</span></div>
 <div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span> </div>
-<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span><span class="keyword">namespace </span>FDP {</div>
-<div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span>std::string <a class="code hl_function" href="metadata_8hxx.html#aef5b5dab5a6743bed9e9d0842ec8e0b9">calculate_hash_from_file</a>(<span class="keyword">const</span> ghc::filesystem::path &amp;);</div>
+<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span><span class="keyword">namespace </span>FairDataPipeline {</div>
+<div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span>std::string calculate_hash_from_file(<span class="keyword">const</span> ghc::filesystem::path &amp;);</div>
 <div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span> </div>
-<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span>std::string <a class="code hl_function" href="metadata_8hxx.html#add1040168fb281b0753ca26cd445d8ee">calculate_hash_from_string</a>(<span class="keyword">const</span> std::string &amp;input);</div>
+<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span>std::string calculate_hash_from_string(<span class="keyword">const</span> std::string &amp;input);</div>
 <div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span> </div>
-<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span>std::string <a class="code hl_function" href="metadata_8hxx.html#ab79af90fa92ae81a67367f00e8c2a99a">generate_random_hash</a>();</div>
+<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span>std::string generate_random_hash();</div>
 <div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span> </div>
-<div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span>std::string <a class="code hl_function" href="metadata_8hxx.html#a0f9f5711fdb2e85d991b5a6c606f9b1e">current_time_stamp</a>(<span class="keywordtype">bool</span> file_name = <span class="keyword">false</span>);</div>
+<div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span>std::string current_time_stamp(<span class="keywordtype">bool</span> file_name = <span class="keyword">false</span>);</div>
 <div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span> </div>
-<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span>std::string <a class="code hl_function" href="metadata_8hxx.html#a1f7e1d16c6056d8117113a16d806e75d">remove_local_from_root</a>(<span class="keyword">const</span> std::string &amp;root);</div>
+<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span>std::string remove_local_from_root(<span class="keyword">const</span> std::string &amp;root);</div>
 <div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span> </div>
-<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span>std::string <a class="code hl_function" href="metadata_8hxx.html#a45be90ccf712b64441d38e0a1ed324f4">remove_backslash_from_path</a>(<span class="keyword">const</span> std::string &amp;path);</div>
+<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span>std::string remove_backslash_from_path(<span class="keyword">const</span> std::string &amp;path);</div>
 <div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span> </div>
-<div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span><span class="keywordtype">bool</span> <a class="code hl_function" href="metadata_8hxx.html#a7d885b9af9988c944d23eedbff430272">file_exists</a>( <span class="keyword">const</span> std::string &amp;Filename );</div>
+<div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span><span class="keywordtype">bool</span> file_exists( <span class="keyword">const</span> std::string &amp;Filename );</div>
 <div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span> </div>
-<div class="line"><a id="l00095" name="l00095"></a><span class="lineno">   95</span>std::string <a class="code hl_function" href="metadata_8hxx.html#a5dbd216ab20d3b4329231ba5965b34e3">read_token</a>(<span class="keyword">const</span> ghc::filesystem::path &amp;token_path);</div>
+<div class="line"><a id="l00095" name="l00095"></a><span class="lineno">   95</span>std::string read_token(<span class="keyword">const</span> ghc::filesystem::path &amp;token_path);</div>
 <div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span> </div>
-<div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span>}; <span class="comment">// namespace FDP</span></div>
+<div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span>}; <span class="comment">// namespace FairDataPipeline</span></div>
 <div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span> </div>
 <div class="line"><a id="l00099" name="l00099"></a><span class="lineno">   99</span><span class="preprocessor">#endif</span></div>
-<div class="ttc" id="ametadata_8hxx_html_a0f9f5711fdb2e85d991b5a6c606f9b1e"><div class="ttname"><a href="metadata_8hxx.html#a0f9f5711fdb2e85d991b5a6c606f9b1e">FDP::current_time_stamp</a></div><div class="ttdeci">std::string current_time_stamp(bool file_name=false)</div><div class="ttdoc">returns the current time as a timestamp</div><div class="ttdef"><b>Definition:</b> metadata.cxx:52</div></div>
-<div class="ttc" id="ametadata_8hxx_html_a1f7e1d16c6056d8117113a16d806e75d"><div class="ttname"><a href="metadata_8hxx.html#a1f7e1d16c6056d8117113a16d806e75d">FDP::remove_local_from_root</a></div><div class="ttdeci">std::string remove_local_from_root(const std::string &amp;root)</div><div class="ttdoc">remove the file:// from a given root</div><div class="ttdef"><b>Definition:</b> metadata.cxx:67</div></div>
-<div class="ttc" id="ametadata_8hxx_html_a45be90ccf712b64441d38e0a1ed324f4"><div class="ttname"><a href="metadata_8hxx.html#a45be90ccf712b64441d38e0a1ed324f4">FDP::remove_backslash_from_path</a></div><div class="ttdeci">std::string remove_backslash_from_path(const std::string &amp;path)</div><div class="ttdoc">replace backslashes with forward slashes in a given path</div><div class="ttdef"><b>Definition:</b> metadata.cxx:71</div></div>
-<div class="ttc" id="ametadata_8hxx_html_a5dbd216ab20d3b4329231ba5965b34e3"><div class="ttname"><a href="metadata_8hxx.html#a5dbd216ab20d3b4329231ba5965b34e3">FDP::read_token</a></div><div class="ttdeci">std::string read_token(const ghc::filesystem::path &amp;token_path)</div><div class="ttdoc">read a token from a given file</div><div class="ttdef"><b>Definition:</b> metadata.cxx:80</div></div>
-<div class="ttc" id="ametadata_8hxx_html_a7d885b9af9988c944d23eedbff430272"><div class="ttname"><a href="metadata_8hxx.html#a7d885b9af9988c944d23eedbff430272">FDP::file_exists</a></div><div class="ttdeci">bool file_exists(const std::string &amp;Filename)</div><div class="ttdoc">check whether a given file exists</div><div class="ttdef"><b>Definition:</b> metadata.cxx:75</div></div>
-<div class="ttc" id="ametadata_8hxx_html_ab79af90fa92ae81a67367f00e8c2a99a"><div class="ttname"><a href="metadata_8hxx.html#ab79af90fa92ae81a67367f00e8c2a99a">FDP::generate_random_hash</a></div><div class="ttdeci">std::string generate_random_hash()</div><div class="ttdoc">Generate a random hash.</div><div class="ttdef"><b>Definition:</b> metadata.cxx:22</div></div>
-<div class="ttc" id="ametadata_8hxx_html_add1040168fb281b0753ca26cd445d8ee"><div class="ttname"><a href="metadata_8hxx.html#add1040168fb281b0753ca26cd445d8ee">FDP::calculate_hash_from_string</a></div><div class="ttdeci">std::string calculate_hash_from_string(const std::string &amp;input)</div><div class="ttdoc">calculates a hash from a given string via SHA1</div><div class="ttdef"><b>Definition:</b> metadata.cxx:18</div></div>
-<div class="ttc" id="ametadata_8hxx_html_aef5b5dab5a6743bed9e9d0842ec8e0b9"><div class="ttname"><a href="metadata_8hxx.html#aef5b5dab5a6743bed9e9d0842ec8e0b9">FDP::calculate_hash_from_file</a></div><div class="ttdeci">std::string calculate_hash_from_file(const ghc::filesystem::path &amp;)</div><div class="ttdoc">calculates a hash from a given input file via SHA1</div><div class="ttdef"><b>Definition:</b> metadata.cxx:4</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

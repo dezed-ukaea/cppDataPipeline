@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['meta_5fdata_5f_0',['meta_data_',['../class_f_d_p_1_1_config.html#a6202b2d39b4dbd977340b90f5382a4fb',1,'FDP::Config']]]
+  ['meta_5fdata_5f_0',['meta_data_',['../class_fair_data_pipeline_1_1_config.html#a007b9d59446d41aa345a62d903051d6b',1,'FairDataPipeline::Config']]]
 ];
