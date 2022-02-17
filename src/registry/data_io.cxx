@@ -1,5 +1,5 @@
 #include "fdp/registry/data_io.hxx"
-#include "fdp/objects/config.hxx"
+
 namespace FDP {
 YAML::Node parse_yaml_(ghc::filesystem::path yaml_path) {
   APILogger->debug("LocalFileSystem: Reading configuration file '{0}'",
