@@ -14,7 +14,7 @@
 
 #include "fdp/utilities/logging.hxx"
 
-using namespace fdp;
+using namespace FairDataPipeline;
 
 class ConfigTest : public ::testing::Test {
 protected:

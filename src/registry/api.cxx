@@ -1,6 +1,6 @@
 #include "fdp/registry/api.hxx"
 
-namespace fdp {
+namespace FairDataPipeline {
 static size_t write_str_(char *ptr, size_t size, size_t nmemb, void* userdata ) {
     std::string* data = static_cast< std::string* >( userdata );
     data->append((char *)ptr, size * nmemb);
@@ -316,4 +316,4 @@ std::string API::remove_leading_forward_slash(std::string str) {
   return str;
 }
 
-}; // namespace fdp
+}; // namespace FairDataPipeline

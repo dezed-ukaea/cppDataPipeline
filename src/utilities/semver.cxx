@@ -1,6 +1,6 @@
 #include "fdp/utilities/semver.hxx"
 
-namespace fdp {
+namespace FairDataPipeline {
 Versioning::version::version(const std::string version_str) {
   const std::string delim_ = ".";
   const std::string meta_delim_ = "+";
@@ -83,4 +83,4 @@ std::string Versioning::version::get_tag_str() const {
     return "";
   };
 }
-} // namespace fdp
+} // namespace FairDataPipeline

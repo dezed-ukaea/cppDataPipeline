@@ -1,10 +1,10 @@
 /*! **************************************************************************
- * @file fdp/registry/api.hxx
+ * @file FairDataPipeline/registry/api.hxx
  * @author K. Zarebski (UKAEA)
  * @date 2021-05-05
  * @brief File containing classes and methods for connecting to the RestAPI
  *
- * The classes and methods within this file are used to access the fdp
+ * The classes and methods within this file are used to access the FairDataPipeline
  * Data Pipeline RestAPI, they handle sending of requests and retrieval of
  * data as JSON strings
  ****************************************************************************/
@@ -27,7 +27,7 @@
 #include "fdp/utilities/json.hxx"
 #include "fdp/utilities/logging.hxx"
 
-namespace fdp {
+namespace FairDataPipeline {
 /*! **************************************************************************
  * @enum RESTAPI
  * @brief selection of either local or remote pipeline running
@@ -185,6 +185,6 @@ private:
 
 std::string url_encode(const std::string& url);
 
-}; // namespace fdp
+}; // namespace FairDataPipeline
 
 #endif

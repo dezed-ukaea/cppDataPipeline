@@ -4,9 +4,7 @@
 #include "spdlog/spdlog.h"
 #include <ghc/filesystem.hpp>
 
-//#include "fdp/registry/datapipeline.hxx"
-
-namespace fdp {
+namespace FairDataPipeline {
 /**
  * @brief DataPipeline Class:
  * A PIMPL Class for interacting the the FAIR Data Pipeline
@@ -72,6 +70,5 @@ namespace fdp {
 
             std::shared_ptr< DataPipeline::impl > pimpl_;
     };
-}; // namespace fdp
-
+}; // namespace FairDataPipeline
 #endif

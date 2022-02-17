@@ -1,6 +1,6 @@
 #include "fdp/objects/api_object.hxx"
 
-namespace fdp {
+namespace FairDataPipeline {
 
     ApiObject::ApiObject() : obj_(Json::Value() )
     {

@@ -1,5 +1,5 @@
 /*! **************************************************************************
- * @file fdp/objects/metadata.hxx
+ * @file FairDataPipeline/objects/metadata.hxx
  * @author K. Zarebski (UKAEA)
  * @date 2021-05-05
  * @brief File containing methods for handling of metadata
@@ -29,7 +29,7 @@
    #include <unistd.h>
 #endif
 
-namespace fdp {
+namespace FairDataPipeline {
 /*! **************************************************************************
  * @brief calculates a hash from a given input file via SHA1
  *
@@ -94,6 +94,6 @@ bool file_exists( const std::string &Filename );
  */
 std::string read_token(const ghc::filesystem::path &token_path);
 
-}; // namespace fdp
+}; // namespace FairDataPipeline
 
 #endif

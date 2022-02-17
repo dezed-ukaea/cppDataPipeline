@@ -9,7 +9,7 @@
 #include <ostream>
 #include <vector>
 
-using namespace fdp;
+using namespace FairDataPipeline;
 
 class RegistryTest : public ::testing::Test {
 protected:

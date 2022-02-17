@@ -1,6 +1,6 @@
 #include "fdp/objects/config.hxx"
 
-namespace fdp {
+namespace FairDataPipeline {
 
     Config::sptr Config::construct(const ghc::filesystem::path &config_file_path,
                     const ghc::filesystem::path &script_file_path,
@@ -17,7 +17,7 @@ namespace fdp {
 
 
 
-fdp::Config::Config(const ghc::filesystem::path &config_file_path,
+FairDataPipeline::Config::Config(const ghc::filesystem::path &config_file_path,
                     const ghc::filesystem::path &script_file_path,
                     const std::string &token, 
                     RESTAPI api_location)
@@ -30,68 +30,68 @@ Config::~Config() {
   // delete api;
 }
 
-YAML::Node fdp::Config::parse_yaml(ghc::filesystem::path yaml_path) {
+YAML::Node FairDataPipeline::Config::parse_yaml(ghc::filesystem::path yaml_path) {
   APILogger->debug("[Config]: Reading configuration file '{0}'",
                    yaml_path.string().c_str());
   return YAML::LoadFile(yaml_path.string().c_str());
 }
 
-YAML::Node fdp::Config::meta_data_() const {
+YAML::Node FairDataPipeline::Config::meta_data_() const {
   return config_data_["run_metadata"];
 }
 
-YAML::Node fdp::Config::config_writes_() const{
+YAML::Node FairDataPipeline::Config::config_writes_() const{
   return config_data_["write"];
 }
 
-YAML::Node fdp::Config::config_reads_() const{
+YAML::Node FairDataPipeline::Config::config_reads_() const{
   return config_data_["read"];
 }
 
-bool fdp::Config::config_has_writes() const{
+bool FairDataPipeline::Config::config_has_writes() const{
   if(config_data_["write"]){
     return true;
   }
   return false;
 }
 
-bool fdp::Config::config_has_reads() const{
+bool FairDataPipeline::Config::config_has_reads() const{
   if(config_data_["read"]){
     return true;
   }
   return false;
 }
 
-bool fdp::Config::has_writes() const{
+bool FairDataPipeline::Config::has_writes() const{
   return ! writes_.empty();
 }
 
-bool fdp::Config::has_reads() const{
+bool FairDataPipeline::Config::has_reads() const{
   return ! reads_.empty();
 }
 
-bool fdp::Config::has_inputs() const{
+bool FairDataPipeline::Config::has_inputs() const{
   return ! inputs_.empty();
 }
 
-bool fdp::Config::has_outputs() const{
+bool FairDataPipeline::Config::has_outputs() const{
   return ! outputs_.empty();
 }
 
-ghc::filesystem::path fdp::Config::get_data_store() const {
+ghc::filesystem::path FairDataPipeline::Config::get_data_store() const {
   return ghc::filesystem::path(
-      fdp::Config::meta_data_()["write_data_store"].as<std::string>());
+      FairDataPipeline::Config::meta_data_()["write_data_store"].as<std::string>());
 }
 
-std::string fdp::Config::get_default_input_namespace() const {
+std::string FairDataPipeline::Config::get_default_input_namespace() const {
   return meta_data_()["default_input_namespace"].as<std::string>();
 }
 
-std::string fdp::Config::get_default_output_namespace() const {
+std::string FairDataPipeline::Config::get_default_output_namespace() const {
   return meta_data_()["default_output_namespace"].as<std::string>();
 }
 
-void fdp::Config::validate_config(ghc::filesystem::path yaml_path,
+void FairDataPipeline::Config::validate_config(ghc::filesystem::path yaml_path,
                                   RESTAPI api_location) {
   config_data_ = parse_yaml(yaml_path);
   if (!config_data_["run_metadata"]) {
@@ -173,7 +173,7 @@ void fdp::Config::validate_config(ghc::filesystem::path yaml_path,
 
 }
 
-void fdp::Config::initialise(RESTAPI api_location) {
+void FairDataPipeline::Config::initialise(RESTAPI api_location) {
   // Set API URL
   if (api_location == RESTAPI::REMOTE) {
     api_url_ = API::append_with_forward_slash(
@@ -429,7 +429,7 @@ ghc::filesystem::path Config::link_write( const std::string& data_product){
 
 }
 
-ghc::filesystem::path fdp::Config::link_read( const std::string &data_product){
+ghc::filesystem::path FairDataPipeline::Config::link_read( const std::string &data_product){
   YAML::Node currentRead;
 
   auto it = inputs_.find("data_product");
@@ -548,7 +548,7 @@ ghc::filesystem::path fdp::Config::link_read( const std::string &data_product){
   return path_;
 }
 
-void fdp::Config::finalise(){
+void FairDataPipeline::Config::finalise(){
 
   if(has_writes()){
       Config::map_type::iterator it;
@@ -704,4 +704,4 @@ void fdp::Config::finalise(){
 
 }
 
-}; // namespace fdp
+}; // namespace FairDataPipeline

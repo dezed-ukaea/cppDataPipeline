@@ -1,6 +1,6 @@
 #include "fdp/objects/metadata.hxx"
 
-namespace fdp {
+namespace FairDataPipeline {
 std::string calculate_hash_from_file(const ghc::filesystem::path &file_path) {
   if (!ghc::filesystem::exists(file_path)) {
     throw std::invalid_argument("File '" + file_path.string() + "' not found");
@@ -85,4 +85,4 @@ std::string read_token(const ghc::filesystem::path &token_path){
   return key_str_;
 }
 
-}; // namespace fdp
+}; // namespace FairDataPipeline

@@ -1,5 +1,5 @@
 /*! **************************************************************************
- * @file fdp/utilities/semver.hxx
+ * @file FairDataPipeline/utilities/semver.hxx
  * @author K. Zarebski (UKAEA)
  * @date 2021-05-06
  * @brief File contains classes and types for validating semantic versioning
@@ -16,9 +16,9 @@
 #include <string>
 #include <vector>
 
-namespace fdp {
+namespace FairDataPipeline {
 /*! **************************************************************************
- * @namespace fdp::Versioning
+ * @namespace FairDataPipeline::Versioning
  * @brief namespace containing all semantic versioning types and classes
  * @author K. Zarebski (UKAEA)
  *
@@ -199,6 +199,6 @@ private:
   std::string get_tag_str() const;
 };
 }; // namespace Versioning
-}; // namespace fdp
+}; // namespace FairDataPipeline
 
 #endif

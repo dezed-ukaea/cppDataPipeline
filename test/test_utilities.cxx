@@ -9,7 +9,7 @@
 
 #include "json/reader.h"
 
-using namespace fdp;
+using namespace FairDataPipeline;
 
 TEST(FDPAPITest, TestSemVerComparisons) {
   Versioning::version v1{1, 4, 5};

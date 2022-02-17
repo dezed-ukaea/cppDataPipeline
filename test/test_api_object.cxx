@@ -7,7 +7,7 @@
 #include "fdp/utilities/json.hxx"
 #include "fdp/utilities/logging.hxx"
 
-using namespace fdp;
+using namespace FairDataPipeline;
 
 class ApiObjectTest : public ::testing::Test {
 protected:

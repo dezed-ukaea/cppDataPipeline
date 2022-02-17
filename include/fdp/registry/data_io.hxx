@@ -1,5 +1,5 @@
 /*! **************************************************************************
- * @file fdp/registry/config.hxx
+ * @file FairDataPipeline/registry/config.hxx
  * @author K. Zarebski (UKAEA)
  * @date 2021-05-06
  * @brief File containing classes for interacting with the local file system
@@ -27,7 +27,7 @@
 #include "fdp/utilities/logging.hxx"
 #include "fdp/utilities/semver.hxx"
 
-namespace fdp {
+namespace FairDataPipeline {
 
 /*! ***************************************************************************
  * @brief read the value of a point estimate from a given TOML file
@@ -101,6 +101,6 @@ ghc::filesystem::path create_estimate(T &value,
  */
 std::string get_first_key_(const toml::value data_table);
 
-}; // namespace fdp
+}; // namespace FairDataPipeline
 
 #endif

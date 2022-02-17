@@ -8,7 +8,7 @@
 #include "fdp/utilities/logging.hxx"
 #include "fdp/objects/api_object.hxx"
 
-namespace fdp {
+namespace FairDataPipeline {
     /**
      * @brief Class for API objects
      * 

@@ -12,7 +12,7 @@
 #include "gtest/gtest.h"
 
 
-using namespace fdp;
+using namespace FairDataPipeline;
 
 class PimplTest : public ::testing::Test {
 protected:

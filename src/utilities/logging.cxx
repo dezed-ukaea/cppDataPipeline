@@ -1,6 +1,6 @@
 #include "fdp/utilities/logging.hxx"
 
-namespace fdp {
+namespace FairDataPipeline {
 
     /*! **************************************************************************
      * @brief Create a the global logger pointer
@@ -17,4 +17,4 @@ namespace fdp {
     }
 
     const logger::sptr APILogger = create_logger();
-} // namespace fdp
+} // namespace FairDataPipeline

@@ -25,7 +25,7 @@
 #include "fdp/objects/api_object.hxx"
 #include "fdp/objects/io_object.hxx"
 
-namespace fdp {
+namespace FairDataPipeline {
     /**
      * @brief class for interacting with confifurations
      * 

@@ -1,5 +1,5 @@
 /*! **************************************************************************
- * @file fdp/utilities/logging.hxx
+ * @file FairDataPipeline/utilities/logging.hxx
  * @author K. Zarebski (UKAEA)
  * @date 2021-05-06
  * @brief File contains pointers for creating global logger during session
@@ -14,7 +14,7 @@
 #include "spdlog/sinks/stdout_color_sinks.h"
 #include "spdlog/spdlog.h"
 
-namespace fdp {
+namespace FairDataPipeline {
 
     class logger
     {
@@ -28,7 +28,7 @@ namespace fdp {
      *
      */
     extern const logger::sptr APILogger;
-} // namespace fdp
+} // namespace FairDataPipeline
 
 
 
