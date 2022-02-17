@@ -13,18 +13,18 @@
 #include "fdp/registry/data_io.hxx"
 #include "fdp/utilities/logging.hxx"
 
-namespace FDP {
+namespace fdp {
     /*! **************************************************************************
      * @class DataPipelineImpl_
      * @brief private pointer-to-implementation class containing all backend methods
      *
      * This class performs all behind the scenes operations acting as the backend to
-     * the user called FDP::DataPipeline class.
+     * the user called fdp::DataPipeline class.
      * This structure has been chosen to allow for unit tests to be created to test
      * all methods including private ones.
      *
      * @warning The class should not be used directly during implementation,
-     * but rather via an FDP::DataPipeline instance.
+     * but rather via an fdp::DataPipeline instance.
      *
      *****************************************************************************/
     class DataPipeline::impl {
@@ -130,17 +130,17 @@ DataPipeline::impl::impl(const ghc::filesystem::path &config_file_path,
             token);
 }
 
-ghc::filesystem::path FDP::DataPipeline::impl::link_read(std::string &data_product){
+ghc::filesystem::path fdp::DataPipeline::impl::link_read(std::string &data_product){
     return config_->link_read(data_product);
 }
-ghc::filesystem::path FDP::DataPipeline::impl::link_write(std::string &data_product){
+ghc::filesystem::path fdp::DataPipeline::impl::link_write(std::string &data_product){
     return config_->link_write(data_product);
 }
-void FDP::DataPipeline::impl::finalise(){
+void fdp::DataPipeline::impl::finalise(){
     config_->finalise();
 }
 
-std::string FDP::DataPipeline::impl::get_code_run_uuid() const { 
+std::string fdp::DataPipeline::impl::get_code_run_uuid() const { 
     return config_->get_code_run_uuid();
 }
 
@@ -175,15 +175,15 @@ DataPipeline& DataPipeline::operator=(const DataPipeline& rhs) {
     return *this;
 }
 
-ghc::filesystem::path FDP::DataPipeline::link_read(std::string &data_product){
+ghc::filesystem::path fdp::DataPipeline::link_read(std::string &data_product){
     return pimpl_->link_read(data_product);
 }
 
-ghc::filesystem::path FDP::DataPipeline::link_write(std::string &data_product){
+ghc::filesystem::path fdp::DataPipeline::link_write(std::string &data_product){
     return pimpl_->link_write(data_product);
 }
 
-void FDP::DataPipeline::finalise(){
+void fdp::DataPipeline::finalise(){
     pimpl_->finalise();
 }
 
@@ -191,4 +191,4 @@ void FDP::DataPipeline::finalise(){
 
 
 
-}; // namespace FDP
+}; // namespace fdp

@@ -4,7 +4,7 @@
  * @date 2021-05-05
  * @brief File containing classes and methods for connecting to the RestAPI
  *
- * The classes and methods within this file are used to access the FDP
+ * The classes and methods within this file are used to access the fdp
  * Data Pipeline RestAPI, they handle sending of requests and retrieval of
  * data as JSON strings
  ****************************************************************************/
@@ -27,7 +27,7 @@
 #include "fdp/utilities/json.hxx"
 #include "fdp/utilities/logging.hxx"
 
-namespace FDP {
+namespace fdp {
 /*! **************************************************************************
  * @enum RESTAPI
  * @brief selection of either local or remote pipeline running
@@ -185,6 +185,6 @@ private:
 
 std::string url_encode(const std::string& url);
 
-}; // namespace FDP
+}; // namespace fdp
 
 #endif

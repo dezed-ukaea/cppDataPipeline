@@ -6,7 +6,7 @@
 
 //#include "fdp/registry/datapipeline.hxx"
 
-namespace FDP {
+namespace fdp {
 /**
  * @brief DataPipeline Class:
  * A PIMPL Class for interacting the the FAIR Data Pipeline
@@ -72,6 +72,6 @@ namespace FDP {
 
             std::shared_ptr< DataPipeline::impl > pimpl_;
     };
-}; // namespace FDP
+}; // namespace fdp
 
 #endif

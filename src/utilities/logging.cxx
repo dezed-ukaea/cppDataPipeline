@@ -1,6 +1,6 @@
 #include "fdp/utilities/logging.hxx"
 
-namespace FDP {
+namespace fdp {
 
     /*! **************************************************************************
      * @brief Create a the global logger pointer
@@ -17,4 +17,4 @@ namespace FDP {
     }
 
     const logger::sptr APILogger = create_logger();
-} // namespace FDP
+} // namespace fdp

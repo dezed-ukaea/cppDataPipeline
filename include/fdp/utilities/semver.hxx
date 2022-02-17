@@ -16,9 +16,9 @@
 #include <string>
 #include <vector>
 
-namespace FDP {
+namespace fdp {
 /*! **************************************************************************
- * @namespace FDP::Versioning
+ * @namespace fdp::Versioning
  * @brief namespace containing all semantic versioning types and classes
  * @author K. Zarebski (UKAEA)
  *
@@ -199,6 +199,6 @@ private:
   std::string get_tag_str() const;
 };
 }; // namespace Versioning
-}; // namespace FDP
+}; // namespace fdp
 
 #endif

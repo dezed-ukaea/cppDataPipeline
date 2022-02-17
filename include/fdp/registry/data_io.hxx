@@ -27,7 +27,7 @@
 #include "fdp/utilities/logging.hxx"
 #include "fdp/utilities/semver.hxx"
 
-namespace FDP {
+namespace fdp {
 
 /*! ***************************************************************************
  * @brief read the value of a point estimate from a given TOML file
@@ -101,6 +101,6 @@ ghc::filesystem::path create_estimate(T &value,
  */
 std::string get_first_key_(const toml::value data_table);
 
-}; // namespace FDP
+}; // namespace fdp
 
 #endif

@@ -1,6 +1,6 @@
 #include "fdp/objects/api_object.hxx"
 
-namespace FDP {
+namespace fdp {
 
     ApiObject::ApiObject() : obj_(Json::Value() )
     {

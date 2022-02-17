@@ -14,7 +14,7 @@
 
 #include "fdp/utilities/logging.hxx"
 
-using namespace FDP;
+using namespace fdp;
 
 class ConfigTest : public ::testing::Test {
 protected:

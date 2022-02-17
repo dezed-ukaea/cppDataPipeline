@@ -29,7 +29,7 @@
    #include <unistd.h>
 #endif
 
-namespace FDP {
+namespace fdp {
 /*! **************************************************************************
  * @brief calculates a hash from a given input file via SHA1
  *
@@ -94,6 +94,6 @@ bool file_exists( const std::string &Filename );
  */
 std::string read_token(const ghc::filesystem::path &token_path);
 
-}; // namespace FDP
+}; // namespace fdp
 
 #endif

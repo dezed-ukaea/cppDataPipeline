@@ -9,7 +9,7 @@
 #include <ostream>
 #include <vector>
 
-using namespace FDP;
+using namespace fdp;
 
 class RegistryTest : public ::testing::Test {
 protected:

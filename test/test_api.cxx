@@ -9,7 +9,7 @@
 #include "fdp/utilities/json.hxx"
 #include "fdp/utilities/logging.hxx"
 
-using namespace FDP;
+using namespace fdp;
 
 class ApiTest : public ::testing::Test {
 protected:
@@ -26,7 +26,7 @@ protected:
   }
   ghc::filesystem::path read_csv_config = ghc::filesystem::path(TESTDIR) / "data" / "read_csv.yaml";
   std::string api_url_ = "http://127.0.0.1:8000/api";
-  FDP::API *api_ = new FDP::API(api_url_);
+  fdp::API *api_ = new fdp::API(api_url_);
   std::string token =
       read_token(ghc::filesystem::path(getHomeDirectory()) /
                                     ".fair" / "registry" / "token");

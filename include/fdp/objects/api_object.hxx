@@ -7,7 +7,7 @@
 
 #include "fdp/utilities/logging.hxx"
 
-namespace FDP {
+namespace fdp {
     /**
      * @brief Class for API objects
      * 

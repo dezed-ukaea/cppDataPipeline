@@ -7,7 +7,7 @@
 #include "fdp/utilities/json.hxx"
 #include "fdp/utilities/logging.hxx"
 
-using namespace FDP;
+using namespace fdp;
 
 class ApiObjectTest : public ::testing::Test {
 protected:

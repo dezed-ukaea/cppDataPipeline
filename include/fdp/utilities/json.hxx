@@ -12,7 +12,7 @@
 
 #include <json/writer.h>
 
-namespace FDP {
+namespace fdp {
 /*! **************************************************************************
  * @brief convert a JSON object to string form
  * @author K. Zarebski (UKAEA)
@@ -29,6 +29,6 @@ namespace FDP {
  *
  ****************************************************************************/
 std::string json_to_string(Json::Value &json_data);
-}; // namespace FDP
+}; // namespace fdp
 
 #endif

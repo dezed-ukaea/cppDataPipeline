@@ -4,7 +4,7 @@
 #include <stdexcept>
 #include <string>
 
-namespace FDP {
+namespace fdp {
 class config_parsing_error : public std::runtime_error {
 public:
   config_parsing_error(const std::string& message)
@@ -37,6 +37,6 @@ public:
   write_error(const std::string& message) : std::runtime_error(message) {}
 };
 
-}; // namespace FDP
+}; // namespace fdp
 
 #endif

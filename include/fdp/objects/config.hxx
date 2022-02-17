@@ -25,7 +25,7 @@
 #include "fdp/objects/api_object.hxx"
 #include "fdp/objects/io_object.hxx"
 
-namespace FDP {
+namespace fdp {
     /**
      * @brief class for interacting with confifurations
      * 

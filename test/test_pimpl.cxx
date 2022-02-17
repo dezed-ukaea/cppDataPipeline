@@ -12,7 +12,7 @@
 #include "gtest/gtest.h"
 
 
-using namespace FDP;
+using namespace fdp;
 
 class PimplTest : public ::testing::Test {
 protected:
