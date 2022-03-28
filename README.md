@@ -1,6 +1,7 @@
 # FAIR Data Pipeline C++ API
 
-[![FDP C++ API](https://github.com/FAIRDataPipeline/cppDataPipeline/actions/workflows/fdp_cpp_api.yaml/badge.svg)](https://github.com/FAIRDataPipeline/cppDataPipeline/actions/workflows/fdp_cpp_api.yaml)
+[![FDP C++ API](https://github.com/FAIRDataPipeline/cppDataPipeline/actions/workflows/fdp_cpp_api.yaml/badge.svg)](https://github.com/FAIRDataPipeline/cppDataPipeline/actions/workflows/fdp_cpp_api.yaml) 
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=FAIRDataPipeline_FDP-Cpp-API&metric=coverage)](https://sonarcloud.io/summary/new_code?id=FAIRDataPipeline_FDP-Cpp-API)
 [![License: LGPL v3](https://img.shields.io/badge/License-LGPL_v3-blue.svg)](https://www.gnu.org/licenses/lgpl-3.0)
 [![software-checklist](https://img.shields.io/badge/software-checklist-3891A6)](https://github.com/FAIRDataPipeline/cppDataPipeline/blob/main/software-checklist.md)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.5874669.svg)](https://doi.org/10.5281/zenodo.5874669)
