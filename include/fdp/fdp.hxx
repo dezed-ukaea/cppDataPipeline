@@ -1,7 +1,8 @@
 #ifndef __FDP__
 #define __FDP__
 
-#include "spdlog/spdlog.h"
+//#include "spdlog/spdlog.h"
+#include "utilities/logging.hxx"
 #include <ghc/filesystem.hpp>
 
 namespace FairDataPipeline {
@@ -13,6 +14,7 @@ namespace FairDataPipeline {
     class DataPipeline {
 
         public:
+            typedef std::shared_ptr< DataPipeline > sptr;
   /**
    * @brief Construct a new Data Pipeline (PIMPL)
    * 
@@ -21,11 +23,12 @@ namespace FairDataPipeline {
    * @param token 
    * @param log_level 
    */
-            explicit DataPipeline(
+           static  sptr construct(
                     const std::string &config_file_path,
                     const std::string &script_file_path,
                     std::string token = "",
-                    spdlog::level::level_enum log_level = spdlog::level::info);
+                    logger::LOG_LEVEL log_level = logger::LOG_LEVEL::log_level_info );
+
 
   /**
    * @brief Destroy the Data Pipeline object
@@ -33,11 +36,9 @@ namespace FairDataPipeline {
    */
             ~DataPipeline();
 
-            DataPipeline(DataPipeline &&rhs) noexcept;
-            DataPipeline &operator=(DataPipeline &&rhs) noexcept;
+            //DataPipeline(DataPipeline &&rhs) noexcept;
+            //DataPipeline &operator=(DataPipeline &&rhs) noexcept;
 
-            DataPipeline(const DataPipeline &rhs);
-            DataPipeline &operator=(const DataPipeline &rhs);
 
   /**
    * @brief Return a path to a given data product
@@ -66,6 +67,16 @@ namespace FairDataPipeline {
             void finalise();
 
         private:
+            explicit DataPipeline(
+                    const std::string &config_file_path,
+                    const std::string &script_file_path,
+                    std::string token = "",
+                    logger::LOG_LEVEL log_level = logger::LOG_LEVEL::log_level_info);
+
+            DataPipeline(const DataPipeline &rhs) = delete;
+
+            DataPipeline &operator=(const DataPipeline &rhs) = delete;
+
             class impl;
 
             std::shared_ptr< DataPipeline::impl > pimpl_;

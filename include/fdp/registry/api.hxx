@@ -72,8 +72,8 @@ public:
    *
    * @param url_root the root of the query address, e.g. localhost:8000/api
    ***************************************************************************/
-  API( const std::string& url_root)
-      : url_root_(API::append_with_forward_slash(url_root)) {}
+    static sptr construct( const std::string& url_root );
+
 
   /**
    * @brief sends the given 'packet' of information to the RestAPI
@@ -166,6 +166,9 @@ public:
   static std::string remove_leading_forward_slash(std::string str);
 
 private:
+  API( const std::string& url_root)
+      : url_root_(API::append_with_forward_slash(url_root)) {}
+
   std::string url_root_;
   CURL *setup_json_session_(std::string &addr_path, std::string *response,
                             long &http_code, std::string token = "");

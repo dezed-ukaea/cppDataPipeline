@@ -87,8 +87,9 @@ ghc::filesystem::path create_estimate(T &value,
 
   toml_out_.close();
 
-  APILogger->debug("FileSystem:CreateEstimate: Wrote point estimate to '{0}'",
-                   output_filename_.string());
+ 
+  logger::sptr the_logger = logger::get_logger();
+  the_logger->debug( "FileSystem:CreateEstimate: Wrote point estimate to '{0}'", output_filename_.string());
 
   return output_filename_;
 }

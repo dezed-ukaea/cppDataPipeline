@@ -2,7 +2,7 @@
 
 namespace FairDataPipeline {
 YAML::Node parse_yaml_(ghc::filesystem::path yaml_path) {
-  APILogger->debug("LocalFileSystem: Reading configuration file '{0}'",
+  logger::get_logger()->debug("LocalFileSystem: Reading configuration file '{0}'",
                    yaml_path.string().c_str());
   return YAML::LoadFile(yaml_path.string().c_str());
 }

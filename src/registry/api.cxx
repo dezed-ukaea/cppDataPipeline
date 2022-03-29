@@ -13,6 +13,11 @@ static size_t write_file_(char*ptr, size_t size, size_t nmemb, void* userdata ) 
     return written_n_;
 }
 
+API::sptr API::construct( const std::string& url_root )
+{
+    return API::sptr( new API( url_root ) );
+}
+
 std::string url_encode( const std::string& url) {
   CURL *curl_ = curl_easy_init();
   curl_easy_setopt(curl_, CURLOPT_SSLVERSION, CURL_SSLVERSION_TLSv1_2);
@@ -26,14 +31,14 @@ CURL *API::setup_json_session_(std::string &addr_path, std::string *response,
 
 
   if (!token.empty()) {
-    APILogger->debug("Adding token: {0} to headers", token);
+    logger::get_logger()->debug("Adding token: {0} to headers", token);
     struct curl_slist *headers = NULL;
     headers = curl_slist_append(
         headers, (std::string("Authorization: token ") + token).c_str());
     curl_easy_setopt(curl_, CURLOPT_HTTPHEADER, headers);
   }
 
-  APILogger->debug("API:JSONSession: Attempting to access: " + addr_path);
+  logger::get_logger()->debug("API:JSONSession: Attempting to access: " + addr_path);
   curl_easy_setopt(curl_, CURLOPT_URL, addr_path.c_str());
   curl_easy_setopt(curl_, CURLOPT_NOPROGRESS, 1);
   curl_easy_setopt(curl_, CURLOPT_WRITEFUNCTION, write_str_);
@@ -55,7 +60,7 @@ void API::download_file(const ghc::filesystem::path &url,
   CURL *curl_ = curl_easy_init();
   FILE *file_ = fopen(out_path.string().c_str(), "wb");
 
-  APILogger->debug("API: Downloading file '{0}' -> '{1}'", url.string(),
+  logger::get_logger()->debug("API: Downloading file '{0}' -> '{1}'", url.string(),
                    out_path.string());
   curl_easy_setopt(curl_, CURLOPT_SSLVERSION, CURL_SSLVERSION_TLSv1_2);                 
   curl_easy_setopt(curl_, CURLOPT_URL, url.c_str());
@@ -68,7 +73,7 @@ void API::download_file(const ghc::filesystem::path &url,
 CURL *API::setup_download_session_(const ghc::filesystem::path &addr_path,
                                    FILE *file) {
   CURL *curl_ = curl_easy_init();
-  APILogger->debug("API:DownloadSession: Attempting to access: " +
+  logger::get_logger()->debug("API:DownloadSession: Attempting to access: " +
                    addr_path.string());
   curl_easy_setopt(curl_, CURLOPT_URL, addr_path.string().c_str());
   curl_easy_setopt(curl_, CURLOPT_NOPROGRESS, 1);
@@ -104,7 +109,7 @@ Json::Value API::get_request(const std::string &addr_path, long expected_respons
   JSONCPP_STRING err;
 
   if (http_code == 0) {
-    APILogger->error("API:Request: Request to '{0}' returned no response",
+    logger::get_logger()->error("API:Request: Request to '{0}' returned no response",
                      search_str_);
     throw rest_apiquery_error("No response was given");
   }
@@ -119,7 +124,7 @@ Json::Value API::get_request(const std::string &addr_path, long expected_respons
   if (!json_reader_->parse(response_str_.c_str(),
                            response_str_.c_str() + response_str_len_, &root_,
                            &err)) {
-    APILogger->error("API:Query: Response string '{0}' is not JSON parsable. "
+    logger::get_logger()->error("API:Query: Response string '{0}' is not JSON parsable. "
                      "Return Code was {1}",
                      response_str_, http_code);
     throw rest_apiquery_error(
@@ -211,7 +216,7 @@ Json::Value API::post_patch_request(std::string addr_path, Json::Value &post_dat
   const std::string url_path_ =
       url_root_ + API::append_with_forward_slash(addr_path);
   const std::string data_ = json_to_string(post_data);
-  APILogger->debug("API:Post: Post Data\n{0}", data_);
+  logger::get_logger()->debug("API:Post: Post Data\n{0}", data_);
   long return_code_;
   std::string response_;
   CURL *curl_ = curl_easy_init();
@@ -220,7 +225,7 @@ Json::Value API::post_patch_request(std::string addr_path, Json::Value &post_dat
   headers = curl_slist_append(headers, "Content-Type: application/json");
 
   if (!token.empty()) {
-    APILogger->debug("Adding token: {0} to headers", token);
+    logger::get_logger()->debug("Adding token: {0} to headers", token);
     headers = curl_slist_append(
         headers, (std::string("Authorization: token ") + token).c_str());
   }
@@ -243,7 +248,7 @@ Json::Value API::post_patch_request(std::string addr_path, Json::Value &post_dat
   } else {
     curl_easy_cleanup(curl_);
     curl_global_cleanup();
-    APILogger->error("API:Post: Post to '{0}' returned no response", url_path_);
+    logger::get_logger()->error("API:Post: Post to '{0}' returned no response", url_path_);
     throw rest_apiquery_error("No response was given");
   }
 
@@ -255,7 +260,7 @@ Json::Value API::post_patch_request(std::string addr_path, Json::Value &post_dat
   }
 
   else if (http_code == 409) {
-    APILogger->info("API:Post Entry Exists attempting to return entry");
+    logger::get_logger()->info("API:Post Entry Exists attempting to return entry");
     return get_request(API::append_with_forward_slash(addr_path) +
                    json_to_query_string(post_data))[0];
   }
@@ -278,7 +283,7 @@ Json::Value API::post_patch_request(std::string addr_path, Json::Value &post_dat
   if (!json_reader_->parse(response_.c_str(),
                            response_.c_str() + response_str_len_, &root_,
                            &err)) {
-    APILogger->error("API:Post: Response string '{0}' is not JSON parsable. "
+    logger::get_logger()->error("API:Post: Response string '{0}' is not JSON parsable. "
                      "Return Code was {1}",
                      response_, return_code_);
     throw rest_apiquery_error(

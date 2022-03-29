@@ -16,7 +16,7 @@ namespace FairDataPipeline {
 
     ApiObject::sptr ApiObject::construct(void)
     {
-        ApiObject::sptr pobj = std::shared_ptr< ApiObject >( new ApiObject() );
+        ApiObject::sptr pobj = ApiObject::sptr( new ApiObject() );
         return pobj;
     }
 

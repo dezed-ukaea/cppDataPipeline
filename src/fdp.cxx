@@ -14,6 +14,20 @@
 #include "fdp/utilities/logging.hxx"
 
 namespace FairDataPipeline {
+    spdlog::level::level_enum LOG_LEVEL_2_spdlog( logger::LOG_LEVEL fdp_log_level )
+    {
+        std::map< logger::LOG_LEVEL, spdlog::level::level_enum > m;
+
+        m[ logger::LOG_LEVEL::log_level_trace ] = spdlog::level::trace;
+        m[ logger::LOG_LEVEL::log_level_debug ] = spdlog::level::debug;
+        m[ logger::LOG_LEVEL::log_level_info ] = spdlog::level::info;
+        m[ logger::LOG_LEVEL::log_level_warn ] = spdlog::level::warn;
+        m[ logger::LOG_LEVEL::log_level_error ] = spdlog::level::err;
+        m[ logger::LOG_LEVEL::log_level_critical ] = spdlog::level::critical;
+        m[ logger::LOG_LEVEL::log_level_off ] = spdlog::level::off;
+            
+        return m[ fdp_log_level ];
+    }
     /*! **************************************************************************
      * @class DataPipelineImpl_
      * @brief private pointer-to-implementation class containing all backend methods
@@ -37,6 +51,13 @@ namespace FairDataPipeline {
       std::string token_() const {return config_->get_token();}
       RESTAPI api_location_() const {return config_->get_rest_api_location();}
 
+      impl(const ghc::filesystem::path &config_file_path,
+          const ghc::filesystem::path &file_system_path,
+          const std::string& token,
+          logger::LOG_LEVEL log_lvl,
+          RESTAPI api_location = RESTAPI::LOCAL);
+
+      impl(const impl &dp) = delete;
       impl& operator=(const impl& ) = delete;
 
   public:
@@ -50,13 +71,13 @@ namespace FairDataPipeline {
    * @param log_level level for the output logging statements
    * @param api_location whether to use local/remote RestAPI endpoint
    ***************************************************************************/
-  impl(const ghc::filesystem::path &config_file_path,
+  static sptr construct(const ghc::filesystem::path &config_file_path,
           const ghc::filesystem::path &file_system_path,
           const std::string& token,
-          spdlog::level::level_enum log_level = spdlog::level::info,
+          logger::LOG_LEVEL log_level,
           RESTAPI api_location = RESTAPI::LOCAL);
 
-  impl(const impl &dp) = default;
+
 
   /**
    * @brief Default Destructor
@@ -100,34 +121,55 @@ namespace FairDataPipeline {
   std::string get_code_run_uuid() const;
 
 };
-#if 0
-DataPipeline::impl::impl(const impl &dp)
+DataPipeline::impl::sptr DataPipeline::impl::construct(const ghc::filesystem::path &config_file_path,
+                    const ghc::filesystem::path &script_file_path,
+                    const std::string& token,
+                    logger::LOG_LEVEL log_level,
+                    RESTAPI api_location)
 {
-    impl( dp.config_file_path_()
-            , dp.script_file_path_()
-            , token_(), spdlog::level::info
-            , api_location_()
-        );
+
+    sptr pobj = impl::sptr( new impl( config_file_path,
+                    script_file_path,
+                    token,
+                    log_level,
+                    api_location ) );
+    return pobj;
 }
-#endif
 
 DataPipeline::impl::impl(const ghc::filesystem::path &config_file_path,
                     const ghc::filesystem::path &script_file_path,
                     const std::string& token,
-                    spdlog::level::level_enum log_level,
+                    logger::LOG_LEVEL log_level,
                     RESTAPI api_location)
 {
+    spdlog::level::level_enum spd_log_lvl = LOG_LEVEL_2_spdlog( log_level );
+
     this->config_  = Config::construct(config_file_path, script_file_path, token, api_location);
 
     const std::string api_root_ = config_->get_api_url();
 
+
+#if 0
     spdlog::set_default_logger(APILogger);
-    APILogger->set_level(log_level);
+    APILogger->set_level( spd_log_lvl );
 
     APILogger->info("\n[Configuration]\n\t- Config Path: {0}\n\t- API Root: "
             "{1}\n\t- FDP API Token: {2}",
             config_file_path.string(), api_root_,
             token);
+#else
+
+    logger::sptr the_logger = logger::get_logger();
+
+    //spdlog::set_default_logger(the_logger);
+    the_logger->set_level( spd_log_lvl );
+    the_logger->info("\n[Configuration]\n\t- Config Path: {0}\n\t- API Root: "
+            "{1}\n\t- FDP API Token: {2}",
+            config_file_path.string(), api_root_,
+            token);
+
+#endif
+
 }
 
 ghc::filesystem::path FairDataPipeline::DataPipeline::impl::link_read(std::string &data_product){
@@ -144,35 +186,32 @@ std::string FairDataPipeline::DataPipeline::impl::get_code_run_uuid() const {
     return config_->get_code_run_uuid();
 }
 
-
-
-
-
 DataPipeline::~DataPipeline() = default;
-DataPipeline::DataPipeline(DataPipeline &&) noexcept = default;
-DataPipeline& DataPipeline::operator=(DataPipeline &&) noexcept = default;
 
-DataPipeline::DataPipeline(const DataPipeline& rhs)
-    : pimpl_(std::make_shared< DataPipeline::impl >(*rhs.pimpl_))
-{}
+DataPipeline::sptr DataPipeline::construct(
+        const std::string &config_file_path,
+        const std::string &script_file_path,
+        std::string token,
+        logger::LOG_LEVEL log_level )
+{
+   return DataPipeline::sptr( new DataPipeline(
+    config_file_path,
+    script_file_path,
+    token,
+    log_level ) );
+}
+
 
 DataPipeline::DataPipeline(
         const std::string &config_file_path,
         const std::string &script_file_path,
         std::string token,
-        spdlog::level::level_enum log_level )
-: pimpl_(std::make_shared< DataPipeline::impl >(ghc::filesystem::path(config_file_path), ghc::filesystem::path(script_file_path), token,
+        logger::LOG_LEVEL log_level )
+: pimpl_( DataPipeline::impl::construct(ghc::filesystem::path(config_file_path), ghc::filesystem::path(script_file_path), token,
             log_level)) 
 {
-    APILogger->debug("DataPipeline: Initialising session '{0}'", pimpl_->get_code_run_uuid());
-}
-
-
-DataPipeline& DataPipeline::operator=(const DataPipeline& rhs) {
-    if (this != &rhs) 
-        pimpl_.reset(new impl(*rhs.pimpl_));
-
-    return *this;
+    logger::sptr logger = logger::get_logger();
+    logger->debug("DataPipeline: Initialising session '{0}'", pimpl_->get_code_run_uuid());
 }
 
 ghc::filesystem::path FairDataPipeline::DataPipeline::link_read(std::string &data_product){
