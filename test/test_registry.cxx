@@ -31,13 +31,13 @@ protected:
         ghc::filesystem::path(TESTDIR) / "config.yaml";
     const ghc::filesystem::path script_path_ =
         ghc::filesystem::path(TESTDIR) / "test_script.sh";
-    logger::get_logger()->set_level(spdlog::level::debug);
+    logger::get_logger()->set_level( logging::LOG_LEVEL::DEBUG );
 
     return DataPipeline::construct(
         config_path_.string(),
         script_path_.string(),
         token,
-        logger::LOG_LEVEL::log_level_debug );
+        logging::LOG_LEVEL::DEBUG );
   }
 
   std::string token =
@@ -51,14 +51,17 @@ TEST_F(RegistryTest, TestDataPipelineInit) {
       ghc::filesystem::path(TESTDIR) / "config.yaml";
   const ghc::filesystem::path script_path_ =
       ghc::filesystem::path(TESTDIR) / "test_script.sh";
-  logger::get_logger()->set_level(spdlog::level::debug);
+  logger::get_logger()->set_level( logging::LOG_LEVEL::DEBUG );
   
-  auto dp = DataPipeline::construct(config_path_.string(), script_path_.string(), token, logger::LOG_LEVEL::log_level_debug);
+  auto dp = DataPipeline::construct( config_path_.string()
+          , script_path_.string()
+          , token
+          , logging::LOG_LEVEL::DEBUG );
 }
 
 TEST_F(RegistryTest, TestLogLevelSet) {
   init_pipeline();
-  ASSERT_EQ(spdlog::get_level(), spdlog::level::debug);
+  ASSERT_EQ( logger::get_logger()->get_level(), logging::LOG_LEVEL::DEBUG );
 }
 
 TEST_F(RegistryTest, TestURLEncode) {
@@ -75,10 +78,13 @@ TEST_F(RegistryTest, TestHashFile) {
 }
 
 TEST_F(RegistryTest, TestLogger) {
-    logging::OStreamSink sink( logging::INFO, std::cout );
-    logging::Logger logger( logging::INFO, sink );
-    logger.trace() << 1 << " " << "TRACE" << "\n";
-    logger.info() << 1 << " " << "INFO" << "\n";
-    logger.warn() << 1 << " " << "WARN" << "\n";
+    logging::OStreamSink::sptr sink = logging::OStreamSink::create( logging::INFO, std::cout );
+
+    logging::Logger::sptr logger = logging::Logger::create( logging::INFO, sink );
+    logger->trace() << " " << 1 << " " << "TRACE";
+    logger->info() << " " << 1 << " " << "INFO";
+    logger->warn() << " " << 1 << " " << "WARN";
+
+    logger::get_logger()->info() << " WARNINF";
     //ASSERT_EQ(0,1) ;
 }

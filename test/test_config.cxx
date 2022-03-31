@@ -41,7 +41,7 @@ protected:
           ghc::filesystem::path(TESTDIR) / "data" / config;
       const ghc::filesystem::path script_path_ =
           ghc::filesystem::path(TESTDIR) / "test_script.sh";
-      logger::get_logger()->set_level(spdlog::level::debug);
+      logger::get_logger()->set_level( logging::LOG_LEVEL::DEBUG );
 
       return Config::construct(config_path_, script_path_, token,
               use_local ? RESTAPI::LOCAL : RESTAPI::REMOTE ); 

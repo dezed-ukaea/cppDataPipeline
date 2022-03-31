@@ -39,7 +39,9 @@ protected:
 //! [TestGetById]
 TEST_F(ApiTest, TestGetById) {
   Json::Value author = api_->get_request(std::string("author/?name=Interface%20Test"))[0]["url"];
-  logger::get_logger()->info("Author: {0}", author.asString());
+  logger::get_logger()->info()
+      << "Author: "
+      <<  author.asString();
   int author_id_ = ApiObject::get_id_from_string( author.asString() );
   ASSERT_EQ(api_->get_by_id(std::string("author"), author_id_)["name"].asString(), std::string("Interface Test"));
 } //! [TestGetById]

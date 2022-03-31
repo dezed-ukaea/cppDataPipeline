@@ -27,7 +27,7 @@ namespace FairDataPipeline {
                     const std::string &config_file_path,
                     const std::string &script_file_path,
                     std::string token = "",
-                    logger::LOG_LEVEL log_level = logger::LOG_LEVEL::log_level_info );
+                    enum logging::LOG_LEVEL log_level = logging::LOG_LEVEL::INFO );
 
 
   /**
@@ -71,7 +71,7 @@ namespace FairDataPipeline {
                     const std::string &config_file_path,
                     const std::string &script_file_path,
                     std::string token = "",
-                    logger::LOG_LEVEL log_level = logger::LOG_LEVEL::log_level_info);
+                    enum logging::LOG_LEVEL log_level = logging::LOG_LEVEL::INFO);
 
             DataPipeline(const DataPipeline &rhs) = delete;
 

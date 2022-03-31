@@ -32,8 +32,8 @@ Config::~Config() {
 }
 
 YAML::Node FairDataPipeline::Config::parse_yaml(ghc::filesystem::path yaml_path) {
-  logger::get_logger()->debug("[Config]: Reading configuration file '{0}'",
-                   yaml_path.string().c_str());
+  logger::get_logger()->debug() 
+      << "[Config]: Reading configuration file '" << yaml_path.string().c_str() << "'";
   return YAML::LoadFile(yaml_path.string().c_str());
 }
 
@@ -96,64 +96,76 @@ void FairDataPipeline::Config::validate_config(ghc::filesystem::path yaml_path,
                                   RESTAPI api_location) {
   config_data_ = parse_yaml(yaml_path);
   if (!config_data_["run_metadata"]) {
-    logger::get_logger()->error(
-        "Failed to obtain run metadata, the key 'run_metadata' is not"
-        " present in the configuration");
+    logger::get_logger()->error()
+        <<  "Failed to obtain run metadata, the key 'run_metadata' is not"
+        " present in the configuration";
     throw config_parsing_error("No run metadata provided");
   }
 
   if (api_location == RESTAPI::LOCAL &&
       !meta_data_()["local_data_registry_url"]) {
-    logger::get_logger()->error("Could not determine URL for local repository, key "
-                     "'local_data_registry_url' "
-                     "is absent from configuration");
+    logger::get_logger()->error()
+        << "Could not determine URL for local repository, key "
+        "'local_data_registry_url' "
+        "is absent from configuration";
     throw config_parsing_error("Failed to read local repository url");
   }
 
   else if (api_location == RESTAPI::REMOTE &&
            !meta_data_()["remote_data_registry_url"]) {
-    logger::get_logger()->error("Could not determine URL for remote repository, key "
-                     "'remote_data_registry_url' "
-                     "is absent from configuration");
+    logger::get_logger()->error()
+        <<"Could not determine URL for remote repository, key "
+        "'remote_data_registry_url' "
+        "is absent from configuration";
     throw config_parsing_error("Failed to read remote repository url");
   }
 
   else if (!(api_location == RESTAPI::LOCAL ||
              api_location == RESTAPI::REMOTE)) {
-    logger::get_logger()->error("Unrecognised API location");
+    logger::get_logger()->error() << "Unrecognised API location";
     throw config_parsing_error("Failed to resolve registry location");
   }
 
   if (!meta_data_()["write_data_store"]) {
-    logger::get_logger()->error("Failed to Read: [\"write_data_store\"] from {0}", yaml_path.string());
+    logger::get_logger()->error() 
+        << "Failed to Read: [\"write_data_store\"] from " 
+        << yaml_path.string();
     throw config_parsing_error("Failed to Read: [\"write_data_store\"] from " + yaml_path.string());
   }
   if (!meta_data_()["default_input_namespace"]) {
-    logger::get_logger()->error("Failed to Read: [\"default_input_namespace\"] from {0}", yaml_path.string());
+    logger::get_logger()->error() 
+        << "Failed to Read: [\"default_input_namespace\"] from " << yaml_path.string();
     throw config_parsing_error("Failed to Read: [\"default_input_namespace\"] from " + yaml_path.string());
   }
   if (!meta_data_()["default_output_namespace"]) {
-    logger::get_logger()->error("Failed to Read: [\"default_output_namespace\"] from {0}", yaml_path.string());
+    logger::get_logger()->error() 
+        << "Failed to Read: [\"default_output_namespace\"] from " << yaml_path.string();
     throw config_parsing_error("Failed to Read: [\"default_output_namespace\"] from " + yaml_path.string());
   }
 
   if (!meta_data_()["latest_commit"]) {
-    logger::get_logger()->error("Failed to Read: [\"latest_commit\"] from {0}", yaml_path.string());
+    logger::get_logger()->error() 
+        << "Failed to Read: [\"latest_commit\"] from " << yaml_path.string();
     throw config_parsing_error("Failed to Read: [\"latest_commit\"] from " + yaml_path.string());
   }
 
   if (!meta_data_()["remote_repo"]) {
-    logger::get_logger()->error("Failed to Read: [\"remote_repo\"] from {0}", yaml_path.string());
+    logger::get_logger()->error() 
+        << "Failed to Read: [\"remote_repo\"] from " << yaml_path.string();
     throw config_parsing_error("Failed to Read: [\"remote_repo\"] from " + yaml_path.string());
   }
 
   if (!meta_data_()["description"]) {
-    logger::get_logger()->error("Failed to Read: [\"description\"] from {0}", yaml_path.string());
+    logger::get_logger()->error()
+        << "Failed to Read: [\"description\"] from " << yaml_path.string();
     throw config_parsing_error("Failed to Read: [\"description\"] from " + yaml_path.string());
   }
 
   if (!file_exists(script_file_path_.string())) {
-    logger::get_logger()->error("Submission script: {0} does not exist", script_file_path_.string());
+    logger::get_logger()->error() 
+        << "Submission script: "
+        <<  script_file_path_.string()
+        << " does not exist";
     throw std::runtime_error("Submission script: " + script_file_path_.string() + " does not exist");
   }
 
@@ -184,8 +196,9 @@ void FairDataPipeline::Config::initialise(RESTAPI api_location) {
         meta_data_()["local_data_registry_url"].as<std::string>());
   }
 
-  logger::get_logger()->info("Reading {0} from local filestore",
-                  config_file_path_.string());
+  logger::get_logger()->info() << "Reading " 
+      << config_file_path_.string()
+      << " from local filestore";
   // Create and API object as a shared pointer
   api_ = API::construct(api_url_);
 
@@ -197,7 +210,7 @@ void FairDataPipeline::Config::initialise(RESTAPI api_location) {
   this->user_ = ApiObject::from_json( j [0]);
 
   if (user_->is_empty()) {
-    logger::get_logger()->error("User: Admin Not Found");
+    logger::get_logger()->error() << "User: Admin Not Found";
     throw std::runtime_error("User: Admin Not Found");
   }
 
@@ -211,8 +224,8 @@ void FairDataPipeline::Config::initialise(RESTAPI api_location) {
   this->author_ = ApiObject::from_json( j_author );
 
   if (author_->is_empty()) {
-    logger::get_logger()->error(
-        "Author for User Admin not found please ensure you have run fair init");
+    logger::get_logger()->error()
+        <<  "Author for User Admin not found please ensure you have run fair init";
     throw std::runtime_error(
         "Author Not Found: Please ensure you have run fair init");
   }
@@ -258,7 +271,10 @@ void FairDataPipeline::Config::initialise(RESTAPI api_location) {
 
   config_value_["file_type"] = config_file_type_url_;
 
-  logger::get_logger()->info("Writing config file {0} to registry", config_file_path_.string());
+  logger::get_logger()->info() 
+      << "Writing config file " 
+      <<  config_file_path_.string()
+      << " to registry", config_file_path_.string();
 
   Json::Value j_config_obj = api_->post("object", config_value_, token_);
  
@@ -296,7 +312,10 @@ void FairDataPipeline::Config::initialise(RESTAPI api_location) {
   script_value_["filetype"] = script_file_type_url_.asString();
   script_value_["storage_location"] = script_storage_location_->get_uri();
 
-  logger::get_logger()->info("Writing script file {0} to registry", script_file_path_.string());
+  logger::get_logger()->info() 
+      << "Writing script file " 
+      << script_file_path_.string() 
+      << " to registry";
 
   Json::Value j_script_obj = api_->post("object", script_value_, token_);
   this->script_obj_ = ApiObject::from_json( j_script_obj );
@@ -336,12 +355,15 @@ void FairDataPipeline::Config::initialise(RESTAPI api_location) {
   code_run_value_["input_urls"] = Json::arrayValue;
   code_run_value_["output_urls"] = Json::arrayValue;
 
-  logger::get_logger()->info("Writing new code run to registry");
+  logger::get_logger()->info() << "Writing new code run to registry";
 
   Json::Value j_code_run = api_->post("code_run", code_run_value_, token_);
   this->code_run_ = ApiObject::from_json( j_code_run );
 
-  logger::get_logger()->info("Code run {0} successfully generated", code_run_->get_value_as_string("uuid"));
+  logger::get_logger()->info() 
+      << "Code run " 
+      <<  code_run_->get_value_as_string("uuid") 
+      << " successfully generated";
 }
 
 std::string Config::get_config_directory() const{
@@ -355,11 +377,13 @@ std::string Config::get_code_run_uuid() const{
 
 ghc::filesystem::path Config::link_write( const std::string& data_product){
   if (!config_has_writes()){
-    logger::get_logger()->error("Config Error: Write has not been specified in the given config file");
+    logger::get_logger()->error()
+        << "Config Error: Write has not been specified in the given config file";
     throw config_parsing_error("Config Error: Write has not been specified in the given config file");
   }
 
-  //logger::get_logger()->info("Node Type: {0}", config_writes_().Type());
+  //logger::get_logger()->info() << "Node Type: " 
+  //<< config_writes_().Type());
   
   YAML::Node currentWrite;
 
@@ -375,30 +399,44 @@ ghc::filesystem::path Config::link_write( const std::string& data_product){
     }
   }
   else{
-    logger::get_logger()->error("Config Error: Write has not been specified in the given config file");
+    logger::get_logger()->error()
+        << "Config Error: Write has not been specified in the given config file";
     throw config_parsing_error("Config Error: Write has not been specified in the given config file");
   }
 
   if(!currentWrite)
   {
-    logger::get_logger()->error("Config Error: Cannot Find {0} in writes", data_product);
+      logger::get_logger()->error()
+          << "Config Error: Cannot Find "
+          << data_product
+          << " in writes";
+
     throw config_parsing_error("Config Error: cannot find " + data_product + "in writes");
   }
 
   if(!currentWrite["description"])
   {
-    logger::get_logger()->error("Config Error: Cannot Find description of {0} in writes", data_product);
+    logger::get_logger()->error() 
+        << "Config Error: Cannot Find description of "
+        << data_product
+        << " in writes";
     throw config_parsing_error("Config Error: cannot find description of " + data_product + "in writes");
   }
 
   if(!currentWrite["file_type"])
   {
-    logger::get_logger()->error("Config Error: Cannot Find file_type of {0} in writes", data_product);
+    logger::get_logger()->error()
+        << "Config Error: Cannot Find file_type of " 
+        << data_product
+        << " in writes";
     throw config_parsing_error("Config Error: cannot find file_type of " + data_product + "in writes");
   }
 
   if(!currentWrite["use"]["version"]){
-    logger::get_logger()->info("Use: Version not found in {0}, using version 0.0.1 by default", data_product);
+    logger::get_logger()->info() 
+        << "Use: Version not found in "
+        << data_product 
+        << ", using version 0.0.1 by default";
     currentWrite["use"]["version"] = "0.0.1";
   }
 
@@ -413,7 +451,7 @@ ghc::filesystem::path Config::link_write( const std::string& data_product){
   std::string filename_("dat-" + generate_random_hash() + "." + currentWrite["file_type"].as<std::string>());
   ghc::filesystem::path path_ = ghc::filesystem::path(meta_data_()["write_data_store"].as<std::string>()) / currentWrite["use"]["namespace"].as<std::string>() / currentWrite["use"]["data_product"].as<std::string>() / filename_;
 
-  logger::get_logger()->info("Link Path: {0}", path_.string());
+  logger::get_logger()->info() << "Link Path: " << path_.string();
 
   // Create Directory
   ghc::filesystem::create_directories(path_.parent_path().string());
@@ -450,18 +488,25 @@ ghc::filesystem::path FairDataPipeline::Config::link_read( const std::string &da
     }
   }
   else{
-    logger::get_logger()->error("Config Error: Write has not been specified in the given config file");
+    logger::get_logger()->error() 
+        << "Config Error: Write has not been specified in the given config file";
     throw config_parsing_error("Config Error: Write has not been specified in the given config file");
   }
 
   if(!currentRead)
   {
-    logger::get_logger()->error("Config Error: Cannot Find {0} in reads", data_product);
+    logger::get_logger()->error() 
+        << "Config Error: Cannot Find " 
+        << data_product
+        << " in reads";
     throw config_parsing_error("Config Error: cannot find " + data_product + "in reads");
   }
 
   if(!currentRead["use"]["version"]){
-    logger::get_logger()->info("Use: Version not found in {0}, using version 0.0.1 by default", data_product);
+    logger::get_logger()->info() 
+        << "Use: Version not found in "
+        << data_product
+        << ", using version 0.0.1 by default";
     currentRead["use"]["version"] = "0.0.1";
   }
 
@@ -480,7 +525,10 @@ ghc::filesystem::path FairDataPipeline::Config::link_read( const std::string &da
   ApiObject::sptr namespaceObj = ApiObject::from_json( j_namespace );
 
   if (namespaceObj->is_empty()){
-    logger::get_logger()->error("Namespace Error: could not find namespace {0} in registry", currentRead["use"]["namespace"].as<std::string>());
+    logger::get_logger()->error()
+        << "Namespace Error: could not find namespace " 
+        <<  currentRead["use"]["namespace"].as<std::string>() 
+        << " in registry";
     throw std::runtime_error("Namespace Error: could not find namespace " + currentRead["use"]["namespace"].as<std::string>() + " in Registry");
   }
 
@@ -493,7 +541,10 @@ ghc::filesystem::path FairDataPipeline::Config::link_read( const std::string &da
   ApiObject::sptr dataProductObj = ApiObject::from_json( j_data_prod_obj );
   //ApiObject dataProductObj = ApiObject(api_->get_by_json_query("data_product", dataProductData)[0]);
   if (dataProductObj->is_empty()){
-    logger::get_logger()->error("data_product Error: could not find data_product {0} in registry", currentRead["use"]["data_product"].as<std::string>());
+    logger::get_logger()->error() 
+        << "data_product Error: could not find data_product "
+        <<  currentRead["use"]["data_product"].as<std::string>() 
+        << " in registry";
     throw std::runtime_error("Namespace Error: could not find data_product " + currentRead["use"]["data_product"].as<std::string>() + " in Registry");
   }
 
@@ -501,7 +552,10 @@ ghc::filesystem::path FairDataPipeline::Config::link_read( const std::string &da
   ApiObject::sptr obj = ApiObject::from_json( _j_ );
 
   if (obj->is_empty()){
-    logger::get_logger()->error("data_product Error: could not find data_product object {0} in registry", dataProductObj->get_value_as_string("object"));
+    logger::get_logger()->error() 
+        << "data_product Error: could not find data_product object "
+        << dataProductObj->get_value_as_string("object") 
+        << " in registry";
     throw std::runtime_error("Namespace Error: could not find data_product object " + dataProductObj->get_value_as_string("object") + " in Registry");
   }
 
@@ -511,7 +565,10 @@ ghc::filesystem::path FairDataPipeline::Config::link_read( const std::string &da
   ApiObject::sptr componentObj = ApiObject::from_json( j_obj_component );
 
   if (componentObj->is_empty()){
-    logger::get_logger()->error("data_product object Error: could not find data_product component_object for {0} in registry", obj->get_value_as_string("object"));
+    logger::get_logger()->error() 
+        << "data_product object Error: could not find data_product component_object for " 
+        << obj->get_value_as_string("object") 
+        << " in registry";
     throw std::runtime_error("data_product object Error: could not find data_product component_object for " + obj->get_value_as_string("object") + " in Registry");
   }
 
@@ -521,7 +578,9 @@ ghc::filesystem::path FairDataPipeline::Config::link_read( const std::string &da
   ApiObject::sptr storageLocationObj = ApiObject::from_json( j_tmp2 );
 
   if (storageLocationObj->is_empty()){
-    logger::get_logger()->error("data_product object Error: could not find storage_location for {0} in registry", obj->get_value_as_string("object"));
+    logger::get_logger()->error() << "data_product object Error: could not find storage_location for " 
+    << obj->get_value_as_string("object") << " in registry";
+
     throw std::runtime_error("data_product object Error: could not find storage_location for " + obj->get_value_as_string("object") + " in Registry");
   }
 
@@ -530,7 +589,10 @@ ghc::filesystem::path FairDataPipeline::Config::link_read( const std::string &da
 
   if (storageRootObj->is_empty()){
       std::string obj_str = obj->get_value_as_string("object");
-    logger::get_logger()->error("data_product object Error: could not find storage_root for {0} in registry", obj_str);
+    
+      logger::get_logger()->error() 
+        << "data_product object Error: could not find storage_root for " << obj_str << " in registry";
+
     throw std::runtime_error("data_product object Error: could not find storage_root for " + obj_str + " in Registry");
   } 
 
@@ -557,7 +619,9 @@ void FairDataPipeline::Config::finalise(){
       IOObject& currentWrite = it->second;
 
       if(! file_exists(currentWrite.get_path().string())){
-        logger::get_logger()->error("File Error: Cannot Find file for write", currentWrite.get_use_data_product());
+        logger::get_logger()->error() 
+            << "File Error: Cannot Find file for write" << currentWrite.get_use_data_product();
+
         throw std::runtime_error("File Error Cannot Find file for write: " + currentWrite.get_use_data_product());
       }
 
@@ -683,7 +747,13 @@ void FairDataPipeline::Config::finalise(){
       IOObject& currentOutput = it->second;
       Json::Value output = currentOutput.get_component_object()->get_uri();
       patch_data["outputs"].append(output);
-      logger::get_logger()->info("Writing {} to local registry", currentOutput.get_use_data_product());
+      //logger::get_logger()->info() 
+      //<< "Writing 
+      //<< currentOutput.get_use_data_product()
+      //<< " to local registry";
+      logger::get_logger()->info() 
+          << "Writing " <<  currentOutput.get_use_data_product() << " to local registry";
+
     }
   }
 
@@ -693,12 +763,13 @@ void FairDataPipeline::Config::finalise(){
       IOObject& currentInput = it->second;
       Json::Value input = currentInput.get_component_object()->get_uri();
       patch_data["inputs"].append(input);
-      logger::get_logger()->info("Writing {} to local registry", currentInput.get_use_data_product());
+      logger::get_logger()->info() 
+          << "Writing " <<  currentInput.get_use_data_product() << " to local registry";
     }
   }
 
   std::string code_run_endpoint = "code_run/" + std::to_string(code_run_->get_id());
-  logger::get_logger()->info("Code Run: {0}", code_run_endpoint);
+  logger::get_logger()->info() << "Code Run: " << code_run_endpoint;
 
   Json::Value j_code_run = api_->patch(code_run_endpoint, patch_data, token_);
   this-> code_run_ = ApiObject::from_json( j_code_run );
