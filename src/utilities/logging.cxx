@@ -1,17 +1,38 @@
-#include "fdp/utilities/logging.hxx"
 #include <iostream>
+#include <map>
 #include <sys/time.h>
 #include <time.h>
-//#include <chrono>
-//#include <chrono_io>
 
-#include "spdlog/sinks/stdout_color_sinks.h"
+#include "fdp/utilities/logging.hxx"
+
 namespace FairDataPipeline {
     namespace logging {
-        const std::string& _LOG_LEVEL_2_str( enum  LOG_LEVEL lvl )
+
+        const std::string& to_string( enum  LOG_LEVEL lvl )
         {
             static const std::string strs[] = {"TRACE","DEBUG","INFO","WARN","ERROR","CRITICAL","OFF"};
             return strs[ lvl ];
+        }
+
+        enum LOG_LEVEL to_LOG_LEVEL( const std::string& s )
+        {
+            enum LOG_LEVEL lvl = LOG_LEVEL::OFF;
+            static std::map< std::string, enum LOG_LEVEL > m = {
+                {"TRACE", LOG_LEVEL::TRACE }
+               , {"DEBUG", LOG_LEVEL::DEBUG }
+               , {"INFO", LOG_LEVEL::INFO }
+               , {"WARN", LOG_LEVEL::WARN }
+               , {"ERROR", LOG_LEVEL::ERROR }
+               , {"CRITICAL", LOG_LEVEL::CRITICAL }
+               , {"OFF", LOG_LEVEL::OFF }
+            };
+
+            auto it = m.find( s );
+
+            if( it != m.end() )
+                lvl = it->second;
+
+            return lvl;
         }
 
         std::string curtime()
@@ -27,6 +48,11 @@ namespace FairDataPipeline {
             return std::move( currentTime );
         }
 
+        Logger::sptr Logger::create( enum LOG_LEVEL lvl, Sink::sptr sink, std::string name )
+        { 
+            return sptr( new Logger(lvl, sink, name));
+        }
+
         Logger::MsgBuilder::MsgBuilder( enum LOG_LEVEL msg_lvl, Logger* logger ) 
             : _msg_lvl( msg_lvl ), _logger(logger)
         {
@@ -40,11 +66,14 @@ namespace FairDataPipeline {
 
         Logger::MsgBuilder::~MsgBuilder()
         {
-            *this << "\n";
+            if( _oss.tellp() > 0 )
+            {
+                *this << "\n";
 
-            std::string msg = _oss.str();
+                std::string msg = _oss.str();
 
-            this->_logger->sink()->execute( _logger, _msg_lvl, msg );
+                this->_logger->sink()->execute( _logger, _msg_lvl, msg );
+            }
         }
 
         Logger::MsgBuilder Logger::info()
@@ -89,37 +118,27 @@ namespace FairDataPipeline {
 
         bool Sink::should_log( enum LOG_LEVEL msg_lvl ){ return msg_lvl >= this->log_level();}
 
-        int Sink::execute( Logger* logger, enum LOG_LEVEL msg_lvl, const std::string& s )
+        int Sink::execute( Logger* logger, enum LOG_LEVEL msg_lvl, const std::string& msg )
         {
             if( this->should_log( msg_lvl ) )
             {
                 if( NULL != _fmtr )
                 {
-                    std::ostringstream oss;
-                    oss << _fmtr->header( msg_lvl, logger );
+                    //std::ostringstream oss;
+                    //oss << _fmtr->header( msg_lvl, logger );
+                    //oss << msg;
+                    //
+                    //this->log( msg_lvl, oss.str() );
+                    std::string s = _fmtr->header(msg_lvl, logger);
+                    s += msg;
 
-                    oss << s;
-
-                    this->log( msg_lvl, oss.str() );
+                    this->log( msg_lvl, s );
                 }
                 else
-                    this->log( msg_lvl, s );
+                    this->log( msg_lvl, msg );
             }
             return 0;
         }
-
-        std::string Sink::apply_formatter( Logger* logger, enum LOG_LEVEL msg_lvl, const std::string& msg )
-        {
-            std::ostringstream oss;
-
-            if( NULL != _fmtr )
-            {
-                oss << _fmtr->header( msg_lvl, logger );
-            }
-            oss << msg;
-            return std::move( oss.str() );
-        }
-
 
         std::string SinkFormatter::header( enum LOG_LEVEL msg_lvl, Logger* logger )
         {
@@ -131,8 +150,8 @@ namespace FairDataPipeline {
             if( !(logger->name().empty()) )
                 oss << "[" << logger->name() << "] ";
 
+            oss << "[" << to_string( msg_lvl ) << "] ";
 
-            oss << "[" << _LOG_LEVEL_2_str( msg_lvl ) << "] ";
             return std::move( oss.str() );
         }
 
@@ -149,27 +168,7 @@ namespace FairDataPipeline {
 
             return 0;
         }
-
-
-
     }
-
-    class SPDSink : public logging::Sink
-    {
-        public:
-            SPDSink( logging::LOG_LEVEL lvl ) 
-                : logging::Sink( lvl )
-            {
-                //_spd_log = logger::get_spd_logger();
-            }
-
-
-        private:
-            //typedef logger::spd_sptr spd_ptr;
-            //spd_ptr _spd_log;
-
-
-    };
 
 
     logger::logger_sptr logger::_instance = NULL;
@@ -178,13 +177,16 @@ namespace FairDataPipeline {
     {
         if( NULL == logger::_instance )
         {
-            auto sink = logging::OStreamSink::create( logging::LOG_LEVEL::INFO, std::cout );
-            logger::_instance = logging::Logger::create( logging::LOG_LEVEL::INFO, sink, "FDPAPI" );
+            enum logging::LOG_LEVEL log_lvl = logging::OFF;
+
+            if( const char* env = std::getenv( "FDP_LOG_LEVEL" ) )
+                log_lvl = logging::to_LOG_LEVEL( env );
+
+            auto sink = logging::OStreamSink::create( log_lvl, std::cout );
+            logger::_instance = logging::Logger::create( log_lvl, sink, "FDPAPI" );
         }
 
         return logger::_instance;
-
     }
-
 
 } // namespace FairDataPipeline

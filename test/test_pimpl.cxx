@@ -40,8 +40,7 @@ TEST_F(PimplTest, TestDataPipelineInit) {
   const ghc::filesystem::path script_path_ =
       ghc::filesystem::path(TESTDIR) / "test_script.sh";
   logger::get_logger()->set_level( logging::LOG_LEVEL::DEBUG );
-  DataPipeline::sptr dp = DataPipeline::construct(config_path_.string(), script_path_.string(), token
-          , logging::LOG_LEVEL::DEBUG );
+  DataPipeline::sptr dp = DataPipeline::construct(config_path_.string(), script_path_.string(), token );
 
   std::string data_product = "test/csv";
   ghc::filesystem::path currentLink = ghc::filesystem::path(dp->link_write(data_product));
@@ -57,8 +56,7 @@ TEST_F(PimplTest, TestDataPipelineInit) {
   ghc::filesystem::path config_path_read_ =
       ghc::filesystem::path(TESTDIR) / "data" / "read_csv.yaml";
 
-  dp = DataPipeline::construct(config_path_read_.string(), script_path_.string(), token
-          , logging::LOG_LEVEL::DEBUG );
+  dp = DataPipeline::construct(config_path_read_.string(), script_path_.string(), token );
 
   currentLink = dp->link_read(data_product);
   EXPECT_GT(currentLink.string().size(), 1);

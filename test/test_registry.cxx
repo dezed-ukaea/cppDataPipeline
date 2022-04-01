@@ -31,13 +31,13 @@ protected:
         ghc::filesystem::path(TESTDIR) / "config.yaml";
     const ghc::filesystem::path script_path_ =
         ghc::filesystem::path(TESTDIR) / "test_script.sh";
+
     logger::get_logger()->set_level( logging::LOG_LEVEL::DEBUG );
 
     return DataPipeline::construct(
         config_path_.string(),
         script_path_.string(),
-        token,
-        logging::LOG_LEVEL::DEBUG );
+        token );
   }
 
   std::string token =
@@ -51,12 +51,12 @@ TEST_F(RegistryTest, TestDataPipelineInit) {
       ghc::filesystem::path(TESTDIR) / "config.yaml";
   const ghc::filesystem::path script_path_ =
       ghc::filesystem::path(TESTDIR) / "test_script.sh";
+
   logger::get_logger()->set_level( logging::LOG_LEVEL::DEBUG );
   
   auto dp = DataPipeline::construct( config_path_.string()
           , script_path_.string()
-          , token
-          , logging::LOG_LEVEL::DEBUG );
+          , token );
 }
 
 TEST_F(RegistryTest, TestLogLevelSet) {
@@ -81,10 +81,10 @@ TEST_F(RegistryTest, TestLogger) {
     logging::OStreamSink::sptr sink = logging::OStreamSink::create( logging::INFO, std::cout );
 
     logging::Logger::sptr logger = logging::Logger::create( logging::INFO, sink );
-    logger->trace() << " " << 1 << " " << "TRACE";
-    logger->info() << " " << 1 << " " << "INFO";
-    logger->warn() << " " << 1 << " " << "WARN";
+    logger->trace() << " " << 10 << " " << "TRACE";
+    logger->info() << " " << 50 << " " << "INFO";
+    
+    logger->warn() << " " << 100 << " " << "WARN";
 
     logger::get_logger()->info() << " WARNINF";
-    //ASSERT_EQ(0,1) ;
 }

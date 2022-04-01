@@ -21,13 +21,11 @@ namespace FairDataPipeline {
    * @param config_file_path 
    * @param script_file_path 
    * @param token 
-   * @param log_level 
    */
            static  sptr construct(
                     const std::string &config_file_path,
                     const std::string &script_file_path,
-                    std::string token = "",
-                    enum logging::LOG_LEVEL log_level = logging::LOG_LEVEL::INFO );
+                    std::string token = "" );
 
 
   /**
@@ -70,8 +68,8 @@ namespace FairDataPipeline {
             explicit DataPipeline(
                     const std::string &config_file_path,
                     const std::string &script_file_path,
-                    std::string token = "",
-                    enum logging::LOG_LEVEL log_level = logging::LOG_LEVEL::INFO);
+                    std::string token = ""
+                    );
 
             DataPipeline(const DataPipeline &rhs) = delete;
 

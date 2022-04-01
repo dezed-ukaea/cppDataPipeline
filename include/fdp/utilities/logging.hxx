@@ -10,22 +10,11 @@
  ****************************************************************************/
 #ifndef __FDP_LOGGING_HXX__
 #define __FDP_LOGGING_HXX__
-
+#include <memory>
 #include <iostream>
 #include <sstream>
 #include <string>
-
-#include "spdlog/spdlog.h"
-#if 0
-#define TRACE 0
-#define DEBUG 1
-#define INFO 2
-#define WARN 3
-#define ERROR 4
-#define CRITICAL 5
-#define OFF 6
-#endif
-
+#include <vector>
 
 namespace FairDataPipeline {
     namespace logging {
@@ -43,7 +32,7 @@ namespace FairDataPipeline {
             OFF = 6
         };
 
-        const std::string& _LOG_LEVEL_2_str( enum  LOG_LEVEL lvl );
+        const std::string& to_string( enum  LOG_LEVEL lvl );
 
         struct ISink
         {
@@ -57,13 +46,19 @@ namespace FairDataPipeline {
         class SinkFormatter;
         typedef std::shared_ptr< SinkFormatter > SinkFormatterPtr;
 
+        struct ISinkFormatter
+        {
+            typedef std::shared_ptr< ISinkFormatter > sptr;
+            virtual std::string header(enum LOG_LEVEL msg_lvl, Logger* logger )= 0;
+            virtual ~ISinkFormatter(){;}
+        };
+
 
         class Sink : public ISink
         {
             public:
                 typedef std::shared_ptr< Sink > sptr;
 
-                std::string apply_formatter( Logger* loggher, enum LOG_LEVEL msg_level, const std::string& msg );
 
                 int execute( Logger* logger, enum LOG_LEVEL msg_lvl, const std::string& s );
 
@@ -72,16 +67,17 @@ namespace FairDataPipeline {
 
                 bool should_log( enum LOG_LEVEL msg_lvl );
 
-                void set_formatter( SinkFormatterPtr fmtr ){_fmtr = fmtr;}
+                void set_formatter( ISinkFormatter::sptr fmtr ){_fmtr = fmtr;}
 
             protected:
                 Sink( enum LOG_LEVEL log_lvl );
-                //std::string do_header( enum LOG_LEVEL msg_lvl, Logger* logger );
 
             private:
 
+                //std::string apply_formatter( Logger* logger, enum LOG_LEVEL msg_lvl, const std::string& msg );
+
                 enum LOG_LEVEL _log_lvl;
-                SinkFormatterPtr _fmtr;
+                ISinkFormatter::sptr _fmtr;
         };
 
 
@@ -95,10 +91,8 @@ namespace FairDataPipeline {
                     return sptr( new OStreamSink( lvl, os ) ); 
                 }
 
-
                 int log( enum LOG_LEVEL msg_lvl, const std::string& s)
                 {
-                    //if( this->should_log( msg_lvl ) )
                     _os << s;
 
                     return 0;
@@ -129,11 +123,6 @@ namespace FairDataPipeline {
                 CompositeSink(enum LOG_LEVEL log_lvl) : Sink(log_lvl){ ;}
         };
 
-        struct ISinkFormatter
-        {
-            virtual std::string header(enum LOG_LEVEL msg_lvl, Logger* logger )= 0;
-            virtual ~ISinkFormatter(){;}
-        };
 
         class SinkFormatter : public ISinkFormatter
         {
@@ -184,11 +173,7 @@ namespace FairDataPipeline {
                         std::ostringstream _oss;
                 };
 
-                static sptr create( enum LOG_LEVEL lvl, Sink::sptr sink, std::string name="" )
-                { 
-                    return sptr( new Logger(lvl, sink, name));
-                }
-
+                static sptr create( enum LOG_LEVEL lvl, Sink::sptr sink, std::string name="" );
 
                 MsgBuilder info();
                 MsgBuilder debug();
@@ -209,7 +194,6 @@ namespace FairDataPipeline {
                 {
                     _log_lvl = lvl;
                 }
-
 
             private:
 
