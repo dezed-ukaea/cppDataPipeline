@@ -1,9 +1,8 @@
 #ifndef __FDP__
 #define __FDP__
 
-#include "utilities/logging.hxx"
-
-#include <ghc/filesystem.hpp>
+#include <memory>
+#include <string>
 
 namespace FairDataPipeline {
 /**
@@ -45,7 +44,7 @@ namespace FairDataPipeline {
    * @param data_product 
    * @return ghc::filesystem::path 
    */
-            ghc::filesystem::path link_read(std::string &data_product);
+	    std::string link_read(std::string &data_product);
 
   /**
    * @brief Return a path to be used for a given data product
@@ -54,7 +53,7 @@ namespace FairDataPipeline {
    * @param data_product 
    * @return ghc::filesystem::path 
    */
-            ghc::filesystem::path link_write(std::string &data_product);
+	    std::string link_write(std::string &data_product);
 
   /**
    * @brief Finalise the pipeline
