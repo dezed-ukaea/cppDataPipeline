@@ -1,8 +1,8 @@
 #ifndef __FDP__
 #define __FDP__
 
-//#include "spdlog/spdlog.h"
 #include "utilities/logging.hxx"
+
 #include <ghc/filesystem.hpp>
 
 namespace FairDataPipeline {
