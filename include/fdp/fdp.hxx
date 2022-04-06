@@ -2,6 +2,7 @@
 #define __FDP__
 
 #include "utilities/logging.hxx"
+
 #include <ghc/filesystem.hpp>
 
 namespace FairDataPipeline {
