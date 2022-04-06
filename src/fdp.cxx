@@ -4,7 +4,6 @@
 #include <iostream>
 #include <string>
 
-#include "spdlog/spdlog.h"
 #include "json/json.h"
 
 #include "fdp/objects/config.hxx"

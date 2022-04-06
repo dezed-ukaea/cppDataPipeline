@@ -35,7 +35,7 @@ namespace FairDataPipeline {
             return lvl;
         }
 
-        std::string curtime()
+        static std::string curtime()
         {
             timeval curTime;
             gettimeofday( &curTime, NULL );
@@ -46,6 +46,12 @@ namespace FairDataPipeline {
 
             sprintf( &currentTime[0], "%s.%03d", buffer, milli );
             return std::move( currentTime );
+        }
+
+        Logger::Logger( enum LOG_LEVEL lvl, Sink::sptr sink, std::string name ) 
+            : _sink(sink), _name(name)
+        {
+            _log_lvl = lvl;
         }
 
         Logger::sptr Logger::create( enum LOG_LEVEL lvl, Sink::sptr sink, std::string name )
@@ -139,6 +145,23 @@ namespace FairDataPipeline {
             }
             return 0;
         }
+
+        OStreamSink::sptr OStreamSink::create( enum LOG_LEVEL lvl, std::ostream& os )
+        {
+            return sptr( new OStreamSink( lvl, os ) ); 
+        }
+
+        int OStreamSink::log( enum LOG_LEVEL msg_lvl, const std::string& s)
+        {
+            _os << s;
+
+            return 0;
+        }
+
+        OStreamSink::OStreamSink(enum LOG_LEVEL log_lvl, std::ostream& os) : Sink(log_lvl), _os(os)
+        {
+        }
+                
 
         std::string SinkFormatter::header( enum LOG_LEVEL msg_lvl, Logger* logger )
         {

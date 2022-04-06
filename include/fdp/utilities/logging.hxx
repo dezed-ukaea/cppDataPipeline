@@ -19,8 +19,6 @@
 namespace FairDataPipeline {
     namespace logging {
 
-        std::string curtime();
-
         enum LOG_LEVEL
         {
             TRACE = 0,
@@ -60,21 +58,20 @@ namespace FairDataPipeline {
                 typedef std::shared_ptr< Sink > sptr;
 
 
-                int execute( Logger* logger, enum LOG_LEVEL msg_lvl, const std::string& s );
-
                 enum LOG_LEVEL log_level();
                 void log_level( enum LOG_LEVEL log_lvl );
 
                 bool should_log( enum LOG_LEVEL msg_lvl );
 
                 void set_formatter( ISinkFormatter::sptr fmtr ){_fmtr = fmtr;}
+                
+                int execute( Logger* logger, enum LOG_LEVEL msg_lvl, const std::string& s );
 
             protected:
                 Sink( enum LOG_LEVEL log_lvl );
 
             private:
 
-                //std::string apply_formatter( Logger* logger, enum LOG_LEVEL msg_lvl, const std::string& msg );
 
                 enum LOG_LEVEL _log_lvl;
                 ISinkFormatter::sptr _fmtr;
@@ -86,21 +83,13 @@ namespace FairDataPipeline {
             public:
                 typedef std::shared_ptr< OStreamSink > sptr;
 
-                static sptr create( enum LOG_LEVEL lvl, std::ostream& os )
-                {
-                    return sptr( new OStreamSink( lvl, os ) ); 
-                }
+                static sptr create( enum LOG_LEVEL lvl, std::ostream& os );
 
-                int log( enum LOG_LEVEL msg_lvl, const std::string& s)
-                {
-                    _os << s;
-
-                    return 0;
-                }
+                int log( enum LOG_LEVEL msg_lvl, const std::string& s);
 
             private:
 
-                OStreamSink(enum LOG_LEVEL log_lvl, std::ostream& os) : Sink(log_lvl), _os(os){ ;}
+                OStreamSink(enum LOG_LEVEL log_lvl, std::ostream& os);
 
                 std::ostream& _os;
         };
@@ -189,11 +178,7 @@ namespace FairDataPipeline {
                 enum LOG_LEVEL get_level() const { return _log_lvl;}
 
             protected:
-                Logger( enum LOG_LEVEL lvl, Sink::sptr sink, std::string name ) 
-                    : _sink(sink), _name(name)
-                {
-                    _log_lvl = lvl;
-                }
+                Logger( enum LOG_LEVEL lvl, Sink::sptr sink, std::string name ) ;
 
             private:
 
