@@ -88,14 +88,17 @@ Installation</h1>
 </div><!-- fragment --><h1><a class="anchor" id="autotoc_md3"></a>
 Outline</h1>
 <p >The main class the user will interact with is <code>DataPipeline</code> which has only the required methods such as <code>link_read</code> etc. This class has a member which is a pointer to an underlying <code><a class="el" href="class_data_pipeline_impl__.html" title="private pointer-to-implementation class containing all backend methods">DataPipelineImpl_</a></code> class which performs the various procedures required to handle the data. A logger has been used to give as much feedback to the user as possible, the verbosity being handled by a log level argument.</p>
-<h1><a class="anchor" id="autotoc_md4"></a>
+<h2><a class="anchor" id="autotoc_md4"></a>
+Logging</h2>
+<p >The environment variable <code>FDP_LOG_LEVEL=[TRACE:DEBUG:INFO:WARN:ERROR:CRITICAL:OFF]</code> can be set to specify the logging output level.</p>
+<h1><a class="anchor" id="autotoc_md5"></a>
 Unit Tests</h1>
 <p >The unit tests use the local registry, this needs to be running prior to running the tests see: <a href="https://github.com/FAIRDataPipeline/FAIR-CLI#registry">the CLI documentation</a></p>
 <p >Tests can be lauched using the following command: </p>
-<h2><a class="anchor" id="autotoc_md5"></a>
+<h2><a class="anchor" id="autotoc_md6"></a>
 Unix</h2>
 <div class="fragment"><div class="line">$ ./build/bin/fdpapi-tests</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md6"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md7"></a>
 Windows</h2>
 <div class="fragment"><div class="line">$ build\bin\Release\fdpapi-tests.exe</div>
 </div><!-- fragment --> </div></div><!-- PageDoc -->
