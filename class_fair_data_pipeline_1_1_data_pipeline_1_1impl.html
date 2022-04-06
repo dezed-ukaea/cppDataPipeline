@@ -70,6 +70,7 @@ $(function() {
   <div class="summary">
 <a href="#pub-types">Public Types</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#pub-static-methods">Static Public Member Functions</a> &#124;
 <a href="class_fair_data_pipeline_1_1_data_pipeline_1_1impl-members.html">List of all members</a>  </div>
   <div class="headertitle"><div class="title">FairDataPipeline::DataPipeline::impl Class Reference</div></div>
 </div><!--header-->
@@ -83,12 +84,6 @@ typedef std::shared_ptr&lt; <a class="el" href="class_fair_data_pipeline_1_1_dat
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a1ed93cc00765e805e3634a0fec301d2d"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_fair_data_pipeline_1_1_data_pipeline_1_1impl.html#a1ed93cc00765e805e3634a0fec301d2d">impl</a> (const ghc::filesystem::path &amp;config_file_path, const ghc::filesystem::path &amp;file_system_path, const std::string &amp;token, spdlog::level::level_enum log_level=spdlog::level::info, RESTAPI api_location=RESTAPI::LOCAL)</td></tr>
-<tr class="memdesc:a1ed93cc00765e805e3634a0fec301d2d"><td class="mdescLeft">&#160;</td><td class="mdescRight">construct a <a class="el" href="class_data_pipeline_impl__.html" title="private pointer-to-implementation class containing all backend methods">DataPipelineImpl_</a> instance from configurations and setup  <a href="class_fair_data_pipeline_1_1_data_pipeline_1_1impl.html#a1ed93cc00765e805e3634a0fec301d2d">More...</a><br /></td></tr>
-<tr class="separator:a1ed93cc00765e805e3634a0fec301d2d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acefbd4477b24edc4f08fe5461c895ce0"><td class="memItemLeft" align="right" valign="top"><a id="acefbd4477b24edc4f08fe5461c895ce0" name="acefbd4477b24edc4f08fe5461c895ce0"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>impl</b> (const <a class="el" href="class_fair_data_pipeline_1_1_data_pipeline_1_1impl.html">impl</a> &amp;dp)=default</td></tr>
-<tr class="separator:acefbd4477b24edc4f08fe5461c895ce0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a95b04cf2f78c7bdfba26f2ebd99dc0e6"><td class="memItemLeft" align="right" valign="top"><a id="a95b04cf2f78c7bdfba26f2ebd99dc0e6" name="a95b04cf2f78c7bdfba26f2ebd99dc0e6"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><b>~impl</b> ()=default</td></tr>
 <tr class="memdesc:a95b04cf2f78c7bdfba26f2ebd99dc0e6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default Destructor. <br /></td></tr>
@@ -106,16 +101,25 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>finalise</b> ()</td><
 <tr class="memitem:a96e28706b3d0a1809787e0afff0f0a88"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_fair_data_pipeline_1_1_data_pipeline_1_1impl.html#a96e28706b3d0a1809787e0afff0f0a88">get_code_run_uuid</a> () const</td></tr>
 <tr class="memdesc:a96e28706b3d0a1809787e0afff0f0a88"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the code run uuid.  <a href="class_fair_data_pipeline_1_1_data_pipeline_1_1impl.html#a96e28706b3d0a1809787e0afff0f0a88">More...</a><br /></td></tr>
 <tr class="separator:a96e28706b3d0a1809787e0afff0f0a88"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-static-methods" name="pub-static-methods"></a>
+Static Public Member Functions</h2></td></tr>
+<tr class="memitem:aade68609c67d22ee027fdd53da1dece8"><td class="memItemLeft" align="right" valign="top">static sptr&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_fair_data_pipeline_1_1_data_pipeline_1_1impl.html#aade68609c67d22ee027fdd53da1dece8">construct</a> (const ghc::filesystem::path &amp;config_file_path, const ghc::filesystem::path &amp;file_system_path, const std::string &amp;token, RESTAPI api_location=RESTAPI::LOCAL)</td></tr>
+<tr class="memdesc:aade68609c67d22ee027fdd53da1dece8"><td class="mdescLeft">&#160;</td><td class="mdescRight">construct a <a class="el" href="class_data_pipeline_impl__.html" title="private pointer-to-implementation class containing all backend methods">DataPipelineImpl_</a> instance from configurations and setup  <a href="class_fair_data_pipeline_1_1_data_pipeline_1_1impl.html#aade68609c67d22ee027fdd53da1dece8">More...</a><br /></td></tr>
+<tr class="separator:aade68609c67d22ee027fdd53da1dece8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="a1ed93cc00765e805e3634a0fec301d2d" name="a1ed93cc00765e805e3634a0fec301d2d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1ed93cc00765e805e3634a0fec301d2d">&#9670;&nbsp;</a></span>impl()</h2>
+<h2 class="groupheader">Member Function Documentation</h2>
+<a id="aade68609c67d22ee027fdd53da1dece8" name="aade68609c67d22ee027fdd53da1dece8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aade68609c67d22ee027fdd53da1dece8">&#9670;&nbsp;</a></span>construct()</h2>
 
 <div class="memitem">
 <div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">FairDataPipeline::DataPipeline::impl::impl </td>
+          <td class="memname">DataPipeline::impl::sptr FairDataPipeline::DataPipeline::impl::construct </td>
           <td>(</td>
           <td class="paramtype">const ghc::filesystem::path &amp;&#160;</td>
           <td class="paramname"><em>config_file_path</em>, </td>
@@ -135,12 +139,6 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>finalise</b> ()</td><
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">spdlog::level::level_enum&#160;</td>
-          <td class="paramname"><em>log_level</em> = <code>spdlog::level::info</code>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
           <td class="paramtype">RESTAPI&#160;</td>
           <td class="paramname"><em>api_location</em> = <code>RESTAPI::LOCAL</code>&#160;</td>
         </tr>
@@ -150,6 +148,11 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>finalise</b> ()</td><
           <td></td><td></td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 
 <p>construct a <a class="el" href="class_data_pipeline_impl__.html" title="private pointer-to-implementation class containing all backend methods">DataPipelineImpl_</a> instance from configurations and setup </p>
@@ -166,7 +169,6 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>finalise</b> ()</td><
 
 </div>
 </div>
-<h2 class="groupheader">Member Function Documentation</h2>
 <a id="a96e28706b3d0a1809787e0afff0f0a88" name="a96e28706b3d0a1809787e0afff0f0a88"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a96e28706b3d0a1809787e0afff0f0a88">&#9670;&nbsp;</a></span>get_code_run_uuid()</h2>
 

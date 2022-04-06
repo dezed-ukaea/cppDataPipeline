@@ -1,4 +1,6 @@
 var searchData=
 [
-  ['version_0',['version',['../class_fair_data_pipeline_1_1_versioning_1_1version.html#a487e9e19f8dc597c02c0d2caf9483984',1,'FairDataPipeline::Versioning::version::version()=default'],['../class_fair_data_pipeline_1_1_versioning_1_1version.html#a82cda27e083c9b3ef3d38c6ca52fc820',1,'FairDataPipeline::Versioning::version::version(unsigned int major, unsigned int minor, unsigned int patch, meta_tag tag=meta_tag::RELEASE, unsigned int tag_v=1E9, std::string meta_data=&quot;&quot;)']]]
+  ['_7econfig_0',['~Config',['../class_fair_data_pipeline_1_1_config.html#ab73735ce5c3376bd09d9b44a92745604',1,'FairDataPipeline::Config']]],
+  ['_7edatapipeline_1',['~DataPipeline',['../class_fair_data_pipeline_1_1_data_pipeline.html#aa78325ee158faa93be203ec59e5e075f',1,'FairDataPipeline::DataPipeline']]],
+  ['_7eimpl_2',['~impl',['../class_fair_data_pipeline_1_1_data_pipeline_1_1impl.html#a95b04cf2f78c7bdfba26f2ebd99dc0e6',1,'FairDataPipeline::DataPipeline::impl']]]
 ];

@@ -125,17 +125,19 @@ $(function() {
 <div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span> </div>
 <div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span>  toml_out_.close();</div>
 <div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span> </div>
-<div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span>  APILogger-&gt;debug(<span class="stringliteral">&quot;FileSystem:CreateEstimate: Wrote point estimate to &#39;{0}&#39;&quot;</span>,</div>
-<div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span>                   output_filename_.string());</div>
-<div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span> </div>
-<div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span>  <span class="keywordflow">return</span> output_filename_;</div>
-<div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span>}</div>
-<div class="line"><a id="l00095" name="l00095"></a><span class="lineno">   95</span> </div>
-<div class="line"><a id="l00102" name="l00102"></a><span class="lineno">  102</span>std::string get_first_key_(<span class="keyword">const</span> toml::value data_table);</div>
-<div class="line"><a id="l00103" name="l00103"></a><span class="lineno">  103</span> </div>
-<div class="line"><a id="l00104" name="l00104"></a><span class="lineno">  104</span>}; <span class="comment">// namespace FairDataPipeline</span></div>
+<div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span> </div>
+<div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span>  <span class="keyword">auto</span> the_logger = logger::get_logger();</div>
+<div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span>  the_logger-&gt;debug() </div>
+<div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span>      &lt;&lt;  <span class="stringliteral">&quot;FileSystem:CreateEstimate: Wrote point estimate to &#39;&quot;</span> &lt;&lt; output_filename_.string() &lt;&lt; <span class="stringliteral">&quot;&#39;&quot;</span>;</div>
+<div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span> </div>
+<div class="line"><a id="l00095" name="l00095"></a><span class="lineno">   95</span>  <span class="keywordflow">return</span> output_filename_;</div>
+<div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span>}</div>
+<div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span> </div>
+<div class="line"><a id="l00104" name="l00104"></a><span class="lineno">  104</span>std::string get_first_key_(<span class="keyword">const</span> toml::value data_table);</div>
 <div class="line"><a id="l00105" name="l00105"></a><span class="lineno">  105</span> </div>
-<div class="line"><a id="l00106" name="l00106"></a><span class="lineno">  106</span><span class="preprocessor">#endif</span></div>
+<div class="line"><a id="l00106" name="l00106"></a><span class="lineno">  106</span>}; <span class="comment">// namespace FairDataPipeline</span></div>
+<div class="line"><a id="l00107" name="l00107"></a><span class="lineno">  107</span> </div>
+<div class="line"><a id="l00108" name="l00108"></a><span class="lineno">  108</span><span class="preprocessor">#endif</span></div>
 <div class="ttc" id="aconfig_8hxx_html"><div class="ttname"><a href="config_8hxx.html">config.hxx</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->

@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['rest_5fapiquery_5ferror_0',['rest_apiquery_error',['../class_fair_data_pipeline_1_1rest__apiquery__error.html',1,'FairDataPipeline']]]
+  ['msgbuilder_0',['MsgBuilder',['../class_fair_data_pipeline_1_1logging_1_1_logger_1_1_msg_builder.html',1,'FairDataPipeline::logging::Logger']]]
 ];

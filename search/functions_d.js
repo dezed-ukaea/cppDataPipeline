@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['set_5fcomponent_5fobject_0',['set_component_object',['../class_fair_data_pipeline_1_1_i_o_object.html#a6889e85849addfa22d01c7c1b63f342f',1,'FairDataPipeline::IOObject']]],
-  ['set_5fdata_5fproduct_5fobject_1',['set_data_product_object',['../class_fair_data_pipeline_1_1_i_o_object.html#a6b5ffe80335b332786cf86eb489f96f2',1,'FairDataPipeline::IOObject']]]
+  ['version_0',['version',['../class_fair_data_pipeline_1_1_versioning_1_1version.html#a487e9e19f8dc597c02c0d2caf9483984',1,'FairDataPipeline::Versioning::version::version()=default'],['../class_fair_data_pipeline_1_1_versioning_1_1version.html#a82cda27e083c9b3ef3d38c6ca52fc820',1,'FairDataPipeline::Versioning::version::version(unsigned int major, unsigned int minor, unsigned int patch, meta_tag tag=meta_tag::RELEASE, unsigned int tag_v=1E9, std::string meta_data=&quot;&quot;)']]]
 ];

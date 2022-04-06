@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['sync_5ferror_0',['sync_error',['../class_fair_data_pipeline_1_1sync__error.html',1,'FairDataPipeline']]]
+  ['ostreamsink_0',['OStreamSink',['../class_fair_data_pipeline_1_1logging_1_1_o_stream_sink.html',1,'FairDataPipeline::logging']]]
 ];
