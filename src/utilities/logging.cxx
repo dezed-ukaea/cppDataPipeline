@@ -41,7 +41,8 @@ namespace FairDataPipeline {
             gettimeofday( &curTime, NULL );
             int milli = curTime.tv_usec / 1000;
             char buffer[ 80 ];
-            strftime( buffer, 80, "%Y-%m-%d %H:%M:%S", localtime( &curTime.tv_sec ));
+            std::time_t _tv_sec = (time_t)curTime.tv_sec;
+            strftime( buffer, 80, "%Y-%m-%d %H:%M:%S", localtime( &_tv_sec ));
             std::string currentTime( 84, 0 );
 
             sprintf( &currentTime[0], "%s.%03d", buffer, milli );
