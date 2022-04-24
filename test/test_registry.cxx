@@ -9,7 +9,7 @@
 #include <ostream>
 #include <vector>
 
-using namespace FDP;
+using namespace FairDataPipeline;
 
 class RegistryTest : public ::testing::Test {
 protected:
@@ -25,19 +25,19 @@ protected:
     return HomeDirectory;
   }
 
-  DataPipeline *init_pipeline(bool use_local = true) {
+  DataPipeline::sptr init_pipeline(bool use_local = true) {
 
     const ghc::filesystem::path config_path_ =
         ghc::filesystem::path(TESTDIR) / "config.yaml";
     const ghc::filesystem::path script_path_ =
         ghc::filesystem::path(TESTDIR) / "test_script.sh";
-    APILogger->set_level(spdlog::level::debug);
 
-    return new DataPipeline(
+    logger::get_logger()->set_level( logging::LOG_LEVEL::DEBUG );
+
+    return DataPipeline::construct(
         config_path_.string(),
         script_path_.string(),
-        token,
-        spdlog::level::debug );
+        token );
   }
 
   std::string token =
@@ -51,13 +51,17 @@ TEST_F(RegistryTest, TestDataPipelineInit) {
       ghc::filesystem::path(TESTDIR) / "config.yaml";
   const ghc::filesystem::path script_path_ =
       ghc::filesystem::path(TESTDIR) / "test_script.sh";
-  APILogger->set_level(spdlog::level::debug);
-  DataPipeline(config_path_.string(), script_path_.string(), token, spdlog::level::debug);
+
+  logger::get_logger()->set_level( logging::LOG_LEVEL::DEBUG );
+  
+  auto dp = DataPipeline::construct( config_path_.string()
+          , script_path_.string()
+          , token );
 }
 
 TEST_F(RegistryTest, TestLogLevelSet) {
   init_pipeline();
-  ASSERT_EQ(spdlog::get_level(), spdlog::level::debug);
+  ASSERT_EQ( logger::get_logger()->get_level(), logging::LOG_LEVEL::DEBUG );
 }
 
 TEST_F(RegistryTest, TestURLEncode) {
@@ -71,4 +75,16 @@ TEST_F(RegistryTest, TestHashFile) {
   const std::string file_hash_ =
       calculate_hash_from_file(ghc::filesystem::path(TESTDIR) / "config.yaml");
   std::cout << "HASH: " << file_hash_ << std::endl;
+}
+
+TEST_F(RegistryTest, TestLogger) {
+    logging::OStreamSink::sptr sink = logging::OStreamSink::create( logging::INFO, std::cout );
+
+    logging::Logger::sptr logger = logging::Logger::create( logging::INFO, sink );
+    logger->trace() << " " << 10 << " " << "TRACE";
+    logger->info() << " " << 50 << " " << "INFO";
+    
+    logger->warn() << " " << 100 << " " << "WARN";
+
+    logger::get_logger()->info() << " WARNINF";
 }

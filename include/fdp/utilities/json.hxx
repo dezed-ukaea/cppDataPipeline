@@ -1,5 +1,5 @@
 /*! **************************************************************************
- * @file fdp/utilities/json.hxx
+ * @file FairDataPipeline/utilities/json.hxx
  * @author K. Zarebski (UKAEA)
  * @date 2021-05-06
  * @brief File contains methods relating to handling of JSON based data
@@ -12,7 +12,7 @@
 
 #include <json/writer.h>
 
-namespace FDP {
+namespace FairDataPipeline {
 /*! **************************************************************************
  * @brief convert a JSON object to string form
  * @author K. Zarebski (UKAEA)
@@ -29,6 +29,6 @@ namespace FDP {
  *
  ****************************************************************************/
 std::string json_to_string(Json::Value &json_data);
-}; // namespace FDP
+}; // namespace FairDataPipeline
 
 #endif

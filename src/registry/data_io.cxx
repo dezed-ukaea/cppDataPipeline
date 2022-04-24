@@ -1,9 +1,11 @@
 #include "fdp/registry/data_io.hxx"
-#include "fdp/objects/config.hxx"
-namespace FDP {
+
+namespace FairDataPipeline {
 YAML::Node parse_yaml_(ghc::filesystem::path yaml_path) {
-  APILogger->debug("LocalFileSystem: Reading configuration file '{0}'",
-                   yaml_path.string().c_str());
+  logger::get_logger()->debug() 
+      << "LocalFileSystem: Reading configuration file '"
+      << yaml_path.string()
+      << "'";
   return YAML::LoadFile(yaml_path.string().c_str());
 }
 
@@ -38,4 +40,4 @@ double read_point_estimate_from_toml(const ghc::filesystem::path var_address) {
 std::string get_first_key_(const toml::value data_table) {
   return data_table.as_table().begin()->first;
 }
-}; // namespace FDP
+}; // namespace FairDataPipeline

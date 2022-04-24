@@ -1,10 +1,10 @@
 /*! **************************************************************************
- * @file fdp/registry/api.hxx
+ * @file FairDataPipeline/registry/api.hxx
  * @author K. Zarebski (UKAEA)
  * @date 2021-05-05
  * @brief File containing classes and methods for connecting to the RestAPI
  *
- * The classes and methods within this file are used to access the FDP
+ * The classes and methods within this file are used to access the FairDataPipeline
  * Data Pipeline RestAPI, they handle sending of requests and retrieval of
  * data as JSON strings
  ****************************************************************************/
@@ -27,7 +27,7 @@
 #include "fdp/utilities/json.hxx"
 #include "fdp/utilities/logging.hxx"
 
-namespace FDP {
+namespace FairDataPipeline {
 /*! **************************************************************************
  * @enum RESTAPI
  * @brief selection of either local or remote pipeline running
@@ -39,6 +39,7 @@ enum class RESTAPI {
   LOCAL   /*!< Run from local registry */
 };
 
+#if 0
 /*! **************************************************************************
  * @brief function for writing to file from a CURL call
  * @author K. Zarebski (UKAEA)
@@ -50,6 +51,7 @@ enum class RESTAPI {
  * @return size_t
  ****************************************************************************/
 size_t write_func_(void *ptr, size_t size, size_t nmemb, std::string *data);
+#endif 
 
 /*! **************************************************************************
  * @class API
@@ -70,8 +72,8 @@ public:
    *
    * @param url_root the root of the query address, e.g. localhost:8000/api
    ***************************************************************************/
-  API(std::string url_root)
-      : url_root_(API::append_with_forward_slash(url_root)) {}
+    static sptr construct( const std::string& url_root );
+
 
   /**
    * @brief sends the given 'packet' of information to the RestAPI
@@ -164,6 +166,9 @@ public:
   static std::string remove_leading_forward_slash(std::string str);
 
 private:
+  API( const std::string& url_root)
+      : url_root_(API::append_with_forward_slash(url_root)) {}
+
   std::string url_root_;
   CURL *setup_json_session_(std::string &addr_path, std::string *response,
                             long &http_code, std::string token = "");
@@ -181,8 +186,8 @@ private:
                      ghc::filesystem::path out_path);
 };
 
-std::string url_encode(std::string url);
+std::string url_encode(const std::string& url);
 
-}; // namespace FDP
+}; // namespace FairDataPipeline
 
 #endif

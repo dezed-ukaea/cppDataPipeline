@@ -14,12 +14,13 @@
 
 #include "fdp/utilities/logging.hxx"
 
-using namespace FDP;
+using namespace FairDataPipeline;
 
 class ConfigTest : public ::testing::Test {
 protected:
   void SetUp() override {}
-  std::string getHomeDirectory() {
+  
+  static std::string getHomeDirectory() {
     std::string HomeDirectory;
 #ifdef _WIN32
     HomeDirectory = getenv("HOMEDRIVE");
@@ -30,35 +31,40 @@ protected:
     return HomeDirectory;
   }
 
-  Config::sptr config(bool use_local = true, std::string config = "write_csv.yaml") {
+  static Config::sptr config(bool use_local = true, std::string config = "write_csv.yaml") {
 
-    const ghc::filesystem::path config_path_ =
-        ghc::filesystem::path(TESTDIR) / "data" / config;
-    const ghc::filesystem::path script_path_ =
-        ghc::filesystem::path(TESTDIR) / "test_script.sh";
-    APILogger->set_level(spdlog::level::debug);
+      std::string home_dir = getHomeDirectory();
+      std::string token =
+          read_token (ghc::filesystem::path( home_dir) / ".fair" / "registry" / "token");
 
-    return Config::construct(config_path_, script_path_, token,
-            static_cast<RESTAPI>(use_local));
+      const ghc::filesystem::path config_path_ =
+          ghc::filesystem::path(TESTDIR) / "data" / config;
+      const ghc::filesystem::path script_path_ =
+          ghc::filesystem::path(TESTDIR) / "test_script.sh";
+      logger::get_logger()->set_level( logging::LOG_LEVEL::DEBUG );
+
+      return Config::construct(config_path_, script_path_, token,
+              use_local ? RESTAPI::LOCAL : RESTAPI::REMOTE ); 
   }
 
-  std::string token =
-      read_token(ghc::filesystem::path(getHomeDirectory()) /
-                                    ".fair" / "registry" / "token");
   void TearDown() override {}
 };
 
 TEST_F(ConfigTest, TestMetaData) {
-  EXPECT_EQ(config()->meta_data_()["description"].as<std::string>(), "Write csv file");
-  EXPECT_EQ(config()->meta_data_()["local_data_registry_url"].as<std::string>(), "http://127.0.0.1:8000/api/");
-  EXPECT_EQ(config()->meta_data_()["remote_data_registry_url"].as<std::string>(), "https://data.scrc.uk/api/");
-  EXPECT_EQ(config()->meta_data_()["default_input_namespace"].as<std::string>(), "testing");
-  EXPECT_EQ(config()->meta_data_()["default_output_namespace"].as<std::string>(), "testing");
-  //EXPECT_EQ(config()->meta_data_()["write_data_store"].as<std::string>(), "tmp");
-  EXPECT_EQ(config()->meta_data_()["local_repo"].as<std::string>(), "./");
-  EXPECT_EQ(config()->meta_data_()["public"].as<std::string>(), "true");
-  EXPECT_EQ(config()->meta_data_()["latest_commit"].as<std::string>(), "52008720d240693150e96021ea34ac6fffe05870");
-  EXPECT_EQ(config()->meta_data_()["remote_repo"].as<std::string>(), "https://github.com/FAIRDataPipeline/cppDataPipeline");
+
+    auto cnf = config();
+    auto meta = cnf->meta_data_();
+
+    EXPECT_EQ( meta["description"].as<std::string>(), "Write csv file");
+    EXPECT_EQ( meta["local_data_registry_url"].as<std::string>(), "http://127.0.0.1:8000/api/");
+    EXPECT_EQ( meta["remote_data_registry_url"].as<std::string>(), "https://data.scrc.uk/api/");
+    EXPECT_EQ( meta["default_input_namespace"].as<std::string>(), "testing");
+    EXPECT_EQ( meta["default_output_namespace"].as<std::string>(), "testing");
+    //EXPECT_EQ(cnf->meta_data_()["write_data_store"].as<std::string>(), "tmp");
+    EXPECT_EQ( meta["local_repo"].as<std::string>(), "./");
+    EXPECT_EQ( meta["public"].as<std::string>(), "true");
+    EXPECT_EQ( meta["latest_commit"].as<std::string>(), "52008720d240693150e96021ea34ac6fffe05870");
+    EXPECT_EQ( meta["remote_repo"].as<std::string>(), "https://github.com/FAIRDataPipeline/cppDataPipeline");
 }
 
 TEST_F(ConfigTest, TestLinkWrite){
