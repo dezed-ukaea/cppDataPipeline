@@ -2,7 +2,7 @@
 FILE( GLOB_RECURSE SRC_FILES CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/*.cxx)
 
 IF(WIN32)
-    list(APPEND SRC_FILES ${FDPAPI_INCLUDE_DIRS}/sys/time.cpp )
+    list(APPEND SRC_FILES ${FDPAPI_INCLUDE_DIRS}/windows_sys/time.cpp )
 ENDIF()
 
 # Add the (Static) Project Library using SRC_FILES

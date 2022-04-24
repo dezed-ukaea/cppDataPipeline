@@ -1,6 +1,10 @@
 #include <iostream>
 #include <map>
-#include <sys/time.h>
+#ifdef _WIN32
+    #include <windows_sys/time.h>
+#else
+    #include <sys/time.h>
+#endif
 #include <time.h>
 
 #include "fdp/utilities/logging.hxx"
