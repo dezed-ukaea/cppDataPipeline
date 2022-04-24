@@ -33,6 +33,8 @@ $ cmake --build build --config=Release
 ## Outline
 The main class the user will interact with is `DataPipeline` which has only the required methods such as `link_read` etc. This class has a member which is a pointer to an underlying `DataPipelineImpl_` class which performs the various procedures required to handle the data. A logger has been used to give as much feedback to the user as possible, the verbosity being handled by a log level argument.
 
+### Logging
+The environment variable `FDP_LOG_LEVEL=[TRACE:DEBUG:INFO:WARN:ERROR:CRITICAL:OFF]` can be set to specify the logging output level.
 
 ## Unit Tests
 The unit tests use the local registry, this needs to be running prior to running the tests see: [the CLI documentation](https://github.com/FAIRDataPipeline/FAIR-CLI#registry)

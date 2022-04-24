@@ -7,6 +7,7 @@ SET( DIGESTCPP_COMMIT "34ff2eeae397ed744d972d86b5a20f603b029fbd" )
 # So tell the compiler to exclude min and max macros in windows
 IF(WIN32)
     add_definitions(-DNOMINMAX)
+    add_definitions(-DNOGDI)
 ENDIF()
 
 MESSAGE( STATUS "[DigestCPP]" )

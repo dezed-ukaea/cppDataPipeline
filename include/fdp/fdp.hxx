@@ -1,12 +1,11 @@
 #ifndef __FDP__
 #define __FDP__
 
-#include "spdlog/spdlog.h"
+#include "utilities/logging.hxx"
+
 #include <ghc/filesystem.hpp>
 
-//#include "fdp/registry/datapipeline.hxx"
-
-namespace FDP {
+namespace FairDataPipeline {
 /**
  * @brief DataPipeline Class:
  * A PIMPL Class for interacting the the FAIR Data Pipeline
@@ -15,19 +14,19 @@ namespace FDP {
     class DataPipeline {
 
         public:
+            typedef std::shared_ptr< DataPipeline > sptr;
   /**
    * @brief Construct a new Data Pipeline (PIMPL)
    * 
    * @param config_file_path 
    * @param script_file_path 
    * @param token 
-   * @param log_level 
    */
-            explicit DataPipeline(
+           static  sptr construct(
                     const std::string &config_file_path,
                     const std::string &script_file_path,
-                    std::string token = "",
-                    spdlog::level::level_enum log_level = spdlog::level::info);
+                    std::string token = "" );
+
 
   /**
    * @brief Destroy the Data Pipeline object
@@ -35,11 +34,9 @@ namespace FDP {
    */
             ~DataPipeline();
 
-            DataPipeline(DataPipeline &&rhs) noexcept;
-            DataPipeline &operator=(DataPipeline &&rhs) noexcept;
+            //DataPipeline(DataPipeline &&rhs) noexcept;
+            //DataPipeline &operator=(DataPipeline &&rhs) noexcept;
 
-            DataPipeline(const DataPipeline &rhs);
-            DataPipeline &operator=(const DataPipeline &rhs);
 
   /**
    * @brief Return a path to a given data product
@@ -68,10 +65,19 @@ namespace FDP {
             void finalise();
 
         private:
+            explicit DataPipeline(
+                    const std::string &config_file_path,
+                    const std::string &script_file_path,
+                    std::string token = ""
+                    );
+
+            DataPipeline(const DataPipeline &rhs) = delete;
+
+            DataPipeline &operator=(const DataPipeline &rhs) = delete;
+
             class impl;
 
             std::shared_ptr< DataPipeline::impl > pimpl_;
     };
-}; // namespace FDP
-
+}; // namespace FairDataPipeline
 #endif

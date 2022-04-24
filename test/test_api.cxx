@@ -9,7 +9,7 @@
 #include "fdp/utilities/json.hxx"
 #include "fdp/utilities/logging.hxx"
 
-using namespace FDP;
+using namespace FairDataPipeline;
 
 class ApiTest : public ::testing::Test {
 protected:
@@ -26,19 +26,22 @@ protected:
   }
   ghc::filesystem::path read_csv_config = ghc::filesystem::path(TESTDIR) / "data" / "read_csv.yaml";
   std::string api_url_ = "http://127.0.0.1:8000/api";
-  FDP::API *api_ = new FDP::API(api_url_);
+
+  FairDataPipeline::API::sptr api_ = FairDataPipeline::API::construct(api_url_);
+
   std::string token =
       read_token(ghc::filesystem::path(getHomeDirectory()) /
                                     ".fair" / "registry" / "token");
   void TearDown() override {
-    delete api_;
   }
 };
 
 //! [TestGetById]
 TEST_F(ApiTest, TestGetById) {
   Json::Value author = api_->get_request(std::string("author/?name=Interface%20Test"))[0]["url"];
-  APILogger->info("Author: {0}", author.asString());
+  logger::get_logger()->info()
+      << "Author: "
+      <<  author.asString();
   int author_id_ = ApiObject::get_id_from_string( author.asString() );
   ASSERT_EQ(api_->get_by_id(std::string("author"), author_id_)["name"].asString(), std::string("Interface Test"));
 } //! [TestGetById]
