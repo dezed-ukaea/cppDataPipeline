@@ -1,15 +1,6 @@
 #include "fdp/fdp.hxx"
-#include <algorithm>
-#include <fstream>
-#include <iostream>
-#include <string>
-
-#include "json/json.h"
 
 #include "fdp/objects/config.hxx"
-#include "fdp/objects/metadata.hxx"
-#include "fdp/registry/api.hxx"
-#include "fdp/registry/data_io.hxx"
 #include "fdp/utilities/logging.hxx"
 
 namespace FairDataPipeline {
@@ -172,11 +163,11 @@ DataPipeline::DataPipeline(
         << pimpl_->get_code_run_uuid() << "'";
 }
 
-ghc::filesystem::path FairDataPipeline::DataPipeline::link_read(std::string &data_product){
+std::string FairDataPipeline::DataPipeline::link_read(std::string &data_product){
     return pimpl_->link_read(data_product);
 }
 
-ghc::filesystem::path FairDataPipeline::DataPipeline::link_write(std::string &data_product){
+std::string FairDataPipeline::DataPipeline::link_write(std::string &data_product){
     return pimpl_->link_write(data_product);
 }
 

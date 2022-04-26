@@ -12,15 +12,12 @@
 #ifndef __FDP_CONFIG_HXX__
 #define __FDP_CONFIG_HXX__
 
+#include <map>
 #include <string>
+
 #include <ghc/filesystem.hpp>
 #include <yaml-cpp/yaml.h>
-#include <regex>
-#include <map>
-#include <ghc/filesystem.hpp>
-#include <stdio.h>
 
-#include "fdp/objects/metadata.hxx"
 #include "fdp/registry/api.hxx"
 #include "fdp/objects/api_object.hxx"
 #include "fdp/objects/io_object.hxx"

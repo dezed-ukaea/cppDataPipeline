@@ -11,21 +11,16 @@
 #ifndef __FDP_API_HXX__
 #define __FDP_API_HXX__
 
-#include <algorithm>
+#include <memory>
+#include <string>
+
 #include <curl/curl.h>
 #include <ghc/filesystem.hpp>
-#include <iostream>
-#include <iterator>
 #include <json/reader.h>
-#include <map>
-#include <regex>
-#include <string>
-#include <vector>
 
 #include "fdp/exceptions.hxx"
 #include "fdp/objects/api_object.hxx"
 #include "fdp/utilities/json.hxx"
-#include "fdp/utilities/logging.hxx"
 
 namespace FairDataPipeline {
 /*! **************************************************************************

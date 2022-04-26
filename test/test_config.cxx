@@ -8,6 +8,8 @@
 #include "fdp/objects/config.hxx"
 #include "fdp/registry/api.hxx"
 //#include "fdp/registry/datapipeline.hxx"
+#include "fdp/objects/metadata.hxx"
+
 #include "gtest/gtest.h"
 
 #include "fdp/utilities/json.hxx"

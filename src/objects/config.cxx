@@ -1,5 +1,6 @@
 #include "fdp/objects/config.hxx"
 
+#include "fdp/objects/metadata.hxx"
 namespace FairDataPipeline {
 
     Config::sptr Config::construct(const ghc::filesystem::path &config_file_path,

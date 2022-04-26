@@ -1,5 +1,7 @@
 #include "fdp/registry/api.hxx"
 
+#include <regex>
+
 namespace FairDataPipeline {
 static size_t write_str_(char *ptr, size_t size, size_t nmemb, void* userdata ) {
     std::string* data = static_cast< std::string* >( userdata );
