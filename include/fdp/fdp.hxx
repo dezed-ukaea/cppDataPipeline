@@ -42,7 +42,7 @@ namespace FairDataPipeline {
    * Whilst recording it's meta data for the code run
    * 
    * @param data_product 
-   * @return ghc::filesystem::path 
+   * @return std::string 
    */
 	    std::string link_read(std::string &data_product);
 
@@ -51,7 +51,7 @@ namespace FairDataPipeline {
    * whilst recording it's meta data
    * 
    * @param data_product 
-   * @return ghc::filesystem::path 
+   * @return std::string 
    */
 	    std::string link_write(std::string &data_product);
 
