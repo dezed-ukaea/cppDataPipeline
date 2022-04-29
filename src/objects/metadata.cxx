@@ -6,7 +6,7 @@ std::string calculate_hash_from_file(const ghc::filesystem::path &file_path) {
     throw std::invalid_argument("File '" + file_path.string() + "' not found");
   }
 
-  std::ifstream file_(file_path, std::ios_base::in | std::ios_base::binary);
+  std::ifstream file_(file_path.string(), std::ios_base::in | std::ios_base::binary);
 
   const std::string hash_ = digestpp::sha1().absorb(file_).hexdigest();
 
@@ -78,7 +78,7 @@ bool file_exists( const std::string &Filename )
 }
 
 std::string read_token(const ghc::filesystem::path &token_path){
-  std::ifstream key_(token_path, std::ios::in);
+  std::ifstream key_(token_path.string(), std::ios::in);
   std::string key_str_;
   key_ >> key_str_;
   key_.close();

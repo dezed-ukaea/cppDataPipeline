@@ -77,7 +77,7 @@ ghc::filesystem::path create_estimate(T &value,
     ghc::filesystem::create_directories(output_filename_.parent_path());
   }
 
-  toml_out_.open(output_filename_);
+  toml_out_.open(output_filename_.string());
 
   if (!toml_out_) {
     throw std::runtime_error("Failed to open TOML file for writing");
