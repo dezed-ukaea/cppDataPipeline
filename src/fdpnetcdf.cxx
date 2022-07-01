@@ -1,10 +1,21 @@
-#include "fdpnetcdf.hxx"
+#include "fdp/fdpnetcdf.hxx"
 #include<sstream>
 
 #include<netcdf>
 
-namespace fdp
+namespace FairDataPipeline
 {
+    void split_str( const std::string& s, const char delim, std::vector< std::string >& splits )
+    {
+        std::stringstream ss( s );
+
+        std::string s_;
+        while( std::getline( ss, s_, delim ))
+        {
+            splits.push_back( s_ );
+        }
+    }
+#if 0
 
 	int DimensionDefinition::UNLIMITED = 0;
 
@@ -47,6 +58,11 @@ namespace fdp
 	{
 		return this->size()==DimensionDefinition::UNLIMITED;
 	}
+#if 0
+	Variable::sptr Variable::create()
+	{
+		return sptr( new Variable );
+	}
 
     class Variable::impl
     {
@@ -59,181 +75,15 @@ namespace fdp
     {
     }
 
-
-	class Group::impl
-	{
-		public:
-
-			typedef std::shared_ptr< Group::impl > sptr;
-			impl();
-			impl::sptr addGroup( const std::string& name );
-		private:
-			netCDF::NcGroup _ncgrp;
-			friend Group;
-	};
-
-	Group::impl::impl()
-	{
-	}
-
-	//Group::impl::sptr Group::impl::addGroup( const std::string& name )
-	//{
-//		//std::make_shared< Group::impl> ();
-//	}
-
-
-	Group::Group( Group::sptr parent ) : _parent( parent )
-	{
-		_pimpl = std::make_shared< impl >();
-	}
-
-	Group::sptr Group::create( Group::sptr parent )
-	{
-		Group::sptr p( new Group( parent ) );
-		return p;
-	}
-
-    std::string Group::name() const
-    {
-        bool fullname = false;
-        netCDF::NcGroup& ncgrp = this->_pimpl->_ncgrp;
-        return ncgrp.getName( fullname );
-    }
-
-    const std::map< std::string, Group::sptr >&  Group::getGroups() const 
-    {
-#if 0
-        std::vector< Group::sptr > grps;
-
-        netCDF::NcGroup& ncgrp = this->_pimpl->_ncgrp;
-        std::multimap< std::string, netCDF::NcGroup > ncchldgrps = ncgrp.getGroups();
-
-        for( auto it = ncchldgrps.begin(); it != ncchldgrps.end(); ++it )
-        {
-            std::string name = it->first;
-            Group::sptr grp = this->getGroup( name );
-            grps.push_back( grp );
-        }
 #endif
-        return this->_name_grp_map;
-    }
 
-    Group::sptr Group::parent()
-    {
-        return this->_parent.lock();
-    }
-
-    void split_str( const std::string& s, const char delim, std::vector< std::string >& splits )
-    {
-        std::stringstream ss( s );
-
-        std::string s_;
-        while( std::getline( ss, s_, delim ))
-        {
-            splits.push_back( s_ );
-        }
-    }
-
-	Group::sptr Group::requireGroup( const std::string& name )
-    {
-        std::vector< std::string > splits;
-        split_str( name, '/', splits );
-
-        Group::sptr parent = shared_from_this();
-        Group::sptr grp;
-
-        for( auto it = splits.begin(); it != splits.end(); ++it )
-        {
-            //does parent have named group?
-            const std::string& s = *it;
-            //grp = parent->_getGroup( s );
-            if (NULL == parent )
-            {
-                grp = parent->_requireGroup( s );
-            }
-            parent = grp;
-        }
-
-        return grp;
-    }
-	Group::sptr Group::getGroup( const std::string& name )
-    {
-        std::vector< std::string > splits;
-        split_str( name, '/', splits );
-
-        Group::sptr parent = shared_from_this();
-        Group::sptr grp;
-
-        for( auto it = splits.begin(); it != splits.end(); ++it )
-        {
-            if( NULL != parent )
-            {
-                grp = parent->_getGroup( *it );
-                parent = grp;
-            }
-        }
-
-        return grp;
-    }
-
-    Group::sptr Group::_getGroup( const std::string& name )
-    {
-        Group::sptr grp;
-
-        auto it = this->_name_grp_map.find( name );
-        if( it != this->_name_grp_map.end() )
-        {
-            grp = it->second;
-        }
-        else
-        {
-            netCDF::NcGroup& this_ncgrp = this->_pimpl->_ncgrp;
-
-            try
-            {
-                netCDF::NcGroup nc_grp = this_ncgrp.getGroup( name );
-
-                grp = Group::sptr(new Group( shared_from_this() ) );
-                grp->_pimpl->_ncgrp = nc_grp;
-                this->_name_grp_map[ name ] = grp;
-            }
-            catch( netCDF::exceptions::NcException& e )
-            {
-                e.what();
-            }
-        }
-        return grp;
-    }
-
-	Group::sptr Group::_requireGroup( const std::string& name )
-	{
-        Group::sptr grp = this->_getGroup( name );
-
-        if( NULL != grp )
-        {
-            try
-            {
-                netCDF::NcGroup ncgrp = _pimpl->_ncgrp.addGroup( name );
-
-                grp = Group::sptr(new Group( shared_from_this() ) );
-                grp->_pimpl->_ncgrp = ncgrp;
-
-                this->_name_grp_map[ name ] = grp;
-            }
-            catch( netCDF::exceptions::NcException& e )
-            {
-                e.what();
-            }
-        }
-
-		return grp;
-	}
-
-    const std::map< std::string, Dimension::sptr >& Group::getDims() const
+#if 0
+    const NAME_DIMENSION_MAP& Group::getDims() const
     {
         return this->_name_dim_map;
     }
-
+#endif
+#if 0
     class Dimension::impl
     {
         public:
@@ -248,11 +98,11 @@ namespace fdp
             size_t _N;
 
     };
-
-
+#endif
+#if 0
     Dimension::sptr Group::addDim( const std::string& name, size_t N )
     {
-        netCDF::NcGroup& this_ncgrp = this->_pimpl->_ncgrp;
+        auto this_ncgrp = this->_ncgrp;
 
         netCDF::NcDim ncdim = this_ncgrp.addDim( name, N );
 
@@ -263,10 +113,9 @@ namespace fdp
 
         return dim;
     }
-
     Variable::sptr Group::addVar( const std::string& name, int vtype, const std::vector< Dimension::sptr >& dims )
     {
-        netCDF::NcGroup& this_ncgrp = this->_pimpl->_ncgrp;
+        auto this_ncgrp = this->_ncgrp;
         std::vector< netCDF::NcDim > ncdims;
 
         for( auto it = dims.begin(); it != dims.end(); ++it )
@@ -275,23 +124,34 @@ namespace fdp
             ncdims.push_back( ncdim );
         }
 
-        netCDF::NcVar ncvar = this_ncgrp.addVar( name, vtype, ncdims );
 
-        Variable::sptr var( new Variable() );
-        var->_pimpl->ncvar = ncvar;
+	Variable::sptr var;
+	try
+	{
+		netCDF::NcVar ncvar = this_ncgrp.addVar( name, vtype, ncdims );
 
-        this->_name_var_map[ name ] = var;
+		var = Variable::create();
+		var->_pimpl->ncvar = ncvar;
+
+		this->_name_var_map[ name ] = var;
+	}
+	catch( netCDF::exceptions::NcException& e )
+	{
+		e.what();
+	}
 
         return var;
-
     }
 
-    const std::map< std::string, Variable::sptr >& Group::getVars() const
+#endif
+#if 0
+    const NAME_VARIABLE_MAP& Group::getVars() const
     {
         return this->_name_var_map;
 
     }
-
+#endif
+#if 0
     Dimension::impl::impl( const std::string& name, size_t N ) : _name(name), _N(N)
     {
 
@@ -307,22 +167,49 @@ namespace fdp
         sptr dim( new Dimension( name, N ) );
         return dim;
     }
-
+#endif
+#if 0
 	class Builder::bimpl
 	{
 		public:
 			typedef std::shared_ptr< bimpl > sptr;
 			static sptr create( const std::string& path, enum Builder::Mode mode ); 
 
-		private:
-			bimpl( const std::string& path, Builder::Mode mode );
 
 			netCDF::NcFile _ncfile;
+		private:
+			bimpl( const std::string& path, Builder::Mode mode );
 	};
 
-	Builder::bimpl::bimpl( const std::string& path, Builder::Mode mode ) : _ncfile( path, netCDF::NcFile::replace )
+	Builder::bimpl::bimpl( const std::string& path, Builder::Mode mode )
 	{
-	//	netCDF::NcFile ncfile( path, netCDF::NcFile::replace );
+		netCDF::NcFile::FileMode ncmode = netCDF::NcFile::FileMode::read;
+		switch( mode )
+		{
+			case READ:
+				{
+					ncmode = netCDF::NcFile::FileMode::read;
+
+					_ncfile.open( path, ncmode );
+				}
+				break;
+			case WRITE:
+				try
+				{
+					ncmode = netCDF::NcFile::FileMode::write;
+
+					_ncfile.open( path, ncmode );
+				}
+				catch( netCDF::exceptions::NcException& e )
+				{
+					ncmode = netCDF::NcFile::FileMode::replace;
+
+					_ncfile.open( path, ncmode );
+				}
+				break;
+			default:
+				break;
+		};
 	}
 
 	Builder::bimpl::sptr Builder::bimpl::create( const std::string& path, Builder::Mode mode )
@@ -330,15 +217,92 @@ namespace fdp
 		sptr p( new bimpl( path, mode ) );
 		return p;
 	}
-
-	Builder::Builder( const std::string& path, Builder::Mode mode ) : Group( NULL )
+#endif
+	Builder::sptr Builder::create( const std::string& path, Builder::Mode mode )
 	{
-		_pbimpl = bimpl::create( path, mode );
+		return Builder::sptr( new Builder( path, mode ) );
+	}
+
+	Builder::Builder( const std::string& path, Builder::Mode mode ) :   BuilderImpl( NULL )
+	{
+		//NcFilePtr ncfile = std::dynamic_pointer_cast< netCDF::NcFile>(_ncgrp);
+
+		netCDF::NcFile::FileMode ncmode = netCDF::NcFile::FileMode::read;
+		switch( mode )
+		{
+			case READ:
+				{
+					ncmode = netCDF::NcFile::FileMode::read;
+
+					_ncgrp.open( path, ncmode );
+				}
+				break;
+			case WRITE:
+				try
+				{
+					ncmode = netCDF::NcFile::FileMode::write;
+
+					_ncgrp.open( path, ncmode );
+				}
+				catch( netCDF::exceptions::NcException& e )
+				{
+					ncmode = netCDF::NcFile::FileMode::replace;
+
+					_ncgrp.open( path, ncmode );
+				}
+				break;
+			default:
+				break;
+		}
+
+	}
+
+	const NAME_GROUP_MAP&  Builder::getGroups() const 
+	{
+		return NAME_GROUP_MAP();
+	}
+
+#if 1
+	IGroup::sptr Builder::requireGroup( const std::string& name )
+	{
+		return NULL;
+	}
+#endif
+
+	IGroup::sptr Builder::getGroup( const std::string& name )
+	{
+		return NULL;
 	}
 
 	void prepareDimension( const std::string& grpName, DimensionDefinition& dimensionDefinition )
 	{
 	}
+#if 0
+    Group::sptr Builder::_requireGroup( const std::string& name )
+    {
+	    Group::sptr grp = this->_getGroup( name );
 
+	    if( !grp )
+	    {
+		    try
+		    {
+			    netCDF::NcGroup ncgrp = _pbimpl->_ncfile.addGroup( name );
 
+			    grp = Group::create( shared_from_this() );
+			    grp->_ncgrp = ncgrp;
+
+			    this->_name_grp_map[ name ] = grp;
+		    }
+		    catch( netCDF::exceptions::NcException& e )
+		    {
+			    e.what();
+		    }
+	    }
+
+	    return grp;
+    }
+#endif
+
+#endif
 }
+
