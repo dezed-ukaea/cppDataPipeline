@@ -368,11 +368,6 @@ namespace FairDataPipeline
 		public:
 			typedef std::shared_ptr< Group2 > sptr;
 
-			virtual void initialise_netcdf()
-			{
-				_nc = std::make_shared< NcGroup >();
-			}
-
 			std::string name()
 			{
 				std::string s = this->_nc->getName();
@@ -416,7 +411,6 @@ namespace FairDataPipeline
 					NcGroup new_ncgrp = this->_nc->getGroup( name );
 					if( ! new_ncgrp.isNull() )
 					{
-						//printf( "ISNULL:%d\n", new_ncgrp.isNull() );
 						Group2::sptr new_grp_ptr = Group2::create( this->shared_from_this() );
 						new_grp_ptr->_nc = std::make_shared<NcGroup>(new_ncgrp);
 						grp_ptr = new_grp_ptr;
@@ -462,7 +456,8 @@ namespace FairDataPipeline
 
 			static Group2::sptr create( Group2::sptr p )
 			{
-				auto pgrp = Group2::sptr( new Group2(p));
+				auto _nc = std::make_shared< NcGroup >();
+				auto pgrp = Group2::sptr( new Group2(p, _nc));
 				return pgrp;
 			}
 			~Group2(){}
@@ -472,9 +467,8 @@ namespace FairDataPipeline
 
 			std::map< std::string, Group2::sptr > _name_grp_map;
 
-			Group2( Group2::sptr grp ) : _parent( grp )
+			Group2( Group2::sptr grp, NcGroupPtr nc ) : _parent( grp ), _nc(nc)
 			{
-				this->initialise_netcdf();
 			}
 
 		private:
@@ -490,11 +484,6 @@ namespace FairDataPipeline
 			typedef std::shared_ptr< Builder2 > sptr;
 
 			~Builder2() {}
-
-			void initialise_netcdf()
-			{
-				_nc = std::make_shared< NcFile >();
-			}
 
 			static Builder2::sptr create(const std::string& path, Builder2::Mode mode )
 			{
@@ -539,10 +528,8 @@ namespace FairDataPipeline
 #endif
 		private:
 			Builder2( const std::string path, Mode mode ) 
-				: Group2( NULL )
+				: Group2( NULL, std::make_shared<NcFile>() )
 			{
-				this->initialise_netcdf();
-
 				auto ncmode = NcFile::FileMode::read;
 
 				auto ncfile = std::dynamic_pointer_cast< NcFile >(_nc);
@@ -574,8 +561,8 @@ namespace FairDataPipeline
 
 								ncfile->open( path, ncmode );
 							}
-							netCDF::NcGroup grp1 = ncfile->addGroup("testgrp");
-							netCDF::NcGroup grp2 = ncfile->addGroup("xtestgrp");
+							//netCDF::NcGroup grp1 = ncfile->addGroup("testgrp");
+							//netCDF::NcGroup grp2 = ncfile->addGroup("xtestgrp");
 						}
 						break;
 					default:
