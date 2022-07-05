@@ -101,63 +101,11 @@ namespace FairDataPipeline
 			enum Mode{ READ, WRITE};
 	};
 
-	class GroupImpl
-		: public std::enable_shared_from_this< GroupImpl>
-          , public IGroup
-	{
-		public:
-            virtual ~GroupImpl(){}
-
-			typedef std::shared_ptr< GroupImpl > sptr;
-
-			std::string name();
-
-            int getGroupCount();
-			IGroup::sptr parent();
-
-            IGroup::sptr getGroup( const std::string& name );
-
-			IGroup::sptr  _getGroup( const std::string name );
-
-            const IGroup::NAME_GROUP_MAP& getGroups();
-
-			IGroup::sptr requireGroup( const std::string& name );
-
-			IGroup::sptr addGroup( const std::string& name );
-
-			static GroupImpl::sptr create( GroupImpl::sptr p );
-
-		protected:
-
-			NcGroupPtr _nc;	
-
-			GroupImpl( GroupImpl::sptr grp, NcGroupPtr nc );
-
-		private:
-			std::weak_ptr<GroupImpl> _parent;
-
-            IGroup::NAME_GROUP_MAP _name_grp_map;
-
-	};
-
-	class BuilderImpl 
-		: public GroupImpl//, public IBuilder
-	{
-		public:
-			typedef std::shared_ptr< BuilderImpl > sptr;
-
-			static sptr create(const std::string& path, IBuilder::Mode mode );
-
-        private:
-			BuilderImpl( const std::string path, IBuilder::Mode mode ) ;
-
-	};
-
-
     class Builder
     {
         public:
             Builder() = delete;
+	    Builder (const Builder& rhs ) = delete;
 
             static IBuilder::sptr create( const std::string& path, IBuilder::Mode mode );
 
@@ -165,7 +113,46 @@ namespace FairDataPipeline
 
     };
 
+    template< size_t...N >
+	    struct DDim
+	    {
+		    DDim()
+		    {
+			    int n = sizeof...(N);
+			    //printf( "DDIM size:%d\n", n  );
+			    
+			    std::array< size_t, sizeof...(N) > a = {N...};
 
+			    //printf("DDIM:");
+			    //for( int i = 0;i < n; ++i )
+			    //{
+				    //printf("%d,", a[i]);
+			    //}
+			    //printf( "\n");
+		    }
+		    size_t rank(){ return sizeof...(N);}
+		    std::vector<size_t> shape()
+		    {
+			    size_t n = this->rank();
+
+			    std::vector<size_t> v;
+			    v.reserve(n);
+
+			    //int a[ sizeof...(N) ]= {N...};
+
+			    std::array< size_t, sizeof...(N) > a = {N...};
+			    for( int i = 0;i < n; ++i )
+			    {
+				   // printf("%d,", a[i]);
+				    v.push_back( a[i] );
+			    }
+			    //printf( "\n");
+			    return v;
+
+		    }
+
+		    //std::array< long, N > Dim;
+	    };
 
 }
 #endif

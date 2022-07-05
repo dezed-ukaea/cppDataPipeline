@@ -2,12 +2,10 @@
 #define TESTDIR ""
 #endif
 
-//#include "fdp/registry/api.hxx"
-#include "fdp/fdpnetcdf.hxx"
-//#include "fdp/objects/metadata.hxx"
 #include "gtest/gtest.h"
-//#include "fdp/utilities/json.hxx"
-//#include "fdp/utilities/logging.hxx"
+
+#include "fdp/fdpnetcdf.hxx"
+#include "fdp/fdparrayref.hxx"
 
 //using namespace FairDataPipeline;
 
@@ -42,8 +40,8 @@ namespace fdp = FairDataPipeline;
 //! [TestGetById]
 TEST_F(BuilderTest, TestBuilder) 
 {
-	fdp::Builder2::sptr 
-		builder = fdp::Builder2::create( "xbuildertest.nc", fdp::Builder2::Mode::WRITE );
+	fdp::IBuilder::sptr 
+		builder = fdp::Builder::create( "xbuildertest.nc", fdp::IBuilder::Mode::WRITE );
 
 	ASSERT_TRUE( NULL != builder );
 
@@ -68,6 +66,20 @@ TEST_F(BuilderTest, TestBuilder)
 
 	ASSERT_TRUE( NULL != grp->parent()->parent() );
 	ASSERT_EQ( "/", grp->parent()->parent()->name() );
+	
+	int a[1][2][3];
+	int* pa = &a[0][0][0];
+	int shape[3] = {1,2,3};
+
+	fdp::Array::Shape dim = fdp::Array::make_shape<int>( shape, 3);
+	ASSERT_EQ( dim.rank(), 3 );
+	ASSERT_EQ( dim.shape()[0], 1 );
+	ASSERT_EQ( dim.shape()[1], 2 );
+	ASSERT_EQ( dim.shape()[2], 3 );
+
+	fdp::Array::ArrayRef< int > a_ref( pa, dim );
+
+	ASSERT_EQ( a_ref.data(), pa );
 
 } //! [TestGetById]
 

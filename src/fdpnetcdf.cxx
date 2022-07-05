@@ -5,6 +5,7 @@
 
 namespace FairDataPipeline
 {
+
     void split_str( const std::string& s, const char delim, std::vector< std::string >& splits )
     {
         std::stringstream ss( s );
@@ -15,6 +16,45 @@ namespace FairDataPipeline
             splits.push_back( s_ );
         }
     }
+
+	class GroupImpl
+		: public std::enable_shared_from_this< GroupImpl>
+          , public IGroup
+	{
+		public:
+            virtual ~GroupImpl(){}
+
+			typedef std::shared_ptr< GroupImpl > sptr;
+
+			std::string name();
+
+            int getGroupCount();
+			IGroup::sptr parent();
+
+            IGroup::sptr getGroup( const std::string& name );
+
+			IGroup::sptr  _getGroup( const std::string name );
+
+            const IGroup::NAME_GROUP_MAP& getGroups();
+
+			IGroup::sptr requireGroup( const std::string& name );
+
+			IGroup::sptr addGroup( const std::string& name );
+
+			static GroupImpl::sptr create( GroupImpl::sptr p );
+
+		protected:
+
+			NcGroupPtr _nc;	
+
+			GroupImpl( GroupImpl::sptr grp, NcGroupPtr nc );
+
+		private:
+			std::weak_ptr<GroupImpl> _parent;
+
+            IGroup::NAME_GROUP_MAP _name_grp_map;
+
+	};
 
     int GroupImpl::getGroupCount()
     {
@@ -147,6 +187,20 @@ namespace FairDataPipeline
     }
 
 
+	class BuilderImpl 
+		: public GroupImpl//, public IBuilder
+	{
+		public:
+			typedef std::shared_ptr< BuilderImpl > sptr;
+
+			static sptr create(const std::string& path, IBuilder::Mode mode );
+
+		private:
+			BuilderImpl( const std::string path, IBuilder::Mode mode ) ;
+
+	};
+
+
 
     BuilderImpl::sptr BuilderImpl::create(const std::string& path, IBuilder::Mode mode )
     {
@@ -203,7 +257,6 @@ namespace FairDataPipeline
     {
         auto builder = BuilderImpl::create( path, mode );
         return builder;
-        return NULL;
     }
 
 }
