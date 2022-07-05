@@ -195,6 +195,9 @@ namespace FairDataPipeline
 
 			static sptr create(const std::string& path, IBuilder::Mode mode );
 
+            void open( const std::string path, IBuilder::Mode mode );
+            void close();
+
 		private:
 			BuilderImpl( const std::string path, IBuilder::Mode mode ) ;
 
@@ -208,8 +211,7 @@ namespace FairDataPipeline
         return p;
     }
 
-    BuilderImpl::BuilderImpl( const std::string path, IBuilder::Mode mode ) 
-        : GroupImpl( NULL, std::make_shared<NcFile>() ) 
+    void BuilderImpl::open( const std::string path, IBuilder::Mode mode )
     {
         auto ncmode = NcFile::FileMode::read;
 
@@ -248,6 +250,17 @@ namespace FairDataPipeline
                 break;
 
         }
+    }
+
+    void BuilderImpl::close()
+    {
+        std::dynamic_pointer_cast< NcFile >( _nc )->close();
+    }
+
+    BuilderImpl::BuilderImpl( const std::string path, IBuilder::Mode mode ) 
+        : GroupImpl( NULL, std::make_shared<NcFile>() ) 
+    {
+        this->open( path, mode );
     }
 
 
