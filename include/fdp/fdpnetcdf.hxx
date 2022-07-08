@@ -129,7 +129,7 @@ namespace FairDataPipeline
         std::string units;
         enum DataType dataType;
         std::string description;
-        std::vector< DimensionDefinition* > dimensions;
+        std::vector< std::string > dimension_names;
 
         void* data;
     };
