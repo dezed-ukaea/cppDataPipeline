@@ -806,45 +806,45 @@ namespace FairDataPipeline
     int Builder::writeArray( const std::string& group_name
             , const ArrayDefinition& arraydef )
     {
+        int status = 0;
         //write dims
-        std::vector< std::string > dim_names;
         std::vector< IDimension::sptr > vdims;
-        std::vector< IVar::sptr > vdim_var_ptrs;
 
         IGroup::sptr grp_ptr = _builder->requireGroup( group_name );
 
-        for( int i = 0; i < arraydef.dimensions.size();++i )
+        for( int i = 0; i < arraydef.dimension_names.size();++i )
         {
-            const DimensionDefinition* dimdef = arraydef.dimensions[i];
+           const std::string& dim_name = arraydef.dimension_names[i];
 
-            this->writeDimension( group_name, *dimdef );
+           IVar::sptr dim_var_ptr = grp_ptr->getVar( dim_name );
+           if( dim_var_ptr )
+           {
+               std::vector< std::string > dims = dim_var_ptr->getDims();
 
-            IVar::sptr dim_var_ptr = grp_ptr->getVar( dimdef->name );
-            //vdim_var_ptrs.push_back( dim_var_ptr );
-            std::vector< std::string > dims = dim_var_ptr->getDims();
-            
-
-
-            //vdims.push_back( dims[0] );
-
-            IDimension::sptr dim_ptr = grp_ptr->getDim( dims[0] );
-            vdims.push_back( dim_ptr );
-
-
-
+               IDimension::sptr dim_ptr = grp_ptr->getDim( dims[0] );
+               vdims.push_back( dim_ptr );
+           }
+           else 
+               status = 1;
         }                    
 
-        IVar::sptr dim_var_ptr = grp_ptr->getVar( arraydef.name );
-        if( !dim_var_ptr )
-        {
-            auto var_ptr = grp_ptr->addVar( arraydef.name, arraydef.dataType, vdims );
-            var_ptr->putVar( arraydef.data );
 
-            var_ptr->putAtt( "units", arraydef.units );
-            var_ptr->putAtt( "description", arraydef.description );
+        if( !status )
+        {
+            IVar::sptr arr_var_ptr = grp_ptr->getVar( arraydef.name );
+            if( !arr_var_ptr )
+            {
+                arr_var_ptr = grp_ptr->addVar( arraydef.name, arraydef.dataType, vdims );
+                arr_var_ptr->putVar( arraydef.data );
+
+                arr_var_ptr->putAtt( "units", arraydef.units );
+                arr_var_ptr->putAtt( "description", arraydef.description );
+            }
+            else
+                status = 1;
         }
 
-        return 0;
+        return status;
     }
 
 

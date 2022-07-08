@@ -156,16 +156,46 @@ TEST_F(BuilderTest, TestBuilder)
     arrdef.description = "arrdescription";
     arrdef.dataType = fdp::DataType::INT;
 
-    arrdef.dimensions = { &dimdef1, &dimdef2 };
+    arrdef.dimension_names = { dimdef1.name, dimdef2.name };
 
     arrdef.data = data;
 
 
     fdp::Builder builder2( "xtest.nc", fdp::IBuilder::Mode::WRITE );
 
-    //builder2.writeDimension( "grp", dimdef1 );
-    //builder2.writeDimension( "grp", dimdef2 );
-    builder2.writeArray( "grp", arrdef );
+    int status = 0;
+
+    status = builder2.writeDimension( "grp", dimdef1 );
+    ASSERT_EQ( 0, status );
+
+    status = builder2.writeDimension( "grp", dimdef2 );
+    ASSERT_EQ( 0, status );
+
+    status = builder2.writeArray( "grp", arrdef );
+    ASSERT_EQ( 0, status );
+
+    //write already existing dim name
+    status = builder2.writeDimension( "grp", dimdef1 );
+    ASSERT_TRUE( 0 != status );
+
+    status = builder2.writeArray( "grp", arrdef );
+    ASSERT_TRUE( 0 != status );
+
+    fdp::ArrayDefinition arrdef_bad;
+    arrdef_bad.name = "arrbad";
+    arrdef_bad.units="arrunits";
+    arrdef_bad.description = "arrdescription";
+    arrdef_bad.dataType = fdp::DataType::INT;
+
+    arrdef_bad.dimension_names = { "baddim1", "baddim2" };
+
+    arrdef.data = data;
+    status = builder2.writeArray( "grp", arrdef_bad );
+    ASSERT_TRUE( 0 != status );
+
+
+
+
     }
 
 
