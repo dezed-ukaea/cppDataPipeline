@@ -1,158 +1,226 @@
 #ifndef __FDPAPI_NETCDF_H__
 #define __FDPAPI_NETCDF_H__
 
-#include<stdio.h>
+//#include<stdio.h>
 #include<memory>
 #include<map>
 #include<vector>
+#include<string>
+//#include<netcdf>
 
-#include <string>
-
-#include<sstream>
-#include<netcdf>
+//#include "fdp/fdparrayref.hxx"
 
 namespace FairDataPipeline
 {
-	void split_str( const std::string& s, const char delim, std::vector< std::string >& splits );
+    void split_str( const std::string& s, const char delim, std::vector< std::string >& splits );
 
-	typedef netCDF::exceptions::NcException NcException;
-	typedef netCDF::NcGroup NcGroup;
-	typedef netCDF::NcFile NcFile;
+    enum DataType
+    {
+        BYTE,
+        CHAR,
+        SHORT,
+        INT,
+        FLOAT,
+        DOUBLE,
+        UBYTE,
+        USHORT,
+        UINT,
+        INT64,
+        UINT64,
+        STRING,
+        //VLEN,
+        //OPAQUE,
+        //ENUM,
+        //COMPOUND
+    };
 
-	typedef std::shared_ptr< NcGroup > NcGroupPtr;
-	typedef std::shared_ptr< NcFile > NcFilePtr;
+    struct IGroup;
+    typedef std::shared_ptr< IGroup > IGroupPtr;
 
-	class DimensionDefinition
-	{
-		public:
-			static int UNLIMITED;
+    struct IDimension
+    {
+        typedef std::shared_ptr< IDimension > sptr;
 
-			DimensionDefinition( const std::string& name
-					, int datatype
-					, const std::string& description
-					, size_t size
-					, const std::string& units
-					);
+        virtual size_t getSize() = 0;
+        virtual std::string getName() = 0;
+        //virtual void rename(const std::string& new_name) = 0;
+        virtual IGroupPtr getParentGroup() = 0;
+    };
 
-			int datatype() const ;
-			const std::string& name() const ;
-			const std::string& description() const ;
-			const std::string& units() const ;
-			bool isUnlimited() const;
-			size_t size() const;
+    struct IVarAtt
+    {
+        typedef std::shared_ptr< IVarAtt > sptr;
 
-		private:
-			std::string _name;
-			std::string _description;
-			int _datatype;
-			size_t _size;
-			std::string _units;
-			void* _values;
-	};
-#if 0
-	class Dimension
-	{
-		public:
-			typedef std::shared_ptr< Dimension > sptr;
-			static sptr create( const::std::string& name, size_t N );
+        virtual int getValues( std::string& values ) = 0;
+    };
 
-			//friend class Group;
+    struct IVar
+    {
+        typedef std::vector< IDimension::sptr > VDIMS;
 
-		private:
-			Dimension( const std::string&, size_t N );
-			class impl;
-			std::shared_ptr< impl >  _pimpl;
-	};
+        typedef std::shared_ptr< IVar > sptr;
 
-	class Variable
-	{
-		public:
-			typedef std::shared_ptr< Variable > sptr;
-			friend class Group;
-			static sptr create();
+        typedef std::map< std::string, IVarAtt::sptr > NAME_VARATT_MAP;
 
-		private:
-			class impl;
-			std::shared_ptr< impl > _pimpl;
-	};
-#endif
-	
+        virtual IGroupPtr parent() = 0;
+
+        virtual void putVar( const void* vals ) = 0;
+        virtual void getVar( void* vals ) = 0;
+
+        virtual std::vector< std::string > getDims() = 0;
+
+        virtual DataType getType() = 0;
+
+        virtual IVarAtt::sptr putAtt( const std::string& key, const std::string& value ) = 0;
+        virtual IVarAtt::sptr getAtt( const std::string& key ) = 0;
+    };
+
     struct IGroup
-	{
-		typedef std::shared_ptr< IGroup > sptr;
+    {
+        typedef std::shared_ptr< IGroup > sptr;
 
         typedef std::map< std::string, IGroup::sptr > NAME_GROUP_MAP;
+        typedef std::map< std::string, IDimension::sptr > NAME_DIM_MAP;
+        typedef std::map< std::string, IVar::sptr > NAME_VAR_MAP;
 
         virtual IGroup::sptr parent() = 0;
 
         virtual IGroup::sptr requireGroup( const std::string& name ) = 0;
 
-		virtual IGroup::sptr addGroup( const std::string& s ) = 0;
+        virtual IGroup::sptr addGroup( const std::string& s ) = 0;
 
         virtual IGroup::sptr getGroup( const std::string& name ) = 0;
+
+        virtual IDimension::sptr addDim( const std::string& name, size_t sz ) = 0;
+        
+        virtual IDimension::sptr getDim( const std::string& name ) = 0;
+
+        virtual IVar::sptr addVar( const std::string& name
+                , DataType dtype
+                , std::vector< IDimension::sptr >& vdims ) = 0;
+
+        virtual IVar::sptr getVar( const std::string& name ) = 0;
+
 
         virtual int getGroupCount() = 0;
 
         virtual std::string name() = 0;
-	};
+    };
 
-	struct IBuilder : public IGroup
-	{
-			enum Mode{ READ, WRITE};
-	};
+    struct IBuilder : public IGroup
+    {
+        enum Mode{ READ, WRITE};
+    };
+
+    struct DimensionDefinition
+    {
+        size_t size;
+        std::string name;
+        std::string units;
+        std::string description;
+        enum DataType dataType;
+
+        void* data;
+    };
+
+    struct ArrayDefinition
+    {
+        std::string name;
+        std::string units;
+        enum DataType dataType;
+        std::string description;
+        std::vector< DimensionDefinition* > dimensions;
+
+        void* data;
+    };
+
+    class BuilderFactory
+    {
+        public:
+            typedef IBuilder::Mode Mode;
+
+            BuilderFactory() = delete;
+            BuilderFactory (const BuilderFactory& rhs ) = delete;
+
+            static IBuilder::sptr create( const std::string& path, Mode mode );
+        private:
+
+    };
 
     class Builder
     {
         public:
             Builder() = delete;
-	    Builder (const Builder& rhs ) = delete;
+            Builder( const Builder& rhs ) = delete;
 
-            static IBuilder::sptr create( const std::string& path, IBuilder::Mode mode );
+            Builder( const std::string& path, IBuilder::Mode mode );
+
+            int writeArray( const std::string& group_name
+                    , const ArrayDefinition& arraydef );
+            //                    , const void* data );
+
+            int writeDimension(const std::string& group_name, const DimensionDefinition& dimdef );
+
+            int readDim_metadata( const std::string& grp_name
+                    , const std::string dim_name
+                    , DimensionDefinition& dimdef );
+
+            int readDim_data( const std::string& grp_name
+                    , const std::string dim_name
+                    , DimensionDefinition& dimdef );
 
 
+            int readArray_metadata( const std::string& grp_name, const std::string& array_name
+                    ,  ArrayDefinition& arraydef );
 
+            int readArray_data( const std::string& grp_name, const std::string& name
+                    ,  ArrayDefinition& arraydef );
+        private:
+            IBuilder::sptr _builder;
     };
 
     template< size_t...N >
-	    struct DDim
-	    {
-		    DDim()
-		    {
-			    int n = sizeof...(N);
-			    //printf( "DDIM size:%d\n", n  );
-			    
-			    std::array< size_t, sizeof...(N) > a = {N...};
+        struct DDim
+        {
+            DDim()
+            {
+                int n = sizeof...(N);
+                //printf( "DDIM size:%d\n", n  );
 
-			    //printf("DDIM:");
-			    //for( int i = 0;i < n; ++i )
-			    //{
-				    //printf("%d,", a[i]);
-			    //}
-			    //printf( "\n");
-		    }
-		    size_t rank(){ return sizeof...(N);}
-		    std::vector<size_t> shape()
-		    {
-			    size_t n = this->rank();
+                std::array< size_t, sizeof...(N) > a = {N...};
 
-			    std::vector<size_t> v;
-			    v.reserve(n);
+                //printf("DDIM:");
+                //for( int i = 0;i < n; ++i )
+                //{
+                //printf("%d,", a[i]);
+                //}
+                //printf( "\n");
+            }
+            size_t rank(){ return sizeof...(N);}
+            std::vector<size_t> shape()
+            {
+                size_t n = this->rank();
 
-			    //int a[ sizeof...(N) ]= {N...};
+                std::vector<size_t> v;
+                v.reserve(n);
 
-			    std::array< size_t, sizeof...(N) > a = {N...};
-			    for( int i = 0;i < n; ++i )
-			    {
-				   // printf("%d,", a[i]);
-				    v.push_back( a[i] );
-			    }
-			    //printf( "\n");
-			    return v;
+                //int a[ sizeof...(N) ]= {N...};
 
-		    }
+                std::array< size_t, sizeof...(N) > a = {N...};
+                for( int i = 0;i < n; ++i )
+                {
+                    // printf("%d,", a[i]);
+                    v.push_back( a[i] );
+                }
+                //printf( "\n");
+                return v;
 
-		    //std::array< long, N > Dim;
-	    };
+            }
+
+            //std::array< long, N > Dim;
+        };
+
+
 
 }
 #endif
