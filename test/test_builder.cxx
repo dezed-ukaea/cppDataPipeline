@@ -114,15 +114,15 @@ TEST_F(BuilderTest, TestBuilder)
 
 
     {
-        int data[2][3];
+        double data[2][3];
         int dim1[2] = {1,2};
-        int dim2[3] ={3,4,5};
+        float dim2[3] ={3.1,4.2,5.3};
         int val=0;
 
         for( int i = 0; i < 2; i++)
         {
             for( int j = 0; j < 3; ++j )
-                data[i][j] = val++;
+                data[i][j] = val++ +.1;
         }
 
         fdp::DimensionDefinition dimdef1, dimdef2;
@@ -136,14 +136,14 @@ TEST_F(BuilderTest, TestBuilder)
         dimdef2.name = "dim2";
         dimdef2.units = "units2";
         dimdef2.description = "description2";
-        dimdef2.dataType = fdp::DataType::INT;
+        dimdef2.dataType = fdp::DataType::FLOAT;
         dimdef2.size = 3;
 
         fdp::ArrayDefinition arrdef;
         arrdef.name = "arr1";
         arrdef.units="arrunits";
         arrdef.description = "arrdescription";
-        arrdef.dataType = fdp::DataType::INT;
+        arrdef.dataType = fdp::DataType::DOUBLE;
         arrdef.dimension_names = { dimdef1.name, dimdef2.name };
         arrdef.shape = { 2,3 };
 
@@ -188,9 +188,9 @@ TEST_F(BuilderTest, TestBuilder)
         ASSERT_EQ( "arrdescription", arrdef_.description );
         ASSERT_EQ( arrdef_.shape, arrdef.shape );
         ASSERT_EQ( arrdef_.dimension_names, arrdef.dimension_names );
-        ASSERT_EQ( arrdef_.dataType, fdp::DataType::INT );
+        ASSERT_EQ( arrdef_.dataType, fdp::DataType::DOUBLE );
 
-        int data_[2][3];
+        double data_[2][3];
         status = builder2.readArray_data( "grp", arrdef_, data_ );
 
         for( int i = 0; i < 2; ++i )
@@ -223,12 +223,24 @@ TEST_F(BuilderTest, TestBuilder)
         ASSERT_EQ( "units2", dimdef2_.units );
         ASSERT_EQ( "description2", dimdef2_.description );
 
-        int dim2_[3];
+        float dim2_[3];
         status = builder2.readDim_data( "grp", dimdef2_, dim2_ );
 
         for( int j = 0; j < 3; ++j )
             ASSERT_EQ( dim2[j], dim2_[j] );
 
+
+        fdp::DimensionDefinition dimdef3;
+        dimdef3.name = "dim3";
+        dimdef3.units = "";
+        dimdef3.description = "";
+        dimdef3.dataType = fdp::DataType::STRING;
+        dimdef3.size = 3;
+
+        const char* dim3data[3] = {"a", "test", "bob"};
+
+
+        status = builder2.writeDimension( "grp", dimdef3, dim3data );
 
 
     }

@@ -46,6 +46,14 @@ namespace FairDataPipeline
         //virtual void rename(const std::string& new_name) = 0;
         virtual IGroupPtr getParentGroup() = 0;
     };
+    struct IGroupAtt
+    {
+        typedef std::shared_ptr< IGroupAtt > sptr;
+
+        virtual int getValues( std::string& values ) = 0;
+    };
+
+
 
     struct IVarAtt
     {
@@ -82,6 +90,7 @@ namespace FairDataPipeline
         typedef std::map< std::string, IGroup::sptr > NAME_GROUP_MAP;
         typedef std::map< std::string, IDimension::sptr > NAME_DIM_MAP;
         typedef std::map< std::string, IVar::sptr > NAME_VAR_MAP;
+        typedef std::map< std::string, IGroupAtt::sptr > NAME_ATT_MAP;
 
         virtual IGroup::sptr parent() = 0;
 
@@ -105,6 +114,10 @@ namespace FairDataPipeline
         virtual int getGroupCount() = 0;
 
         virtual std::string name() = 0;
+
+        virtual IGroupAtt::sptr putAtt( const std::string& key, const std::string& value ) = 0;
+        virtual IGroupAtt::sptr getAtt( const std::string& key ) = 0;
+
     };
 
     struct IBuilder : public IGroup

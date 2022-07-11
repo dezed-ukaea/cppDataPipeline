@@ -13,6 +13,7 @@ typedef std::shared_ptr< NcFile > NcFilePtr;
 
 namespace FairDataPipeline
 {
+#if 0
     size_t DataType_sizeof( DataType dtype )
     {
         size_t sz = 0;
@@ -62,6 +63,63 @@ namespace FairDataPipeline
         }
         return sz;
     }
+#endif
+    netCDF::NcType::ncType DataType2NcType( DataType dtype )
+    {
+        netCDF::NcType::ncType nctype;
+
+        switch( dtype )
+        {
+            case BYTE:
+               nctype = netCDF::NcType::nc_BYTE;
+                break;
+            case CHAR:
+               nctype = netCDF::NcType::nc_CHAR;
+                break;
+            case SHORT:
+               nctype = netCDF::NcType::nc_SHORT;
+                break;
+            case INT:
+               nctype = netCDF::NcType::nc_INT;
+                break;
+            case INT64:
+               nctype = netCDF::NcType::nc_INT64;
+                break;
+
+            case USHORT:
+               nctype  =netCDF::NcType::nc_USHORT;
+                break;
+            case UINT:
+               nctype = netCDF::NcType::nc_UINT;
+                break;
+            case UINT64:
+               nctype = netCDF::NcType::nc_UINT64;
+                break;
+            case UBYTE:
+               nctype = netCDF::NcType::nc_UBYTE;
+                break;
+
+
+            case FLOAT:
+               nctype = netCDF::NcType::nc_FLOAT;
+                break;
+            case DOUBLE:
+               nctype = netCDF::NcType::nc_DOUBLE;
+                break;
+
+            case STRING:
+                nctype = netCDF::NcType::nc_STRING;
+                break;
+
+            default:
+                break;
+
+
+
+        }
+        return nctype;
+    }
+
 
     DataType NcType2DataType( netCDF::NcType::ncType nctype )
     {
@@ -156,6 +214,40 @@ namespace FairDataPipeline
 
             IVar::NAME_VARATT_MAP _name_varatt_map;
     };
+
+    class GroupAtt : public IGroupAtt
+    {
+        public:
+            typedef std::shared_ptr< GroupAtt > sptr;
+
+            GroupAtt() = delete;
+            static GroupAtt::sptr create( netCDF::NcGroupAtt& ncatt ) 
+            {
+                return GroupAtt::sptr( new GroupAtt( ncatt ) );
+            }
+
+            int getValues( std::string& values );
+        private:
+            GroupAtt( netCDF::NcGroupAtt& ncatt ) : _ncatt( ncatt ){}
+            netCDF::NcGroupAtt _ncatt;
+
+    };
+
+    int GroupAtt::getValues( std::string& values )
+    {
+        int status = 0;
+        
+        try
+        {
+            _ncatt.getValues( values );
+        }
+        catch( NcException& e )
+        {
+            e.what();
+        }
+
+        return status;
+    }
 
     class VarAtt : public IVarAtt
     {
@@ -341,6 +433,10 @@ namespace FairDataPipeline
 
             IVar::sptr getVar( const std::string& name );
 
+            IGroupAtt::sptr putAtt( const std::string& key, const std::string& value );
+            IGroupAtt::sptr getAtt( const std::string& key );
+
+
 			static GroupImpl::sptr create( GroupImpl::sptr p );
 
 		protected:
@@ -356,7 +452,54 @@ namespace FairDataPipeline
             IGroup::NAME_DIM_MAP _name_dim_map;
             IGroup::NAME_VAR_MAP _name_var_map;
 
+            IGroup::NAME_ATT_MAP _name_att_map;
+
 	};
+
+    IGroupAtt::sptr GroupImpl::putAtt( const std::string& key, const std::string& value )
+    {
+        IGroupAtt::sptr grp_att;
+            try
+            {
+                netCDF::NcGroupAtt ncatt = _nc->putAtt( key, value );
+                grp_att = GroupAtt::create( ncatt );
+
+                _name_att_map[ key ] = grp_att;
+            }
+            catch( NcException& e )
+            {
+                e.what();
+            }
+        
+    return grp_att;
+    }
+
+    IGroupAtt::sptr GroupImpl::getAtt( const std::string& key )
+    {
+        IGroupAtt::sptr att_ptr;
+        auto it = _name_att_map.find( key );
+        if( it != _name_att_map.end() )
+        {
+            att_ptr = it->second;
+        }
+        else
+        {
+            try
+            {
+                netCDF::NcGroupAtt ncatt = _nc->getAtt( key );
+                att_ptr = GroupAtt::create( ncatt );
+                _name_att_map[ key ] = att_ptr;
+            }
+            catch( NcException& e )
+            {
+                e.what();
+            }
+
+        }
+        return att_ptr;
+
+    }
+
 
     IVar::sptr GroupImpl::addVar( const std::string& name, DataType dataType, IVar::VDIMS& vdims )
     {
@@ -371,7 +514,8 @@ namespace FairDataPipeline
 
         try
         {
-            netCDF::NcVar ncvar = _nc->addVar( name, netCDF::NcInt(), ncdims );
+            netCDF::NcType::ncType nctype = DataType2NcType( dataType );
+            netCDF::NcVar ncvar = _nc->addVar( name, nctype, ncdims );
             var_ptr = VarImpl::create( this->shared_from_this(), name,  ncvar );
             _name_var_map[ name ] = var_ptr;
         }
@@ -842,7 +986,9 @@ namespace FairDataPipeline
             std::vector< IDimension::sptr > vdims = {dim_ptr};
 
             dim_var_ptr = grp_ptr->addVar( dimdef.name, dimdef.dataType, vdims );
-            dim_var_ptr->putVar( data );
+
+            if( data )
+                dim_var_ptr->putVar( data );
 
             dim_var_ptr->putAtt( "units", dimdef.units );
             dim_var_ptr->putAtt( "description", dimdef.description );
@@ -901,7 +1047,8 @@ namespace FairDataPipeline
             if( !arr_var_ptr )
             {
                 arr_var_ptr = grp_ptr->addVar( arraydef.name, arraydef.dataType, vdims );
-                arr_var_ptr->putVar( data );
+                if( data )
+                    arr_var_ptr->putVar( data );
 
                 arr_var_ptr->putAtt( "units", arraydef.units );
                 arr_var_ptr->putAtt( "description", arraydef.description );
