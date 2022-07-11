@@ -816,18 +816,34 @@ namespace FairDataPipeline
         {
            const std::string& dim_name = arraydef.dimension_names[i];
 
-           IVar::sptr dim_var_ptr = grp_ptr->getVar( dim_name );
-           if( dim_var_ptr )
+           if( dim_name == "" )//no dim
            {
-               std::vector< std::string > dims = dim_var_ptr->getDims();
+               //create a dummy dim based on shape
+               std::ostringstream os;
+               os << arraydef.name << "_dim" << i;
 
-               IDimension::sptr dim_ptr = grp_ptr->getDim( dims[0] );
+               size_t n = arraydef.array_shape[ i ];
+
+               std::string dummy_name = os.str();
+
+               IDimension::sptr dim_ptr = grp_ptr->addDim(dummy_name, n );
+
                vdims.push_back( dim_ptr );
            }
-           else 
-               status = 1;
-        }                    
+           else
+           {
+               IVar::sptr dim_var_ptr = grp_ptr->getVar( dim_name );
+               if( dim_var_ptr )
+               {
+                   std::vector< std::string > dims = dim_var_ptr->getDims();
 
+                   IDimension::sptr dim_ptr = grp_ptr->getDim( dims[0] );
+                   vdims.push_back( dim_ptr );
+               }
+               else 
+                   status = 1;
+           }
+        }                    
 
         if( !status )
         {

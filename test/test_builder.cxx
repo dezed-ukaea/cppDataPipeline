@@ -22,14 +22,7 @@ protected:
     #endif
     return HomeDirectory;
   }
-  //ghc::filesystem::path read_csv_config = ghc::filesystem::path(TESTDIR) / "data" / "read_csv.yaml";
-  //std::string api_url_ = "http://127.0.0.1:8000/api";
 
-  //FairDataPipeline::API::sptr api_ = FairDataPipeline::API::construct(api_url_);
-
-  //std::string token =
-  //    read_token(ghc::filesystem::path(getHomeDirectory()) /
-  //                                  ".fair" / "registry" / "token");
   void TearDown() override 
   {
   }
@@ -37,7 +30,6 @@ protected:
 
 namespace fdp = FairDataPipeline;
 
-//! [TestGetById]
 TEST_F(BuilderTest, TestBuilder) 
 {
 	fdp::IBuilder::sptr 
@@ -45,37 +37,37 @@ TEST_F(BuilderTest, TestBuilder)
 
 	ASSERT_TRUE( NULL != ibuilder );
 
-	auto grp_bob = ibuilder->addGroup("bob");
+	auto grp_bob_ptr = ibuilder->addGroup("bob");
 
-	ASSERT_TRUE( NULL != grp_bob );
+	ASSERT_TRUE( NULL != grp_bob_ptr );
 
-	auto grp_bob_terry = grp_bob->addGroup( "terry");
+	auto grp_bob_terry_ptr = grp_bob_ptr->addGroup( "terry");
 
-	ASSERT_TRUE( NULL != grp_bob_terry );
+	ASSERT_TRUE( NULL != grp_bob_terry_ptr );
 
-	auto grp_bad = grp_bob->getGroup( "bad" );
+	auto grp_bad = grp_bob_ptr->getGroup( "bad" );
 
-	auto grp = ibuilder->getGroup("bob/terry");
+	auto grp_ptr = ibuilder->getGroup("bob/terry");
 
-    grp_bob_terry->addDim( "dim1", 10);
-    auto dim1 = grp_bob_terry->getDim( "dim1" );
+    grp_bob_terry_ptr->addDim( "dim1", 10);
+    auto dim1_ptr = grp_bob_terry_ptr->getDim( "dim1" );
 
-	ASSERT_EQ( dim1->getName(), "dim1" );
-	ASSERT_EQ( dim1->getSize(), 10 );
-	ASSERT_EQ( dim1->getParentGroup(), grp_bob_terry );
+	ASSERT_EQ( dim1_ptr->getName(), "dim1" );
+	ASSERT_EQ( dim1_ptr->getSize(), 10 );
+	ASSERT_EQ( dim1_ptr->getParentGroup(), grp_bob_terry_ptr );
         
 
     
 
-	ASSERT_TRUE( NULL != grp );
-	ASSERT_EQ( grp->name(), "terry" );
-	ASSERT_EQ( grp->parent()->name(), "bob" );
+	ASSERT_TRUE( NULL != grp_ptr );
+	ASSERT_EQ( grp_ptr->name(), "terry" );
+	ASSERT_EQ( grp_ptr->parent()->name(), "bob" );
 
-	auto parent_parent = grp->parent()->parent();
+	auto parent_parent = grp_ptr->parent()->parent();
 	std::string s = parent_parent->name();
 
-	ASSERT_TRUE( NULL != grp->parent()->parent() );
-	ASSERT_EQ( "/", grp->parent()->parent()->name() );
+	ASSERT_TRUE( NULL != grp_ptr->parent()->parent() );
+	ASSERT_EQ( "/", grp_ptr->parent()->parent()->name() );
 	
 	int a[1][2][3];
 	int* pa = &a[0][0][0];
@@ -91,20 +83,19 @@ TEST_F(BuilderTest, TestBuilder)
 	ASSERT_EQ( dim.shape()[2], 3 );
 
 	fdp::Array::ArrayRef< int > a_ref( pa, dim );
-    std::vector< int > vals = {{0,1,2,3,4,5,6,7,8,9}};
+    std::vector< int > vals = {0,1,2,3,4,5,6,7,8,9};
 
 	ASSERT_EQ( a_ref.data(), pa );
 
 
-    std::vector< fdp::IDimension::sptr > vdims;
-    vdims.push_back( dim1 );
+    std::vector< fdp::IDimension::sptr > vdims ={ dim1_ptr };
 
-    auto dim_var1_ptr = grp_bob_terry->addVar( "var1", fdp::DataType::INT, vdims ); 
+    auto dim_var1_ptr = grp_bob_terry_ptr->addVar( "var1", fdp::DataType::INT, vdims ); 
     dim_var1_ptr->putVar( vals.data() );
 
-	ASSERT_EQ( dim_var1_ptr->parent(), grp_bob_terry );
+	ASSERT_EQ( dim_var1_ptr->parent(), grp_bob_terry_ptr );
 
-    auto var_ptr = grp_bob_terry->getVar( "var1" );
+    auto var_ptr = grp_bob_terry_ptr->getVar( "var1" );
 
 	ASSERT_EQ( dim_var1_ptr, var_ptr );
 
@@ -155,8 +146,8 @@ TEST_F(BuilderTest, TestBuilder)
     arrdef.units="arrunits";
     arrdef.description = "arrdescription";
     arrdef.dataType = fdp::DataType::INT;
-
     arrdef.dimension_names = { dimdef1.name, dimdef2.name };
+    arrdef.array_shape = { 2,3 };
 
     arrdef.data = data;
 

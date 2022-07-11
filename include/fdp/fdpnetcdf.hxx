@@ -130,6 +130,7 @@ namespace FairDataPipeline
         enum DataType dataType;
         std::string description;
         std::vector< std::string > dimension_names;
+        std::vector< size_t > array_shape;
 
         void* data;
     };
