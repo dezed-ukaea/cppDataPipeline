@@ -119,8 +119,6 @@ namespace FairDataPipeline
         std::string units;
         std::string description;
         enum DataType dataType;
-
-        void* data;
     };
 
     struct ArrayDefinition
@@ -131,8 +129,6 @@ namespace FairDataPipeline
         std::string description;
         std::vector< std::string > dimension_names;
         std::vector< size_t > shape;
-
-        void* data;
     };
 
     class BuilderFactory
@@ -157,25 +153,22 @@ namespace FairDataPipeline
             Builder( const std::string& path, IBuilder::Mode mode );
 
             int writeArray( const std::string& group_name
-                    , const ArrayDefinition& arraydef );
-            //                    , const void* data );
+                    , const ArrayDefinition& arraydef, const void* data );
 
-            int writeDimension(const std::string& group_name, const DimensionDefinition& dimdef );
+            int writeDimension(const std::string& group_name, const DimensionDefinition& dimdef, const void* data );
 
             int readDim_metadata( const std::string& grp_name
                     , const std::string dim_name
                     , DimensionDefinition& dimdef );
 
             int readDim_data( const std::string& grp_name
-                    , const std::string dim_name
-                    , DimensionDefinition& dimdef );
+                    , const DimensionDefinition& dimdef, void* data );
 
 
             int readArray_metadata( const std::string& grp_name, const std::string& array_name
                     ,  ArrayDefinition& arraydef );
 
-            int readArray_data( const std::string& grp_name, const std::string& name
-                    ,  ArrayDefinition& arraydef );
+            int readArray_data( const std::string& grp_name,  const ArrayDefinition& arraydef, void *data );
         private:
             IBuilder::sptr _builder;
     };

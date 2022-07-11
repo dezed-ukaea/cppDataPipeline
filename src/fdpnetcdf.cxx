@@ -720,7 +720,7 @@ namespace FairDataPipeline
             dimdef.name = dim_name;
             dimdef.dataType = dtype;
             dimdef.size = n;
-            dimdef.data = NULL;
+            //dimdef.data = NULL;
             dimdef.units = units;
             dimdef.description = description;
         }
@@ -728,16 +728,15 @@ namespace FairDataPipeline
         return status;
     }
     int Builder::readDim_data( const std::string& grp_name
-            , const std::string dim_name
-            , DimensionDefinition& dimdef )
+            , const DimensionDefinition& dimdef, void* data )
     {
         int status = 0;
 
         IGroup::sptr grp_ptr = _builder->getGroup( grp_name );
         if( grp_ptr )
         {
-            IVar::sptr var_ptr = grp_ptr->getVar( dim_name );
-            var_ptr->getVar( dimdef.data );
+            IVar::sptr var_ptr = grp_ptr->getVar( dimdef.name );
+            var_ptr->getVar( data );
         }
 
         return status;
@@ -786,9 +785,6 @@ namespace FairDataPipeline
 
                 DataType dtype =  var_ptr->getType();
 
-                //char* p = (char*)malloc(  n * DataType_sizeof( dtype ) );
-                //var_ptr->getVar( p );
-
                 std::string units, description;
 
                 IVarAtt::sptr att_units_ptr = var_ptr->getAtt( "units" );
@@ -814,16 +810,15 @@ namespace FairDataPipeline
 
         return status;
     }
-    int Builder::readArray_data( const std::string& grp_name, const std::string& name
-            ,  ArrayDefinition& arraydef )
+    int Builder::readArray_data( const std::string& grp_name, const ArrayDefinition& arraydef, void* data )
     {
         int status = 0;
         IGroup::sptr grp_ptr = _builder->getGroup( grp_name );
         if( grp_ptr )
         {
-            IVar::sptr var_ptr = grp_ptr->getVar( name );
+            IVar::sptr var_ptr = grp_ptr->getVar( arraydef.name );
             if( var_ptr )
-                var_ptr->getVar( arraydef.data );
+                var_ptr->getVar( data );
             else
                 status = 1;
         }
@@ -833,7 +828,7 @@ namespace FairDataPipeline
         return status;
     }
 
-    int Builder::writeDimension(const std::string& group_name, const DimensionDefinition& dimdef )
+    int Builder::writeDimension(const std::string& group_name, const DimensionDefinition& dimdef, const void* data )
     {
         int status = 0;
 
@@ -847,7 +842,7 @@ namespace FairDataPipeline
             std::vector< IDimension::sptr > vdims = {dim_ptr};
 
             dim_var_ptr = grp_ptr->addVar( dimdef.name, dimdef.dataType, vdims );
-            dim_var_ptr->putVar( dimdef.data );
+            dim_var_ptr->putVar( data );
 
             dim_var_ptr->putAtt( "units", dimdef.units );
             dim_var_ptr->putAtt( "description", dimdef.description );
@@ -859,7 +854,7 @@ namespace FairDataPipeline
     }
 
     int Builder::writeArray( const std::string& group_name
-            , const ArrayDefinition& arraydef )
+            , const ArrayDefinition& arraydef, const void* data )
     {
         int status = 0;
         //write dims
@@ -906,7 +901,7 @@ namespace FairDataPipeline
             if( !arr_var_ptr )
             {
                 arr_var_ptr = grp_ptr->addVar( arraydef.name, arraydef.dataType, vdims );
-                arr_var_ptr->putVar( arraydef.data );
+                arr_var_ptr->putVar( data );
 
                 arr_var_ptr->putAtt( "units", arraydef.units );
                 arr_var_ptr->putAtt( "description", arraydef.description );
@@ -917,9 +912,6 @@ namespace FairDataPipeline
 
         return status;
     }
-
-
-
 }
 
 
