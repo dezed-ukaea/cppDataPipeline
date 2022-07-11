@@ -708,11 +708,21 @@ namespace FairDataPipeline
             size_t n = dim_def_ptr->getSize();
             DataType dtype = var_ptr->getType();
 
-
+            std::string units, description;
+            IVarAtt::sptr att_units_ptr = var_ptr->getAtt( "units" );
+            if( att_units_ptr )
+                att_units_ptr->getValues( units );
+ 
+            IVarAtt::sptr att_desc_ptr = var_ptr->getAtt( "description" );
+            if( att_desc_ptr )
+                att_desc_ptr->getValues( description );
+                  
             dimdef.name = dim_name;
             dimdef.dataType = dtype;
             dimdef.size = n;
             dimdef.data = NULL;
+            dimdef.units = units;
+            dimdef.description = description;
         }
 
         return status;
@@ -749,6 +759,7 @@ namespace FairDataPipeline
 
             if( var_ptr )
             {
+                std::vector< std::string > dim_names;
 
                 auto dims = var_ptr->getDims();
                 for( int i = 0; i < dims.size(); ++i )
@@ -758,6 +769,13 @@ namespace FairDataPipeline
 
                     size_t size = dim_ptr->getSize();
                     shape.push_back( size );
+
+                    std::string dim_var_name( dim_name.begin(), dim_name.end()-4 );
+                    IVar::sptr dim_var_ptr = grp_ptr->getVar( dim_var_name );
+                    if( dim_var_ptr )
+                        dim_names.push_back( dim_var_name );
+                    else
+                        dim_names.push_back( "" );
                 }
 
                 size_t n = 1;
@@ -768,8 +786,27 @@ namespace FairDataPipeline
 
                 DataType dtype =  var_ptr->getType();
 
-                char* p = (char*)malloc(  n * DataType_sizeof( dtype ) );
-                var_ptr->getVar( p );
+                //char* p = (char*)malloc(  n * DataType_sizeof( dtype ) );
+                //var_ptr->getVar( p );
+
+                std::string units, description;
+
+                IVarAtt::sptr att_units_ptr = var_ptr->getAtt( "units" );
+                if( att_units_ptr )
+                    att_units_ptr->getValues( units );
+
+                IVarAtt::sptr att_desc_ptr = var_ptr->getAtt( "description" );
+                if( att_desc_ptr )
+                    att_desc_ptr->getValues( description );
+
+
+                arraydef.name = array_name;
+                arraydef.dataType = dtype;
+                arraydef.dimension_names = dim_names;
+                arraydef.shape = shape;
+                arraydef.units = units;
+                arraydef.description = description;
+
             }
         }
         else
@@ -777,7 +814,25 @@ namespace FairDataPipeline
 
         return status;
     }
-    
+    int Builder::readArray_data( const std::string& grp_name, const std::string& name
+            ,  ArrayDefinition& arraydef )
+    {
+        int status = 0;
+        IGroup::sptr grp_ptr = _builder->getGroup( grp_name );
+        if( grp_ptr )
+        {
+            IVar::sptr var_ptr = grp_ptr->getVar( name );
+            if( var_ptr )
+                var_ptr->getVar( arraydef.data );
+            else
+                status = 1;
+        }
+        else
+            status = 1;
+
+        return status;
+    }
+
     int Builder::writeDimension(const std::string& group_name, const DimensionDefinition& dimdef )
     {
         int status = 0;
@@ -822,7 +877,7 @@ namespace FairDataPipeline
                std::ostringstream os;
                os << arraydef.name << "_dim" << i;
 
-               size_t n = arraydef.array_shape[ i ];
+               size_t n = arraydef.shape[ i ];
 
                std::string dummy_name = os.str();
 
