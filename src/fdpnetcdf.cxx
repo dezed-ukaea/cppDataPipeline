@@ -881,13 +881,28 @@ namespace FairDataPipeline
 		_builder->putAtt( "schema", 1 );
     }
 
-    int Builder::readDim_metadata( const std::string& grp_name
-            , const std::string dim_name
+    int Builder::readDim_metadata( /*const std::string& grp_name
+            , */std::string dim_name
             , DimensionDefinition& dimdef )
     {
         int status = 0;
+	std::string dim_name_orig = dim_name;
 
-        IGroup::sptr grp_ptr = _builder->getGroup( grp_name );
+        IGroup::sptr grp_ptr = _builder;
+
+	std::vector< std::string > splits;
+	split_str( dim_name, '/', splits );
+
+	if( splits.size() > 1 )
+	{
+		for(int i = 0; i < splits.size()-1; ++i )
+		{
+			if (grp_ptr)
+				grp_ptr = grp_ptr->getGroup( splits[i] );
+		}
+		dim_name = splits[ splits.size()-1 ];
+	}
+
         if( grp_ptr )
         {
             IVar::sptr var_ptr = grp_ptr->getVar( dim_name );
@@ -906,7 +921,7 @@ namespace FairDataPipeline
             if( att_desc_ptr )
                 att_desc_ptr->getValues( description );
                   
-            dimdef.name = dim_name;
+            dimdef.name = dim_name_orig;
             dimdef.dataType = dtype;
             dimdef.size = n;
             dimdef.units = units;
@@ -915,15 +930,35 @@ namespace FairDataPipeline
 
         return status;
     }
-    int Builder::readDim_data( const std::string& grp_name
-            , const DimensionDefinition& dimdef, void* data )
+    int Builder::readDim_data( /*const std::string& grp_name
+            , */const DimensionDefinition& dimdef, void* data )
     {
         int status = 0;
 
-        IGroup::sptr grp_ptr = _builder->getGroup( grp_name );
+	std::string dim_name_orig = dimdef.name;
+	std::string dim_name = dim_name_orig;
+
+        IGroup::sptr grp_ptr = _builder;
+
+	std::vector< std::string > splits;
+	split_str( dim_name_orig, '/', splits );
+
+	if( splits.size() > 1 )
+	{
+		for(int i = 0; i < splits.size()-1; ++i )
+		{
+			if (grp_ptr)
+				grp_ptr = grp_ptr->getGroup( splits[i] );
+		}
+		dim_name = splits[ splits.size()-1 ];
+	}
+
+
+
+       // IGroup::sptr grp_ptr = _builder->getGroup( grp_name );
         if( grp_ptr )
         {
-            IVar::sptr var_ptr = grp_ptr->getVar( dimdef.name );
+            IVar::sptr var_ptr = grp_ptr->getVar( dim_name );
             var_ptr->getVar( data );
         }
 
@@ -932,11 +967,26 @@ namespace FairDataPipeline
 
 
 
-    int Builder::readArray_metadata( const std::string& grp_name, const std::string& array_name
+    int Builder::readArray_metadata( /*const std::string& grp_name, */std::string array_name
             ,  ArrayDefinition& arraydef )
     {
         int status = 0;
-        IGroup::sptr grp_ptr = _builder->getGroup( grp_name );
+	std::string array_name_orig = array_name;
+
+        IGroup::sptr grp_ptr = _builder;
+
+	std::vector< std::string > splits;
+	split_str( array_name, '/', splits );
+
+	if( splits.size() > 1 )
+	{
+		for(int i = 0; i < splits.size()-1; ++i )
+		{
+			if (grp_ptr)
+				grp_ptr = grp_ptr->getGroup( splits[i] );
+		}
+		array_name = splits[ splits.size()-1 ];
+	}
 
         std::vector< size_t > shape;
 
@@ -954,11 +1004,21 @@ namespace FairDataPipeline
                     const std::string& dim_name = dims[i];
                     IDimension::sptr dim_ptr = grp_ptr->getDim( dim_name );
 
+
                     size_t size = dim_ptr->getSize();
                     shape.push_back( size );
 
                     std::string dim_var_name( dim_name.begin(), dim_name.end()-4 );
                     IVar::sptr dim_var_ptr = grp_ptr->getVar( dim_var_name );
+
+		    IGroup::sptr parent_grp_ptr = dim_var_ptr->parent();
+		    while( parent_grp_ptr && parent_grp_ptr->name() != "/" )
+		    {
+			    dim_var_name = parent_grp_ptr->name() + "/" +dim_var_name;
+
+			    parent_grp_ptr = parent_grp_ptr->parent();
+		    }
+
                     if( dim_var_ptr )
                         dim_names.push_back( dim_var_name );
                     else
@@ -984,7 +1044,7 @@ namespace FairDataPipeline
                     att_desc_ptr->getValues( description );
 
 
-                arraydef.name = array_name;
+                arraydef.name = array_name_orig;
                 arraydef.dataType = dtype;
                 arraydef.dimension_names = dim_names;
                 arraydef.shape = shape;
@@ -998,13 +1058,32 @@ namespace FairDataPipeline
 
         return status;
     }
-    int Builder::readArray_data( const std::string& grp_name, const ArrayDefinition& arraydef, void* data )
+    int Builder::readArray_data( /*const std::string& grp_name,*/ const ArrayDefinition& arraydef, void* data )
     {
         int status = 0;
-        IGroup::sptr grp_ptr = _builder->getGroup( grp_name );
+	std::string array_name_orig = arraydef.name;
+	std::string array_name = array_name_orig;
+
+        IGroup::sptr grp_ptr = _builder;
+
+	std::vector< std::string > splits;
+	split_str( array_name_orig, '/', splits );
+
+	if( splits.size() > 1 )
+	{
+		for(int i = 0; i < splits.size()-1; ++i )
+		{
+			if (grp_ptr)
+				grp_ptr = grp_ptr->getGroup( splits[i] );
+		}
+		array_name = splits[ splits.size()-1 ];
+	}
+
+
+        //IGroup::sptr grp_ptr = _builder->getGroup( grp_name );
         if( grp_ptr )
         {
-            IVar::sptr var_ptr = grp_ptr->getVar( arraydef.name );
+            IVar::sptr var_ptr = grp_ptr->getVar( array_name );
             if( var_ptr )
                 var_ptr->getVar( data );
             else
@@ -1016,20 +1095,38 @@ namespace FairDataPipeline
         return status;
     }
 
-    int Builder::writeDimension(const std::string& group_name, const DimensionDefinition& dimdef, const void* data )
+    int Builder::writeDimension( /*const std::string& group_name,*/ const DimensionDefinition& dimdef, const void* data )
     {
         int status = 0;
 
-        IGroup::sptr grp_ptr = _builder->requireGroup( group_name );
+	std::string dimdef_name = dimdef.name;
 
-        IVar::sptr dim_var_ptr = grp_ptr->getVar( dimdef.name );
+	IGroup::sptr grp_ptr =_builder;// this->shared_from_this();
+#if 1
+	std::vector< std::string > splits;
+
+        split_str( dimdef.name, '/', splits );
+
+	if( splits.size() > 1 )
+	{
+		for( int i=0; i < splits.size()-1; ++i )
+		{
+			grp_ptr = grp_ptr->requireGroup( splits[i] );
+		}
+
+		dimdef_name = splits[ splits.size()-1];
+	}
+#else
+        grp_ptr = _builder->requireGroup( group_name );
+#endif
+        IVar::sptr dim_var_ptr = grp_ptr->getVar( dimdef_name );
         if( !dim_var_ptr )
         {
-            IDimension::sptr dim_ptr = grp_ptr->addDim( dimdef.name + "_dim", dimdef.size );
+            IDimension::sptr dim_ptr = grp_ptr->addDim( dimdef_name + "_dim", dimdef.size );
 
             std::vector< IDimension::sptr > vdims = {dim_ptr};
 
-            dim_var_ptr = grp_ptr->addVar( dimdef.name, dimdef.dataType, vdims );
+            dim_var_ptr = grp_ptr->addVar( dimdef_name, dimdef.dataType, vdims );
 
             if( data )
                 dim_var_ptr->putVar( data );
@@ -1043,18 +1140,30 @@ namespace FairDataPipeline
         return status;
     }
 
-    int Builder::writeArray( const std::string& group_name
-            , const ArrayDefinition& arraydef, const void* data )
+    int Builder::writeArray( /*const std::string& group_name
+            ,*/ const ArrayDefinition& arraydef, const void* data )
     {
         int status = 0;
         //write dims
         std::vector< IDimension::sptr > vdims;
 
-        IGroup::sptr grp_ptr = _builder->requireGroup( group_name );
+        IGroup::sptr grp_ptr;// = _builder->requireGroup( group_name );
 
         for( int i = 0; i < arraydef.dimension_names.size();++i )
         {
-           const std::string& dim_name = arraydef.dimension_names[i];
+		grp_ptr = _builder;
+           std::string dim_name = arraydef.dimension_names[i];
+	   std::vector< std::string > splits;
+	   split_str( dim_name, '/', splits );
+
+	   if( splits.size() > 1 )
+	   {
+		   for( int i=0; i < splits.size()-1; ++i )
+		   {
+			   grp_ptr = grp_ptr->requireGroup( splits[i] );
+		   }
+		   dim_name = splits[ splits.size()-1];
+	   }
 
            if( dim_name == "" )//no dim
            {
@@ -1087,10 +1196,24 @@ namespace FairDataPipeline
 
         if( !status )
         {
-            IVar::sptr arr_var_ptr = grp_ptr->getVar( arraydef.name );
+	   std::vector< std::string > splits;
+	   split_str( arraydef.name, '/', splits );
+	   std::string arrname = arraydef.name;
+	   grp_ptr = _builder;
+
+	   if( splits.size() > 1 )
+	   {
+		   for( int i=0; i < splits.size()-1; ++i )
+		   {
+			   grp_ptr = grp_ptr->requireGroup( splits[i] );
+		   }
+		   arrname = splits[ splits.size()-1];
+	   }
+
+            IVar::sptr arr_var_ptr = grp_ptr->getVar( arrname );
             if( !arr_var_ptr )
             {
-                arr_var_ptr = grp_ptr->addVar( arraydef.name, arraydef.dataType, vdims );
+                arr_var_ptr = grp_ptr->addVar( arrname, arraydef.dataType, vdims );
                 if( data )
                     arr_var_ptr->putVar( data );
 

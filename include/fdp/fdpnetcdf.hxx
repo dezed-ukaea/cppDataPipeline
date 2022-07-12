@@ -174,23 +174,23 @@ namespace FairDataPipeline
 
             Builder( const std::string& path, IBuilder::Mode mode );
 
-            int writeArray( const std::string& group_name
-                    , const ArrayDefinition& arraydef, const void* data );
+            int writeArray( /*const std::string& group_name
+                    , */const ArrayDefinition& arraydef, const void* data );
 
-            int writeDimension(const std::string& group_name, const DimensionDefinition& dimdef, const void* data );
+            int writeDimension( /*const std::string& group_name,*/ const DimensionDefinition& dimdef, const void* data );
 
-            int readDim_metadata( const std::string& grp_name
-                    , const std::string dim_name
+            int readDim_metadata( /*const std::string& grp_name
+                    , */const std::string dim_name
                     , DimensionDefinition& dimdef );
 
-            int readDim_data( const std::string& grp_name
-                    , const DimensionDefinition& dimdef, void* data );
+            int readDim_data( /*const std::string& grp_name
+                    ,*/ const DimensionDefinition& dimdef, void* data );
 
 
-            int readArray_metadata( const std::string& grp_name, const std::string& array_name
+            int readArray_metadata( /*const std::string& grp_name, */std::string array_name
                     ,  ArrayDefinition& arraydef );
 
-            int readArray_data( const std::string& grp_name,  const ArrayDefinition& arraydef, void *data );
+            int readArray_data( /*const std::string& grp_name,*/  const ArrayDefinition& arraydef, void *data );
         private:
             IBuilder::sptr _builder;
     };
