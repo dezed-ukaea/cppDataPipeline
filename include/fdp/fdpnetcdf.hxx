@@ -6,6 +6,7 @@
 #include<map>
 #include<vector>
 #include<string>
+#include<type_traits>
 //#include<netcdf>
 
 //#include "fdp/fdparrayref.hxx"
@@ -50,6 +51,8 @@ namespace FairDataPipeline
     {
         typedef std::shared_ptr< IGroupAtt > sptr;
 
+        virtual int getValues( int* values ) = 0;
+        virtual int getValues( float* values ) = 0;
         virtual int getValues( std::string& values ) = 0;
     };
 
@@ -59,6 +62,8 @@ namespace FairDataPipeline
     {
         typedef std::shared_ptr< IVarAtt > sptr;
 
+	virtual int getValues( int* values ) = 0;
+        virtual int getValues( float* values ) = 0;
         virtual int getValues( std::string& values ) = 0;
     };
 
@@ -116,6 +121,9 @@ namespace FairDataPipeline
         virtual std::string name() = 0;
 
         virtual IGroupAtt::sptr putAtt( const std::string& key, const std::string& value ) = 0;
+        virtual IGroupAtt::sptr putAtt( const std::string& key, int value ) = 0;
+        virtual IGroupAtt::sptr putAtt( const std::string& key, float value ) = 0;
+
         virtual IGroupAtt::sptr getAtt( const std::string& key ) = 0;
 
     };
@@ -143,6 +151,7 @@ namespace FairDataPipeline
         std::vector< std::string > dimension_names;
         std::vector< size_t > shape;
     };
+
 
     class BuilderFactory
     {
@@ -185,7 +194,7 @@ namespace FairDataPipeline
         private:
             IBuilder::sptr _builder;
     };
-
+#if 0
     template< size_t...N >
         struct DDim
         {
@@ -226,7 +235,7 @@ namespace FairDataPipeline
 
             //std::array< long, N > Dim;
         };
-
+#endif
 
 
 }

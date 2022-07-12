@@ -5,7 +5,6 @@
 #include "gtest/gtest.h"
 
 #include "fdp/fdpnetcdf.hxx"
-#include "fdp/fdparrayref.hxx"
 
 //using namespace FairDataPipeline;
 
@@ -38,6 +37,9 @@ TEST_F(BuilderTest, TestBuilder)
     ASSERT_TRUE( NULL != ibuilder );
 
     auto grp_bob_ptr = ibuilder->addGroup("bob");
+    grp_bob_ptr->putAtt( "int", 123 );
+    grp_bob_ptr->putAtt( "float", 123.123f );
+    grp_bob_ptr->putAtt( "string", "a string" );
 
     ASSERT_TRUE( NULL != grp_bob_ptr );
 
@@ -76,16 +78,16 @@ TEST_F(BuilderTest, TestBuilder)
 
     pa2 = &a;
 
-    fdp::Array::Shape dim = fdp::Array::make_shape( shape, 3 );
-    ASSERT_EQ( dim.rank(), 3 );
-    ASSERT_EQ( dim.shape()[0], 1 );
-    ASSERT_EQ( dim.shape()[1], 2 );
-    ASSERT_EQ( dim.shape()[2], 3 );
+    //fdp::Array::Shape dim = fdp::Array::make_shape( shape, 3 );
+    //ASSERT_EQ( dim.rank(), 3 );
+    //ASSERT_EQ( dim.shape()[0], 1 );
+    //ASSERT_EQ( dim.shape()[1], 2 );
+    //ASSERT_EQ( dim.shape()[2], 3 );
 
-    fdp::Array::ArrayRef< int > a_ref( pa, dim );
+    //fdp::Array::ArrayRef< int > a_ref( pa, dim );
     std::vector< int > vals = {0,1,2,3,4,5,6,7,8,9};
 
-    ASSERT_EQ( a_ref.data(), pa );
+    //ASSERT_EQ( a_ref.data(), pa );
 
 
     std::vector< fdp::IDimension::sptr > vdims ={ dim1_ptr };

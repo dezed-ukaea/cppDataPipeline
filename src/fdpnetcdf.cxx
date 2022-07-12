@@ -13,57 +13,6 @@ typedef std::shared_ptr< NcFile > NcFilePtr;
 
 namespace FairDataPipeline
 {
-#if 0
-    size_t DataType_sizeof( DataType dtype )
-    {
-        size_t sz = 0;
-
-        switch( dtype )
-        {
-            case BYTE:
-                sz = 1;
-                break;
-            case CHAR:
-                sz = 1;
-                break;
-            case SHORT:
-                sz = sizeof( short );
-                break;
-            case INT:
-                sz = sizeof( int );
-                break;
-            case INT64:
-                sz = sizeof( int64_t );
-                break;
-
-            case UBYTE:
-                sz = 1;
-                break;
-
-            case USHORT:
-                sz = sizeof( unsigned short );
-                break;
-            case UINT:
-                sz = sizeof( unsigned int );
-                break;
-            case UINT64:
-                sz = sizeof( uint64_t );
-                break;
-
-
-            case FLOAT:
-                sz = sizeof( float );
-                break;
-            case DOUBLE:
-                sz = sizeof(double);
-                break;
-            default:
-                break;
-
-        }
-        return sz;
-    }
-#endif
     netCDF::NcType::ncType DataType2NcType( DataType dtype )
     {
         netCDF::NcType::ncType nctype;
@@ -113,9 +62,6 @@ namespace FairDataPipeline
 
             default:
                 break;
-
-
-
         }
         return nctype;
     }
@@ -205,8 +151,6 @@ namespace FairDataPipeline
             IVarAtt::sptr putAtt( const std::string& key, const std::string& value );
             IVarAtt::sptr getAtt( const std::string& key );
 
-
-
         private:
             std::weak_ptr< IGroup > _parent;
             VarImpl( IGroup::sptr parent, const std::string& name, netCDF::NcVar& nc_var ) ;
@@ -226,12 +170,47 @@ namespace FairDataPipeline
                 return GroupAtt::sptr( new GroupAtt( ncatt ) );
             }
 
+            int getValues( int* values );
+            int getValues( float* values );
             int getValues( std::string& values );
         private:
             GroupAtt( netCDF::NcGroupAtt& ncatt ) : _ncatt( ncatt ){}
             netCDF::NcGroupAtt _ncatt;
 
     };
+
+    int GroupAtt::getValues( int* values )
+    {
+        int status = 0;
+        
+        try
+        {
+            _ncatt.getValues( values );
+        }
+        catch( NcException& e )
+        {
+            e.what();
+        }
+
+        return status;
+    }
+
+    int GroupAtt::getValues( float* values )
+    {
+        int status = 0;
+        
+        try
+        {
+            _ncatt.getValues( values );
+        }
+        catch( NcException& e )
+        {
+            e.what();
+        }
+
+        return status;
+    }
+
 
     int GroupAtt::getValues( std::string& values )
     {
@@ -249,17 +228,54 @@ namespace FairDataPipeline
         return status;
     }
 
+
     class VarAtt : public IVarAtt
     {
         public:
             VarAtt() = delete;
             static VarAtt::sptr create( netCDF::NcVarAtt& ncvaratt ) { return VarAtt::sptr( new VarAtt( ncvaratt ) );}
+            int getValues( int* values );
+            int getValues( float* values );
             int getValues( std::string& values );
         private:
             VarAtt( netCDF::NcVarAtt& ncvaratt ) : _ncvaratt( ncvaratt ){}
             netCDF::NcVarAtt _ncvaratt;
 
     };
+
+   int VarAtt::getValues( int* values )
+    {
+        int status = 0;
+        
+        try
+        {
+            _ncvaratt.getValues( values );
+        }
+        catch( NcException& e )
+        {
+            e.what();
+        }
+
+        return status;
+    }
+
+   int VarAtt::getValues( float* values )
+    {
+        int status = 0;
+        
+        try
+        {
+            _ncvaratt.getValues( values );
+        }
+        catch( NcException& e )
+        {
+            e.what();
+        }
+
+        return status;
+    }
+
+
 
     int VarAtt::getValues( std::string& values )
     {
@@ -375,21 +391,6 @@ namespace FairDataPipeline
 
             size_t getSize(){ return _nc_dim.getSize();}
             std::string getName(){return _nc_dim.getName();}
-#if 0
-            void rename(const std::string& new_name)
-            {
-                std::string name = this->name();
-
-                auto it = _parent->_name_dim_map.find( this->name() );
-                if( it != this->_name_dim_map.end() )
-                    this->_name_dim_map.erase( it );
-
-                _parent->_name_dim_map[ name ] = this->shared_from_this();
-
-                _nc_dim.rename( new_name );
-                
-            }
-#endif
             IGroup::sptr getParentGroup(){ return _parent;}
 
 		private:
@@ -434,6 +435,8 @@ namespace FairDataPipeline
             IVar::sptr getVar( const std::string& name );
 
             IGroupAtt::sptr putAtt( const std::string& key, const std::string& value );
+            IGroupAtt::sptr putAtt( const std::string& key, int value );
+            IGroupAtt::sptr putAtt( const std::string& key, float value );
             IGroupAtt::sptr getAtt( const std::string& key );
 
 
@@ -455,6 +458,42 @@ namespace FairDataPipeline
             IGroup::NAME_ATT_MAP _name_att_map;
 
 	};
+
+	IGroupAtt::sptr GroupImpl::putAtt( const std::string& key, float value )
+	{
+		IGroupAtt::sptr grp_att;
+		try
+		{
+			netCDF::NcGroupAtt ncatt = _nc->putAtt( key, netCDF::NcFloat(), value );
+			grp_att = GroupAtt::create( ncatt );
+
+			_name_att_map[ key ] = grp_att;
+		}
+		catch( NcException& e )
+		{
+			e.what();
+		}
+
+		return grp_att;
+	}
+	IGroupAtt::sptr GroupImpl::putAtt( const std::string& key, int value )
+	{
+		IGroupAtt::sptr grp_att;
+		try
+		{
+			netCDF::NcGroupAtt ncatt = _nc->putAtt( key, netCDF::NcInt(), value );
+			grp_att = GroupAtt::create( ncatt );
+
+			_name_att_map[ key ] = grp_att;
+		}
+		catch( NcException& e )
+		{
+			e.what();
+		}
+
+		return grp_att;
+	}
+
 
     IGroupAtt::sptr GroupImpl::putAtt( const std::string& key, const std::string& value )
     {
@@ -741,7 +780,7 @@ namespace FairDataPipeline
 
 
 	class BuilderImpl 
-		: public GroupImpl//, public IBuilder
+		: public GroupImpl
 	{
 		public:
 			typedef std::shared_ptr< BuilderImpl > sptr;
@@ -788,11 +827,13 @@ namespace FairDataPipeline
                 {
                     try
                     {
+			//open existing file
                         ncmode = NcFile::FileMode::write;
                         ncfile()->open( path, ncmode );
                     }
                     catch( NcException& e )
                     {
+			//if does not exist then create a new one
                         ncmode = NcFile::FileMode::newFile;
 
                         ncfile()->open( path, ncmode );
@@ -822,6 +863,7 @@ namespace FairDataPipeline
         : GroupImpl( NULL, std::make_shared<NcFile>() ) 
     {
         this->open( path, mode );
+
     }
 
 
@@ -834,6 +876,9 @@ namespace FairDataPipeline
     Builder::Builder( const std::string& path, IBuilder::Mode mode )
     {
         _builder = BuilderFactory::create( path, mode );
+
+	if( IBuilder::Mode::WRITE == mode )	
+		_builder->putAtt( "schema", 1 );
     }
 
     int Builder::readDim_metadata( const std::string& grp_name
@@ -864,7 +909,6 @@ namespace FairDataPipeline
             dimdef.name = dim_name;
             dimdef.dataType = dtype;
             dimdef.size = n;
-            //dimdef.data = NULL;
             dimdef.units = units;
             dimdef.description = description;
         }
