@@ -112,10 +112,10 @@ TEST_F(BuilderTest, TestBuilder)
 
     int vals2[10];
     var_ptr->getVar( vals2 );
-    auto dim_names = var_ptr->getDims();
+    auto dim_ptrs = var_ptr->getDims();
 
-    ASSERT_EQ( dim_names.size(), 1 );
-    ASSERT_EQ( dim_names[0], "dim1" );
+    ASSERT_EQ( dim_ptrs.size(), 1 );
+    ASSERT_EQ( dim_ptrs[0]->getName(), "dim1" );
 
     for( int i = 0; i < 10; ++i )
     {
@@ -138,55 +138,51 @@ TEST_F(BuilderTest, TestBuilder)
 
         fdp::DimensionDefinition dimdef1, dimdef2;
 
-        dimdef1.name = "grp/dim1";
         dimdef1.units = "units1";
         dimdef1.description = "description1";
         dimdef1.dataType = fdp::DataType::INT;
         dimdef1.size = 2;
 
-        dimdef2.name = "grp/dim2";
         dimdef2.units = "units2";
         dimdef2.description = "description2";
         dimdef2.dataType = fdp::DataType::FLOAT;
         dimdef2.size = 3;
 
         fdp::ArrayDefinition arrdef;
-        arrdef.name = "grp/arr1";
         arrdef.units="arrunits";
         arrdef.description = "arrdescription";
         arrdef.dataType = fdp::DataType::DOUBLE;
-        arrdef.dimension_names = { dimdef1.name, dimdef2.name };
+        arrdef.dimension_names = { "grp/dim1", "grp/dim2" };
         arrdef.shape = { 2,3 };
 
         fdp::Builder builder2( "xtest.nc", fdp::IBuilder::Mode::WRITE );
 
         int status = 0;
 
-        status = builder2.writeDimension( dimdef1, dim1 );
+        status = builder2.writeDimension( "grp/dim1", dimdef1, dim1 );
         ASSERT_EQ( 0, status );
 
-        status = builder2.writeDimension( dimdef2, dim2 );
+        status = builder2.writeDimension( "grp/dim2", dimdef2, dim2 );
         ASSERT_EQ( 0, status );
 
-        status = builder2.writeArray( arrdef, data );
+        status = builder2.writeArray( "grp/arr1", arrdef, data );
         ASSERT_EQ( 0, status );
 
         //write already existing dim name
-        status = builder2.writeDimension( dimdef1, dim1 );
+        status = builder2.writeDimension( "grp/dim1", dimdef1, dim1 );
         ASSERT_TRUE( 0 != status );
 
-        status = builder2.writeArray( arrdef, data );
+        status = builder2.writeArray( "grp/arr1", arrdef, data );
         ASSERT_TRUE( 0 != status );
 
         fdp::ArrayDefinition arrdef_bad;
-        arrdef_bad.name = "grp/arrbad";
         arrdef_bad.units="arrunits";
         arrdef_bad.description = "arrdescription";
         arrdef_bad.dataType = fdp::DataType::INT;
 
         arrdef_bad.dimension_names = { "baddim1", "baddim2" };
 
-        status = builder2.writeArray( arrdef_bad, data );
+        status = builder2.writeArray( "grp/arr1", arrdef_bad, data );
         ASSERT_TRUE( 0 != status );
 
         fdp::ArrayDefinition arrdef_;
@@ -194,7 +190,6 @@ TEST_F(BuilderTest, TestBuilder)
         status = builder2.readArray_metadata( "grp/arr1",  arrdef_ );
 
         ASSERT_EQ( 0, status );
-        ASSERT_EQ( "grp/arr1", arrdef_.name );
         ASSERT_EQ( "arrunits", arrdef_.units );
         ASSERT_EQ( "arrdescription", arrdef_.description );
         ASSERT_EQ( arrdef_.shape, arrdef.shape );
@@ -202,26 +197,28 @@ TEST_F(BuilderTest, TestBuilder)
         ASSERT_EQ( arrdef_.dataType, fdp::DataType::DOUBLE );
 
         double data_[2][3];
-        
-	status = builder2.readArray_data( arrdef_, data_ );
+
+        status = builder2.readArray_data( "grp/arr1", arrdef_, data_ );
 
         for( int i = 0; i < 2; ++i )
             for( int j = 0; j < 3; ++j )
                 ASSERT_EQ( data[i][j], data_[i][j] );
-        
-	fdp::DimensionDefinition dimdef1_;
+
+        fdp::DimensionDefinition dimdef1_;
         status = builder2.readDim_metadata( "grp/dim1",  dimdef1_ );
 
         ASSERT_EQ( 0, status );
-        ASSERT_EQ( "grp/dim1", dimdef1_.name );
         ASSERT_EQ( 2, dimdef1_.size );
 
         ASSERT_EQ( "units1", dimdef1_.units );
         ASSERT_EQ( "description1", dimdef1_.description );
 
         int dim1_[2];
-        
-	status = builder2.readDim_data( dimdef1_, dim1_ );
+
+        status = builder2.readDim_data( "grp/dim1", dimdef1_, dim1_ );
+
+        ASSERT_EQ( 0, status );
+
         for( int j = 0; j < 2; ++j )
             ASSERT_EQ( dim1[j], dim1_[j] );
 
@@ -229,7 +226,6 @@ TEST_F(BuilderTest, TestBuilder)
         status = builder2.readDim_metadata( "grp/dim2", dimdef2_ );
 
         ASSERT_EQ( 0, status );
-        ASSERT_EQ( "grp/dim2", dimdef2_.name );
         ASSERT_EQ( 3, dimdef2_.size );
 
         ASSERT_EQ( "units2", dimdef2_.units );
@@ -237,13 +233,12 @@ TEST_F(BuilderTest, TestBuilder)
 
         float dim2_[3];
 
-        status = builder2.readDim_data( dimdef2_, dim2_ );
+        status = builder2.readDim_data( "grp/dim2", dimdef2_, dim2_ );
 
         for( int j = 0; j < 3; ++j )
             ASSERT_EQ( dim2[j], dim2_[j] );
 
         fdp::DimensionDefinition dimdef3;
-        dimdef3.name = "grp/dim3";
         dimdef3.units = "";
         dimdef3.description = "";
         dimdef3.dataType = fdp::DataType::STRING;
@@ -252,7 +247,7 @@ TEST_F(BuilderTest, TestBuilder)
         const char* dim3data[3] = {"a", "test", "bob"};
 
 
-        status = builder2.writeDimension( dimdef3, dim3data );
+        status = builder2.writeDimension("grp/dim3", dimdef3, dim3data );
 
 
     }

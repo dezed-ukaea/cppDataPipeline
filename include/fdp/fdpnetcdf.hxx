@@ -62,7 +62,7 @@ namespace FairDataPipeline
     {
         typedef std::shared_ptr< IVarAtt > sptr;
 
-	virtual int getValues( int* values ) = 0;
+        virtual int getValues( int* values ) = 0;
         virtual int getValues( float* values ) = 0;
         virtual int getValues( std::string& values ) = 0;
     };
@@ -80,7 +80,7 @@ namespace FairDataPipeline
         virtual void putVar( const void* vals ) = 0;
         virtual void getVar( void* vals ) = 0;
 
-        virtual std::vector< std::string > getDims() = 0;
+        virtual std::vector< IDimension::sptr > getDims() = 0;
 
         virtual DataType getType() = 0;
 
@@ -106,7 +106,7 @@ namespace FairDataPipeline
         virtual IGroup::sptr getGroup( const std::string& name ) = 0;
 
         virtual IDimension::sptr addDim( const std::string& name, size_t sz ) = 0;
-        
+
         virtual IDimension::sptr getDim( const std::string& name ) = 0;
 
         virtual IVar::sptr addVar( const std::string& name
@@ -136,7 +136,6 @@ namespace FairDataPipeline
     struct DimensionDefinition
     {
         size_t size;
-        std::string name;
         std::string units;
         std::string description;
         enum DataType dataType;
@@ -144,7 +143,6 @@ namespace FairDataPipeline
 
     struct ArrayDefinition
     {
-        std::string name;
         std::string units;
         enum DataType dataType;
         std::string description;
@@ -170,73 +168,29 @@ namespace FairDataPipeline
     {
         public:
             Builder() = delete;
+
             Builder( const Builder& rhs ) = delete;
 
             Builder( const std::string& path, IBuilder::Mode mode );
 
-            int writeArray( /*const std::string& group_name
-                    , */const ArrayDefinition& arraydef, const void* data );
+            int writeArray( const std::string& name
+                    , const ArrayDefinition& arraydef, const void* data );
 
-            int writeDimension( /*const std::string& group_name,*/ const DimensionDefinition& dimdef, const void* data );
+            int writeDimension( const std::string& name
+                    , const DimensionDefinition& dimdef, const void* data );
 
-            int readDim_metadata( /*const std::string& grp_name
-                    , */const std::string dim_name
-                    , DimensionDefinition& dimdef );
+            int readDim_metadata( std::string dim_name, DimensionDefinition& dimdef );
 
-            int readDim_data( /*const std::string& grp_name
-                    ,*/ const DimensionDefinition& dimdef, void* data );
+            int readDim_data( const std::string& name
+                    , const DimensionDefinition& dimdef, void* data );
 
+            int readArray_metadata( std::string array_name,  ArrayDefinition& arraydef );
 
-            int readArray_metadata( /*const std::string& grp_name, */std::string array_name
-                    ,  ArrayDefinition& arraydef );
+            int readArray_data( const std::string& name
+                    , const ArrayDefinition& arraydef, void *data );
 
-            int readArray_data( /*const std::string& grp_name,*/  const ArrayDefinition& arraydef, void *data );
         private:
             IBuilder::sptr _builder;
     };
-#if 0
-    template< size_t...N >
-        struct DDim
-        {
-            DDim()
-            {
-                int n = sizeof...(N);
-                //printf( "DDIM size:%d\n", n  );
-
-                std::array< size_t, sizeof...(N) > a = {N...};
-
-                //printf("DDIM:");
-                //for( int i = 0;i < n; ++i )
-                //{
-                //printf("%d,", a[i]);
-                //}
-                //printf( "\n");
-            }
-            size_t rank(){ return sizeof...(N);}
-            std::vector<size_t> shape()
-            {
-                size_t n = this->rank();
-
-                std::vector<size_t> v;
-                v.reserve(n);
-
-                //int a[ sizeof...(N) ]= {N...};
-
-                std::array< size_t, sizeof...(N) > a = {N...};
-                for( int i = 0;i < n; ++i )
-                {
-                    // printf("%d,", a[i]);
-                    v.push_back( a[i] );
-                }
-                //printf( "\n");
-                return v;
-
-            }
-
-            //std::array< long, N > Dim;
-        };
-#endif
-
-
 }
 #endif
