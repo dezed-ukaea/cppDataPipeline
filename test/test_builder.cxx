@@ -51,6 +51,8 @@ TEST_F(BuilderTest, TestBuilder)
 
     auto grp_bad = grp_bob_ptr->getGroup( "bad" );
 
+    ASSERT_TRUE( NULL == grp_bad );
+
     auto grp_ptr = ibuilder->getGroup("bob/terry");
 
 

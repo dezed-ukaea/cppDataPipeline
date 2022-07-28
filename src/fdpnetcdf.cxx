@@ -13,7 +13,7 @@ typedef std::shared_ptr< NcFile > NcFilePtr;
 
 namespace FairDataPipeline
 {
-    netCDF::NcType::ncType DataType2NcType( DataType dtype )
+    static netCDF::NcType::ncType DataType2NcType( DataType dtype )
     {
         netCDF::NcType::ncType nctype;
 
@@ -67,7 +67,7 @@ namespace FairDataPipeline
     }
 
 
-    DataType NcType2DataType( netCDF::NcType::ncType nctype )
+    static DataType NcType2DataType( netCDF::NcType::ncType nctype )
     {
         DataType dtype;
 
@@ -136,7 +136,7 @@ namespace FairDataPipeline
 
             static VarImpl::sptr create( IGroup::sptr parent
                     , const std::string& name
-                    , netCDF::NcVar& nc_var );
+                    , const netCDF::NcVar& nc_var );
 
 
             void putVar( const void* vals );
@@ -149,11 +149,14 @@ namespace FairDataPipeline
             IGroup::sptr parent(){return _parent.lock();}
 
             IVarAtt::sptr putAtt( const std::string& key, const std::string& value );
+            IVarAtt::sptr putAtt( const std::string& key, int value );
+            IVarAtt::sptr putAtt( const std::string& key, float value );
+
             IVarAtt::sptr getAtt( const std::string& key );
 
         private:
             std::weak_ptr< IGroup > _parent;
-            VarImpl( IGroup::sptr parent, const std::string& name, netCDF::NcVar& nc_var ) ;
+            VarImpl( IGroup::sptr parent, const std::string& name, const netCDF::NcVar& nc_var ) ;
             netCDF::NcVar _nc_var;
 
             IVar::NAME_VARATT_MAP _name_varatt_map;
@@ -165,7 +168,7 @@ namespace FairDataPipeline
             typedef std::shared_ptr< GroupAtt > sptr;
 
             GroupAtt() = delete;
-            static GroupAtt::sptr create( netCDF::NcGroupAtt& ncatt ) 
+            static GroupAtt::sptr create( const netCDF::NcGroupAtt& ncatt ) 
             {
                 return GroupAtt::sptr( new GroupAtt( ncatt ) );
             }
@@ -174,7 +177,7 @@ namespace FairDataPipeline
             int getValues( float* values );
             int getValues( std::string& values );
         private:
-            GroupAtt( netCDF::NcGroupAtt& ncatt ) : _ncatt( ncatt ){}
+            GroupAtt( const netCDF::NcGroupAtt& ncatt ) : _ncatt( ncatt ){}
             netCDF::NcGroupAtt _ncatt;
 
     };
@@ -233,12 +236,12 @@ namespace FairDataPipeline
     {
         public:
             VarAtt() = delete;
-            static VarAtt::sptr create( netCDF::NcVarAtt& ncvaratt ) { return VarAtt::sptr( new VarAtt( ncvaratt ) );}
+            static VarAtt::sptr create( const netCDF::NcVarAtt& ncvaratt ) { return VarAtt::sptr( new VarAtt( ncvaratt ) );}
             int getValues( int* values );
             int getValues( float* values );
             int getValues( std::string& values );
         private:
-            VarAtt( netCDF::NcVarAtt& ncvaratt ) : _ncvaratt( ncvaratt ){}
+            VarAtt( const netCDF::NcVarAtt& ncvaratt ) : _ncvaratt( ncvaratt ){}
             netCDF::NcVarAtt _ncvaratt;
 
     };
@@ -292,6 +295,42 @@ namespace FairDataPipeline
 
         return status;
     }
+    
+    IVarAtt::sptr VarImpl::putAtt( const std::string& key, int value )
+    {
+        VarAtt::sptr att_ptr;
+        try
+        {
+            netCDF::NcVarAtt ncatt = _nc_var.putAtt( key, netCDF::NcInt(), value );
+            att_ptr = VarAtt::create( ncatt );
+            _name_varatt_map[ key ] = att_ptr;
+        }
+        catch( NcException& e )
+        {
+            e.what();
+        }
+        return att_ptr;
+
+    }
+
+    IVarAtt::sptr VarImpl::putAtt( const std::string& key, float value )
+    {
+        VarAtt::sptr att_ptr;
+        try
+        {
+            netCDF::NcVarAtt ncatt = _nc_var.putAtt( key, netCDF::NcFloat(), value );
+            att_ptr = VarAtt::create( ncatt );
+            _name_varatt_map[ key ] = att_ptr;
+        }
+        catch( NcException& e )
+        {
+            e.what();
+        }
+        return att_ptr;
+
+    }
+
+
 
     IVarAtt::sptr VarImpl::putAtt( const std::string& key, const std::string& value )
     {
@@ -372,12 +411,12 @@ namespace FairDataPipeline
         _nc_var.getVar( vals );
     }
 
-    VarImpl::VarImpl( IGroup::sptr parent, const std::string& name, netCDF::NcVar& nc_var ) 
+    VarImpl::VarImpl( IGroup::sptr parent, const std::string& name, const netCDF::NcVar& nc_var ) 
         : _parent(parent), _nc_var( nc_var ) 
     {
     }
 
-    VarImpl::sptr VarImpl::create( IGroup::sptr parent, const std::string& name, netCDF::NcVar& nc_var )
+    VarImpl::sptr VarImpl::create( IGroup::sptr parent, const std::string& name, const netCDF::NcVar& nc_var )
     {
         return VarImpl::sptr( new VarImpl( parent, name, nc_var ) );
     }
@@ -390,7 +429,7 @@ namespace FairDataPipeline
 
             DimensionImpl() = delete;
 
-            static sptr create( IGroup::sptr parent, netCDF::NcDim& nc_dim )
+            static sptr create( IGroup::sptr parent, const netCDF::NcDim& nc_dim )
             {
                 return DimensionImpl::sptr( new DimensionImpl( parent, nc_dim ) );
             }
@@ -400,7 +439,7 @@ namespace FairDataPipeline
             IGroup::sptr getParentGroup(){ return _parent;}
 
         private:
-            DimensionImpl( IGroup::sptr parent, netCDF::NcDim& nc_dim ) : _parent(parent), _nc_dim( nc_dim ) 
+            DimensionImpl( IGroup::sptr parent, const netCDF::NcDim& nc_dim ) : _parent(parent), _nc_dim( nc_dim ) 
         {
         }
             netCDF::NcDim _nc_dim;
@@ -773,11 +812,11 @@ namespace FairDataPipeline
     {
     }
 
-
     IGroup::sptr GroupImpl::parent()
     {
         return _parent.lock(); 
     }
+
     std::string GroupImpl::name()
     {
         std::string s = this->_nc->getName();
@@ -793,13 +832,13 @@ namespace FairDataPipeline
 
             static sptr create(const std::string& path, IBuilder::Mode mode );
 
-            void open( const std::string path, IBuilder::Mode mode );
+            void open( const std::string& path , IBuilder::Mode mode );
             void close();
 
         private:
             NcFilePtr ncfile(){ return std::dynamic_pointer_cast< NcFile >( _nc ); }
 
-            BuilderImpl( const std::string path, IBuilder::Mode mode ) ;
+            BuilderImpl( const std::string& path, IBuilder::Mode mode ) ;
 
     };
 
@@ -811,7 +850,7 @@ namespace FairDataPipeline
         return p;
     }
 
-    void BuilderImpl::open( const std::string path, IBuilder::Mode mode )
+    void BuilderImpl::open( const std::string& path, IBuilder::Mode mode )
     {
         auto ncmode = NcFile::FileMode::read;
 
@@ -865,7 +904,7 @@ namespace FairDataPipeline
     }
 
 
-    BuilderImpl::BuilderImpl( const std::string path, IBuilder::Mode mode ) 
+    BuilderImpl::BuilderImpl( const std::string& path, IBuilder::Mode mode ) 
         : GroupImpl( NULL, std::make_shared<NcFile>() ) 
     {
         this->open( path, mode );
@@ -886,10 +925,11 @@ namespace FairDataPipeline
             _builder->putAtt( "schema", 1 );
     }
 
-    int Builder::readDim_metadata( std::string dim_name
+    int Builder::readDim_metadata( const std::string& name
             , DimensionDefinition& dimdef )
     {
         int status = 0;
+        std::string dim_name( name );
         std::string dim_name_orig = dim_name;
 
         IGroup::sptr grp_ptr = _builder;
@@ -911,26 +951,33 @@ namespace FairDataPipeline
         if( grp_ptr )
         {
             IVar::sptr var_ptr = grp_ptr->getVar( dim_name );
-            std::vector< IDimension::sptr > dimdef_ptrs = var_ptr->getDims();
 
-            auto dim_def_ptr = dimdef_ptrs[0];
-            size_t n = dim_def_ptr->getSize();
-            DataType dtype = var_ptr->getType();
+            if( var_ptr )
+            {
+                std::vector< IDimension::sptr > dimdef_ptrs = var_ptr->getDims();
 
-            std::string units, description;
-            IVarAtt::sptr att_units_ptr = var_ptr->getAtt( "units" );
-            if( att_units_ptr )
-                att_units_ptr->getValues( units );
+                auto dim_def_ptr = dimdef_ptrs[0];
+                size_t n = dim_def_ptr->getSize();
+                DataType dtype = var_ptr->getType();
 
-            IVarAtt::sptr att_desc_ptr = var_ptr->getAtt( "description" );
-            if( att_desc_ptr )
-                att_desc_ptr->getValues( description );
+                std::string units, description;
+                IVarAtt::sptr att_units_ptr = var_ptr->getAtt( "units" );
+                if( att_units_ptr )
+                    att_units_ptr->getValues( units );
 
-            dimdef.dataType = dtype;
-            dimdef.size = n;
-            dimdef.units = units;
-            dimdef.description = description;
+                IVarAtt::sptr att_desc_ptr = var_ptr->getAtt( "description" );
+                if( att_desc_ptr )
+                    att_desc_ptr->getValues( description );
+
+                dimdef.dataType = dtype;
+                dimdef.size = n;
+                dimdef.units = units;
+                dimdef.description = description;
+            }
+            else status = 1;
         }
+        else
+            status = 1;
 
         return status;
     }
@@ -960,17 +1007,24 @@ namespace FairDataPipeline
         if( grp_ptr )
         {
             IVar::sptr var_ptr = grp_ptr->getVar( dim_name );
-            var_ptr->getVar( data );
+
+            if( var_ptr )
+                var_ptr->getVar( data );
+            else
+                status = 1;
         }
+        else 
+            status = 1;
 
         return status;
     }
 
 
 
-    int Builder::readArray_metadata( std::string array_name,  ArrayDefinition& arraydef )
+    int Builder::readArray_metadata( const std::string& name,  ArrayDefinition& arraydef )
     {
         int status = 0;
+        std::string array_name( name );
         std::string array_name_orig = array_name;
 
         IGroup::sptr grp_ptr = _builder;
@@ -999,38 +1053,44 @@ namespace FairDataPipeline
             {
                 std::vector< std::string > dim_names;
 
+                size_t n = 1;
                 auto dims = var_ptr->getDims();
                 for( int i = 0; i < dims.size(); ++i )
                 {
                     IDimension::sptr dim_ptr = dims[i];
+
+                    n = n * dim_ptr->getSize();
                     const std::string& dim_name = dim_ptr->getName();
 
                     size_t size = dim_ptr->getSize();
                     shape.push_back( size );
 
-                    std::string dim_var_name( dim_name.begin(), dim_name.end()-4 );
+                    std::string dim_var_name( dim_name.begin(), dim_name.end()/*-4*/ );
                     IVar::sptr dim_var_ptr = grp_ptr->getVar( dim_var_name );
 
-                    IGroup::sptr parent_grp_ptr = dim_var_ptr->parent();
-                    while( parent_grp_ptr && parent_grp_ptr->name() != "/" )
+                    if( dim_var_ptr )
                     {
-                        dim_var_name = parent_grp_ptr->name() + "/" +dim_var_name;
+                        IGroup::sptr parent_grp_ptr = dim_var_ptr->parent();
+                        while( parent_grp_ptr && parent_grp_ptr->name() != "/" )
+                        {
+                            dim_var_name = parent_grp_ptr->name() + "/" +dim_var_name;
 
-                        parent_grp_ptr = parent_grp_ptr->parent();
+                            parent_grp_ptr = parent_grp_ptr->parent();
+                        }
                     }
+
 
                     if( dim_var_ptr )
                         dim_names.push_back( dim_var_name );
                     else
                         dim_names.push_back( "" );
                 }
-
-                size_t n = 1;
+#if 0
                 for( int i = 0; i < shape.size(); ++i )
                 {
                     n = n * shape[i];
                 }
-
+#endif
                 DataType dtype =  var_ptr->getType();
 
                 std::string units, description;
@@ -1049,6 +1109,8 @@ namespace FairDataPipeline
                 arraydef.units = units;
                 arraydef.description = description;
             }
+            else
+                status = 1;
         }
         else
             status = 1;
@@ -1117,7 +1179,7 @@ namespace FairDataPipeline
         IVar::sptr dim_var_ptr = grp_ptr->getVar( dimdef_name );
         if( !dim_var_ptr )
         {
-            IDimension::sptr dim_ptr = grp_ptr->addDim( dimdef_name + "_dim", dimdef.size );
+            IDimension::sptr dim_ptr = grp_ptr->addDim( dimdef_name /*+ "_dim"*/, dimdef.size );
 
             std::vector< IDimension::sptr > vdims = {dim_ptr};
 
@@ -1160,7 +1222,7 @@ namespace FairDataPipeline
                 }
                 dim_name = splits.back();
             }
-
+#if 0
             if( dim_name == "" )//no dim
             {
                 //create a dummy dim based on shape
@@ -1176,6 +1238,7 @@ namespace FairDataPipeline
                 vdims.push_back( dim_ptr );
             }
             else
+#endif
             {
                 IVar::sptr dim_var_ptr = grp_ptr->getVar( dim_name );
                 if( dim_var_ptr )

@@ -179,12 +179,12 @@ namespace FairDataPipeline
             int writeDimension( const std::string& name
                     , const DimensionDefinition& dimdef, const void* data );
 
-            int readDim_metadata( std::string dim_name, DimensionDefinition& dimdef );
+            int readDim_metadata( const std::string& name, DimensionDefinition& dimdef );
 
             int readDim_data( const std::string& name
                     , const DimensionDefinition& dimdef, void* data );
 
-            int readArray_metadata( std::string array_name,  ArrayDefinition& arraydef );
+            int readArray_metadata( const std::string& name,  ArrayDefinition& arraydef );
 
             int readArray_data( const std::string& name
                     , const ArrayDefinition& arraydef, void *data );
