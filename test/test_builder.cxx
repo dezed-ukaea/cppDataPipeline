@@ -43,6 +43,18 @@ TEST_F(BuilderTest, TestBuilder)
     grp_bob_ptr->putAtt( "float", 123.123f );
     grp_bob_ptr->putAtt( "string", "a string" );
 
+
+    int ivals[] = { 1, 2, 3 };
+    float fvals[] = { 1.0, 2.0, 3.0 };
+    double dvals[] = { 1.0, 2.0, 3.0 };
+
+    const char* strings[3] = {"a", "test", "bob"};
+
+    grp_bob_ptr->putAtt( "ints", 3, ivals );
+    grp_bob_ptr->putAtt( "floats", 3, fvals );
+    grp_bob_ptr->putAtt( "doubles", 3, dvals );
+    grp_bob_ptr->putAtt( "some_strings", 3, &strings[0] );
+
     ASSERT_TRUE( NULL != grp_bob_ptr );
 
     auto grp_bob_terry_ptr = grp_bob_ptr->addGroup( "terry");
@@ -105,6 +117,8 @@ TEST_F(BuilderTest, TestBuilder)
 
     auto dim_var1_ptr = grp_bob_terry_ptr->addVar( "var1", fdp::DataType::INT, vdims ); 
     dim_var1_ptr->putVar( vals.data() );
+    dim_var1_ptr->putAtt( "astring", "the_string" );
+    dim_var1_ptr->putAtt( "ints", 3, ivals );
 
     ASSERT_EQ( dim_var1_ptr->parent(), grp_bob_terry_ptr );
 

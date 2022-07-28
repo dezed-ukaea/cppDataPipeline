@@ -85,6 +85,9 @@ namespace FairDataPipeline
         virtual DataType getType() = 0;
 
         virtual IVarAtt::sptr putAtt( const std::string& key, const std::string& value ) = 0;
+
+        virtual IVarAtt::sptr putAtt( const std::string& key, size_t nvals, const int* values ) = 0;
+
         virtual IVarAtt::sptr getAtt( const std::string& key ) = 0;
     };
 
@@ -123,6 +126,14 @@ namespace FairDataPipeline
         virtual IGroupAtt::sptr putAtt( const std::string& key, const std::string& value ) = 0;
         virtual IGroupAtt::sptr putAtt( const std::string& key, int value ) = 0;
         virtual IGroupAtt::sptr putAtt( const std::string& key, float value ) = 0;
+
+
+        virtual IGroupAtt::sptr putAtt( const std::string& key, size_t nvals, const int* values ) = 0;
+        virtual IGroupAtt::sptr putAtt( const std::string& key, size_t nvals, const float* values ) = 0;
+        virtual IGroupAtt::sptr putAtt( const std::string& key, size_t nvals, const double* values ) = 0;
+
+        virtual IGroupAtt::sptr putAtt( const std::string& key, size_t nvals, const char** values ) = 0;
+
 
         virtual IGroupAtt::sptr getAtt( const std::string& key ) = 0;
 
