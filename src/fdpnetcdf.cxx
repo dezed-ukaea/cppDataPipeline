@@ -220,14 +220,16 @@ namespace FairDataPipeline
             IVarAtt::sptr putAtt( const std::string& key, size_t nvals, const int* values );
             IVarAtt::sptr putAtt( const std::string& key, size_t nvals, const long* values );
             IVarAtt::sptr putAtt( const std::string& key, size_t nvals, const long long* values );
-            IVarAtt::sptr putAtt( const std::string& key, size_t nvals, const float* values );
-            IVarAtt::sptr putAtt( const std::string& key, size_t nvals, const double* values );
-            IVarAtt::sptr putAtt( const std::string& key, size_t nvals, const char** values );
 
             IVarAtt::sptr putAtt( const std::string& key, size_t nvals, const unsigned short* values );
             IVarAtt::sptr putAtt( const std::string& key, size_t nvals, const unsigned int* values );
             IVarAtt::sptr putAtt( const std::string& key, size_t nvals, const unsigned long* values );
             IVarAtt::sptr putAtt( const std::string& key, size_t nvals, const unsigned long long* values );
+
+            IVarAtt::sptr putAtt( const std::string& key, size_t nvals, const float* values );
+            IVarAtt::sptr putAtt( const std::string& key, size_t nvals, const double* values );
+
+            IVarAtt::sptr putAtt( const std::string& key, size_t nvals, const char** values );
 
 
 
@@ -258,15 +260,101 @@ namespace FairDataPipeline
                 return GroupAtt::sptr( new GroupAtt( ncatt ) );
             }
 
-            int getValues( int* values );
-            int getValues( float* values );
+            //int getValues( int* values );
+            //int getValues( float* values );
             int getValues( std::string& values );
+
+            int getValues( short* values );
+            int getValues( int* values );
+            int getValues( long* values );
+            int getValues( long long* values );
+            int getValues( unsigned short* values );
+            int getValues( unsigned int* values );
+            int getValues( unsigned long* values );
+            int getValues( unsigned long long* values );
+
+            int getValues( float* values );
+            int getValues( double* values );
+
         private:
+            template< typename T>
+                int getValuesImpl( T* values );
+
             GroupAtt( const netCDF::NcGroupAtt& ncatt ) : _ncatt( ncatt ){}
             netCDF::NcGroupAtt _ncatt;
 
     };
 
+    template< typename T > 
+        int GroupAtt::getValuesImpl( T* values )
+        {
+            int status = 0;
+
+            try
+            {
+                _ncatt.getValues( values );
+            }
+            catch( NcException& e )
+            {
+                e.what();
+            }
+
+            return status;
+        }
+
+    int GroupAtt::getValues( short* values )
+    {
+        return this->getValuesImpl( values );
+    }
+
+    int GroupAtt::getValues( int* values )
+    {
+        return this->getValuesImpl( values );
+    }
+
+    int GroupAtt::getValues( long* values )
+    {
+        return this->getValuesImpl( values );
+    }
+
+    int GroupAtt::getValues( long long* values )
+    {
+        return this->getValuesImpl( values );
+    }
+
+    int GroupAtt::getValues( unsigned short* values )
+    {
+        return this->getValuesImpl( values );
+    }
+
+    int GroupAtt::getValues( unsigned int* values )
+    {
+        return this->getValuesImpl( values );
+    }
+
+    int GroupAtt::getValues( unsigned long* values )
+    {
+        return this->getValuesImpl( values );
+    }
+
+    int GroupAtt::getValues( unsigned long long* values )
+    {
+        return this->getValuesImpl( values );
+    }
+
+
+    int GroupAtt::getValues( float* values )
+    {
+        return this->getValuesImpl( values );
+    }
+
+    int GroupAtt::getValues( double* values )
+    {
+        return this->getValuesImpl( values );
+    }
+
+
+#if 0
     int GroupAtt::getValues( int* values )
     {
         int status = 0;
@@ -282,7 +370,6 @@ namespace FairDataPipeline
 
         return status;
     }
-
     int GroupAtt::getValues( float* values )
     {
         int status = 0;
@@ -300,6 +387,7 @@ namespace FairDataPipeline
     }
 
 
+#endif
     int GroupAtt::getValues( std::string& values )
     {
         int status = 0;
@@ -322,46 +410,100 @@ namespace FairDataPipeline
         public:
             VarAtt() = delete;
             static VarAtt::sptr create( const netCDF::NcVarAtt& ncvaratt ) { return VarAtt::sptr( new VarAtt( ncvaratt ) );}
+            int getValues( short* values );
             int getValues( int* values );
+            int getValues( long* values );
+            int getValues( long long* values );
+            int getValues( unsigned short* values );
+            int getValues( unsigned int* values );
+            int getValues( unsigned long* values );
+            int getValues( unsigned long long* values );
+
             int getValues( float* values );
+            int getValues( double* values );
+
             int getValues( std::string& values );
         private:
+
+
+            template< typename T>
+                int getValuesImpl( T* values );
+
             VarAtt( const netCDF::NcVarAtt& ncvaratt ) : _ncvaratt( ncvaratt ){}
             netCDF::NcVarAtt _ncvaratt;
 
     };
 
+    template< typename T > 
+        int VarAtt::getValuesImpl( T* values )
+        {
+            int status = 0;
+
+            try
+            {
+                _ncvaratt.getValues( values );
+            }
+            catch( NcException& e )
+            {
+                e.what();
+            }
+
+            return status;
+        }
+
+    int VarAtt::getValues( short* values )
+    {
+        return this->getValuesImpl( values );
+    }
+
     int VarAtt::getValues( int* values )
     {
-        int status = 0;
-
-        try
-        {
-            _ncvaratt.getValues( values );
-        }
-        catch( NcException& e )
-        {
-            e.what();
-        }
-
-        return status;
+        return this->getValuesImpl( values );
     }
+
+    int VarAtt::getValues( long* values )
+    {
+        return this->getValuesImpl( values );
+    }
+
+    int VarAtt::getValues( long long* values )
+    {
+        return this->getValuesImpl( values );
+    }
+
+    int VarAtt::getValues( unsigned short* values )
+    {
+        return this->getValuesImpl( values );
+    }
+
+    int VarAtt::getValues( unsigned int* values )
+    {
+        return this->getValuesImpl( values );
+    }
+
+    int VarAtt::getValues( unsigned long* values )
+    {
+        return this->getValuesImpl( values );
+    }
+
+    int VarAtt::getValues( unsigned long long* values )
+    {
+        return this->getValuesImpl( values );
+    }
+
 
     int VarAtt::getValues( float* values )
     {
-        int status = 0;
-
-        try
-        {
-            _ncvaratt.getValues( values );
-        }
-        catch( NcException& e )
-        {
-            e.what();
-        }
-
-        return status;
+        return this->getValuesImpl( values );
     }
+
+    int VarAtt::getValues( double* values )
+    {
+        return this->getValuesImpl( values );
+    }
+
+
+
 
 
 
@@ -439,11 +581,79 @@ namespace FairDataPipeline
             return var_att;
         }
 
+    IVarAtt::sptr VarImpl::putAtt( const std::string& key, size_t nvals, const short* values )
+    {
+        return this->putAttImpl( key, nvals, values );
+    }
+
 
     IVarAtt::sptr VarImpl::putAtt( const std::string& key, size_t nvals, const int* values )
     {
         return this->putAttImpl( key, nvals, values );
     }
+
+    IVarAtt::sptr VarImpl::putAtt( const std::string& key, size_t nvals, const long* values )
+    {
+        return this->putAttImpl( key, nvals, values );
+    }
+
+    IVarAtt::sptr VarImpl::putAtt( const std::string& key, size_t nvals, const long long* values )
+    {
+        return this->putAttImpl( key, nvals, values );
+    }
+
+    IVarAtt::sptr VarImpl::putAtt( const std::string& key, size_t nvals, const unsigned short* values )
+    {
+        return this->putAttImpl( key, nvals, values );
+    }
+
+
+    IVarAtt::sptr VarImpl::putAtt( const std::string& key, size_t nvals, const unsigned int* values )
+    {
+        return this->putAttImpl( key, nvals, values );
+    }
+
+    IVarAtt::sptr VarImpl::putAtt( const std::string& key, size_t nvals, const unsigned long* values )
+    {
+        return this->putAttImpl( key, nvals, values );
+    }
+
+    IVarAtt::sptr VarImpl::putAtt( const std::string& key, size_t nvals, const unsigned long long* values )
+    {
+        return this->putAttImpl( key, nvals, values );
+    }
+
+    IVarAtt::sptr VarImpl::putAtt( const std::string& key, size_t nvals, const float* values )
+    {
+        return this->putAttImpl( key, nvals, values );
+    }
+
+    IVarAtt::sptr VarImpl::putAtt( const std::string& key, size_t nvals, const double* values )
+    {
+        return this->putAttImpl( key, nvals, values );
+    }
+
+
+    IVarAtt::sptr VarImpl::putAtt( const std::string& key, size_t nvals, const char** values )
+    {
+        IVarAtt::sptr var_att;
+        try
+        {
+            netCDF::NcVarAtt ncatt = _nc_var.putAtt( key, netCDF::NcString(), nvals, values );
+            var_att = VarAtt::create( ncatt );
+
+            _name_varatt_map[ key ] = var_att;
+        }
+        catch( NcException& e )
+        {
+            e.what();
+        }
+
+
+        return var_att;
+    }
+
+
 
 
 
@@ -605,19 +815,23 @@ namespace FairDataPipeline
             IGroupAtt::sptr putAtt( const std::string& key, size_t nvals, const int* values );
             IGroupAtt::sptr putAtt( const std::string& key, size_t nvals, const long* values );
             IGroupAtt::sptr putAtt( const std::string& key, size_t nvals, const long long* values );
-            IGroupAtt::sptr putAtt( const std::string& key, size_t nvals, const float* values );
-            IGroupAtt::sptr putAtt( const std::string& key, size_t nvals, const double* values );
-            IGroupAtt::sptr putAtt( const std::string& key, size_t nvals, const char** values );
 
             IGroupAtt::sptr putAtt( const std::string& key, size_t nvals, const unsigned short* values );
             IGroupAtt::sptr putAtt( const std::string& key, size_t nvals, const unsigned int* values );
             IGroupAtt::sptr putAtt( const std::string& key, size_t nvals, const unsigned long* values );
             IGroupAtt::sptr putAtt( const std::string& key, size_t nvals, const unsigned long long* values );
 
+            IGroupAtt::sptr putAtt( const std::string& key, size_t nvals, const float* values );
+            IGroupAtt::sptr putAtt( const std::string& key, size_t nvals, const double* values );
 
-            static GroupImpl::sptr create( GroupImpl::sptr p );
+            IGroupAtt::sptr putAtt( const std::string& key, size_t nvals, const char** values );
+            
+
+
 
         protected:
+
+            static GroupImpl::sptr create( GroupImpl::sptr p );
 
             NcGroupPtr _nc;	
 
@@ -698,18 +912,18 @@ namespace FairDataPipeline
 
     IGroupAtt::sptr GroupImpl::putAtt( const std::string& key, size_t nvals, const float* values )
     {
-
         IGroupAtt::sptr grp_att = this->putAttImpl< float >( key, nvals, values );
         return grp_att;
     }
 
 
+#if 1
     IGroupAtt::sptr GroupImpl::putAtt( const std::string& key, size_t nvals, const short* values )
     {
         IGroupAtt::sptr grp_att = this->putAttImpl< short >( key, nvals, values );
-
         return grp_att;
     }
+#endif
 
     IGroupAtt::sptr GroupImpl::putAtt( const std::string& key, size_t nvals, const int* values )
     {
@@ -722,6 +936,7 @@ namespace FairDataPipeline
         IGroupAtt::sptr grp_att = this->putAttImpl< long >( key, nvals, values );
         return grp_att;
     }
+
 
 
     IGroupAtt::sptr GroupImpl::putAtt( const std::string& key, size_t nvals, const long long* values )
@@ -1011,15 +1226,18 @@ namespace FairDataPipeline
         {
             NcGroup new_ncgrp( nc->addGroup( name ) );
 
-            auto self_ptr = this->shared_from_this();
+            if( !new_ncgrp.isNull() )
+            {
+                auto self_ptr = this->shared_from_this();
 
-            GroupImpl::sptr new_grp_ptr = GroupImpl::create( self_ptr );
+                GroupImpl::sptr new_grp_ptr = GroupImpl::create( self_ptr );
 
-            new_grp_ptr->_nc =std::make_shared< NcGroup >( new_ncgrp) ;
+                new_grp_ptr->_nc =std::make_shared< NcGroup >( new_ncgrp) ;
 
-            grp_ptr = new_grp_ptr;
+                grp_ptr = new_grp_ptr;
 
-            _name_grp_map[ name ] = grp_ptr;
+                _name_grp_map[ name ] = grp_ptr;
+            }
         }
         catch( NcException& e )
         {
@@ -1516,6 +1734,155 @@ namespace FairDataPipeline
 
         return status;
     }
+
+#if 0
+    template< typename T >
+    int BuilderImpl::putAttImpl( const std::string& name, size_t nvals, T* values )
+    {
+        int status = 0;
+        return status;
+    }
+#endif
+
+    template< typename T >
+    int Builder_putAttImpl( IGroup::sptr grp_ptr, const std::string& name, size_t nvals, T* values  )
+    {
+        int status = 0;
+
+        std::vector< std::string > splits;
+        split_str( name, '/', splits );
+        std::string arrname = name;
+
+        auto its = splits.begin();
+        auto ite = splits.end();
+        for( auto it = splits.begin(); it != ite-1 && grp_ptr; ++it )
+        {
+            grp_ptr = grp_ptr->getGroup( *it );
+        }
+
+        if( grp_ptr )
+        {
+            //last split could be a var or a group
+            grp_ptr = grp_ptr->getGroup( splits.back() );
+            if( grp_ptr )
+            {
+                grp_ptr->putAtt( name, nvals, values );
+            }
+            else
+            {
+                //could be a var
+                auto var_ptr = grp_ptr->getVar( splits.back() );
+
+                if( var_ptr )
+                    var_ptr->putAtt( name, nvals, values );
+                else
+                    status = 1;
+            }
+        }
+        else
+            status = 1;
+
+        return status;
+    }
+
+    int Builder_putAttImpl_strings( IGroup::sptr grp_ptr, const std::string& name, size_t nvals, const char** values  )
+    {
+        int status = 0;
+
+        std::vector< std::string > splits;
+        split_str( name, '/', splits );
+        std::string arrname = name;
+
+        auto its = splits.begin();
+        auto ite = splits.end();
+        for( auto it = splits.begin(); it != ite-1 && grp_ptr; ++it )
+        {
+            grp_ptr = grp_ptr->getGroup( *it );
+        }
+
+        if( grp_ptr )
+        {
+            //last split could be a var or a group
+            grp_ptr = grp_ptr->getGroup( splits.back() );
+            if( grp_ptr )
+            {
+                grp_ptr->putAtt( name, nvals, values );
+            }
+            else
+            {
+                //could be a var
+                auto var_ptr = grp_ptr->getVar( splits.back() );
+
+                if( var_ptr )
+                    var_ptr->putAtt( name, nvals, values );
+                else
+                    status = 1;
+            }
+        }
+        else
+            status = 1;
+
+        return status;
+    }
+
+
+    int Builder::putAtt( const std::string& name, size_t nvals, const short* values  )
+    {
+        return Builder_putAttImpl( _builder, name, nvals, values );
+    }
+
+    int Builder::putAtt( const std::string& name, size_t nvals, const int* values  )
+    {
+        return Builder_putAttImpl( _builder, name, nvals, values );
+    }
+
+    int Builder::putAtt( const std::string& name, size_t nvals, const long* values  )
+    {
+        return Builder_putAttImpl( _builder, name, nvals, values );
+    }
+
+    int Builder::putAtt( const std::string& name, size_t nvals, const long long* values  )
+    {
+        return Builder_putAttImpl( _builder, name, nvals, values );
+    }
+
+    int Builder::putAtt( const std::string& name, size_t nvals, const unsigned short* values  )
+    {
+        return Builder_putAttImpl( _builder, name, nvals, values );
+    }
+
+    int Builder::putAtt( const std::string& name, size_t nvals,  const unsigned int* values  )
+    {
+        return Builder_putAttImpl( _builder, name, nvals, values );
+    }
+
+    int Builder::putAtt( const std::string& name, size_t nvals,  const unsigned long* values  )
+    {
+        return Builder_putAttImpl( _builder, name, nvals, values );
+    }
+
+    int Builder::putAtt( const std::string& name, size_t nvals,  const unsigned long long* values  )
+    {
+        return Builder_putAttImpl( _builder, name, nvals, values );
+    }
+
+    int Builder::putAtt( const std::string& name, size_t nvals,  const double * values  )
+    {
+        return Builder_putAttImpl( _builder, name, nvals, values );
+    }
+
+    int Builder::putAtt( const std::string& name, size_t nvals,  const float* values  )
+    {
+        return Builder_putAttImpl( _builder, name, nvals, values );
+    }
+
+    int Builder::putAtt( const std::string& name, size_t nvals,  const char** values )
+    {
+        return Builder_putAttImpl_strings( _builder, name, nvals, values );
+    }
+
+
+
 }
 
 

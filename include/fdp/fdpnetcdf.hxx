@@ -86,7 +86,25 @@ namespace FairDataPipeline
 
         virtual IVarAtt::sptr putAtt( const std::string& key, const std::string& value ) = 0;
 
+        virtual IVarAtt::sptr putAtt( const std::string& key, size_t nvals, const short* values ) = 0;
         virtual IVarAtt::sptr putAtt( const std::string& key, size_t nvals, const int* values ) = 0;
+        virtual IVarAtt::sptr putAtt( const std::string& key, size_t nvals, const long* values ) = 0;
+        virtual IVarAtt::sptr putAtt( const std::string& key, size_t nvals, const long long* values ) = 0;
+
+        virtual IVarAtt::sptr putAtt( const std::string& key, size_t nvals, const unsigned short* values ) = 0;
+        virtual IVarAtt::sptr putAtt( const std::string& key, size_t nvals, const unsigned int* values ) = 0;
+        virtual IVarAtt::sptr putAtt( const std::string& key, size_t nvals, const unsigned long* values ) = 0;
+        virtual IVarAtt::sptr putAtt( const std::string& key, size_t nvals, const unsigned long long* values ) = 0;
+
+        virtual IVarAtt::sptr putAtt( const std::string& key, size_t nvals, const float* values ) = 0;
+        virtual IVarAtt::sptr putAtt( const std::string& key, size_t nvals, const double* values ) = 0;
+        
+        virtual IVarAtt::sptr putAtt( const std::string& key, size_t nvals, const char** values ) = 0;
+
+
+
+
+
 
         virtual IVarAtt::sptr getAtt( const std::string& key ) = 0;
     };
@@ -128,7 +146,17 @@ namespace FairDataPipeline
         virtual IGroupAtt::sptr putAtt( const std::string& key, float value ) = 0;
 
 
+        virtual IGroupAtt::sptr putAtt( const std::string& key, size_t nvals, const short* values ) = 0;
         virtual IGroupAtt::sptr putAtt( const std::string& key, size_t nvals, const int* values ) = 0;
+        virtual IGroupAtt::sptr putAtt( const std::string& key, size_t nvals, const long* values ) = 0;
+        virtual IGroupAtt::sptr putAtt( const std::string& key, size_t nvals, const long long* values ) = 0;
+
+        virtual IGroupAtt::sptr putAtt( const std::string& key, size_t nvals, const unsigned short* values ) = 0;
+        virtual IGroupAtt::sptr putAtt( const std::string& key, size_t nvals, const unsigned int* values ) = 0;
+        virtual IGroupAtt::sptr putAtt( const std::string& key, size_t nvals, const unsigned long* values ) = 0;
+        virtual IGroupAtt::sptr putAtt( const std::string& key, size_t nvals, const unsigned long long* values ) = 0;
+
+
         virtual IGroupAtt::sptr putAtt( const std::string& key, size_t nvals, const float* values ) = 0;
         virtual IGroupAtt::sptr putAtt( const std::string& key, size_t nvals, const double* values ) = 0;
 
@@ -199,6 +227,22 @@ namespace FairDataPipeline
 
             int readArray_data( const std::string& name
                     , const ArrayDefinition& arraydef, void *data );
+
+            int putAtt( const std::string& name, size_t nvals,  const short* values );
+            int putAtt( const std::string& name, size_t nvals,  const int* values );
+            int putAtt( const std::string& name, size_t nvals,  const long* values );
+            int putAtt( const std::string& name, size_t nvals,  const long long* values );
+            int putAtt( const std::string& name, size_t nvals,  const unsigned short* values );
+            int putAtt( const std::string& name, size_t nvals,  const unsigned int* values );
+            int putAtt( const std::string& name, size_t nvals,  const unsigned long* values );
+            int putAtt( const std::string& name, size_t nvals,  const unsigned long long* values );
+
+            int putAtt( const std::string& name, size_t nvals,  const float* values );
+            int putAtt( const std::string& name, size_t nvals,  const double* values );
+
+
+
+            int putAtt( const std::string& name, size_t nvals,  const char** values );
 
         private:
             IBuilder::sptr _builder;

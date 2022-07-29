@@ -75,11 +75,20 @@ TEST_F(BuilderTest, TestBuilder)
 
 
     grp_bob_terry_ptr->addDim( "dim1", 10);
+
     auto dim1_ptr = grp_bob_terry_ptr->getDim( "dim1" );
+
+
 
     ASSERT_EQ( dim1_ptr->getName(), "dim1" );
     ASSERT_EQ( dim1_ptr->getSize(), 10 );
     ASSERT_EQ( dim1_ptr->getParentGroup(), grp_bob_terry_ptr );
+
+
+    //auto grp_with_dim_name = grp_bob_terry_ptr->addGroup( "dim1" );
+
+    //ASSERT_TRUE( NULL != grp_with_dim_name );
+    //return;
 
 
 
