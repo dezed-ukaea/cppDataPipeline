@@ -29,20 +29,17 @@ class BuilderTest : public ::testing::Test {
 
 namespace fdp = FairDataPipeline;
 
-TEST_F(BuilderTest, TestBuilder) 
+TEST_F(BuilderTest, TestInterface) 
 {
-
     fdp::IBuilder::sptr 
         ibuilder = fdp::BuilderFactory::create( "xbuildertest.nc", fdp::IBuilder::Mode::WRITE );
 
     ASSERT_TRUE( NULL != ibuilder );
 
-
     auto grp_bob_ptr = ibuilder->addGroup("bob");
     grp_bob_ptr->putAtt( "int", 123 );
     grp_bob_ptr->putAtt( "float", 123.123f );
     grp_bob_ptr->putAtt( "string", "a string" );
-
 
     int ivals[] = { 1, 2, 3 };
     float fvals[] = { 1.0, 2.0, 3.0 };
@@ -78,19 +75,14 @@ TEST_F(BuilderTest, TestBuilder)
 
     auto dim1_ptr = grp_bob_terry_ptr->getDim( "dim1" );
 
-
-
     ASSERT_EQ( dim1_ptr->getName(), "dim1" );
     ASSERT_EQ( dim1_ptr->getSize(), 10 );
     ASSERT_EQ( dim1_ptr->getParentGroup(), grp_bob_terry_ptr );
-
 
     //auto grp_with_dim_name = grp_bob_terry_ptr->addGroup( "dim1" );
 
     //ASSERT_TRUE( NULL != grp_with_dim_name );
     //return;
-
-
 
 
     ASSERT_TRUE( NULL != grp_ptr );
@@ -112,9 +104,6 @@ TEST_F(BuilderTest, TestBuilder)
 
     //fdp::Array::Shape dim = fdp::Array::make_shape( shape, 3 );
     //ASSERT_EQ( dim.rank(), 3 );
-    //ASSERT_EQ( dim.shape()[0], 1 );
-    //ASSERT_EQ( dim.shape()[1], 2 );
-    //ASSERT_EQ( dim.shape()[2], 3 );
 
     //fdp::Array::ArrayRef< int > a_ref( pa, dim );
     std::vector< int > vals = {0,1,2,3,4,5,6,7,8,9};
@@ -148,8 +137,10 @@ TEST_F(BuilderTest, TestBuilder)
 
     }
 
+}
 
-    {
+TEST_F(BuilderTest, TestInterface2) 
+{
         double data[2][3];
         int dim1[2] = {1,2};
         float dim2[3] ={3.1,4.2,5.3};
@@ -274,10 +265,24 @@ TEST_F(BuilderTest, TestBuilder)
 
         status = builder2.writeDimension("grp/dim3", dimdef3, dim3data );
 
+        int iatts[] = { 1,2,3 };
+        builder2.putAtt( "grp/dim3", "dim3_att", 3, iatts );
 
-    }
+        fdp::IAtt::sptr att_ptr;
+        status = builder2.getAtt( "grp/dim3", "dim3_att",  att_ptr );
 
+        ASSERT_EQ( 0, status );
 
+        ASSERT_TRUE( NULL != att_ptr );
 
-} //! [TestGetById]
+        ASSERT_EQ( fdp::DataType::INT, att_ptr->getAttType() );
+        ASSERT_EQ( fdp::IAtt::ATTRIBUTE_VAR_TYPE, att_ptr->getClassType() );
+        ASSERT_EQ( 3, att_ptr->getAttLength() );
 
+        status = builder2.getAtt( "grp/dim3", "bad_att",  att_ptr );
+
+        ASSERT_NE( 0, status );
+
+        ASSERT_TRUE( NULL == att_ptr );
+
+} 

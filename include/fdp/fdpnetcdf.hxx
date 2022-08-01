@@ -13,8 +13,6 @@
 
 namespace FairDataPipeline
 {
-    void split_str( const std::string& s, const char delim, std::vector< std::string >& splits );
-
     enum DataType
     {
         BYTE,
@@ -44,27 +42,35 @@ namespace FairDataPipeline
 
         virtual size_t getSize() = 0;
         virtual std::string getName() = 0;
-        //virtual void rename(const std::string& new_name) = 0;
         virtual IGroupPtr getParentGroup() = 0;
     };
-    struct IGroupAtt
+
+    struct IAtt
+    {
+        enum ATTRIBUTE_TYPE{ ATTRIBUTE_GROUP_TYPE, ATTRIBUTE_VAR_TYPE };
+
+        typedef std::shared_ptr< IAtt > sptr;
+
+        virtual DataType getAttType() = 0;
+
+        virtual int getClassType() = 0;
+        virtual size_t getAttLength() = 0;
+
+        virtual int getValues( int* values ) = 0;
+        virtual int getValues( float* values ) = 0;
+        virtual int getValues( std::string& values ) = 0;
+
+    };
+
+    struct IGroupAtt : public IAtt
     {
         typedef std::shared_ptr< IGroupAtt > sptr;
 
-        virtual int getValues( int* values ) = 0;
-        virtual int getValues( float* values ) = 0;
-        virtual int getValues( std::string& values ) = 0;
     };
 
-
-
-    struct IVarAtt
+    struct IVarAtt : public IAtt
     {
         typedef std::shared_ptr< IVarAtt > sptr;
-
-        virtual int getValues( int* values ) = 0;
-        virtual int getValues( float* values ) = 0;
-        virtual int getValues( std::string& values ) = 0;
     };
 
     struct IVar
@@ -228,22 +234,41 @@ namespace FairDataPipeline
             int readArray_data( const std::string& name
                     , const ArrayDefinition& arraydef, void *data );
 
-            int putAtt( const std::string& name, size_t nvals,  const short* values );
-            int putAtt( const std::string& name, size_t nvals,  const int* values );
-            int putAtt( const std::string& name, size_t nvals,  const long* values );
-            int putAtt( const std::string& name, size_t nvals,  const long long* values );
-            int putAtt( const std::string& name, size_t nvals,  const unsigned short* values );
-            int putAtt( const std::string& name, size_t nvals,  const unsigned int* values );
-            int putAtt( const std::string& name, size_t nvals,  const unsigned long* values );
-            int putAtt( const std::string& name, size_t nvals,  const unsigned long long* values );
+            int putAtt( const std::string& name
+                    , const std::string& key, size_t nvals,  const short* values );
 
-            int putAtt( const std::string& name, size_t nvals,  const float* values );
-            int putAtt( const std::string& name, size_t nvals,  const double* values );
+            int putAtt( const std::string& name
+                    , const std::string& key, size_t nvals,  const int* values );
+
+            int putAtt( const std::string& name
+                    , const std::string& key, size_t nvals,  const long* values );
+
+            int putAtt( const std::string& name
+                    , const std::string& key, size_t nvals,  const long long* values );
+
+            int putAtt( const std::string& name
+                    , const std::string& key, size_t nvals,  const unsigned short* values );
+
+            int putAtt( const std::string& name
+                    , const std::string& key, size_t nvals,  const unsigned int* values );
+
+            int putAtt( const std::string& name
+                    , const std::string& key, size_t nvals,  const unsigned long* values );
+
+            int putAtt( const std::string& name
+                    , const std::string& key, size_t nvals,  const unsigned long long* values );
+            
+            int putAtt( const std::string& name
+                    , const std::string& key, size_t nvals,  const float* values );
+
+            int putAtt( const std::string& name
+                    , const std::string& key, size_t nvals,  const double* values );
+
+            int putAtt( const std::string& name
+                    , const std::string& key, size_t nvals,  const char** values );
 
 
-
-            int putAtt( const std::string& name, size_t nvals,  const char** values );
-
+            int getAtt( const std::string& name, const std::string& key, IAtt::sptr& att_ptr );
         private:
             IBuilder::sptr _builder;
     };

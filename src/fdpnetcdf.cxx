@@ -260,6 +260,11 @@ namespace FairDataPipeline
                 return GroupAtt::sptr( new GroupAtt( ncatt ) );
             }
 
+
+            DataType getAttType();
+            int getClassType(){ return ATTRIBUTE_GROUP_TYPE; }
+            size_t getAttLength() { return _ncatt.getAttLength();}
+
             //int getValues( int* values );
             //int getValues( float* values );
             int getValues( std::string& values );
@@ -410,6 +415,13 @@ namespace FairDataPipeline
         public:
             VarAtt() = delete;
             static VarAtt::sptr create( const netCDF::NcVarAtt& ncvaratt ) { return VarAtt::sptr( new VarAtt( ncvaratt ) );}
+
+
+            DataType getAttType();
+            int getClassType(){ return ATTRIBUTE_VAR_TYPE; }
+
+            size_t getAttLength() { return _ncvaratt.getAttLength();}
+
             int getValues( short* values );
             int getValues( int* values );
             int getValues( long* values );
@@ -1745,7 +1757,52 @@ namespace FairDataPipeline
 #endif
 
     template< typename T >
-    int Builder_putAttImpl( IGroup::sptr grp_ptr, const std::string& name, size_t nvals, T* values  )
+    int Builder_putAttImpl( IGroup::sptr grp_ptr, const std::string& name
+            , const std::string& key, size_t nvals, T* values  )
+    {
+        int status = 0;
+
+        std::vector< std::string > splits;
+        split_str( name, '/', splits );
+        std::string arrname = name;
+
+        auto its = splits.begin();
+        auto ite = splits.end();
+        for( auto it = splits.begin(); it != ite-1 && grp_ptr; ++it )
+        {
+            grp_ptr = grp_ptr->getGroup( *it );
+        }
+
+        if( grp_ptr )
+        {
+            IGroup::sptr last_grp_ptr = grp_ptr;
+
+            //last split could be a var or a group
+            grp_ptr = grp_ptr->getGroup( splits.back() );
+            if( grp_ptr )
+            {
+                grp_ptr->putAtt( key, nvals, values );
+            }
+            else
+            {
+                //could be a var
+                auto var_ptr = last_grp_ptr->getVar( splits.back() );
+
+                if( var_ptr )
+                    var_ptr->putAtt( key, nvals, values );
+                else
+                    status = 1;
+            }
+        }
+        else
+            status = 1;
+
+        return status;
+    }
+
+    int Builder_putAttImpl_strings( IGroup::sptr grp_ptr
+            , const std::string& name
+            , const std::string& key, size_t nvals, const char** values  )
     {
         int status = 0;
 
@@ -1766,7 +1823,7 @@ namespace FairDataPipeline
             grp_ptr = grp_ptr->getGroup( splits.back() );
             if( grp_ptr )
             {
-                grp_ptr->putAtt( name, nvals, values );
+                grp_ptr->putAtt( key, nvals, values );
             }
             else
             {
@@ -1774,7 +1831,7 @@ namespace FairDataPipeline
                 auto var_ptr = grp_ptr->getVar( splits.back() );
 
                 if( var_ptr )
-                    var_ptr->putAtt( name, nvals, values );
+                    var_ptr->putAtt( key, nvals, values );
                 else
                     status = 1;
             }
@@ -1785,7 +1842,68 @@ namespace FairDataPipeline
         return status;
     }
 
-    int Builder_putAttImpl_strings( IGroup::sptr grp_ptr, const std::string& name, size_t nvals, const char** values  )
+
+    int Builder::putAtt( const std::string& name
+            , const std::string& key, size_t nvals, const short* values  )
+    {
+        return Builder_putAttImpl( _builder, name, key, nvals, values );
+    }
+
+    int Builder::putAtt( const std::string& name
+            , const std::string& key, size_t nvals, const int* values  )
+    {
+        return Builder_putAttImpl( _builder, name, key, nvals, values );
+    }
+
+    int Builder::putAtt( const std::string& name
+            , const std::string& key, size_t nvals, const long* values  )
+    {
+        return Builder_putAttImpl( _builder, name, key, nvals, values );
+    }
+
+    int Builder::putAtt( const std::string& name
+            , const std::string& key, size_t nvals, const long long* values  )
+    {
+        return Builder_putAttImpl( _builder, name, key, nvals, values );
+    }
+
+    int Builder::putAtt( const std::string& name, const std::string& key, size_t nvals, const unsigned short* values  )
+    {
+        return Builder_putAttImpl( _builder, name, key, nvals, values );
+    }
+
+    int Builder::putAtt( const std::string& name, const std::string& key, size_t nvals,  const unsigned int* values  )
+    {
+        return Builder_putAttImpl( _builder, name, key, nvals, values );
+    }
+
+    int Builder::putAtt( const std::string& name, const std::string& key, size_t nvals,  const unsigned long* values  )
+    {
+        return Builder_putAttImpl( _builder, name, key, nvals, values );
+    }
+
+    int Builder::putAtt( const std::string& name, const std::string& key, size_t nvals,  const unsigned long long* values  )
+    {
+        return Builder_putAttImpl( _builder, name, key, nvals, values );
+    }
+
+    int Builder::putAtt( const std::string& name, const std::string& key, size_t nvals,  const double * values  )
+    {
+        return Builder_putAttImpl( _builder, name, key, nvals, values );
+    }
+
+    int Builder::putAtt( const std::string& name, const std::string& key, size_t nvals,  const float* values  )
+    {
+        return Builder_putAttImpl( _builder, name, key, nvals, values );
+    }
+
+    int Builder::putAtt( const std::string& name, const std::string& key, size_t nvals,  const char** values )
+    {
+        return Builder_putAttImpl_strings( _builder, name, key, nvals, values );
+    }
+
+
+    int Builder::getAtt( const std::string& name, const std::string& key, IAtt::sptr& att_ptr )
     {
         int status = 0;
 
@@ -1795,6 +1913,11 @@ namespace FairDataPipeline
 
         auto its = splits.begin();
         auto ite = splits.end();
+
+        att_ptr = NULL;
+
+        IGroup::sptr grp_ptr = _builder;
+
         for( auto it = splits.begin(); it != ite-1 && grp_ptr; ++it )
         {
             grp_ptr = grp_ptr->getGroup( *it );
@@ -1802,19 +1925,31 @@ namespace FairDataPipeline
 
         if( grp_ptr )
         {
+            IGroup::sptr last_grp_ptr = grp_ptr;
+
             //last split could be a var or a group
             grp_ptr = grp_ptr->getGroup( splits.back() );
             if( grp_ptr )
             {
-                grp_ptr->putAtt( name, nvals, values );
+                IGroupAtt::sptr grp_att_ptr = grp_ptr->getAtt( key );
+
+                att_ptr = grp_att_ptr;
+
+                status = (att_ptr != NULL) ? 0 : 1;
             }
             else
             {
                 //could be a var
-                auto var_ptr = grp_ptr->getVar( splits.back() );
+                auto var_ptr = last_grp_ptr->getVar( splits.back() );
 
                 if( var_ptr )
-                    var_ptr->putAtt( name, nvals, values );
+                {
+                    IVarAtt::sptr var_att_ptr =  var_ptr->getAtt( key );
+
+                    att_ptr = var_att_ptr;
+
+                    status = (att_ptr != NULL) ? 0 : 1;
+                }
                 else
                     status = 1;
             }
@@ -1823,62 +1958,23 @@ namespace FairDataPipeline
             status = 1;
 
         return status;
+
     }
 
 
-    int Builder::putAtt( const std::string& name, size_t nvals, const short* values  )
+    DataType VarAtt::getAttType()
     {
-        return Builder_putAttImpl( _builder, name, nvals, values );
+        auto nctype = _ncvaratt.getType().getTypeClass();
+        DataType dtype = NcType2DataType( nctype );
+        return dtype;
     }
 
-    int Builder::putAtt( const std::string& name, size_t nvals, const int* values  )
+    DataType GroupAtt::getAttType()
     {
-        return Builder_putAttImpl( _builder, name, nvals, values );
-    }
+        auto nctype = _ncatt.getType().getTypeClass();
 
-    int Builder::putAtt( const std::string& name, size_t nvals, const long* values  )
-    {
-        return Builder_putAttImpl( _builder, name, nvals, values );
-    }
-
-    int Builder::putAtt( const std::string& name, size_t nvals, const long long* values  )
-    {
-        return Builder_putAttImpl( _builder, name, nvals, values );
-    }
-
-    int Builder::putAtt( const std::string& name, size_t nvals, const unsigned short* values  )
-    {
-        return Builder_putAttImpl( _builder, name, nvals, values );
-    }
-
-    int Builder::putAtt( const std::string& name, size_t nvals,  const unsigned int* values  )
-    {
-        return Builder_putAttImpl( _builder, name, nvals, values );
-    }
-
-    int Builder::putAtt( const std::string& name, size_t nvals,  const unsigned long* values  )
-    {
-        return Builder_putAttImpl( _builder, name, nvals, values );
-    }
-
-    int Builder::putAtt( const std::string& name, size_t nvals,  const unsigned long long* values  )
-    {
-        return Builder_putAttImpl( _builder, name, nvals, values );
-    }
-
-    int Builder::putAtt( const std::string& name, size_t nvals,  const double * values  )
-    {
-        return Builder_putAttImpl( _builder, name, nvals, values );
-    }
-
-    int Builder::putAtt( const std::string& name, size_t nvals,  const float* values  )
-    {
-        return Builder_putAttImpl( _builder, name, nvals, values );
-    }
-
-    int Builder::putAtt( const std::string& name, size_t nvals,  const char** values )
-    {
-        return Builder_putAttImpl_strings( _builder, name, nvals, values );
+        DataType dtype = NcType2DataType( nctype );
+        return dtype;
     }
 
 
