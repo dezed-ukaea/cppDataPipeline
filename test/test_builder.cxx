@@ -31,8 +31,8 @@ namespace fdp = FairDataPipeline;
 
 TEST_F(BuilderTest, TestInterface) 
 {
-    fdp::IBuilder::sptr 
-        ibuilder = fdp::BuilderFactory::create( "xbuildertest.nc", fdp::IBuilder::Mode::WRITE );
+    fdp::IFile::sptr 
+        ibuilder = fdp::FileFactory::create( "xbuildertest.nc", fdp::IFile::Mode::WRITE );
 
     ASSERT_TRUE( NULL != ibuilder );
 
@@ -169,9 +169,9 @@ TEST_F(BuilderTest, TestInterface2)
         arrdef.description = "arrdescription";
         arrdef.dataType = fdp::DataType::DOUBLE;
         arrdef.dimension_names = { "grp/dim1", "grp/dim2" };
-        arrdef.shape = { 2,3 };
+        //arrdef.shape = { 2,3 };
 
-        fdp::Builder builder2( "xtest.nc", fdp::IBuilder::Mode::WRITE );
+        fdp::Builder builder2( "xtest.nc", fdp::IFile::Mode::WRITE );
 
         int status = 0;
 
@@ -208,7 +208,7 @@ TEST_F(BuilderTest, TestInterface2)
         ASSERT_EQ( 0, status );
         ASSERT_EQ( "arrunits", arrdef_.units );
         ASSERT_EQ( "arrdescription", arrdef_.description );
-        ASSERT_EQ( arrdef_.shape, arrdef.shape );
+        //ASSERT_EQ( arrdef_.shape, arrdef.shape );
         ASSERT_EQ( arrdef_.dimension_names, arrdef.dimension_names );
         ASSERT_EQ( arrdef_.dataType, fdp::DataType::DOUBLE );
 

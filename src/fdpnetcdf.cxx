@@ -358,41 +358,6 @@ namespace FairDataPipeline
         return this->getValuesImpl( values );
     }
 
-
-#if 0
-    int GroupAtt::getValues( int* values )
-    {
-        int status = 0;
-
-        try
-        {
-            _ncatt.getValues( values );
-        }
-        catch( NcException& e )
-        {
-            e.what();
-        }
-
-        return status;
-    }
-    int GroupAtt::getValues( float* values )
-    {
-        int status = 0;
-
-        try
-        {
-            _ncatt.getValues( values );
-        }
-        catch( NcException& e )
-        {
-            e.what();
-        }
-
-        return status;
-    }
-
-
-#endif
     int GroupAtt::getValues( std::string& values )
     {
         int status = 0;
@@ -436,7 +401,6 @@ namespace FairDataPipeline
 
             int getValues( std::string& values );
         private:
-
 
             template< typename T>
                 int getValuesImpl( T* values );
@@ -513,11 +477,6 @@ namespace FairDataPipeline
     {
         return this->getValuesImpl( values );
     }
-
-
-
-
-
 
     int VarAtt::getValues( std::string& values )
     {
@@ -598,7 +557,6 @@ namespace FairDataPipeline
         return this->putAttImpl( key, nvals, values );
     }
 
-
     IVarAtt::sptr VarImpl::putAtt( const std::string& key, size_t nvals, const int* values )
     {
         return this->putAttImpl( key, nvals, values );
@@ -618,7 +576,6 @@ namespace FairDataPipeline
     {
         return this->putAttImpl( key, nvals, values );
     }
-
 
     IVarAtt::sptr VarImpl::putAtt( const std::string& key, size_t nvals, const unsigned int* values )
     {
@@ -645,7 +602,6 @@ namespace FairDataPipeline
         return this->putAttImpl( key, nvals, values );
     }
 
-
     IVarAtt::sptr VarImpl::putAtt( const std::string& key, size_t nvals, const char** values )
     {
         IVarAtt::sptr var_att;
@@ -661,14 +617,8 @@ namespace FairDataPipeline
             e.what();
         }
 
-
         return var_att;
     }
-
-
-
-
-
 
     IVarAtt::sptr VarImpl::putAtt( const std::string& key, const std::string& value )
     {
@@ -776,6 +726,9 @@ namespace FairDataPipeline
             std::string getName(){return _nc_dim.getName();}
             IGroup::sptr getParentGroup(){ return _parent;}
 
+            bool isUnlimited() { return _nc_dim.isUnlimited(); }
+
+
         private:
             DimensionImpl( IGroup::sptr parent, const netCDF::NcDim& nc_dim ) : _parent(parent), _nc_dim( nc_dim ) 
         {
@@ -810,6 +763,8 @@ namespace FairDataPipeline
             IGroup::sptr addGroup( const std::string& name );
 
             IDimension::sptr addDim( const std::string& name, size_t sz );
+            IDimension::sptr addUnlimitedDim( const std::string& name );
+            
             IDimension::sptr getDim( const std::string& name );
 
             IVar::sptr addVar( const std::string& name, DataType dataType
@@ -1127,6 +1082,29 @@ namespace FairDataPipeline
         return dim_ptr;
     }
 
+    IDimension::sptr GroupImpl::addUnlimitedDim( const std::string& name )
+    {
+        DimensionImpl::sptr dim_ptr;
+
+        try
+        {
+            netCDF::NcDim nc_dim = _nc->addDim( name );
+
+            if( !nc_dim.isNull() )
+            {
+                dim_ptr = DimensionImpl::create( this->shared_from_this(), nc_dim );
+
+                _name_dim_map[ name ] = dim_ptr;
+            }
+        }
+        catch( NcException& e )
+        {
+            e.what();
+        }
+
+        return dim_ptr;
+    }
+
     IDimension::sptr GroupImpl::addDim( const std::string& name, size_t sz )
     {
         DimensionImpl::sptr dim_ptr;
@@ -1215,7 +1193,6 @@ namespace FairDataPipeline
         }
 
         return _name_grp_map;
-
     }
 
     IGroup::sptr GroupImpl::requireGroup( const std::string& name )
@@ -1284,39 +1261,39 @@ namespace FairDataPipeline
     }
 
 
-    class BuilderImpl 
+    class FileImpl 
         : public GroupImpl
     {
         public:
-            typedef std::shared_ptr< BuilderImpl > sptr;
+            typedef std::shared_ptr< FileImpl > sptr;
 
-            static sptr create(const std::string& path, IBuilder::Mode mode );
+            static sptr create(const std::string& path, IFile::Mode mode );
 
-            void open( const std::string& path , IBuilder::Mode mode );
+            void open( const std::string& path , IFile::Mode mode );
             void close();
 
         private:
             NcFilePtr ncfile(){ return std::dynamic_pointer_cast< NcFile >( _nc ); }
 
-            BuilderImpl( const std::string& path, IBuilder::Mode mode ) ;
+            FileImpl( const std::string& path, IFile::Mode mode ) ;
 
     };
 
 
 
-    BuilderImpl::sptr BuilderImpl::create(const std::string& path, IBuilder::Mode mode )
+    FileImpl::sptr FileImpl::create(const std::string& path, IFile::Mode mode )
     {
-        auto p = BuilderImpl::sptr( new BuilderImpl(path, mode ));
+        auto p = FileImpl::sptr( new FileImpl(path, mode ));
         return p;
     }
 
-    void BuilderImpl::open( const std::string& path, IBuilder::Mode mode )
+    void FileImpl::open( const std::string& path, IFile::Mode mode )
     {
         auto ncmode = NcFile::FileMode::read;
 
         switch( mode )
         {
-            case IBuilder::Mode::READ:
+            case IFile::Mode::READ:
                 {
                     try
                     {
@@ -1328,7 +1305,7 @@ namespace FairDataPipeline
                     }
                 }
                 break;
-            case IBuilder::Mode::WRITE:
+            case IFile::Mode::WRITE:
                 {
                     try
                     {
@@ -1351,7 +1328,7 @@ namespace FairDataPipeline
         }
     }
 
-    void BuilderImpl::close()
+    void FileImpl::close()
     {
         try
         {
@@ -1364,25 +1341,25 @@ namespace FairDataPipeline
     }
 
 
-    BuilderImpl::BuilderImpl( const std::string& path, IBuilder::Mode mode ) 
+    FileImpl::FileImpl( const std::string& path, IFile::Mode mode ) 
         : GroupImpl( NULL, std::make_shared<NcFile>() ) 
     {
         this->open( path, mode );
     }
 
 
-    IBuilder::sptr BuilderFactory::create( const std::string& path, Mode mode ) 
+    IFile::sptr FileFactory::create( const std::string& path, Mode mode ) 
     {
-        auto builder = BuilderImpl::create( path, mode );
+        auto builder = FileImpl::create( path, mode );
         return builder;
     }
 
-    Builder::Builder( const std::string& path, IBuilder::Mode mode )
+    Builder::Builder( const std::string& path, IFile::Mode mode )
     {
-        _builder = BuilderFactory::create( path, mode );
+        _file = FileFactory::create( path, mode );
 
-        if( IBuilder::Mode::WRITE == mode )	
-            _builder->putAtt( "schema", 1 );
+        if( IFile::Mode::WRITE == mode )	
+            _file->putAtt( "schema", 1 );
     }
 
     int Builder::readDim_metadata( const std::string& name
@@ -1392,7 +1369,7 @@ namespace FairDataPipeline
         std::string dim_name( name );
         std::string dim_name_orig = dim_name;
 
-        IGroup::sptr grp_ptr = _builder;
+        IGroup::sptr grp_ptr = _file;
 
         std::vector< std::string > splits;
         split_str( dim_name, '/', splits );
@@ -1448,7 +1425,7 @@ namespace FairDataPipeline
         std::string dim_name_orig = name;
         std::string dim_name = dim_name_orig;
 
-        IGroup::sptr grp_ptr = _builder;
+        IGroup::sptr grp_ptr = _file;
 
         std::vector< std::string > splits;
         split_str( dim_name_orig, '/', splits );
@@ -1487,7 +1464,7 @@ namespace FairDataPipeline
         std::string array_name( name );
         std::string array_name_orig = array_name;
 
-        IGroup::sptr grp_ptr = _builder;
+        IGroup::sptr grp_ptr = _file;
 
         std::vector< std::string > splits;
         split_str( array_name, '/', splits );
@@ -1545,12 +1522,7 @@ namespace FairDataPipeline
                     else
                         dim_names.push_back( "" );
                 }
-#if 0
-                for( int i = 0; i < shape.size(); ++i )
-                {
-                    n = n * shape[i];
-                }
-#endif
+
                 DataType dtype =  var_ptr->getType();
 
                 std::string units, description;
@@ -1565,7 +1537,7 @@ namespace FairDataPipeline
 
                 arraydef.dataType = dtype;
                 arraydef.dimension_names = dim_names;
-                arraydef.shape = shape;
+                //arraydef.shape = shape;
                 arraydef.units = units;
                 arraydef.description = description;
             }
@@ -1583,7 +1555,7 @@ namespace FairDataPipeline
         std::string array_name_orig = name;
         std::string array_name = array_name_orig;
 
-        IGroup::sptr grp_ptr = _builder;
+        IGroup::sptr grp_ptr = _file;
 
         std::vector< std::string > splits;
         split_str( array_name_orig, '/', splits );
@@ -1619,7 +1591,7 @@ namespace FairDataPipeline
 
         std::string dimdef_name = name;
 
-        IGroup::sptr grp_ptr =_builder;
+        IGroup::sptr grp_ptr = _file;
         
         std::vector< std::string > splits;
 
@@ -1667,7 +1639,7 @@ namespace FairDataPipeline
 
         for( int i = 0; i < arraydef.dimension_names.size();++i )
         {
-            grp_ptr = _builder;
+            grp_ptr = _file;
             std::string dim_name = arraydef.dimension_names[i];
             std::vector< std::string > splits;
             split_str( dim_name, '/', splits );
@@ -1682,34 +1654,16 @@ namespace FairDataPipeline
                 }
                 dim_name = splits.back();
             }
-#if 0
-            if( dim_name == "" )//no dim
+
+            IVar::sptr dim_var_ptr = grp_ptr->getVar( dim_name );
+            if( dim_var_ptr )
             {
-                //create a dummy dim based on shape
-                std::ostringstream os;
-                os << name << "_dim" << i;
+                std::vector< IDimension::sptr > dim_ptrs = dim_var_ptr->getDims();
 
-                size_t n = arraydef.shape[ i ];
-
-                std::string dummy_name = os.str();
-
-                IDimension::sptr dim_ptr = grp_ptr->addDim(dummy_name, n );
-
-                vdims.push_back( dim_ptr );
+                vdims.push_back( dim_ptrs[0] );
             }
-            else
-#endif
-            {
-                IVar::sptr dim_var_ptr = grp_ptr->getVar( dim_name );
-                if( dim_var_ptr )
-                {
-                    std::vector< IDimension::sptr > dim_ptrs = dim_var_ptr->getDims();
-
-                    vdims.push_back( dim_ptrs[0] );
-                }
-                else 
-                    status = 1;
-            }
+            else 
+                status = 1;
         }                    
 
         if( !status )
@@ -1717,7 +1671,7 @@ namespace FairDataPipeline
             std::vector< std::string > splits;
             split_str( name, '/', splits );
             std::string arrname = name;
-            grp_ptr = _builder;
+            grp_ptr = _file;
 
             if( splits.size() > 1 )
             {
@@ -1747,14 +1701,6 @@ namespace FairDataPipeline
         return status;
     }
 
-#if 0
-    template< typename T >
-    int BuilderImpl::putAttImpl( const std::string& name, size_t nvals, T* values )
-    {
-        int status = 0;
-        return status;
-    }
-#endif
 
     template< typename T >
     int Builder_putAttImpl( IGroup::sptr grp_ptr, const std::string& name
@@ -1846,60 +1792,60 @@ namespace FairDataPipeline
     int Builder::putAtt( const std::string& name
             , const std::string& key, size_t nvals, const short* values  )
     {
-        return Builder_putAttImpl( _builder, name, key, nvals, values );
+        return Builder_putAttImpl( _file, name, key, nvals, values );
     }
 
     int Builder::putAtt( const std::string& name
             , const std::string& key, size_t nvals, const int* values  )
     {
-        return Builder_putAttImpl( _builder, name, key, nvals, values );
+        return Builder_putAttImpl( _file, name, key, nvals, values );
     }
 
     int Builder::putAtt( const std::string& name
             , const std::string& key, size_t nvals, const long* values  )
     {
-        return Builder_putAttImpl( _builder, name, key, nvals, values );
+        return Builder_putAttImpl( _file, name, key, nvals, values );
     }
 
     int Builder::putAtt( const std::string& name
             , const std::string& key, size_t nvals, const long long* values  )
     {
-        return Builder_putAttImpl( _builder, name, key, nvals, values );
+        return Builder_putAttImpl( _file, name, key, nvals, values );
     }
 
     int Builder::putAtt( const std::string& name, const std::string& key, size_t nvals, const unsigned short* values  )
     {
-        return Builder_putAttImpl( _builder, name, key, nvals, values );
+        return Builder_putAttImpl( _file, name, key, nvals, values );
     }
 
     int Builder::putAtt( const std::string& name, const std::string& key, size_t nvals,  const unsigned int* values  )
     {
-        return Builder_putAttImpl( _builder, name, key, nvals, values );
+        return Builder_putAttImpl( _file, name, key, nvals, values );
     }
 
     int Builder::putAtt( const std::string& name, const std::string& key, size_t nvals,  const unsigned long* values  )
     {
-        return Builder_putAttImpl( _builder, name, key, nvals, values );
+        return Builder_putAttImpl( _file, name, key, nvals, values );
     }
 
     int Builder::putAtt( const std::string& name, const std::string& key, size_t nvals,  const unsigned long long* values  )
     {
-        return Builder_putAttImpl( _builder, name, key, nvals, values );
+        return Builder_putAttImpl( _file, name, key, nvals, values );
     }
 
     int Builder::putAtt( const std::string& name, const std::string& key, size_t nvals,  const double * values  )
     {
-        return Builder_putAttImpl( _builder, name, key, nvals, values );
+        return Builder_putAttImpl( _file, name, key, nvals, values );
     }
 
     int Builder::putAtt( const std::string& name, const std::string& key, size_t nvals,  const float* values  )
     {
-        return Builder_putAttImpl( _builder, name, key, nvals, values );
+        return Builder_putAttImpl( _file, name, key, nvals, values );
     }
 
     int Builder::putAtt( const std::string& name, const std::string& key, size_t nvals,  const char** values )
     {
-        return Builder_putAttImpl_strings( _builder, name, key, nvals, values );
+        return Builder_putAttImpl_strings( _file, name, key, nvals, values );
     }
 
 
@@ -1916,7 +1862,7 @@ namespace FairDataPipeline
 
         att_ptr = NULL;
 
-        IGroup::sptr grp_ptr = _builder;
+        IGroup::sptr grp_ptr = _file;
 
         for( auto it = splits.begin(); it != ite-1 && grp_ptr; ++it )
         {

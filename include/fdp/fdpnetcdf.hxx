@@ -41,6 +41,7 @@ namespace FairDataPipeline
         typedef std::shared_ptr< IDimension > sptr;
 
         virtual size_t getSize() = 0;
+        virtual bool isUnlimited() = 0;
         virtual std::string getName() = 0;
         virtual IGroupPtr getParentGroup() = 0;
     };
@@ -107,11 +108,6 @@ namespace FairDataPipeline
         
         virtual IVarAtt::sptr putAtt( const std::string& key, size_t nvals, const char** values ) = 0;
 
-
-
-
-
-
         virtual IVarAtt::sptr getAtt( const std::string& key ) = 0;
     };
 
@@ -133,6 +129,7 @@ namespace FairDataPipeline
         virtual IGroup::sptr getGroup( const std::string& name ) = 0;
 
         virtual IDimension::sptr addDim( const std::string& name, size_t sz ) = 0;
+        virtual IDimension::sptr addUnlimitedDim( const std::string& name ) = 0;
 
         virtual IDimension::sptr getDim( const std::string& name ) = 0;
 
@@ -151,7 +148,6 @@ namespace FairDataPipeline
         virtual IGroupAtt::sptr putAtt( const std::string& key, int value ) = 0;
         virtual IGroupAtt::sptr putAtt( const std::string& key, float value ) = 0;
 
-
         virtual IGroupAtt::sptr putAtt( const std::string& key, size_t nvals, const short* values ) = 0;
         virtual IGroupAtt::sptr putAtt( const std::string& key, size_t nvals, const int* values ) = 0;
         virtual IGroupAtt::sptr putAtt( const std::string& key, size_t nvals, const long* values ) = 0;
@@ -161,7 +157,6 @@ namespace FairDataPipeline
         virtual IGroupAtt::sptr putAtt( const std::string& key, size_t nvals, const unsigned int* values ) = 0;
         virtual IGroupAtt::sptr putAtt( const std::string& key, size_t nvals, const unsigned long* values ) = 0;
         virtual IGroupAtt::sptr putAtt( const std::string& key, size_t nvals, const unsigned long long* values ) = 0;
-
 
         virtual IGroupAtt::sptr putAtt( const std::string& key, size_t nvals, const float* values ) = 0;
         virtual IGroupAtt::sptr putAtt( const std::string& key, size_t nvals, const double* values ) = 0;
@@ -173,7 +168,7 @@ namespace FairDataPipeline
 
     };
 
-    struct IBuilder : public IGroup
+    struct IFile : public IGroup
     {
         enum Mode{ READ, WRITE};
     };
@@ -192,19 +187,18 @@ namespace FairDataPipeline
         enum DataType dataType;
         std::string description;
         std::vector< std::string > dimension_names;
-        std::vector< size_t > shape;
     };
 
 
-    class BuilderFactory
+    class FileFactory
     {
         public:
-            typedef IBuilder::Mode Mode;
+            typedef IFile::Mode Mode;
 
-            BuilderFactory() = delete;
-            BuilderFactory (const BuilderFactory& rhs ) = delete;
+            FileFactory() = delete;
+            FileFactory (const FileFactory& rhs ) = delete;
 
-            static IBuilder::sptr create( const std::string& path, Mode mode );
+            static IFile::sptr create( const std::string& path, Mode mode );
         private:
 
     };
@@ -216,7 +210,7 @@ namespace FairDataPipeline
 
             Builder( const Builder& rhs ) = delete;
 
-            Builder( const std::string& path, IBuilder::Mode mode );
+            Builder( const std::string& path, IFile::Mode mode );
 
             int writeArray( const std::string& name
                     , const ArrayDefinition& arraydef, const void* data );
@@ -270,7 +264,7 @@ namespace FairDataPipeline
 
             int getAtt( const std::string& name, const std::string& key, IAtt::sptr& att_ptr );
         private:
-            IBuilder::sptr _builder;
+            IFile::sptr _file;
     };
 }
 #endif
