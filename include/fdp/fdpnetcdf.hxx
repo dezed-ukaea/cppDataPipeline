@@ -10,6 +10,9 @@
 //#include<netcdf>
 
 //#include "fdp/fdparrayref.hxx"
+//
+#define FDP_FILE_NOERR 0
+#define FDP_FILE_ERR 1
 
 namespace FairDataPipeline
 {

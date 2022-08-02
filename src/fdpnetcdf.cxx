@@ -293,7 +293,7 @@ namespace FairDataPipeline
     template< typename T > 
         int GroupAtt::getValuesImpl( T* values )
         {
-            int status = 0;
+            int status =FDP_FILE_NOERR;
 
             try
             {
@@ -302,6 +302,7 @@ namespace FairDataPipeline
             catch( NcException& e )
             {
                 e.what();
+		status = FDP_FILE_ERR;
             }
 
             return status;
@@ -360,7 +361,7 @@ namespace FairDataPipeline
 
     int GroupAtt::getValues( std::string& values )
     {
-        int status = 0;
+        int status = FDP_FILE_NOERR;
 
         try
         {
@@ -369,6 +370,7 @@ namespace FairDataPipeline
         catch( NcException& e )
         {
             e.what();
+	    status = FDP_FILE_ERR;
         }
 
         return status;
@@ -413,7 +415,7 @@ namespace FairDataPipeline
     template< typename T > 
         int VarAtt::getValuesImpl( T* values )
         {
-            int status = 0;
+            int status = FDP_FILE_NOERR;
 
             try
             {
@@ -422,6 +424,7 @@ namespace FairDataPipeline
             catch( NcException& e )
             {
                 e.what();
+		status = FDP_FILE_ERR;
             }
 
             return status;
@@ -480,7 +483,7 @@ namespace FairDataPipeline
 
     int VarAtt::getValues( std::string& values )
     {
-        int status = 0;
+        int status = FDP_FILE_NOERR;
 
         try
         {
@@ -489,6 +492,7 @@ namespace FairDataPipeline
         catch( NcException& e )
         {
             e.what();
+	    status = FDP_FILE_ERR;
         }
 
         return status;
@@ -508,7 +512,6 @@ namespace FairDataPipeline
             e.what();
         }
         return att_ptr;
-
     }
 
     IVarAtt::sptr VarImpl::putAtt( const std::string& key, float value )
@@ -530,7 +533,6 @@ namespace FairDataPipeline
     template< typename T >
         IVarAtt::sptr VarImpl::putAttImpl( const std::string& key, size_t nvals, const T* values )
         {
-
             IVarAtt::sptr var_att;
             try
             {
@@ -547,7 +549,6 @@ namespace FairDataPipeline
             {
                 e.what();
             }
-
 
             return var_att;
         }
@@ -822,12 +823,9 @@ namespace FairDataPipeline
     };
 
 
-
-
     template< typename T >
         IGroupAtt::sptr GroupImpl::putAttImpl( const std::string& key, size_t nvals, const T* values )
         {
-
             IGroupAtt::sptr grp_att;
             try
             {
@@ -848,7 +846,6 @@ namespace FairDataPipeline
 
             return grp_att;
         }
-
 
 
     IGroupAtt::sptr GroupImpl::putAtt( const std::string& key, size_t nvals, const char** values )
@@ -883,14 +880,11 @@ namespace FairDataPipeline
         return grp_att;
     }
 
-
-#if 1
     IGroupAtt::sptr GroupImpl::putAtt( const std::string& key, size_t nvals, const short* values )
     {
         IGroupAtt::sptr grp_att = this->putAttImpl< short >( key, nvals, values );
         return grp_att;
     }
-#endif
 
     IGroupAtt::sptr GroupImpl::putAtt( const std::string& key, size_t nvals, const int* values )
     {
@@ -1230,7 +1224,7 @@ namespace FairDataPipeline
         }
         catch( NcException& e )
         {
-            printf("%s\n", e.what());
+            e.what();
         }
 
         return  grp_ptr;
@@ -1411,10 +1405,10 @@ namespace FairDataPipeline
                 dimdef.units = units;
                 dimdef.description = description;
             }
-            else status = 1;
+            else status = FDP_FILE_ERR;
         }
         else
-            status = 1;
+            status = FDP_FILE_ERR;
 
         return status;
     }
@@ -1448,10 +1442,10 @@ namespace FairDataPipeline
             if( var_ptr )
                 var_ptr->getVar( data );
             else
-                status = 1;
+                status = FDP_FILE_ERR;
         }
         else 
-            status = 1;
+            status = FDP_FILE_ERR;
 
         return status;
     }
@@ -1542,10 +1536,10 @@ namespace FairDataPipeline
                 arraydef.description = description;
             }
             else
-                status = 1;
+                status = FDP_FILE_ERR;
         }
         else
-            status = 1;
+            status = FDP_FILE_ERR;
 
         return status;
     }
@@ -1577,10 +1571,10 @@ namespace FairDataPipeline
             if( var_ptr )
                 var_ptr->getVar( data );
             else
-                status = 1;
+                status = FDP_FILE_ERR;
         }
         else
-            status = 1;
+            status = FDP_FILE_ERR;
 
         return status;
     }
@@ -1624,7 +1618,7 @@ namespace FairDataPipeline
             dim_var_ptr->putAtt( "description", dimdef.description );
         }
         else
-            status = 1;
+            status = FDP_FILE_ERR;
 
         return status;
     }
@@ -1663,7 +1657,7 @@ namespace FairDataPipeline
                 vdims.push_back( dim_ptrs[0] );
             }
             else 
-                status = 1;
+                status = FDP_FILE_ERR;
         }                    
 
         if( !status )
@@ -1695,7 +1689,7 @@ namespace FairDataPipeline
                 arr_var_ptr->putAtt( "description", arraydef.description );
             }
             else
-                status = 1;
+                status = FDP_FILE_ERR;
         }
 
         return status;
@@ -1737,11 +1731,11 @@ namespace FairDataPipeline
                 if( var_ptr )
                     var_ptr->putAtt( key, nvals, values );
                 else
-                    status = 1;
+                    status = FDP_FILE_ERR;
             }
         }
         else
-            status = 1;
+            status = FDP_FILE_ERR;
 
         return status;
     }
@@ -1779,11 +1773,11 @@ namespace FairDataPipeline
                 if( var_ptr )
                     var_ptr->putAtt( key, nvals, values );
                 else
-                    status = 1;
+                    status = FDP_FILE_ERR;
             }
         }
         else
-            status = 1;
+            status = FDP_FILE_ERR;
 
         return status;
     }
@@ -1881,7 +1875,7 @@ namespace FairDataPipeline
 
                 att_ptr = grp_att_ptr;
 
-                status = (att_ptr != NULL) ? 0 : 1;
+                status = (att_ptr != NULL) ? FDP_FILE_NOERR : FDP_FILE_ERR;
             }
             else
             {
@@ -1894,14 +1888,14 @@ namespace FairDataPipeline
 
                     att_ptr = var_att_ptr;
 
-                    status = (att_ptr != NULL) ? 0 : 1;
+                    status = (att_ptr != NULL) ? FDP_FILE_NOERR : FDP_FILE_ERR;
                 }
                 else
-                    status = 1;
+                    status = FDP_FILE_ERR;
             }
         }
         else
-            status = 1;
+            status = FDP_FILE_ERR;
 
         return status;
 
