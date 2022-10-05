@@ -10,15 +10,87 @@
 typedef std::shared_ptr< netCDF::NcGroup > NcGroupPtr;
 typedef std::shared_ptr< netCDF::NcFile > NcFilePtr;
 
+template< typename T >
+struct NcTraits;
+
+template<>
+struct NcTraits< short >
+{
+	typedef netCDF::NcShort MyNcType;
+};
+
+template<>
+struct NcTraits< int >
+{
+	typedef netCDF::NcInt MyNcType;
+};
+
+template<>
+struct NcTraits< unsigned short >
+{
+	typedef netCDF::NcUshort MyNcType;
+};
+
+template<>
+struct NcTraits< unsigned int >
+{
+	typedef netCDF::NcUint MyNcType;
+};
+
+
+template<>
+struct NcTraits< float >
+{
+	typedef netCDF::NcFloat MyNcType;
+};
+
+template<>
+struct NcTraits< double >
+{
+	typedef netCDF::NcDouble MyNcType;
+};
+
+template<>
+struct NcTraits< long >
+{
+	typedef netCDF::NcInt64 MyNcType;
+};
+
+
+template<>
+struct NcTraits< long long >
+{
+	typedef netCDF::NcInt64 MyNcType;
+};
+
+template<>
+struct NcTraits< unsigned long >
+{
+	typedef netCDF::NcUint64 MyNcType;
+};
+
+template<>
+struct NcTraits< unsigned long long >
+{
+	typedef netCDF::NcUint64 MyNcType;
+};
+
 
 
 namespace FairdataPipeline
 {
 	void split_str( const std::string& s, const char delim, std::vector< std::string >& splits ) ;
-	class IGroup2
+	struct IGroup2
 	{
-		public:
-			typedef std::shared_ptr< IGroup2 > sptr;
+		typedef std::shared_ptr< IGroup2 > sptr;
+
+		typedef std::map< std::string, sptr > NAME_GROUP_MAP; 
+
+		virtual sptr parent() = 0;
+		virtual std::string name() = 0;
+		virtual sptr addGroup( const std::string& grp_name ) = 0;
+		virtual sptr getGroup( const std::string& grp_name ) = 0;
+		virtual sptr requireGroup( const std::string& grp_name ) = 0;
 	};
 
 	class IFile2
@@ -30,48 +102,311 @@ namespace FairdataPipeline
 
 	};
 
-	//class File2;
+	class Group2;
+	typedef std::shared_ptr< Group2 > Group2Sptr;
 
-	class Group2: public std::enable_shared_from_this< Group2 >,  public IGroup2
+	class GroupAtt2 : std::enable_shared_from_this< GroupAtt2 >
 	{
 		public:
+			typedef std::shared_ptr< GroupAtt2 > sptr;
 
-			//friend File2;
+			static sptr create( Group2Sptr parent_grp_ptr, const netCDF::NcGroupAtt& nc_att );
+
+			size_t getAttLength();
+			Group2Sptr getParentGroup();
+			std::string name();
+
+			int getValues( short* values );
+			int getValues( int* values );
+			int getValues( long* values );
+			int getValues( long long* values );
+			int getValues( unsigned short* values );
+			int getValues( unsigned int* values );
+			int getValues( unsigned long* values );
+			int getValues( unsigned long long* values );
+
+			int getValues( float* values );
+			int getValues( double* values );
+
+
+		private:
+			GroupAtt2( Group2Sptr parent_grp_ptr, const netCDF::NcGroupAtt& nc_at );
+			netCDF::NcGroupAtt _nc;
+			std::weak_ptr< Group2 > _parent_grp_ptr;
+
+			template< typename T > 
+				int getValuesImpl( T* values );
+
+	};
+
+	template< typename T > 
+		int GroupAtt2::getValuesImpl( T* values )
+		{
+			int status = 0;
+
+			try
+			{
+				_nc.getValues( values );
+			}
+			catch( netCDF::exceptions::NcException& e )
+			{
+				e.what();
+				status = 1;
+			}
+
+			return status;
+		}
+
+	int GroupAtt2::getValues( short* values )
+	{
+		return this->getValuesImpl( values );
+	}
+
+	int GroupAtt2::getValues( int* values )
+	{
+		return this->getValuesImpl( values );
+	}
+
+	int GroupAtt2::getValues( long* values )
+	{
+		return this->getValuesImpl( values );
+	}
+
+	int GroupAtt2::getValues( long long* values )
+	{
+		return this->getValuesImpl( values );
+	}
+
+	int GroupAtt2::getValues( unsigned short* values )
+	{
+		return this->getValuesImpl( values );
+	}
+
+	int GroupAtt2::getValues( unsigned int* values )
+	{
+		return this->getValuesImpl( values );
+	}
+
+	int GroupAtt2::getValues( unsigned long* values )
+	{
+		return this->getValuesImpl( values );
+	}
+
+	int GroupAtt2::getValues( unsigned long long* values )
+	{
+		return this->getValuesImpl( values );
+	}
+
+
+	int GroupAtt2::getValues( float* values )
+	{
+		return this->getValuesImpl( values );
+	}
+
+	int GroupAtt2::getValues( double* values )
+	{
+		return this->getValuesImpl( values );
+	}
+
+
+	Group2Sptr GroupAtt2::getParentGroup()
+	{
+		return _parent_grp_ptr.lock();
+	}
+
+	std::string GroupAtt2::name()
+	{
+		return _nc.getName();
+	}
+
+	size_t GroupAtt2::getAttLength()
+	{
+		return _nc.getAttLength();
+	}
+
+	GroupAtt2::GroupAtt2( Group2Sptr parent_grp_ptr, const netCDF::NcGroupAtt& nc_att ) //: _nc( nc_att ) 
+	{
+	}
+
+	GroupAtt2::sptr GroupAtt2::create( Group2Sptr parent_grp_ptr, const netCDF::NcGroupAtt& nc_att )
+	{
+		return sptr( new GroupAtt2 ( parent_grp_ptr, nc_att ) );
+	}
+
+	class Group2 : public std::enable_shared_from_this< Group2 >,  public IGroup2
+	{
+		public:
+			typedef std::map< std::string, GroupAtt2::sptr > NAME_ATTRIB_MAP;
+
 			typedef std::shared_ptr< Group2 > sptr;
 
-			typedef std::map< std::string, sptr > NAME_GROUP_MAP; 
 
-			sptr addGroup( const std::string& grp_name );
-			sptr getGroup( const std::string& grp_name );
-			sptr requireGroup( const std::string& grp_name );
+			IGroup2::sptr addGroup( const std::string& grp_name );
+			IGroup2::sptr getGroup( const std::string& grp_name );
+			IGroup2::sptr requireGroup( const std::string& grp_name );
 
 			static sptr create( sptr grp_parent
 				       , NcGroupPtr nc_grp_ptr	);
-			sptr parent();
+			IGroup2::sptr parent();
 
 			std::string name();
+
+			GroupAtt2::sptr getAtt( const std::string& key );
+
+
+			GroupAtt2::sptr putAtt( const std::string& key, size_t nvals, const short* values );
+			GroupAtt2::sptr putAtt( const std::string& key, size_t nvals, const int* values );
+			GroupAtt2::sptr putAtt( const std::string& key, size_t nvals, const long* values );
+			GroupAtt2::sptr putAtt( const std::string& key, size_t nvals, const long long* values );
+
+			GroupAtt2::sptr putAtt( const std::string& key, size_t nvals, const unsigned short* values );
+			GroupAtt2::sptr putAtt( const std::string& key, size_t nvals, const unsigned int* values );
+			GroupAtt2::sptr putAtt( const std::string& key, size_t nvals, const unsigned long* values );
+			GroupAtt2::sptr putAtt( const std::string& key, size_t nvals, const unsigned long long* values );
+
+			GroupAtt2::sptr putAtt( const std::string& key, size_t nvals, const float* values );
+			GroupAtt2::sptr putAtt( const std::string& key, size_t nvals, const double* values );
+
+			GroupAtt2::sptr putAtt( const std::string& key, size_t nvals, const char** values );
+
+
+
+
+
+
 		protected:
 
 			Group2( Group2::sptr grp_parent
 					, NcGroupPtr _nc_grp );
+			template< typename T >
+				GroupAtt2::sptr putAttImpl( const std::string& key
+						, size_t nvals, const T* values );
+
 
 		private:
+
+			Group2::sptr _addGroup( const std::string& grp_name );
+
+			Group2::sptr _requireGroup( const std::string& grp_name );
+
 			std::weak_ptr< Group2 > _parent_grp_ptr;
 
 			sptr _getGroup( const std::string& name );
 
-			//netCDF::NcGroup _nc;
 			NcGroupPtr _nc_ptr;
 
 			NAME_GROUP_MAP _name_grp_map; 
+			NAME_ATTRIB_MAP _name_attrib_map;
 	};
 
+	GroupAtt2::sptr Group2::getAtt( const std::string& key )
+	{
+		GroupAtt2::sptr att_ptr;
+		auto it = _name_attrib_map.find( key );
+		if( it != _name_attrib_map.end() )
+		{
+			att_ptr = it->second;
+		}
+		else
+		{
+			try
+			{
+				netCDF::NcGroupAtt ncatt = _nc_ptr->getAtt( key );
+				att_ptr = GroupAtt2::create( this->shared_from_this(), ncatt );
+				_name_attrib_map[ key ] = att_ptr;
+			}
+			catch( netCDF::exceptions::NcException& e )
+			{
+				e.what();
+			}
+
+		}
+		return att_ptr;
+
+	}
+
+
+	template< typename T >
+	GroupAtt2::sptr Group2::putAttImpl( const std::string& key, size_t nvals, const T* values )
+	{
+		GroupAtt2::sptr grp_att;
+		try
+		{
+			typedef typename NcTraits< T >::MyNcType MyNcType;
+
+			MyNcType theNcType = MyNcType();
+
+			netCDF::NcGroupAtt ncatt = _nc_ptr->putAtt( key, theNcType, nvals, values );
+			grp_att = GroupAtt2::create( this->shared_from_this(), ncatt );
+
+			_name_attrib_map[ key ] = grp_att;
+		}
+		catch( netCDF::exceptions::NcException& e )
+		{
+			e.what();
+		}
+
+
+		return grp_att;
+	}
+	
+	GroupAtt2::sptr Group2::putAtt( const std::string& key, size_t nvals, const double* values )
+	{
+		GroupAtt2::sptr grp_att = this->putAttImpl< double >( key, nvals, values );
+		return grp_att;
+	}
+
+	GroupAtt2::sptr Group2::putAtt( const std::string& key, size_t nvals, const float* values )
+	{
+		GroupAtt2::sptr grp_att = this->putAttImpl< float >( key, nvals, values );
+		return grp_att;
+	}
+
+	GroupAtt2::sptr Group2::putAtt( const std::string& key, size_t nvals, const short* values )
+	{
+		GroupAtt2::sptr grp_att = this->putAttImpl< short >( key, nvals, values );
+		return grp_att;
+	}
+	
+	GroupAtt2::sptr Group2::putAtt( const std::string& key, size_t nvals, const int* values )
+	{
+		GroupAtt2::sptr grp_att = this->putAttImpl< int >( key, nvals, values );
+		return grp_att;
+	}
+
+	GroupAtt2::sptr Group2::putAtt( const std::string& key, size_t nvals, const long* values )
+	{
+		GroupAtt2::sptr grp_att = this->putAttImpl< long >( key, nvals, values );
+		return grp_att;
+	}
+
+
+
+	GroupAtt2::sptr Group2::putAtt( const std::string& key, size_t nvals, const long long* values )
+	{
+		GroupAtt2::sptr grp_att = this->putAttImpl< long long >( key, nvals, values );
+		return grp_att;
+	}
+
+	GroupAtt2::sptr Group2::putAtt( const std::string& key, size_t nvals, const unsigned short* values )
+	{
+		GroupAtt2::sptr grp_att = this->putAttImpl( key, nvals, values );
+
+		return grp_att;
+	}
+
+	GroupAtt2::sptr Group2::putAtt( const std::string& key, size_t nvals, const unsigned int* values )
+	{
+		GroupAtt2::sptr grp_att = this->putAttImpl( key, nvals, values );
+		return grp_att;
+	}
+	
 	std::string Group2::name()
 	{
 		return _nc_ptr->getName();
 	}
 
-	Group2::sptr Group2::parent()
+	IGroup2::sptr Group2::parent()
 	{
 		return _parent_grp_ptr.lock();
 	}
@@ -91,17 +426,24 @@ namespace FairdataPipeline
 		return grp_ptr;
 	}
 
-	Group2::sptr Group2::requireGroup( const std::string& grp_name )
+	Group2::sptr Group2::_requireGroup( const std::string& grp_name )
 	{
-		sptr grp_ptr = this->_getGroup( grp_name );
+		sptr grp_ptr = std::static_pointer_cast< Group2 >( this->_getGroup( grp_name ) );
 
 		if( !grp_ptr )
-			grp_ptr = this->addGroup( grp_name );
+			grp_ptr = std::static_pointer_cast< Group2 >( this->addGroup( grp_name ) );
 
 		return grp_ptr;
 	}
 
-	Group2::sptr Group2::getGroup( const std::string& grp_name )
+	IGroup2::sptr Group2::requireGroup( const std::string& grp_name )
+	{
+		sptr grp_ptr = this->_requireGroup( grp_name );
+
+		return grp_ptr;
+	}
+
+	IGroup2::sptr Group2::getGroup( const std::string& grp_name )
 	{
 		Group2::sptr grp_ptr;
 #if 1
@@ -131,7 +473,7 @@ namespace FairdataPipeline
 		auto it = this->_name_grp_map.find( name );
 		if( it != this->_name_grp_map.end() )
 		{
-			grp_ptr = it->second;
+			grp_ptr = std::static_pointer_cast< Group2 >( it->second );
 		}
 		else
 		{
@@ -153,7 +495,7 @@ namespace FairdataPipeline
 		return grp_ptr;
 	}
 
-	Group2::sptr Group2::addGroup( const std::string& grp_name )
+	Group2::sptr Group2::_addGroup( const std::string& grp_name )
 	{
 		Group2::sptr grp_ptr;
 
@@ -170,6 +512,13 @@ namespace FairdataPipeline
 		{
 		}
 		return grp_ptr;
+
+	}
+
+	IGroup2::sptr Group2::addGroup( const std::string& grp_name )
+	{
+		Group2::sptr grp_ptr = this->_addGroup( grp_name );
+		return grp_ptr;
 	}
 
 
@@ -182,16 +531,12 @@ namespace FairdataPipeline
 
 			~File2();
 
-			void build();
+			//void build();
 
-			void prepare_coordinate_variable();
-			void prepare_table_definition();
-			void prepare_dimension_variable_definition();
+			//void prepare_coordinate_variable();
+			//void prepare_table_definition();
+			//void prepare_dimension_variable_definition();
 
-			//Group2::sptr getGroup( const std::string& grp_path );
-
-			//Group2::sptr addGroup( const std::string& grp_path );
-			//Group2::sptr requireGroup( const std::string& grp_path );
 
 		private:
 
@@ -212,7 +557,7 @@ namespace FairdataPipeline
 	const std::string File2::ATTRIB_UNITS= "units";
 	const std::string File2::ATTRIB_GROUP_TYPE= "group_type";
 
-
+#if 0
 	void File2::prepare_coordinate_variable()
 	{
 	}
@@ -224,6 +569,7 @@ namespace FairdataPipeline
 	void File2::prepare_dimension_variable_definition()
 	{
 	}
+#endif
 #if 0
 	Group2::sptr File2::getGroup( const std::string& grp_path )
 	{
