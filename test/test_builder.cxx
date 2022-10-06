@@ -31,6 +31,7 @@ namespace fdp = FairDataPipeline;
 
 TEST_F(BuilderTest, TestInterface) 
 {
+    return;
     fdp::IFile::sptr 
         ibuilder = fdp::FileFactory::create( "xbuildertest.nc", fdp::IFile::Mode::WRITE );
 

@@ -1,9 +1,7 @@
-#include <memory>
-#include<string>
-#include<vector>
 #include<map>
 
 #include "fdp/fdpnetcdf.hxx"
+#include "fdp/fdpnetcdf2.hxx"
 
 
 
@@ -190,73 +188,6 @@ namespace FairDataPipeline
 
 	void split_str( const std::string& s, const char delim, std::vector< std::string >& splits ) ;
 
-    struct IGroup2;
-    typedef std::shared_ptr< IGroup2 > IGroup2Sptr;
-
-    struct IGroupAtt2
-    {
-        typedef std::shared_ptr< IGroupAtt2 > sptr;
-
-        virtual std::string name() = 0;
-        virtual DataType getAttType() = 0;
-
-        virtual size_t getAttLength() = 0;
-
-        virtual IGroup2Sptr getParentGroup() = 0;
-
-
-        virtual int getValues( short* values ) = 0;
-        virtual int getValues( int* values ) = 0;
-        virtual int getValues( long* values ) = 0;
-        virtual int getValues( long long* values ) = 0;
-        virtual int getValues( unsigned short* values ) = 0;
-        virtual int getValues( unsigned int* values ) = 0;
-        virtual int getValues( unsigned long* values ) = 0;
-        virtual int getValues( unsigned long long* values ) = 0;
-
-        virtual int getValues( float* values ) = 0;
-        virtual int getValues( double* values ) = 0;
-
-
-    };
-
-
-	struct IGroup2
-	{
-		typedef std::shared_ptr< IGroup2 > sptr;
-
-		virtual sptr parent() = 0;
-		virtual std::string name() = 0;
-		//virtual sptr addGroup( const std::string& grp_name ) = 0;
-		virtual sptr getGroup( const std::string& grp_name ) = 0;
-		virtual sptr requireGroup( const std::string& grp_name ) = 0;
-
-        virtual std::vector< IGroupAtt2::sptr > getAttributes() = 0;
-        virtual IGroupAtt2::sptr getAtt( const std::string& key ) = 0;
-
-        IGroupAtt2::sptr putAtt( const std::string& key, size_t nvals, const short* values );
-        IGroupAtt2::sptr putAtt( const std::string& key, size_t nvals, const int* values );
-        IGroupAtt2::sptr putAtt( const std::string& key, size_t nvals, const long* values );
-        IGroupAtt2::sptr putAtt( const std::string& key, size_t nvals, const long long* values );
-
-        IGroupAtt2::sptr putAtt( const std::string& key, size_t nvals, const unsigned short* values );
-        IGroupAtt2::sptr putAtt( const std::string& key, size_t nvals, const unsigned int* values );
-        IGroupAtt2::sptr putAtt( const std::string& key, size_t nvals, const unsigned long* values );
-        IGroupAtt2::sptr putAtt( const std::string& key, size_t nvals, const unsigned long long* values );
-
-        IGroupAtt2::sptr putAtt( const std::string& key, size_t nvals, const float* values );
-        IGroupAtt2::sptr putAtt( const std::string& key, size_t nvals, const double* values );
-
-        IGroupAtt2::sptr putAtt( const std::string& key, size_t nvals, const char** values );
-
-
-	};
-
-	struct IFile2
-	{
-        enum Mode{ READ, WRITE };
-        typedef std::shared_ptr< IFile2 > sptr;
-	};
 
 	class Group2;
 	typedef std::shared_ptr< Group2 > Group2Sptr;
@@ -394,12 +325,12 @@ namespace FairDataPipeline
 			typedef std::map< std::string, GroupAtt2::sptr > NAME_ATTRIB_MAP;
 			typedef std::shared_ptr< Group2 > sptr;
 
+			static sptr create( sptr grp_parent, NcGroupPtr nc_grp_ptr	);
 
 			//IGroup2::sptr addGroup( const std::string& grp_name );
 			IGroup2::sptr getGroup( const std::string& grp_name );
 			IGroup2::sptr requireGroup( const std::string& grp_name );
 
-			static sptr create( sptr grp_parent, NcGroupPtr nc_grp_ptr	);
 			IGroup2::sptr parent();
 
 			std::string name();
@@ -409,47 +340,41 @@ namespace FairDataPipeline
 			IGroupAtt2::sptr getAtt( const std::string& key );
 			GroupAtt2::sptr _getAtt( const std::string& key );
 
+			IGroupAtt2::sptr putAtt( const std::string& key, size_t nvals, const short* vals );
+			IGroupAtt2::sptr putAtt( const std::string& key, size_t nvals, const int* vals );
+			IGroupAtt2::sptr putAtt( const std::string& key, size_t nvals, const long* vals );
+			IGroupAtt2::sptr putAtt( const std::string& key, size_t nvals, const long long* vals );
 
-			IGroupAtt2::sptr putAtt( const std::string& key, size_t nvals, const short* values );
-			IGroupAtt2::sptr putAtt( const std::string& key, size_t nvals, const int* values );
-			IGroupAtt2::sptr putAtt( const std::string& key, size_t nvals, const long* values );
-			IGroupAtt2::sptr putAtt( const std::string& key, size_t nvals, const long long* values );
+			IGroupAtt2::sptr putAtt( const std::string& key, size_t nvals, const unsigned short* vals );
+			IGroupAtt2::sptr putAtt( const std::string& key, size_t nvals, const unsigned int* vals );
+			IGroupAtt2::sptr putAtt( const std::string& key, size_t nvals, const unsigned long* vals );
+			IGroupAtt2::sptr putAtt( const std::string& key, size_t nvals, const unsigned long long* vals );
 
-			IGroupAtt2::sptr putAtt( const std::string& key, size_t nvals, const unsigned short* values );
-			IGroupAtt2::sptr putAtt( const std::string& key, size_t nvals, const unsigned int* values );
-			IGroupAtt2::sptr putAtt( const std::string& key, size_t nvals, const unsigned long* values );
-			IGroupAtt2::sptr putAtt( const std::string& key, size_t nvals, const unsigned long long* values );
+			IGroupAtt2::sptr putAtt( const std::string& key, size_t nvals, const float* vals );
+			IGroupAtt2::sptr putAtt( const std::string& key, size_t nvals, const double* vals );
 
-			IGroupAtt2::sptr putAtt( const std::string& key, size_t nvals, const float* values );
-			IGroupAtt2::sptr putAtt( const std::string& key, size_t nvals, const double* values );
-
-			IGroupAtt2::sptr putAtt( const std::string& key, size_t nvals, const char** values );
-
-
-
-
+			IGroupAtt2::sptr putAtt( const std::string& key, size_t nvals, const char** vals );
 
 
 		protected:
 
-			Group2( Group2::sptr grp_parent
-					, NcGroupPtr _nc_grp );
-			template< typename T >
-				GroupAtt2::sptr putAttImpl( const std::string& key
-						, size_t nvals, const T* values );
+			Group2( Group2::sptr grp_parent, NcGroupPtr _nc_grp );
 
+			template< typename T >
+				GroupAtt2::sptr putAttImpl( const std::string& key, size_t nvals, const T* vals );
+
+			NcGroupPtr _nc_ptr;
 
 		private:
 
-			Group2::sptr _addGroup( const std::string& grp_name );
+			sptr _addGroup( const std::string& grp_name );
 
-			Group2::sptr _requireGroup( const std::string& grp_name );
+			sptr _requireGroup( const std::string& grp_name );
 
 			std::weak_ptr< Group2 > _parent_grp_ptr;
 
 			sptr _getGroup( const std::string& name );
 
-			NcGroupPtr _nc_ptr;
 
 			NAME_GROUP_MAP _name_grp_map; 
 			NAME_ATTRIB_MAP _name_attrib_map;
@@ -617,10 +542,10 @@ namespace FairDataPipeline
 	}
 
 	Group2::Group2( Group2::sptr grp_parent
-			, NcGroupPtr nc_grp_ptr )
+			, NcGroupPtr nc_grp_ptr ) : _parent_grp_ptr( grp_parent ), _nc_ptr( nc_grp_ptr )
 	{
-		_nc_ptr = nc_grp_ptr;
-		_parent_grp_ptr = grp_parent;
+	//	_nc_ptr = nc_grp_ptr;
+	//	_parent_grp_ptr = grp_parent;
 	}
 
 	Group2::sptr Group2::create( Group2::sptr grp_parent
@@ -636,7 +561,7 @@ namespace FairDataPipeline
 		sptr grp_ptr = this->_getGroup( grp_name );
 
 		if( !grp_ptr )
-			grp_ptr = std::static_pointer_cast< Group2 >( this->_addGroup( grp_name ) );
+			grp_ptr = /*std::static_pointer_cast< Group2 >*/( this->_addGroup( grp_name ) );
 
 		return grp_ptr;
 	}
@@ -684,7 +609,7 @@ namespace FairDataPipeline
 
 	Group2::sptr Group2::_getGroup( const std::string& name )
 	{
-		Group2::sptr grp_ptr;
+		sptr grp_ptr;
 		auto it = this->_name_grp_map.find( name );
 		if( it != this->_name_grp_map.end() )
 		{
@@ -712,11 +637,13 @@ namespace FairDataPipeline
 
 	Group2::sptr Group2::_addGroup( const std::string& grp_name )
 	{
-		Group2::sptr grp_ptr;
+		sptr grp_ptr;
 
 		try
 		{
-			netCDF::NcGroup new_ncgrp = _nc_ptr->addGroup( grp_name );
+            printf( "AAAA\n" );
+			netCDF::NcGroup new_ncgrp( _nc_ptr->addGroup( grp_name ) );
+            printf( "XXXXXXXX\n" );
 			if( !new_ncgrp.isNull() )
 			{
 				NcGroupPtr nc_grp_ptr = std::make_shared< netCDF::NcGroup >( new_ncgrp );
@@ -725,9 +652,10 @@ namespace FairDataPipeline
 		}
 		catch( netCDF::exceptions::NcException& e )
 		{
+            std::cerr << e.what();
 		}
-		return grp_ptr;
 
+		return grp_ptr;
 	}
 #if 0
 	IGroup2::sptr Group2::addGroup( const std::string& grp_name )
@@ -755,11 +683,11 @@ namespace FairDataPipeline
 	}
 #endif
 
-	class File2 : public IFile2, public Group2
+	class File2 : public Group2//, public IFile2
 	{
 		public:
 			typedef std::shared_ptr< File2 > sptr;
-			static sptr create( const std::string& path, enum IFile2::Mode mode);
+			static File2::sptr create( const std::string& path, enum IFile2::Mode mode);
 ;
 
 			~File2();
@@ -781,7 +709,7 @@ namespace FairDataPipeline
 
 			File2( const std::string& path, IFile2::Mode mode );
 			bool _hasBeenBuilt;
-			netCDF::NcFile _nc;
+			//netCDF::NcFile _nc;
 	};
 
 	const std::string File2::ATTRIB_DESC = "description";
@@ -861,7 +789,7 @@ namespace FairDataPipeline
 #endif
 	File2::sptr File2::create(const std::string& path, enum IFile2::Mode mode )
 	{
-		sptr p = sptr( new File2(path, mode) );
+		sptr p = File2::sptr( new File2(path, mode) );
 		return p;
 	}
 
@@ -869,12 +797,14 @@ namespace FairDataPipeline
 	{
 		_hasBeenBuilt = false;
 
+        auto nc_file_ptr = std::dynamic_pointer_cast< netCDF::NcFile >( _nc_ptr );
+
 		switch( mode )
 		{
 			case IFile2::Mode::READ:
 				try
 				{
-					_nc.open( path, netCDF::NcFile::FileMode::read );
+					nc_file_ptr->open( path, netCDF::NcFile::FileMode::read );
 				}
 				catch( netCDF::exceptions::NcException& e )
 				{
@@ -884,11 +814,11 @@ namespace FairDataPipeline
 			case IFile2::Mode::WRITE:
 				try
 				{
-					_nc.open( path, netCDF::NcFile::FileMode::newFile );
+					nc_file_ptr->open( path, netCDF::NcFile::FileMode::newFile );
 				}
 				catch( netCDF::exceptions::NcException& e )
 				{
-					_nc.open( path, netCDF::NcFile::FileMode::write );
+					nc_file_ptr->open( path, netCDF::NcFile::FileMode::write );
 				}
 				break;
 			default:
@@ -901,7 +831,7 @@ namespace FairDataPipeline
 	{
 		try
 		{
-			_nc.close();
+			//_nc_ptr->close();
 		}
 		catch( netCDF::exceptions::NcException& e )
 		{
@@ -926,6 +856,11 @@ namespace FairDataPipeline
 	}
 
 
+    IFile2::sptr FileFactory2::create( const std::string& path, IFile2::Mode mode )
+    {
+        File2::sptr ptr =File2::create( path, mode );
+        return ptr;
+    }
 	
 
 }
