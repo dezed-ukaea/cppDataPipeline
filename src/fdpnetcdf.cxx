@@ -204,6 +204,12 @@ namespace FairDataPipeline
 
 
             void putVar( const void* vals );
+
+	    void putVar( const std::vector< size_t >& index, int value ) const;
+	    void putVar( const std::vector< size_t >& index
+			    , const std::vector< size_t >& countp
+			    , int* values ) const;
+
             void getVar( void* vals );
 
             DataType getType();
@@ -240,6 +246,16 @@ namespace FairDataPipeline
                 IVarAtt::sptr putAttImpl( const std::string& key
                         , size_t nvals, const T* values );
 
+	    template< typename T >  
+		    void putVarImpl( const std::vector< size_t >& index, T* values ) const;
+
+	    template< typename T >  
+		 void putVarImpl( const std::vector< size_t >& index
+				 , const std::vector< size_t >& countp
+				 , T* values ) const;
+
+
+
 
             std::weak_ptr< IGroup > _parent;
             VarImpl( IGroup::sptr parent, const std::string& name, const netCDF::NcVar& nc_var ) ;
@@ -247,6 +263,55 @@ namespace FairDataPipeline
 
             IVar::NAME_VARATT_MAP _name_varatt_map;
     };
+    template< typename T >  
+	    void VarImpl::putVarImpl( const std::vector< size_t >& index, T* values ) const
+	    {
+		    try
+		    {
+			    _nc_var.putVar( index, values );
+		    }
+		    catch (NcException& ex )
+		    {
+			    ex.what();
+		    }
+	    }
+
+    template< typename T >  
+	    void VarImpl::putVarImpl( const std::vector< size_t >& index
+			    , const std::vector< size_t >& countp
+			    , T* values ) const
+	    {
+		    try
+		    {
+			    _nc_var.putVar( index, countp, values );
+		    }
+		    catch (NcException& ex )
+		    {
+			    ex.what();
+		    }
+	    }
+
+
+    void VarImpl::putVar( const std::vector< size_t >& index, int value ) const
+    {
+	    try
+	    {
+		    _nc_var.putVar( index, value );
+	    }
+	    catch( NcException& ex )
+	    {
+		    ex.what();
+	    }
+    }
+
+    void VarImpl::putVar( const std::vector< size_t >& index
+		    , const std::vector< size_t >& countp
+		    , int* values ) const
+    {
+	    putVarImpl( index, countp, values );
+    }
+
+
 
 
     class GroupAtt : public IGroupAtt
