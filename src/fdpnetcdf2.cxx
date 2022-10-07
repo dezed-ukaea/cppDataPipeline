@@ -308,7 +308,7 @@ namespace FairDataPipeline
 		return _nc.getAttLength();
 	}
 
-	GroupAtt2::GroupAtt2( Group2Sptr parent_grp_ptr, const netCDF::NcGroupAtt& nc_att ) //: _nc( nc_att ) 
+	GroupAtt2::GroupAtt2( Group2Sptr parent_grp_ptr, const netCDF::NcGroupAtt& nc_att ) : _nc( nc_att ) , _parent_grp_ptr( parent_grp_ptr )
 	{
 	}
 
@@ -321,9 +321,9 @@ namespace FairDataPipeline
 	{
 		public:
 
+			typedef std::shared_ptr< Group2 > sptr;
             typedef std::map< std::string, sptr > NAME_GROUP_MAP; 
 			typedef std::map< std::string, GroupAtt2::sptr > NAME_ATTRIB_MAP;
-			typedef std::shared_ptr< Group2 > sptr;
 
 			static sptr create( sptr grp_parent, NcGroupPtr nc_grp_ptr	);
 
@@ -339,6 +339,19 @@ namespace FairDataPipeline
 
 			IGroupAtt2::sptr getAtt( const std::string& key );
 			GroupAtt2::sptr _getAtt( const std::string& key );
+
+            IGroupAtt2::sptr putAtt( const std::string& key, const std::string& value );
+
+            IGroupAtt2::sptr putAtt( const std::string& key, short value );
+            IGroupAtt2::sptr putAtt( const std::string& key, int value );
+            IGroupAtt2::sptr putAtt( const std::string& key, long value );
+            IGroupAtt2::sptr putAtt( const std::string& key, long long value );
+
+            IGroupAtt2::sptr putAtt( const std::string& key, unsigned short value );
+            IGroupAtt2::sptr putAtt( const std::string& key, unsigned int value );
+            //IGroupAtt2::sptr putAtt( const std::string& key, unsigned long value );
+            IGroupAtt2::sptr putAtt( const std::string& key, unsigned long long value );
+
 
 			IGroupAtt2::sptr putAtt( const std::string& key, size_t nvals, const short* vals );
 			IGroupAtt2::sptr putAtt( const std::string& key, size_t nvals, const int* vals );
@@ -366,6 +379,9 @@ namespace FairDataPipeline
 			NcGroupPtr _nc_ptr;
 
 		private:
+            template< typename T > 
+                IGroupAtt2::sptr _putAttImpl( const std::string& key, const T& value );
+
 
 			sptr _addGroup( const std::string& grp_name );
 
@@ -380,7 +396,103 @@ namespace FairDataPipeline
 			NAME_ATTRIB_MAP _name_attrib_map;
 	};
 
-            
+    class Group2_ : public Group2, public IGroup2
+    {
+        public:
+            typedef std::shared_ptr< Group2_ > sptr;
+    };
+
+    template<>
+        IGroupAtt2::sptr Group2::_putAttImpl< std::string >( const std::string& key, const std::string& value )
+        {
+            GroupAtt2::sptr grp_att_ptr;
+
+            try
+            {
+                netCDF::NcGroupAtt ncatt = _nc_ptr->putAtt( key, value );
+                if( !ncatt.isNull() )
+                {
+                    grp_att_ptr = GroupAtt2::create( this->shared_from_this(), ncatt );
+
+                }
+            }
+            catch( netCDF::exceptions::NcException& e )
+            {
+                std::cerr << e.what();
+            }
+
+            return grp_att_ptr;
+        }
+
+    template< typename T > 
+        IGroupAtt2::sptr Group2::_putAttImpl( const std::string& key, const T& value )
+    {
+        GroupAtt2::sptr grp_att_ptr;
+        try
+        {
+			typedef typename NcTraits< T >::MyNcType MyNcType;
+			MyNcType nctype = MyNcType();
+            netCDF::NcGroupAtt ncatt = _nc_ptr->putAtt( key, nctype, value );
+        }
+        catch( netCDF::exceptions::NcException& e )
+        {
+            std::cerr << e.what();
+        }
+        return grp_att_ptr;
+    }
+
+    IGroupAtt2::sptr Group2::putAtt( const std::string& key, const std::string& value )
+    {
+        return this->_putAttImpl< std::string >( key, value );
+    }
+
+    IGroupAtt2::sptr Group2::putAtt( const std::string& key, short value )
+    {
+        return this->_putAttImpl( key, value );
+    }
+#if 1
+    IGroupAtt2::sptr Group2::putAtt( const std::string& key, long value )
+    {
+        return this->_putAttImpl( key, value );
+    }
+
+    IGroupAtt2::sptr Group2::putAtt( const std::string& key, long long value )
+    {
+        return this->_putAttImpl( key, value );
+    }
+
+    IGroupAtt2::sptr Group2::putAtt( const std::string& key, unsigned short value )
+    {
+        return this->_putAttImpl( key, value );
+    }
+
+#endif        
+    IGroupAtt2::sptr Group2::putAtt( const std::string& key, unsigned int value )
+    {
+        return this->_putAttImpl( key, value );
+    }
+
+
+
+#if 0
+    IGroupAtt2::sptr Group2::putAtt( const std::string& key, unsigned long value )
+    {
+        return this->_putAttImpl( key, value );
+    }
+#endif
+    IGroupAtt2::sptr Group2::putAtt( const std::string& key, unsigned long long value )
+    {
+        return this->_putAttImpl( key, value );
+    }
+
+
+
+
+    IGroupAtt2::sptr Group2::putAtt( const std::string& key, int value )
+    {
+        return this->_putAttImpl( key, value );
+    }
+
     std::vector< IGroupAtt2::sptr > Group2::getAttributes()
     {
         std::vector< IGroupAtt2::sptr > v;
@@ -467,6 +579,27 @@ namespace FairDataPipeline
 
 		return grp_att;
 	}
+
+    IGroupAtt2::sptr Group2::putAtt( const std::string& key, size_t nvals, const char** values )
+	{
+		GroupAtt2::sptr grp_att_ptr;
+       try
+       {
+           netCDF::NcGroupAtt ncatt = _nc_ptr->putAtt( key, netCDF::NcString(), nvals, values );
+           if( !ncatt.isNull() )
+           {
+               grp_att_ptr = GroupAtt2::create( this->shared_from_this(), ncatt );
+               _name_attrib_map[ key ] = grp_att_ptr;
+           }
+       
+       }
+       catch( netCDF::exceptions::NcException& e )
+       {
+           std::cerr << e.what();
+       }
+		return grp_att_ptr;
+	}
+
 	
 	IGroupAtt2::sptr Group2::putAtt( const std::string& key, size_t nvals, const double* values )
 	{
@@ -858,8 +991,8 @@ namespace FairDataPipeline
 
     IFile2::sptr FileFactory2::create( const std::string& path, IFile2::Mode mode )
     {
-        File2::sptr ptr =File2::create( path, mode );
-        return ptr;
+        File2::sptr ptr = File2::create( path, mode );
+        return  ptr;
     }
 	
 
