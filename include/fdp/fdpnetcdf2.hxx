@@ -54,34 +54,17 @@ namespace FairDataPipeline
         virtual IGroupAtt2::sptr getAtt( const std::string& key ) = 0;
 
         virtual IGroupAtt2::sptr putAtt( const std::string& key, const std::string& value ) = 0;
-#if 0
 
-        IGroupAtt2::sptr putAtt( const std::string& key, short value );
-        IGroupAtt2::sptr putAtt( const std::string& key, int value );
-        IGroupAtt2::sptr putAtt( const std::string& key, long value );
-        IGroupAtt2::sptr putAtt( const std::string& key, long long value );
+        virtual IGroupAtt2::sptr putAtt( const std::string& key, short value ) =0;
 
-        IGroupAtt2::sptr putAtt( const std::string& key, unsigned short value );
-        IGroupAtt2::sptr putAtt( const std::string& key, unsigned int value );
-        //IGroupAtt2::sptr putAtt( const std::string& key, unsigned long value );
-        IGroupAtt2::sptr putAtt( const std::string& key, unsigned long long value );
+        virtual IGroupAtt2::sptr putAtt( const std::string& key, int value ) = 0;
+        virtual IGroupAtt2::sptr putAtt( const std::string& key, long value ) = 0;
+        virtual IGroupAtt2::sptr putAtt( const std::string& key, long long value ) = 0;
 
-
-        IGroupAtt2::sptr putAtt( const std::string& key, size_t nvals, const short* vals );
-        IGroupAtt2::sptr putAtt( const std::string& key, size_t nvals, const int* vals );
-        IGroupAtt2::sptr putAtt( const std::string& key, size_t nvals, const long* vals );
-        IGroupAtt2::sptr putAtt( const std::string& key, size_t nvals, const long long* vals );
-
-        IGroupAtt2::sptr putAtt( const std::string& key, size_t nvals, const unsigned short* vals );
-        IGroupAtt2::sptr putAtt( const std::string& key, size_t nvals, const unsigned int* vals );
-        IGroupAtt2::sptr putAtt( const std::string& key, size_t nvals, const unsigned long* vals );
-        IGroupAtt2::sptr putAtt( const std::string& key, size_t nvals, const unsigned long long* vals );
-
-        IGroupAtt2::sptr putAtt( const std::string& key, size_t nvals, const float* vals );
-        IGroupAtt2::sptr putAtt( const std::string& key, size_t nvals, const double* vals );
-
-        IGroupAtt2::sptr putAtt( const std::string& key, size_t nvals, const char** vals );
-#endif
+        virtual IGroupAtt2::sptr putAtt( const std::string& key, unsigned short value ) = 0;
+        virtual IGroupAtt2::sptr putAtt( const std::string& key, unsigned int value ) = 0;
+        //virtual IGroupAtt2::sptr putAtt( const std::string& key, unsigned long value );
+        virtual IGroupAtt2::sptr putAtt( const std::string& key, unsigned long long value ) = 0;
 
 
         virtual IGroupAtt2::sptr putAtt( const std::string& key, size_t nvals, const short* vals ) = 0;

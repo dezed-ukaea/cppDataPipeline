@@ -396,11 +396,6 @@ namespace FairDataPipeline
 			NAME_ATTRIB_MAP _name_attrib_map;
 	};
 
-    class Group2_ : public Group2, public IGroup2
-    {
-        public:
-            typedef std::shared_ptr< Group2_ > sptr;
-    };
 
     template<>
         IGroupAtt2::sptr Group2::_putAttImpl< std::string >( const std::string& key, const std::string& value )
