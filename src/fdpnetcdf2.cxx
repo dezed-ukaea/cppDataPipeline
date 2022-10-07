@@ -187,7 +187,35 @@ namespace FairDataPipeline
 
 
 	void split_str( const std::string& s, const char delim, std::vector< std::string >& splits ) ;
+#if 1
 
+    class Dimension2 : public IDimension2
+    {
+        public:
+            typedef std::shared_ptr< Dimension2 > sptr;
+
+            Dimension2() = delete;
+
+            static sptr create( IGroup2::sptr parent_grp, netCDF::NcDim& ncdim );
+        private:
+
+           // Dimension2( IGroup2::sptr parent_grp_ptr, netCDF::NcDim& ncdim );
+
+            std::weak_ptr< IGroup2 > _parent_grp_ptr;
+            netCDF::NcDim _nc;
+           
+           
+    };
+    Dimension2::sptr Dimension2::create( IGroup2::sptr parent_grp_ptr, netCDF::NcDim& ncdim )
+    {
+        return NULL;
+        //return Dimension2::sptr( new Dimension2(parent_grp_ptr, ncdim );
+    }
+#endif
+    //Dimension2::Dimension2( IGroup2::sptr parent_grp_ptr, netCDF::NcDim& ncdim ) 
+    //    : _parent_grp_ptr( parent_grp_ptr ), _nc(ncdim)
+    //{
+    //}
 
 	class Group2;
 	typedef std::shared_ptr< Group2 > Group2Sptr;
@@ -324,8 +352,13 @@ namespace FairDataPipeline
 			typedef std::shared_ptr< Group2 > sptr;
             typedef std::map< std::string, sptr > NAME_GROUP_MAP; 
 			typedef std::map< std::string, GroupAtt2::sptr > NAME_ATTRIB_MAP;
+			typedef std::map< std::string, Dimension2::sptr > NAME_DIM_MAP;
 
 			static sptr create( sptr grp_parent, NcGroupPtr nc_grp_ptr	);
+
+            IDimension2::sptr getDim( const std::string& name );
+            IDimension2::sptr addUnlimitedDim( const std::string& name );
+            IDimension2::sptr addDim( const std::string& name, size_t n );
 
 			//IGroup2::sptr addGroup( const std::string& grp_name );
 			IGroup2::sptr getGroup( const std::string& grp_name );
@@ -396,7 +429,78 @@ namespace FairDataPipeline
 
 			NAME_GROUP_MAP _name_grp_map; 
 			NAME_ATTRIB_MAP _name_attrib_map;
+			NAME_DIM_MAP _name_dim_map;
 	};
+
+    IDimension2::sptr Group2::getDim( const std::string& name )
+    {
+        Dimension2::sptr dim_ptr;
+        auto it = _name_dim_map.find( name );
+        if( it != _name_dim_map.end() )
+        {
+            dim_ptr = it->second;
+        }
+        else
+        {
+            try
+            {
+                netCDF::NcDim nc_dim = _nc_ptr->getDim( name ); 
+                if( !nc_dim.isNull() )  
+                {
+                    dim_ptr = Dimension2::create( this->shared_from_this(), nc_dim );
+                    _name_dim_map[ name ] = dim_ptr; 
+                }
+            }
+            catch( netCDF::exceptions::NcException& e )
+            {
+                std::cerr << e.what();
+            }
+        }
+
+        return dim_ptr;
+    }
+
+    IDimension2::sptr Group2::addUnlimitedDim( const std::string& name )
+    {
+       Dimension2::sptr dim_ptr;
+       try
+       {
+           netCDF::NcDim ncdim = _nc_ptr->addDim( name );
+           if( !ncdim.isNull() )
+           {
+               dim_ptr = Dimension2::create( this->shared_from_this(), ncdim );
+               _name_dim_map[ name ] = dim_ptr;
+           }
+       }
+       catch( netCDF::exceptions::NcException& e )
+       {
+           std::cerr << e.what();
+       }
+
+       return dim_ptr;
+    }
+
+    IDimension2::sptr Group2::addDim( const std::string& name, size_t n )
+    {
+       Dimension2::sptr dim_ptr;
+       try
+       {
+           netCDF::NcDim ncdim = _nc_ptr->addDim( name, n );
+           if( !ncdim.isNull() )
+           {
+               dim_ptr = Dimension2::create( this->shared_from_this(), ncdim );
+               _name_dim_map[ name ] = dim_ptr;
+           }
+       }
+       catch( netCDF::exceptions::NcException& e )
+       {
+           std::cerr << e.what();
+       }
+
+       return dim_ptr;
+    }
+
+
 
 
     template<>
@@ -1003,6 +1107,42 @@ namespace FairDataPipeline
         File2::sptr ptr = File2::create( path, mode );
         return  ptr;
     }
-	
+
+
+    Builder2::Builder2( const std::string& path, IFile2::Mode mode )
+    {
+        FileFactory2 ff;
+        _file = ff.create( path, mode );
+    }
+
+    void Builder2::prepare( CoordinatVariableDefinition& cv )
+    {
+        std::vector< std::string > splits;
+        split_str( cv.name, '/', splits );
+
+        std::string grp_name;
+        for( auto it=splits.begin(); it != splits.end()-1; ++it )
+        {
+            grp_name = grp_name + "/" + *it;
+        }
+
+        std::string item_name = *(splits.rbegin());
+
+        std::cout << "GROUP NAME" << grp_name << "\n";
+        std::cout << "ITEM  NAME" << item_name << "\n";
+
+
+        IGroup2::sptr igrp_ptr = std::dynamic_pointer_cast< File2 >(_file);
+
+        if( grp_name.size() )
+            igrp_ptr =  igrp_ptr->requireGroup( grp_name );
+
+        Group2::sptr grp_ptr = std::static_pointer_cast< Group2 >( igrp_ptr );
+
+        
+
+
+
+    }
 
 }

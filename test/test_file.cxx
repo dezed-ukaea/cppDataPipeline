@@ -104,3 +104,20 @@ TEST_F(FileTest, TestInterface)
 #endif
 }
 
+TEST_F(FileTest, TestBuilder) 
+{
+    fdp::CoordinatVariableDefinition cv;
+
+    cv.name = "grp1/grp2/cv1";
+
+
+    fdp::Builder2 builder( "test_builder.nc", fdp::IFile2::WRITE );
+
+    builder.prepare( cv );
+
+    cv.name = "cv1";
+
+    builder.prepare( cv );
+
+
+}

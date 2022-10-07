@@ -26,7 +26,7 @@ namespace FairDataPipeline
 
 	struct LocalVAriableDefinition : VariableDefinition
 	{
-		int local_name;
+        std::string local_name;
 	};
 
 	struct CoordinatVariableDefinition : VariableDefinition
@@ -36,6 +36,18 @@ namespace FairDataPipeline
 		void* values;
 		std::string name;//variable name in jave splits the group and patgh
 	};
+
+    struct DimensionalVariableDefinition : VariableDefinition
+    {
+        std::vector< std::string > dimensions;
+        std::string name;
+    };
+
+    struct IDimension2
+    {
+        typedef std::shared_ptr< IDimension2 > sptr;
+    };
+
 
 
     struct IGroup2;
@@ -112,6 +124,8 @@ namespace FairDataPipeline
         virtual IGroupAtt2::sptr putAtt( const std::string& key, size_t nvals, const double* vals ) = 0;
 
         virtual IGroupAtt2::sptr putAtt( const std::string& key, size_t nvals, const char** vals ) = 0;
+
+        virtual IDimension2::sptr getDim( const std::string& name ) = 0;
 	};
 
 	struct IFile2 : public IGroup2
@@ -123,6 +137,17 @@ namespace FairDataPipeline
     struct FileFactory2
     {
         IFile2::sptr create( const std::string& path, IFile2::Mode mode );
+    };
+
+    class Builder2
+    {
+        public:
+            Builder2( const std::string& path, IFile2::Mode mode );
+
+            void prepare( CoordinatVariableDefinition& cv );
+
+        private:
+            IFile2::sptr _file;
     };
 
 }
