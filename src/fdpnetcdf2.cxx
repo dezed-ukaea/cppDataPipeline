@@ -342,6 +342,8 @@ namespace FairDataPipeline
 
             IGroupAtt2::sptr putAtt( const std::string& key, const std::string& value );
 
+            IGroupAtt2::sptr putAtt( const std::string& key, float value );
+
             IGroupAtt2::sptr putAtt( const std::string& key, short value );
             IGroupAtt2::sptr putAtt( const std::string& key, int value );
             IGroupAtt2::sptr putAtt( const std::string& key, long value );
@@ -428,6 +430,9 @@ namespace FairDataPipeline
 			typedef typename NcTraits< T >::MyNcType MyNcType;
 			MyNcType nctype = MyNcType();
             netCDF::NcGroupAtt ncatt = _nc_ptr->putAtt( key, nctype, value );
+
+            if( !ncatt.isNull() )
+                grp_att_ptr = GroupAtt2::create( this->shared_from_this(), ncatt );
         }
         catch( netCDF::exceptions::NcException& e )
         {
@@ -440,6 +445,13 @@ namespace FairDataPipeline
     {
         return this->_putAttImpl< std::string >( key, value );
     }
+
+    IGroupAtt2::sptr Group2::putAtt( const std::string& key, float value )
+    {
+        return this->_putAttImpl( key, value );
+    }
+
+
 
     IGroupAtt2::sptr Group2::putAtt( const std::string& key, short value )
     {
@@ -674,6 +686,7 @@ namespace FairDataPipeline
 	{
 	//	_nc_ptr = nc_grp_ptr;
 	//	_parent_grp_ptr = grp_parent;
+    //    grp_parent->_name_grp_map[ _nc_ptr->getName() ];
 	}
 
 	Group2::sptr Group2::create( Group2::sptr grp_parent
@@ -681,6 +694,7 @@ namespace FairDataPipeline
 	       	       )
 	{
 		Group2::sptr grp_ptr( new Group2( grp_parent, nc_grp_ptr ) );
+
 		return grp_ptr;
 	}
 
@@ -769,13 +783,13 @@ namespace FairDataPipeline
 
 		try
 		{
-            printf( "AAAA\n" );
 			netCDF::NcGroup new_ncgrp( _nc_ptr->addGroup( grp_name ) );
-            printf( "XXXXXXXX\n" );
 			if( !new_ncgrp.isNull() )
 			{
 				NcGroupPtr nc_grp_ptr = std::make_shared< netCDF::NcGroup >( new_ncgrp );
 				grp_ptr = Group2::create( this->shared_from_this(), nc_grp_ptr ); 
+                _name_grp_map[ grp_name ] = grp_ptr;
+
 			}
 		}
 		catch( netCDF::exceptions::NcException& e )

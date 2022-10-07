@@ -65,6 +65,8 @@ namespace FairDataPipeline
         virtual IGroupAtt2::sptr putAtt( const std::string& key, unsigned int value ) = 0;
         //virtual IGroupAtt2::sptr putAtt( const std::string& key, unsigned long value );
         virtual IGroupAtt2::sptr putAtt( const std::string& key, unsigned long long value ) = 0;
+        
+        virtual IGroupAtt2::sptr putAtt( const std::string& key, float value ) = 0;
 
 
         virtual IGroupAtt2::sptr putAtt( const std::string& key, size_t nvals, const short* vals ) = 0;
@@ -81,8 +83,6 @@ namespace FairDataPipeline
         virtual IGroupAtt2::sptr putAtt( const std::string& key, size_t nvals, const double* vals ) = 0;
 
         virtual IGroupAtt2::sptr putAtt( const std::string& key, size_t nvals, const char** vals ) = 0;
-
-
 	};
 
 	struct IFile2 : public IGroup2
