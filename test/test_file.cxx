@@ -3,6 +3,7 @@
 #endif
 
 #include "gtest/gtest.h"
+#include<cstring>
 
 #include "fdp/fdpnetcdf.hxx"
 #include "fdp/fdpnetcdf2.hxx"
@@ -65,15 +66,24 @@ TEST_F(FileTest, TestInterface)
 
     const char* strings[3] = {"a", "test", "bob"};
 
+    std::string s[3] = {"a","b","c"};
+
     grp_att_ptr = grp_bob_ptr->putAtt( "ints", 3, ivals );
 
     ASSERT_TRUE( grp_att_ptr->name() == "ints" );
     ASSERT_TRUE( grp_att_ptr->getAttType() == fdp::INT );
     ASSERT_TRUE( grp_att_ptr->getAttLength() == 3 );
 
+    int ivals_[3] = {0,0,0};
+    grp_att_ptr->getValues( ivals_ );
+
+
+    ASSERT_TRUE( 0 == std::memcmp( ivals, ivals_, sizeof(int)*3 ) );
+
+    //grp_att_ptr = grp_bob_ptr->putAtt( "more_strings", &s[0] );
     grp_att_ptr = grp_bob_ptr->putAtt( "floats", 3, fvals );
     grp_att_ptr = grp_bob_ptr->putAtt( "doubles", 3, dvals );
-    grp_att_ptr = grp_bob_ptr->putAtt( "some_strings", 3, &strings[0] );
+    grp_att_ptr = grp_bob_ptr->putAtt( "some_strings", 3, &strings[0] );  
 
     ASSERT_TRUE( NULL != grp_bob_ptr );
 
@@ -89,6 +99,8 @@ TEST_F(FileTest, TestInterface)
 
     ASSERT_TRUE( NULL != grp_ptr );
     ASSERT_TRUE( grp_12_ptr == grp_ptr );
+
+
 #endif
 }
 
