@@ -9,6 +9,8 @@
 
 namespace FairDataPipeline
 {
+    struct IGroup2;
+    typedef std::shared_ptr< IGroup2 > IGroup2Sptr;
 
 	struct netCDFComponentDefinition
 	{
@@ -46,12 +48,20 @@ namespace FairDataPipeline
     struct IDimension2
     {
         typedef std::shared_ptr< IDimension2 > sptr;
+
+        virtual size_t getSize() = 0;
+        virtual std::string getName() = 0;
+        virtual IGroup2Sptr parent() = 0;
+        virtual bool isUnlimited() = 0;
+
     };
 
+     
 
 
-    struct IGroup2;
-    typedef std::shared_ptr< IGroup2 > IGroup2Sptr;
+
+    //struct IGroup2;
+    //typedef std::shared_ptr< IGroup2 > IGroup2Sptr;
 
     struct IGroupAtt2
     {
@@ -126,6 +136,10 @@ namespace FairDataPipeline
         virtual IGroupAtt2::sptr putAtt( const std::string& key, size_t nvals, const char** vals ) = 0;
 
         virtual IDimension2::sptr getDim( const std::string& name ) = 0;
+        virtual std::vector< std::string > getDims() = 0;
+        virtual IDimension2::sptr addUnlimitedDim( const std::string& name ) = 0;
+        virtual IDimension2::sptr addDim( const std::string& name, size_t n ) = 0;
+
 	};
 
 	struct IFile2 : public IGroup2

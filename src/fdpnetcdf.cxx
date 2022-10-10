@@ -77,6 +77,9 @@ template< typename T >
 
 namespace FairDataPipeline
 {
+    class GroupImpl;
+    typedef std::shared_ptr< GroupImpl > GroupImplSptr;
+
     static netCDF::NcType::ncType DataType2NcType( DataType dtype )
     {
         netCDF::NcType::ncType nctype;
@@ -320,18 +323,12 @@ namespace FairDataPipeline
             typedef std::shared_ptr< GroupAtt > sptr;
 
             GroupAtt() = delete;
-            static GroupAtt::sptr create( const netCDF::NcGroupAtt& ncatt ) 
-            {
-                return GroupAtt::sptr( new GroupAtt( ncatt ) );
-            }
-
+            static GroupAtt::sptr create( GroupImplSptr grp_ptr, const netCDF::NcGroupAtt& ncatt );
 
             DataType getAttType();
             int getClassType(){ return ATTRIBUTE_GROUP_TYPE; }
             size_t getAttLength() { return _ncatt.getAttLength();}
 
-            //int getValues( int* values );
-            //int getValues( float* values );
             int getValues( std::string& values );
 
             int getValues( short* values );
@@ -346,14 +343,47 @@ namespace FairDataPipeline
             int getValues( float* values );
             int getValues( double* values );
 
+
+			IGroupPtr getParentGroup();
+			//GroupImplSptr _getParentGroup();
+			std::string getName();
+
         private:
             template< typename T>
                 int getValuesImpl( T* values );
 
-            GroupAtt( const netCDF::NcGroupAtt& ncatt ) : _ncatt( ncatt ){}
+            GroupAtt( GroupImplSptr grp_ptr, const netCDF::NcGroupAtt& ncatt );
+
             netCDF::NcGroupAtt _ncatt;
 
+            std::weak_ptr< GroupImpl > _parent_group_ptr;
     };
+
+    GroupAtt::GroupAtt( GroupImplSptr grp_ptr, const netCDF::NcGroupAtt& ncatt ) : _parent_group_ptr( grp_ptr),  _ncatt( ncatt ){}
+
+    IGroupPtr GroupAtt::getParentGroup()
+    {
+        GroupImplSptr grp_ptr(_parent_group_ptr);
+        //IGroup::sptr iptr( grp_ptr);
+
+
+        return std::static_pointer_cast< IGroup >( grp_ptr );
+    }
+
+
+    std::string GroupAtt::getName()
+    {
+        return _ncatt.getName();
+    }
+
+
+
+    GroupAtt::sptr GroupAtt::create( GroupImplSptr grp_ptr, const netCDF::NcGroupAtt& ncatt ) 
+    {
+        return GroupAtt::sptr( new GroupAtt( grp_ptr, ncatt ) );
+    }
+
+
 
     template< typename T > 
         int GroupAtt::getValuesImpl( T* values )
@@ -453,6 +483,7 @@ namespace FairDataPipeline
             int getClassType(){ return ATTRIBUTE_VAR_TYPE; }
 
             size_t getAttLength() { return _ncvaratt.getAttLength();}
+            std::string getName(){ return _ncvaratt.getName(); }
 
             int getValues( short* values );
             int getValues( int* values );
@@ -790,7 +821,7 @@ namespace FairDataPipeline
 
             size_t getSize(){ return _nc_dim.getSize();}
             std::string getName(){return _nc_dim.getName();}
-            IGroup::sptr getParentGroup(){ return _parent;}
+            IGroup::sptr getParentGroup(){ return _parent.lock();}
 
             bool isUnlimited() { return _nc_dim.isUnlimited(); }
 
@@ -800,7 +831,7 @@ namespace FairDataPipeline
         {
         }
             netCDF::NcDim _nc_dim;
-            IGroup::sptr _parent;
+            std::weak_ptr< IGroup > _parent;
     };
 
 
@@ -813,7 +844,7 @@ namespace FairDataPipeline
 
             typedef std::shared_ptr< GroupImpl > sptr;
 
-            std::string name();
+            std::string getName();
 
             int getGroupCount();
             IGroup::sptr parent();
@@ -822,7 +853,7 @@ namespace FairDataPipeline
 
             IGroup::sptr  _getGroup( const std::string name );
 
-            const IGroup::NAME_GROUP_MAP& getGroups();
+            std::vector< std::string > getGroups();
 
             IGroup::sptr requireGroup( const std::string& name );
 
@@ -837,6 +868,7 @@ namespace FairDataPipeline
                     , std::vector< IDimension::sptr >& vdims );
 
             IVar::sptr getVar( const std::string& name );
+            std::vector< std::string > getVars();
 
             IGroupAtt::sptr putAtt( const std::string& key, const std::string& value );
             IGroupAtt::sptr putAtt( const std::string& key, int value );
@@ -899,7 +931,7 @@ namespace FairDataPipeline
                 MyNcType theNcType = MyNcType();
 
                 netCDF::NcGroupAtt ncatt = _nc->putAtt( key, theNcType, nvals, values );
-                grp_att = GroupAtt::create( ncatt );
+                grp_att = GroupAtt::create( this->shared_from_this(), ncatt );
 
                 _name_att_map[ key ] = grp_att;
             }
@@ -919,7 +951,7 @@ namespace FairDataPipeline
         try
         {
             netCDF::NcGroupAtt ncatt = _nc->putAtt( key, netCDF::NcString(), nvals, values );
-            grp_att = GroupAtt::create( ncatt );
+            grp_att = GroupAtt::create( this->shared_from_this(), ncatt );
 
             _name_att_map[ key ] = grp_att;
         }
@@ -1017,7 +1049,7 @@ namespace FairDataPipeline
         try
         {
             netCDF::NcGroupAtt ncatt = _nc->putAtt( key, value );
-            grp_att = GroupAtt::create( ncatt );
+            grp_att = GroupAtt::create( this->shared_from_this(), ncatt );
 
             _name_att_map[ key ] = grp_att;
         }
@@ -1042,7 +1074,7 @@ namespace FairDataPipeline
             try
             {
                 netCDF::NcGroupAtt ncatt = _nc->getAtt( key );
-                att_ptr = GroupAtt::create( ncatt );
+                att_ptr = GroupAtt::create( this->shared_from_this(), ncatt );
                 _name_att_map[ key ] = att_ptr;
             }
             catch( NcException& e )
@@ -1080,6 +1112,28 @@ namespace FairDataPipeline
         }
 
         return var_ptr;
+    }
+
+    std::vector< std::string > GroupImpl::getVars()
+    {
+        std::vector< std::string > var_names;
+        try
+        {
+            if( !_nc->isNull() )
+            {
+                std::multimap< std::string, netCDF::NcVar > ncvars = _nc->getVars();
+                for( auto it = ncvars.begin(); it != ncvars.end(); ++it )
+                {
+                    var_names.push_back( it->first );
+                }
+                
+            }
+        }
+        catch( NcException& e )
+        {
+            std::cerr << e.what();
+        }
+        return var_names;
     }
 
     IVar::sptr GroupImpl::getVar( const std::string& name )
@@ -1241,17 +1295,25 @@ namespace FairDataPipeline
         return grp_ptr;
     }
 
-    const IGroup::NAME_GROUP_MAP& GroupImpl::getGroups()
+    std::vector< std::string > GroupImpl::getGroups()
     {
-        auto nc_grps = this->_nc->getGroups();
-        for( auto it_nc_grp = nc_grps.begin(); it_nc_grp != nc_grps.end(); ++it_nc_grp )
-        {
-            std::string name = it_nc_grp->first;
+        std::vector< std::string > grp_names;
 
-            IGroup::sptr grp_ptr = this->requireGroup( name );
+        try
+        {
+            auto nc_grps = this->_nc->getGroups();
+            for( auto it_nc_grp = nc_grps.begin(); it_nc_grp != nc_grps.end(); ++it_nc_grp )
+            {
+                std::string name = it_nc_grp->first;
+                grp_names.push_back( name );
+            }
+        }
+        catch( NcException& e )
+        {
+            std::cerr << e.what();
         }
 
-        return _name_grp_map;
+        return grp_names;
     }
 
     IGroup::sptr GroupImpl::requireGroup( const std::string& name )
@@ -1313,7 +1375,7 @@ namespace FairDataPipeline
         return _parent.lock(); 
     }
 
-    std::string GroupImpl::name()
+    std::string GroupImpl::getName()
     {
         std::string s = this->_nc->getName();
         return s;
@@ -1567,9 +1629,9 @@ namespace FairDataPipeline
                     if( dim_var_ptr )
                     {
                         IGroup::sptr parent_grp_ptr = dim_var_ptr->parent();
-                        while( parent_grp_ptr && parent_grp_ptr->name() != "/" )
+                        while( parent_grp_ptr && parent_grp_ptr->getName() != "/" )
                         {
-                            dim_var_name = parent_grp_ptr->name() + "/" +dim_var_name;
+                            dim_var_name = parent_grp_ptr->getName() + "/" +dim_var_name;
 
                             parent_grp_ptr = parent_grp_ptr->parent();
                         }
