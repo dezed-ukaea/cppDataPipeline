@@ -56,19 +56,30 @@ namespace FairDataPipeline
         typedef std::shared_ptr< IAtt > sptr;
 
         virtual DataType getAttType() = 0;
+        virtual std::string getName() = 0;
 
         virtual int getClassType() = 0;
         virtual size_t getAttLength() = 0;
 
         virtual int getValues( int* values ) = 0;
+        virtual int getValues( short* values ) = 0;
+        virtual int getValues( long* values ) = 0;
+        virtual int getValues( long long* values ) = 0;
+
+        virtual int getValues( unsigned short* values ) = 0;
+        virtual int getValues( unsigned int* values ) = 0;
+        virtual int getValues( unsigned long* values ) = 0;
+
         virtual int getValues( float* values ) = 0;
         virtual int getValues( std::string& values ) = 0;
+        virtual int getValues( unsigned long long* values ) = 0;
 
     };
 
     struct IGroupAtt : public IAtt
     {
         typedef std::shared_ptr< IGroupAtt > sptr;
+
 
     };
 
@@ -141,11 +152,14 @@ namespace FairDataPipeline
                 , std::vector< IDimension::sptr >& vdims ) = 0;
 
         virtual IVar::sptr getVar( const std::string& name ) = 0;
+        virtual std::vector< std::string > getVars() = 0;
+
+        virtual std::vector< std::string > getGroups() = 0;
 
 
         virtual int getGroupCount() = 0;
 
-        virtual std::string name() = 0;
+        virtual std::string getName() = 0;
 
         virtual IGroupAtt::sptr putAtt( const std::string& key, const std::string& value ) = 0;
         virtual IGroupAtt::sptr putAtt( const std::string& key, int value ) = 0;
@@ -168,6 +182,7 @@ namespace FairDataPipeline
 
 
         virtual IGroupAtt::sptr getAtt( const std::string& key ) = 0;
+        virtual std::vector< std::string > getAtts() = 0;
 
     };
 

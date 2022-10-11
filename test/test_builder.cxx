@@ -10,7 +10,11 @@
 
 class BuilderTest : public ::testing::Test {
     protected:
-        void SetUp() override {}
+        void SetUp() override 
+        {
+            std::remove( "xtest.nc" );
+        }
+
         std::string getHomeDirectory() {
             std::string HomeDirectory;
 #ifdef _WIN32
@@ -87,14 +91,14 @@ TEST_F(BuilderTest, TestInterface)
 
 
     ASSERT_TRUE( NULL != grp_ptr );
-    ASSERT_EQ( grp_ptr->name(), "terry" );
-    ASSERT_EQ( grp_ptr->parent()->name(), "bob" );
+    ASSERT_EQ( grp_ptr->getName(), "terry" );
+    ASSERT_EQ( grp_ptr->parent()->getName(), "bob" );
 
     auto parent_parent = grp_ptr->parent()->parent();
-    std::string s = parent_parent->name();
+    std::string s = parent_parent->getName();
 
     ASSERT_TRUE( NULL != grp_ptr->parent()->parent() );
-    ASSERT_EQ( "/", grp_ptr->parent()->parent()->name() );
+    ASSERT_EQ( "/", grp_ptr->parent()->parent()->getName() );
 
     int a[1][2][3];
     int* pa = &a[0][0][0];
@@ -185,7 +189,7 @@ TEST_F(BuilderTest, TestInterface2)
         status = builder2.writeArray( "grp/arr1", arrdef, data );
         ASSERT_EQ( FDP_FILE_NOERR, status );
 
-        //write already existing dim name
+        // write already existing dim name
         status = builder2.writeDimension( "grp/dim1", dimdef1, dim1 );
         ASSERT_TRUE( FDP_FILE_NOERR != status );
 

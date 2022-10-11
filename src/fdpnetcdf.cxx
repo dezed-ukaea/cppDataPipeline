@@ -873,7 +873,9 @@ namespace FairDataPipeline
             IGroupAtt::sptr putAtt( const std::string& key, const std::string& value );
             IGroupAtt::sptr putAtt( const std::string& key, int value );
             IGroupAtt::sptr putAtt( const std::string& key, float value );
+
             IGroupAtt::sptr getAtt( const std::string& key );
+            std::vector< std::string > getAtts();
 
         
             IGroupAtt::sptr putAtt( const std::string& key, size_t nvals, const short* values );
@@ -1079,11 +1081,33 @@ namespace FairDataPipeline
             }
             catch( NcException& e )
             {
-                e.what();
+                std::cerr << e.what();
             }
 
         }
         return att_ptr;
+
+    }
+
+    std::vector< std::string > GroupImpl::getAtts()
+    {
+        std::vector< std::string > att_names;
+        try
+        {
+            if( !_nc->isNull() )
+            {
+                std::multimap< std::string, netCDF::NcGroupAtt > ncatts = _nc->getAtts();
+                for( auto it = ncatts.begin(); it != ncatts.end(); ++it )
+                {
+                    att_names.push_back( it->first );
+                }
+            }
+        }
+        catch( NcException& e ) 
+        {
+            std::cerr << e.what();
+        }
+        return att_names;
 
     }
 
