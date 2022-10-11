@@ -36,6 +36,41 @@ namespace FairDataPipeline
         //COMPOUND
     };
 
+	struct netCDFComponentDefinition
+	{
+		std::string description;
+		std::string long_name;
+		std::map< std::string, std::vector<std::string> > optional_attribs;
+	};
+
+	struct VariableDefinition : netCDFComponentDefinition
+	{
+		int datatype;
+		std::string units;
+		int missing_value;
+	};
+
+	struct LocalVAriableDefinition : VariableDefinition
+	{
+        std::string local_name;
+	};
+
+	struct CoordinatVariableDefinition : VariableDefinition
+	{
+		int size;
+		int UNLIMITED;
+		void* values;
+		std::string name;//variable name in jave splits the group and patgh
+	};
+
+    struct DimensionalVariableDefinition : VariableDefinition
+    {
+        std::vector< std::string > dimensions;
+        std::string name;
+    };
+
+
+
     struct IGroup;
     typedef std::shared_ptr< IGroup > IGroupPtr;
 
