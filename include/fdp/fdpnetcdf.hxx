@@ -81,12 +81,20 @@ namespace FairDataPipeline
     {
         std::vector< std::string > dimensions;
         std::string name;
+
+        const std::vector< std::string >& getDimensions() const;
     };
 
-    struct TableDefinition
+    struct TableDefinition : netCDFComponentDefinition
     {
         std::vector< LocalVAriableDefinition > columns;
-        std::string grp_name;
+        std::string name;
+        size_t size;
+
+        size_t getSize();
+        bool isUnlimited();
+        const std::string& getName() const { return name;}
+        std::string getVariableName( int i );
     };
 
 

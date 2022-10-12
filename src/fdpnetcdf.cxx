@@ -1550,6 +1550,24 @@ namespace FairDataPipeline
         return this->size == CoordinatVariableDefinition::UNLIMITED;
     }
 
+    size_t TableDefinition::getSize()
+    {
+        return this->size;
+    }
+
+    bool TableDefinition::isUnlimited()
+    {
+        return this->getSize() == CoordinatVariableDefinition::UNLIMITED;
+    }
+
+    std::string TableDefinition::getVariableName( int i )
+    {
+       PARENT_ITEM_TYPE col_grp_item = split_item_name( this->columns[i].name );
+       
+
+        return this->name + "/" + col_grp_item.second;
+    }
+
 
 
     int Builder::prepare( CoordinatVariableDefinition& cvd )
@@ -1563,7 +1581,7 @@ namespace FairDataPipeline
 
         IGroup::sptr grp_ptr = _file->requireGroup( parent_grp_name );
 
-        status = ( grp_ptr != NULL ) 0 : 1;
+        status = ( grp_ptr != NULL ) ? 0 : 1;
 
         IDimension::sptr dim_ptr;
 
@@ -1577,7 +1595,7 @@ namespace FairDataPipeline
                 dim_ptr = grp_ptr->addDim( itm_name, cvd.size );
         }
 
-        status = ( dim_ptr != NULL ) 0 : 1;
+        status = ( dim_ptr != NULL ) ? 0 : 1;
 
         std::vector< IDimension::sptr > vdims = { dim_ptr };
 
@@ -1585,7 +1603,7 @@ namespace FairDataPipeline
 
         var_ptr = grp_ptr->addVar( itm_name, cvd.datatype, vdims );
 
-        status = ( var_ptr != NULL ) 0 : 1;
+        status = ( var_ptr != NULL ) ? 0 : 1;
 
         if( !cvd.description.empty() )
             var_ptr->putAtt( ATTRIB_KEY_DESC, cvd.description );
@@ -1593,7 +1611,7 @@ namespace FairDataPipeline
         if( !cvd.units.empty() )
             var_ptr->putAtt( ATTRIB_KEY_UNITS, cvd.units );
 
-        if( !cvd.long_name.empty )
+        if( !cvd.long_name.empty() )
             var_ptr->putAtt( ATTRIB_KEY_LNAME, cvd.long_name );
 
         //fill value?
@@ -1603,11 +1621,103 @@ namespace FairDataPipeline
     int Builder::prepare( TableDefinition& td )
     {
         int status = 0;
+
+        PARENT_ITEM_TYPE parent_item = split_item_name( td.name );
+        const std::string& grp_name = parent_item.first;
+        const std::string& itm_name = parent_item.second;
+
+        IGroup::sptr grp_ptr = _file->requireGroup( grp_name );
+
+        status = ( grp_ptr != NULL ) ? 0 : 1;
+
+        if( 0==status )
+        {
+            std::string dim_name = "index";
+            IDimension::sptr dim_ptr;
+
+            if( grp_ptr )
+            {
+                IDimension::sptr dim_ptr;
+
+                if( td.isUnlimited() )
+                    dim_ptr = grp_ptr->addUnlimitedDim( dim_name );
+                else
+                    dim_ptr = grp_ptr->addDim( dim_name, td.getSize() );
+            }
+
+            status = ( dim_ptr != NULL ) ? 0 : 1;
+        }
+
+        if( 0==status )
+        {
+            if( !td.description.empty() )
+                grp_ptr->putAtt( ATTRIB_KEY_DESC, td.description );
+
+            if( !td.long_name.empty() )
+                grp_ptr->putAtt( ATTRIB_KEY_LNAME, td.long_name );
+
+             // add the optional attribs
+             //
+             // add the columns as DimensionalVariableDefinitions
+             grp_ptr->putAtt( ATTRIB_KEY_GROUP_TYPE, "table" );
+            
+            
+        }
+        
         return status;
     }
+
+    const std::vector< std::string >& DimensionalVariableDefinition::getDimensions() const
+    {
+        return this->dimensions;
+    }
+
     int Builder::prepare( DimensionalVariableDefinition& dvd )
     {
         int status = 0;
+
+        PARENT_ITEM_TYPE grp_item = split_item_name( dvd.name );
+        const std::string& grp_name = grp_item.first;
+        const std::string& itm_name = grp_item.second;
+
+        IGroup::sptr grp_ptr = _file->requireGroup( grp_name );
+
+        status = grp_ptr ? 0 : 1;
+
+        std::vector< IDimension::sptr > dims;
+
+        for( size_t i = 0; i < dvd.getDimensions().size() && !status ; ++i )
+        {
+            IDimension::sptr dim_ptr = grp_ptr->getDim( dvd.getDimensions()[i] );
+
+            if( dim_ptr )
+            {
+                dims.push_back( dim_ptr );
+            }
+            else
+            {
+                status = 1;
+            }
+
+        }
+
+        IVar::sptr var_ptr;
+        if( !status )
+        {
+            var_ptr = grp_ptr->addVar( dvd.name, dvd.datatype, dims );
+            status = var_ptr ? 0 : 1;
+        }
+
+        if( var_ptr )
+        {
+            var_ptr->putAtt( ATTRIB_KEY_DESC, dvd.description );
+            var_ptr->putAtt( ATTRIB_KEY_UNITS, dvd.units );
+            var_ptr->putAtt( ATTRIB_KEY_LNAME, dvd.long_name );
+            //misiing values?
+        }
+
+
+
         return status;
     }
 
