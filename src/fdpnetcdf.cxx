@@ -10,6 +10,12 @@ typedef netCDF::NcFile NcFile;
 typedef std::shared_ptr< NcGroup > NcGroupPtr;
 typedef std::shared_ptr< NcFile > NcFilePtr;
 
+#define ATTRIB_KEY_DESC "description"
+#define ATTRIB_KEY_LNAME "long_name"
+#define ATTRIB_KEY_FILLVALUE "_FillValue"
+#define ATTRIB_KEY_UNITS "units"
+#define ATTRIB_KEY_GROUP_TYPE "group_type"
+
 template< typename T >
         struct NcTraits;
 
@@ -1506,6 +1512,106 @@ namespace FairDataPipeline
         if( IFile::Mode::WRITE == mode )	
             _file->putAtt( "schema", 1 );
     }
+
+    std::string str_strip_right( std::string str, const std::string& chars )
+    {
+        str.erase( str.find_last_not_of( chars ) + 1 );
+        return str;
+    }
+
+    std::string str_strip_left( std::string str, const std::string& chars )
+    {
+        str.erase( 0, str.find_first_not_of( chars ) );
+        return str;
+    }
+
+    std::string str_strip( std::string str, const std::string& chars )
+    {
+        str = str_strip_right( str, chars );
+        str = str_strip_left( str, chars );
+        return str;
+    }
+
+    PARENT_ITEM_TYPE split_item_name( std::string str )
+    {
+        str = str_strip( str, "/" );
+
+        size_t pos = str.rfind( "/" );
+
+        std::string str_grp( str.begin(), str.begin() + pos );
+        std::string str_itm( str.begin() + pos +1 , str.end() );
+
+       return  std::make_pair( str_grp, str_itm );
+    }
+    int CoordinatVariableDefinition::UNLIMITED = 0;
+
+    bool CoordinatVariableDefinition::isUnlimited()
+    {
+        return this->size == CoordinatVariableDefinition::UNLIMITED;
+    }
+
+
+
+    int Builder::prepare( CoordinatVariableDefinition& cvd )
+    {
+        int status = 0;
+
+        PARENT_ITEM_TYPE parent_item = split_item_name( cvd.name );
+
+        const std::string& parent_grp_name = parent_item.first;
+        const std::string& itm_name = parent_item.second;
+
+        IGroup::sptr grp_ptr = _file->requireGroup( parent_grp_name );
+
+        status = ( grp_ptr != NULL ) 0 : 1;
+
+        IDimension::sptr dim_ptr;
+
+        if( grp_ptr )
+        {
+            IDimension::sptr dim_ptr;
+
+            if( cvd.isUnlimited() )
+                dim_ptr = grp_ptr->addUnlimitedDim( itm_name );
+            else
+                dim_ptr = grp_ptr->addDim( itm_name, cvd.size );
+        }
+
+        status = ( dim_ptr != NULL ) 0 : 1;
+
+        std::vector< IDimension::sptr > vdims = { dim_ptr };
+
+        IVar::sptr var_ptr;
+
+        var_ptr = grp_ptr->addVar( itm_name, cvd.datatype, vdims );
+
+        status = ( var_ptr != NULL ) 0 : 1;
+
+        if( !cvd.description.empty() )
+            var_ptr->putAtt( ATTRIB_KEY_DESC, cvd.description );
+
+        if( !cvd.units.empty() )
+            var_ptr->putAtt( ATTRIB_KEY_UNITS, cvd.units );
+
+        if( !cvd.long_name.empty )
+            var_ptr->putAtt( ATTRIB_KEY_LNAME, cvd.long_name );
+
+        //fill value?
+
+        return status;
+    }
+    int Builder::prepare( TableDefinition& td )
+    {
+        int status = 0;
+        return status;
+    }
+    int Builder::prepare( DimensionalVariableDefinition& dvd )
+    {
+        int status = 0;
+        return status;
+    }
+
+
 
     int Builder::readDim_metadata( const std::string& name
             , DimensionDefinition& dimdef )

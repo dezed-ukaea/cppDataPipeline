@@ -33,6 +33,27 @@ class BuilderTest : public ::testing::Test {
 
 namespace fdp = FairDataPipeline;
 
+TEST_F(BuilderTest, TestStringSplit) 
+{
+
+    ASSERT_EQ( fdp::str_strip_right( "/grp1/grp2/", "/" ), "/grp1/grp2" );
+    ASSERT_EQ( fdp::str_strip_right( "/grp1/grp2//", "/" ), "/grp1/grp2" );
+    ASSERT_EQ( fdp::str_strip_left( "//grp1/grp2/", "/" ), "grp1/grp2/" );
+
+    ASSERT_EQ( fdp::str_strip( "/grp1/grp2/", "/" ), "grp1/grp2" );
+    ASSERT_EQ( fdp::str_strip( "//grp1/grp2//", "/" ), "grp1/grp2" );
+}
+
+
+TEST_F(BuilderTest, TestGroupItemType ) 
+{
+    fdp::PARENT_ITEM_TYPE parent_item = fdp::split_item_name( "/grp1/grp2/itm" );
+
+    ASSERT_EQ( parent_item.first, "grp1/grp2" );
+    ASSERT_EQ( parent_item.second, "itm" );
+
+}
+
 TEST_F(BuilderTest, TestInterface) 
 {
     return;

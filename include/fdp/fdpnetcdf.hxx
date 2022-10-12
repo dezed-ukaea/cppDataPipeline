@@ -16,6 +16,18 @@
 
 namespace FairDataPipeline
 {
+    std::string str_strip_right( std::string str, const std::string& chars );
+
+    std::string str_strip_left( std::string str, const std::string& chars );
+
+    std::string str_strip( std::string str, const std::string& chars );
+
+    typedef std::pair< std::string, std::string > PARENT_ITEM_TYPE;
+
+    PARENT_ITEM_TYPE split_item_name( std::string str );
+
+
+
     enum DataType
     {
         BYTE,
@@ -45,22 +57,24 @@ namespace FairDataPipeline
 
 	struct VariableDefinition : netCDFComponentDefinition
 	{
-		int datatype;
+		DataType datatype;
 		std::string units;
 		int missing_value;
 	};
 
 	struct LocalVAriableDefinition : VariableDefinition
 	{
-        std::string local_name;
+        std::string name;
 	};
 
 	struct CoordinatVariableDefinition : VariableDefinition
 	{
 		int size;
-		int UNLIMITED;
+        static int UNLIMITED;
 		void* values;
 		std::string name;//variable name in jave splits the group and patgh
+
+        bool isUnlimited();
 	};
 
     struct DimensionalVariableDefinition : VariableDefinition
@@ -68,6 +82,13 @@ namespace FairDataPipeline
         std::vector< std::string > dimensions;
         std::string name;
     };
+
+    struct TableDefinition
+    {
+        std::vector< LocalVAriableDefinition > columns;
+        std::string grp_name;
+    };
+
 
 
 
@@ -264,6 +285,10 @@ namespace FairDataPipeline
             Builder( const Builder& rhs ) = delete;
 
             Builder( const std::string& path, IFile::Mode mode );
+
+            int prepare( CoordinatVariableDefinition& cvd );
+            int prepare( TableDefinition& td );
+            int prepare( DimensionalVariableDefinition& dvd );
 
             int writeArray( const std::string& name
                     , const ArrayDefinition& arraydef, const void* data );
