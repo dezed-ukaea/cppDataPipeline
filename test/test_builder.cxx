@@ -13,9 +13,11 @@ class BuilderTest : public ::testing::Test {
         void SetUp() override 
         {
             std::remove( "xtest.nc" );
+            std::remove( "xbuildertest.nc" );
         }
 
-        std::string getHomeDirectory() {
+        std::string getHomeDirectory() 
+        {
             std::string HomeDirectory;
 #ifdef _WIN32
             HomeDirectory = getenv("HOMEDRIVE");
@@ -33,9 +35,16 @@ class BuilderTest : public ::testing::Test {
 
 namespace fdp = FairDataPipeline;
 
+TEST_F(BuilderTest, TestCheckStatus) 
+{
+    ASSERT_TRUE( FDP_FILE_ISNOERR(0) );
+    ASSERT_FALSE( FDP_FILE_ISNOERR(1) );
+    ASSERT_TRUE( FDP_FILE_ISERR(1) );
+    ASSERT_FALSE( FDP_FILE_ISERR(0) );
+}
+
 TEST_F(BuilderTest, TestStringSplit) 
 {
-
     ASSERT_EQ( fdp::str_strip_right( "/grp1/grp2/", "/" ), "/grp1/grp2" );
     ASSERT_EQ( fdp::str_strip_right( "/grp1/grp2//", "/" ), "/grp1/grp2" );
     ASSERT_EQ( fdp::str_strip_left( "//grp1/grp2/", "/" ), "grp1/grp2/" );
@@ -51,7 +60,6 @@ TEST_F(BuilderTest, TestGroupItemType )
 
     ASSERT_EQ( parent_item.first, "grp1/grp2" );
     ASSERT_EQ( parent_item.second, "itm" );
-
 }
 
 TEST_F(BuilderTest, TestInterface) 
@@ -199,23 +207,23 @@ TEST_F(BuilderTest, TestInterface2)
 
         fdp::Builder builder2( "xtest.nc", fdp::IFile::Mode::WRITE );
 
-        int status = FDP_FILE_NOERR;
+        int status = FDP_FILE_STATUS_NOERR;
 
         status = builder2.writeDimension( "grp/dim1", dimdef1, dim1 );
-        ASSERT_EQ( FDP_FILE_NOERR, status );
+        ASSERT_EQ( FDP_FILE_STATUS_NOERR, status );
 
         status = builder2.writeDimension( "grp/dim2", dimdef2, dim2 );
-        ASSERT_EQ( FDP_FILE_NOERR, status );
+        ASSERT_EQ( FDP_FILE_STATUS_NOERR, status );
 
         status = builder2.writeArray( "grp/arr1", arrdef, data );
-        ASSERT_EQ( FDP_FILE_NOERR, status );
+        ASSERT_EQ( FDP_FILE_STATUS_NOERR, status );
 
         // write already existing dim name
         status = builder2.writeDimension( "grp/dim1", dimdef1, dim1 );
-        ASSERT_TRUE( FDP_FILE_NOERR != status );
+        ASSERT_TRUE( FDP_FILE_STATUS_NOERR != status );
 
         status = builder2.writeArray( "grp/arr1", arrdef, data );
-        ASSERT_TRUE( FDP_FILE_NOERR != status );
+        ASSERT_TRUE( FDP_FILE_STATUS_NOERR != status );
 
         fdp::ArrayDefinition arrdef_bad;
         arrdef_bad.units="arrunits";
@@ -225,13 +233,13 @@ TEST_F(BuilderTest, TestInterface2)
         arrdef_bad.dimension_names = { "baddim1", "baddim2" };
 
         status = builder2.writeArray( "grp/arr1", arrdef_bad, data );
-        ASSERT_TRUE( FDP_FILE_NOERR != status );
+        ASSERT_TRUE( FDP_FILE_STATUS_NOERR != status );
 
         fdp::ArrayDefinition arrdef_;
 
         status = builder2.readArray_metadata( "grp/arr1",  arrdef_ );
 
-        ASSERT_EQ( FDP_FILE_NOERR, status );
+        ASSERT_EQ( FDP_FILE_STATUS_NOERR, status );
         ASSERT_EQ( "arrunits", arrdef_.units );
         ASSERT_EQ( "arrdescription", arrdef_.description );
         //ASSERT_EQ( arrdef_.shape, arrdef.shape );
@@ -249,7 +257,7 @@ TEST_F(BuilderTest, TestInterface2)
         fdp::DimensionDefinition dimdef1_;
         status = builder2.readDim_metadata( "grp/dim1",  dimdef1_ );
 
-        ASSERT_EQ( FDP_FILE_NOERR, status );
+        ASSERT_EQ( FDP_FILE_STATUS_NOERR, status );
         ASSERT_EQ( 2, dimdef1_.size );
 
         ASSERT_EQ( "units1", dimdef1_.units );
@@ -259,7 +267,7 @@ TEST_F(BuilderTest, TestInterface2)
 
         status = builder2.readDim_data( "grp/dim1", dimdef1_, dim1_ );
 
-        ASSERT_EQ( FDP_FILE_NOERR, status );
+        ASSERT_EQ( FDP_FILE_STATUS_NOERR, status );
 
         for( int j = 0; j < 2; ++j )
             ASSERT_EQ( dim1[j], dim1_[j] );
@@ -267,7 +275,7 @@ TEST_F(BuilderTest, TestInterface2)
         fdp::DimensionDefinition dimdef2_;
         status = builder2.readDim_metadata( "grp/dim2", dimdef2_ );
 
-        ASSERT_EQ( FDP_FILE_NOERR, status );
+        ASSERT_EQ( FDP_FILE_STATUS_NOERR, status );
         ASSERT_EQ( 3, dimdef2_.size );
 
         ASSERT_EQ( "units2", dimdef2_.units );
@@ -297,7 +305,7 @@ TEST_F(BuilderTest, TestInterface2)
         fdp::IAtt::sptr att_ptr;
         status = builder2.getAtt( "grp/dim3", "dim3_att",  att_ptr );
 
-        ASSERT_EQ( FDP_FILE_NOERR, status );
+        ASSERT_EQ( FDP_FILE_STATUS_NOERR, status );
 
         ASSERT_TRUE( NULL != att_ptr );
 
@@ -307,7 +315,7 @@ TEST_F(BuilderTest, TestInterface2)
 
         status = builder2.getAtt( "grp/dim3", "bad_att",  att_ptr );
 
-        ASSERT_NE( FDP_FILE_NOERR, status );
+        ASSERT_NE( FDP_FILE_STATUS_NOERR, status );
 
         ASSERT_TRUE( NULL == att_ptr );
 

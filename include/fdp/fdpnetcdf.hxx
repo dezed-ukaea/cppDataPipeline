@@ -11,8 +11,11 @@
 
 //#include "fdp/fdparrayref.hxx"
 //
-#define FDP_FILE_NOERR 0
-#define FDP_FILE_ERR 1
+#define FDP_FILE_STATUS_NOERR 0
+#define FDP_FILE_STATUS_ERR 1
+
+#define FDP_FILE_ISNOERR(x) (0 == x)
+#define FDP_FILE_ISERR(x) (!FDP_FILE_ISNOERR(x))
 
 namespace FairDataPipeline
 {
@@ -52,14 +55,28 @@ namespace FairDataPipeline
 	{
 		std::string description;
 		std::string long_name;
-		std::map< std::string, std::vector<std::string> > optional_attribs;
+		//std::map< std::string, std::vector<std::string> > optional_attribs;
 	};
 
 	struct VariableDefinition : netCDFComponentDefinition
 	{
 		DataType datatype;
 		std::string units;
-		int missing_value;
+        std::shared_ptr< void > _missing_ptr;
+        size_t _sz_missing;
+
+        template< typename T >
+        int setFillValue( const T& pval )
+        {
+            int status = 0;
+
+            std::shared_ptr<T> p( new T() );
+
+            _missing_ptr = p;
+            _sz_missing = sizeof( T );
+
+            return status;
+        }
 	};
 
 	struct LocalVAriableDefinition : VariableDefinition
@@ -74,7 +91,7 @@ namespace FairDataPipeline
 		void* values;
 		std::string name;//variable name in jave splits the group and patgh
 
-        bool isUnlimited();
+        bool isUnlimited() const;
 	};
 
     struct DimensionalVariableDefinition : VariableDefinition
@@ -91,8 +108,8 @@ namespace FairDataPipeline
         std::string name;
         size_t size;
 
-        size_t getSize();
-        bool isUnlimited();
+        size_t getSize() const;
+        bool isUnlimited() const;
         const std::string& getName() const { return name;}
         std::string getVariableName( int i );
     };
@@ -185,6 +202,9 @@ namespace FairDataPipeline
         virtual IVarAtt::sptr putAtt( const std::string& key, size_t nvals, const double* values ) = 0;
         
         virtual IVarAtt::sptr putAtt( const std::string& key, size_t nvals, const char** values ) = 0;
+       virtual  IVarAtt::sptr putAtt( const std::string& key
+                , DataType datatype, size_t nvals, void* pv ) = 0;
+
 
         virtual IVarAtt::sptr getAtt( const std::string& key ) = 0;
     };
@@ -294,9 +314,9 @@ namespace FairDataPipeline
 
             Builder( const std::string& path, IFile::Mode mode );
 
-            int prepare( CoordinatVariableDefinition& cvd );
-            int prepare( TableDefinition& td );
-            int prepare( DimensionalVariableDefinition& dvd );
+            int prepare( const CoordinatVariableDefinition& cvd );
+            int prepare( const TableDefinition& td );
+            int prepare( const DimensionalVariableDefinition& dvd );
 
             int writeArray( const std::string& name
                     , const ArrayDefinition& arraydef, const void* data );

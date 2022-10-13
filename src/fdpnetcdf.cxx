@@ -16,6 +16,7 @@ typedef std::shared_ptr< NcFile > NcFilePtr;
 #define ATTRIB_KEY_UNITS "units"
 #define ATTRIB_KEY_GROUP_TYPE "group_type"
 
+
 template< typename T >
         struct NcTraits;
 
@@ -83,6 +84,59 @@ template< typename T >
 
 namespace FairDataPipeline
 {
+template< int > struct  DataTypeTraits;
+
+template<>
+struct DataTypeTraits< DataType::CHAR >
+{
+    typedef char native_type;
+};
+
+template<>
+struct DataTypeTraits< DataType::SHORT >
+{
+    typedef short native_type;
+};
+
+template<>
+struct DataTypeTraits< DataType::INT >
+{
+    typedef int native_type;
+};
+
+template<>
+struct DataTypeTraits< DataType::INT64 >
+{
+    typedef long native_type;
+};
+
+//template<>
+//struct DataTypeTraits< DataType::UCHAR >
+//{
+//    typedef unsigned char native_type;
+//};
+
+template<>
+struct DataTypeTraits< DataType::USHORT >
+{
+    typedef unsigned short native_type;
+};
+
+template<>
+struct DataTypeTraits< DataType::UINT >
+{
+    typedef unsigned int native_type;
+};
+
+template<>
+struct DataTypeTraits< DataType::UINT64 >
+{
+    typedef long native_type;
+};
+
+
+
+
     class GroupImpl;
     typedef std::shared_ptr< GroupImpl > GroupImplSptr;
 
@@ -246,6 +300,69 @@ namespace FairDataPipeline
 
             IVarAtt::sptr putAtt( const std::string& key, size_t nvals, const char** values );
 
+            IVarAtt::sptr putAtt( const std::string& key
+                    , DataType datatype, size_t nvals, void* pv )
+            {
+                IVarAtt::sptr att_ptr;
+                switch( datatype )
+                {
+                    case DataType::SHORT:
+
+                        this->putAtt( ATTRIB_KEY_FILLVALUE, 1
+                                , (const short*)(pv) );
+                        break;
+
+                    case DataType::INT:
+
+                        this->putAtt( ATTRIB_KEY_FILLVALUE, 1
+                                , (const int*)(pv) );
+                        break;
+                    case DataType::INT64:
+
+                        this->putAtt( ATTRIB_KEY_FILLVALUE, 1
+                                , (const long*)(pv) );
+                        break;
+                    case DataType::USHORT:
+
+                        this->putAtt( ATTRIB_KEY_FILLVALUE, 1
+                                , (const unsigned short*)(pv) );
+                        break;
+
+                    case DataType::UINT:
+
+                        this->putAtt( ATTRIB_KEY_FILLVALUE, 1
+                                , (const unsigned int*)(pv) );
+                        break;
+                    case DataType::UINT64:
+
+                        this->putAtt( ATTRIB_KEY_FILLVALUE, 1
+                                , (const unsigned long*)(pv) );
+                        break;
+
+
+                    case DataType::FLOAT:
+
+                        this->putAtt( ATTRIB_KEY_FILLVALUE, 1
+                                , (const float*)(pv) );
+                        break;
+                    case DataType::DOUBLE:
+
+                        this->putAtt( ATTRIB_KEY_FILLVALUE, 1
+                                , (const double*)(pv) );
+                        break;
+
+
+
+                    default:
+                        std::cerr << __FUNCTION__ << ": Unhandled datatype";
+                        break;
+
+             
+                }
+                return att_ptr;
+            }
+
+
 
 
             IVarAtt::sptr getAtt( const std::string& key );
@@ -394,7 +511,7 @@ namespace FairDataPipeline
     template< typename T > 
         int GroupAtt::getValuesImpl( T* values )
         {
-            int status =FDP_FILE_NOERR;
+            int status =FDP_FILE_STATUS_NOERR;
 
             try
             {
@@ -403,7 +520,7 @@ namespace FairDataPipeline
             catch( NcException& e )
             {
                 e.what();
-		status = FDP_FILE_ERR;
+		status = FDP_FILE_STATUS_ERR;
             }
 
             return status;
@@ -462,7 +579,7 @@ namespace FairDataPipeline
 
     int GroupAtt::getValues( std::string& values )
     {
-        int status = FDP_FILE_NOERR;
+        int status = FDP_FILE_STATUS_NOERR;
 
         try
         {
@@ -471,7 +588,7 @@ namespace FairDataPipeline
         catch( NcException& e )
         {
             e.what();
-	    status = FDP_FILE_ERR;
+	    status = FDP_FILE_STATUS_ERR;
         }
 
         return status;
@@ -517,7 +634,7 @@ namespace FairDataPipeline
     template< typename T > 
         int VarAtt::getValuesImpl( T* values )
         {
-            int status = FDP_FILE_NOERR;
+            int status = FDP_FILE_STATUS_NOERR;
 
             try
             {
@@ -526,7 +643,7 @@ namespace FairDataPipeline
             catch( NcException& e )
             {
                 e.what();
-		status = FDP_FILE_ERR;
+		status = FDP_FILE_STATUS_ERR;
             }
 
             return status;
@@ -585,7 +702,7 @@ namespace FairDataPipeline
 
     int VarAtt::getValues( std::string& values )
     {
-        int status = FDP_FILE_NOERR;
+        int status = FDP_FILE_STATUS_NOERR;
 
         try
         {
@@ -594,7 +711,7 @@ namespace FairDataPipeline
         catch( NcException& e )
         {
             e.what();
-	    status = FDP_FILE_ERR;
+	    status = FDP_FILE_STATUS_ERR;
         }
 
         return status;
@@ -1545,17 +1662,17 @@ namespace FairDataPipeline
     }
     int CoordinatVariableDefinition::UNLIMITED = 0;
 
-    bool CoordinatVariableDefinition::isUnlimited()
+    bool CoordinatVariableDefinition::isUnlimited() const
     {
         return this->size == CoordinatVariableDefinition::UNLIMITED;
     }
 
-    size_t TableDefinition::getSize()
+    size_t TableDefinition::getSize() const
     {
         return this->size;
     }
 
-    bool TableDefinition::isUnlimited()
+    bool TableDefinition::isUnlimited() const
     {
         return this->getSize() == CoordinatVariableDefinition::UNLIMITED;
     }
@@ -1570,18 +1687,17 @@ namespace FairDataPipeline
 
 
 
-    int Builder::prepare( CoordinatVariableDefinition& cvd )
+    int Builder::prepare( const CoordinatVariableDefinition& cvd )
     {
         int status = 0;
 
-        PARENT_ITEM_TYPE parent_item = split_item_name( cvd.name );
+        PARENT_ITEM_TYPE grp_item = split_item_name( cvd.name );
+        const std::string& grp_name = grp_item.first;
+        const std::string itm_name = grp_item.second;
 
-        const std::string& parent_grp_name = parent_item.first;
-        const std::string& itm_name = parent_item.second;
+        IGroup::sptr grp_ptr = _file->requireGroup( grp_name );
 
-        IGroup::sptr grp_ptr = _file->requireGroup( parent_grp_name );
-
-        status = ( grp_ptr != NULL ) ? 0 : 1;
+        status = ( grp_ptr != NULL )  ?FDP_FILE_STATUS_NOERR : FDP_FILE_STATUS_ERR;
 
         IDimension::sptr dim_ptr;
 
@@ -1595,7 +1711,7 @@ namespace FairDataPipeline
                 dim_ptr = grp_ptr->addDim( itm_name, cvd.size );
         }
 
-        status = ( dim_ptr != NULL ) ? 0 : 1;
+        status = ( dim_ptr != NULL ) ? FDP_FILE_STATUS_NOERR : FDP_FILE_STATUS_ERR;
 
         std::vector< IDimension::sptr > vdims = { dim_ptr };
 
@@ -1603,7 +1719,7 @@ namespace FairDataPipeline
 
         var_ptr = grp_ptr->addVar( itm_name, cvd.datatype, vdims );
 
-        status = ( var_ptr != NULL ) ? 0 : 1;
+        status = ( var_ptr != NULL ) ? FDP_FILE_STATUS_NOERR : FDP_FILE_STATUS_ERR;
 
         if( !cvd.description.empty() )
             var_ptr->putAtt( ATTRIB_KEY_DESC, cvd.description );
@@ -1614,11 +1730,12 @@ namespace FairDataPipeline
         if( !cvd.long_name.empty() )
             var_ptr->putAtt( ATTRIB_KEY_LNAME, cvd.long_name );
 
-        //fill value?
+        if(cvd._missing_ptr)
+            var_ptr->putAtt( ATTRIB_KEY_FILLVALUE, cvd.datatype, 1, cvd._missing_ptr.get() );
 
         return status;
     }
-    int Builder::prepare( TableDefinition& td )
+    int Builder::prepare( const TableDefinition& td )
     {
         int status = 0;
 
@@ -1655,8 +1772,18 @@ namespace FairDataPipeline
 
             if( !td.long_name.empty() )
                 grp_ptr->putAtt( ATTRIB_KEY_LNAME, td.long_name );
-
+#if 0
              // add the optional attribs
+            for( int i  = 0; i < td.optional_attribs.size(); ++i )
+            {
+                std::string key = "key" + std::to_string( i );
+                int* pv = &i;
+                size_t nvals = 1;
+                DataType datatype = INT;
+
+                grp_ptr->putAtt( key, nvals, pv );
+            }
+#endif
              //
              // add the columns as DimensionalVariableDefinitions
              grp_ptr->putAtt( ATTRIB_KEY_GROUP_TYPE, "table" );
@@ -1672,7 +1799,7 @@ namespace FairDataPipeline
         return this->dimensions;
     }
 
-    int Builder::prepare( DimensionalVariableDefinition& dvd )
+    int Builder::prepare( const DimensionalVariableDefinition& dvd )
     {
         int status = 0;
 
@@ -1713,7 +1840,71 @@ namespace FairDataPipeline
             var_ptr->putAtt( ATTRIB_KEY_DESC, dvd.description );
             var_ptr->putAtt( ATTRIB_KEY_UNITS, dvd.units );
             var_ptr->putAtt( ATTRIB_KEY_LNAME, dvd.long_name );
+
+            if( dvd._missing_ptr )
+                var_ptr->putAtt( ATTRIB_KEY_FILLVALUE, dvd.datatype, 1
+                        , dvd._missing_ptr.get() );
+#if 0
             //misiing values?
+            if( dvd._missing_ptr)
+            {
+                switch( dvd.datatype )
+                {
+                    case DataType::SHORT:
+
+                        var_ptr->putAtt( ATTRIB_KEY_FILLVALUE, 1
+                                , (const short*)(dvd._missing_ptr.get()) );
+                        break;
+
+                    case DataType::INT:
+
+                        var_ptr->putAtt( ATTRIB_KEY_FILLVALUE, 1
+                                , (const int*)(dvd._missing_ptr.get()) );
+                        break;
+                    case DataType::INT64:
+
+                        var_ptr->putAtt( ATTRIB_KEY_FILLVALUE, 1
+                                , (const long*)(dvd._missing_ptr.get()) );
+                        break;
+                    case DataType::USHORT:
+
+                        var_ptr->putAtt( ATTRIB_KEY_FILLVALUE, 1
+                                , (const unsigned short*)(dvd._missing_ptr.get()) );
+                        break;
+
+                    case DataType::UINT:
+
+                        var_ptr->putAtt( ATTRIB_KEY_FILLVALUE, 1
+                                , (const unsigned int*)(dvd._missing_ptr.get()) );
+                        break;
+                    case DataType::UINT64:
+
+                        var_ptr->putAtt( ATTRIB_KEY_FILLVALUE, 1
+                                , (const unsigned long*)(dvd._missing_ptr.get()) );
+                        break;
+
+
+                    case DataType::FLOAT:
+
+                        var_ptr->putAtt( ATTRIB_KEY_FILLVALUE, 1
+                                , (const float*)(dvd._missing_ptr.get()) );
+                        break;
+                    case DataType::DOUBLE:
+
+                        var_ptr->putAtt( ATTRIB_KEY_FILLVALUE, 1
+                                , (const double*)(dvd._missing_ptr.get()) );
+                        break;
+
+
+
+                    default:
+                        std::cerr << __FUNCTION__ << ": Unhandled datatype";
+                        break;
+
+                }
+            }
+
+#endif
         }
 
 
@@ -1772,10 +1963,10 @@ namespace FairDataPipeline
                 dimdef.units = units;
                 dimdef.description = description;
             }
-            else status = FDP_FILE_ERR;
+            else status = FDP_FILE_STATUS_ERR;
         }
         else
-            status = FDP_FILE_ERR;
+            status = FDP_FILE_STATUS_ERR;
 
         return status;
     }
@@ -1809,10 +2000,10 @@ namespace FairDataPipeline
             if( var_ptr )
                 var_ptr->getVar( data );
             else
-                status = FDP_FILE_ERR;
+                status = FDP_FILE_STATUS_ERR;
         }
         else 
-            status = FDP_FILE_ERR;
+            status = FDP_FILE_STATUS_ERR;
 
         return status;
     }
@@ -1903,10 +2094,10 @@ namespace FairDataPipeline
                 arraydef.description = description;
             }
             else
-                status = FDP_FILE_ERR;
+                status = FDP_FILE_STATUS_ERR;
         }
         else
-            status = FDP_FILE_ERR;
+            status = FDP_FILE_STATUS_ERR;
 
         return status;
     }
@@ -1938,10 +2129,10 @@ namespace FairDataPipeline
             if( var_ptr )
                 var_ptr->getVar( data );
             else
-                status = FDP_FILE_ERR;
+                status = FDP_FILE_STATUS_ERR;
         }
         else
-            status = FDP_FILE_ERR;
+            status = FDP_FILE_STATUS_ERR;
 
         return status;
     }
@@ -1985,7 +2176,7 @@ namespace FairDataPipeline
             dim_var_ptr->putAtt( "description", dimdef.description );
         }
         else
-            status = FDP_FILE_ERR;
+            status = FDP_FILE_STATUS_ERR;
 
         return status;
     }
@@ -2024,7 +2215,7 @@ namespace FairDataPipeline
                 vdims.push_back( dim_ptrs[0] );
             }
             else 
-                status = FDP_FILE_ERR;
+                status = FDP_FILE_STATUS_ERR;
         }                    
 
         if( !status )
@@ -2056,7 +2247,7 @@ namespace FairDataPipeline
                 arr_var_ptr->putAtt( "description", arraydef.description );
             }
             else
-                status = FDP_FILE_ERR;
+                status = FDP_FILE_STATUS_ERR;
         }
 
         return status;
@@ -2098,11 +2289,11 @@ namespace FairDataPipeline
                 if( var_ptr )
                     var_ptr->putAtt( key, nvals, values );
                 else
-                    status = FDP_FILE_ERR;
+                    status = FDP_FILE_STATUS_ERR;
             }
         }
         else
-            status = FDP_FILE_ERR;
+            status = FDP_FILE_STATUS_ERR;
 
         return status;
     }
@@ -2140,11 +2331,11 @@ namespace FairDataPipeline
                 if( var_ptr )
                     var_ptr->putAtt( key, nvals, values );
                 else
-                    status = FDP_FILE_ERR;
+                    status = FDP_FILE_STATUS_ERR;
             }
         }
         else
-            status = FDP_FILE_ERR;
+            status = FDP_FILE_STATUS_ERR;
 
         return status;
     }
@@ -2242,7 +2433,7 @@ namespace FairDataPipeline
 
                 att_ptr = grp_att_ptr;
 
-                status = (att_ptr != NULL) ? FDP_FILE_NOERR : FDP_FILE_ERR;
+                status = (att_ptr != NULL) ? FDP_FILE_STATUS_NOERR : FDP_FILE_STATUS_ERR;
             }
             else
             {
@@ -2255,17 +2446,16 @@ namespace FairDataPipeline
 
                     att_ptr = var_att_ptr;
 
-                    status = (att_ptr != NULL) ? FDP_FILE_NOERR : FDP_FILE_ERR;
+                    status = (att_ptr != NULL) ? FDP_FILE_STATUS_NOERR : FDP_FILE_STATUS_ERR;
                 }
                 else
-                    status = FDP_FILE_ERR;
+                    status = FDP_FILE_STATUS_ERR;
             }
         }
         else
-            status = FDP_FILE_ERR;
+            status = FDP_FILE_STATUS_ERR;
 
         return status;
-
     }
 
 
