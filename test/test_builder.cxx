@@ -68,7 +68,15 @@ TEST_F(BuilderTest, TestInterface)
 
     ASSERT_TRUE( NULL != ibuilder );
 
+    auto root_grp_ptr = ibuilder->requireGroup( "" );
+    ASSERT_EQ( ibuilder, root_grp_ptr );
+
     auto grp_bob_ptr = ibuilder->requireGroup("bob");
+    
+    auto tmp_grp_ptr = grp_bob_ptr->requireGroup("");
+
+    ASSERT_EQ( tmp_grp_ptr, grp_bob_ptr );
+
     grp_bob_ptr->putAtt( "int", 123 );
     grp_bob_ptr->putAtt( "float", 123.123f );
     grp_bob_ptr->putAtt( "string", "a string" );
@@ -379,7 +387,9 @@ TEST_F(BuilderTest, TestPrepareCoordinateVar)
     cvdef1.datatype = fdp::DataType::INT;
     cvdef1.units = "";
 
-    //file_ptr->prepare( cvdef1 );
+    int status = file_ptr->prepare( cvdef1 );
+
+    ASSERT_TRUE( FDP_FILE_ISNOERR( status ) );
 
 //	    new CoordinateVariableDefinition(
 			//    "dim", new int[] {1, 2, 3}, "", "", "");
@@ -389,3 +399,50 @@ TEST_F(BuilderTest, TestPrepareCoordinateVar)
 
 }
 
+TEST_F(BuilderTest, TestPrepareCoordinateVars)
+{
+    std::string path = "test_prepare_coordinate_vars.nc";
+    std::remove( path.c_str() );
+
+    fdp::IFile::sptr file_ptr = fdp::FileFactory::create( path, fdp::IFile::Mode::WRITE );
+
+    ASSERT_TRUE( NULL != file_ptr );
+
+    int status = FDP_FILE_STATUS_NOERR;
+
+
+    int dim_values1[] = {1,2,3};
+    fdp::CoordinatVariableDefinition cvdef1; 
+    cvdef1.name = "dim";
+    cvdef1.values = &dim_values1;
+    cvdef1.size = 3;
+    cvdef1.datatype = fdp::DataType::INT;
+    cvdef1.units = "";
+
+    status = file_ptr->prepare( cvdef1 );
+
+    int dim_values2[] = {1,2,3, 4};
+    fdp::CoordinatVariableDefinition cvdef2; 
+    cvdef2.name = "one/dim";
+    cvdef2.values = &dim_values2;
+    cvdef2.size = 4;
+    cvdef2.datatype = fdp::DataType::INT;
+    cvdef2.units = "";
+
+    status = file_ptr->prepare( cvdef2 );
+
+    //fdp::DimensionalVariableDefinition dvd;
+    //dvd.name = "one/two/var";
+    //dvd.datatype = fdp::DataType::INT;
+    //dvd.dimensions = {"dim"};
+
+
+
+
+
+    ASSERT_TRUE( FDP_FILE_ISNOERR( status ) );
+
+//	    new CoordinateVariableDefinition(
+			//    "dim", new int[] {1, 2, 3}, "", "", "");
+
+}

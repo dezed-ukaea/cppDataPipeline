@@ -33,6 +33,7 @@ namespace FairDataPipeline
 
     enum DataType
     {
+        UNKNOWN,
         BYTE,
         CHAR,
         SHORT,
@@ -53,13 +54,23 @@ namespace FairDataPipeline
 
 	struct netCDFComponentDefinition
 	{
+        netCDFComponentDefinition()
+        {
+        }
+
 		std::string description;
 		std::string long_name;
+
 		//std::map< std::string, std::vector<std::string> > optional_attribs;
 	};
 
 	struct VariableDefinition : netCDFComponentDefinition
 	{
+        VariableDefinition() : netCDFComponentDefinition(), _sz_missing(0)
+        {
+            datatype = DataType::UNKNOWN;
+        }
+
 		DataType datatype;
 		std::string units;
         std::shared_ptr< void > _missing_ptr;
@@ -81,11 +92,21 @@ namespace FairDataPipeline
 
 	struct LocalVAriableDefinition : VariableDefinition
 	{
+        LocalVAriableDefinition() : VariableDefinition()
+        {
+        }
+
         std::string name;
 	};
 
 	struct CoordinatVariableDefinition : VariableDefinition
 	{
+        CoordinatVariableDefinition() : VariableDefinition()
+        {
+            size=0;
+            values = NULL;
+        }
+
 		int size;
         static int UNLIMITED;
 		void* values;
@@ -96,6 +117,10 @@ namespace FairDataPipeline
 
     struct DimensionalVariableDefinition : VariableDefinition
     {
+        DimensionalVariableDefinition() : VariableDefinition()
+        {
+        }
+
         std::vector< std::string > dimensions;
         std::string name;
 
@@ -104,6 +129,17 @@ namespace FairDataPipeline
 
     struct TableDefinition : netCDFComponentDefinition
     {
+        TableDefinition() : netCDFComponentDefinition()
+        {
+            size = 0;
+        }
+
+        const std::vector< LocalVAriableDefinition >& getColumns() const
+        {
+            return this->columns;
+        }
+
+
         std::vector< LocalVAriableDefinition > columns;
         std::string name;
         size_t size;
@@ -273,6 +309,8 @@ namespace FairDataPipeline
 
 	virtual int prepare( const CoordinatVariableDefinition& cvd ) = 0;
 
+    virtual int prepare( const DimensionalVariableDefinition& dvd ) = 0;
+
     };
 
     struct IFile : public IGroup
@@ -320,8 +358,6 @@ namespace FairDataPipeline
             Builder( const std::string& path, IFile::Mode mode );
 
             //int prepare( const CoordinatVariableDefinition& cvd );
-            int prepare( const TableDefinition& td );
-            int prepare( const DimensionalVariableDefinition& dvd );
 
             int writeArray( const std::string& name
                     , const ArrayDefinition& arraydef, const void* data );

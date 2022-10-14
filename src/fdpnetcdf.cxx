@@ -1016,7 +1016,10 @@ struct DataTypeTraits< DataType::UINT64 >
             
 
 
-    int prepare( const CoordinatVariableDefinition& cvd );
+            int prepare( const CoordinatVariableDefinition& cvd );
+            int prepare( const TableDefinition& td );
+
+            int prepare( const DimensionalVariableDefinition& dvd );
 
         protected:
 
@@ -1672,29 +1675,28 @@ struct DataTypeTraits< DataType::UINT64 >
 
     PARENT_ITEM_TYPE split_item_name( std::string str )
     {
-	    std::cout << __FUNCTION__ << ":" << str << std::endl;
         str = str_strip( str, "/" );
 
         size_t pos = str.rfind( "/" );
-std::cout << "POS:" << pos << std::endl;
-std::string str_grp;
-std::string str_itm;
 
-	if( std::string::npos == pos )
-	{
-		//not found
-		str_grp = "";
-		str_itm = str;
-	}
-	else
-	{
+        std::string str_grp;
+        std::string str_itm;
 
-		str_grp = std::string( str.begin(), str.begin() + pos );
-		str_itm = std::string( str.begin() + pos +1 , str.end() );
-	}
+        if( std::string::npos == pos )
+        {
+            //not found
+            str_grp = "";
+            str_itm = str;
+        }
+        else
+        {
+            str_grp = std::string( str.begin(), str.begin() + pos );
+            str_itm = std::string( str.begin() + pos +1 , str.end() );
+        }
 
-       return  std::make_pair( str_grp, str_itm );
+        return  std::make_pair( str_grp, str_itm );
     }
+
     int CoordinatVariableDefinition::UNLIMITED = 0;
 
     bool CoordinatVariableDefinition::isUnlimited() const
@@ -1726,15 +1728,11 @@ std::string str_itm;
     {
         int status = 0;
 
-	std::cout << "XXXXXXXXXXXXXX\n";
         PARENT_ITEM_TYPE grp_item = split_item_name( cvd.name );
-	std::cout << "AAAAAAA\n";
-        const std::string& grp_name = grp_item.first;
 
+        const std::string& grp_name = grp_item.first;
         const std::string& itm_name = grp_item.second;
 
-	std::cout << "BBBBBAAAAAAA\n";
-	std::cout << "GRP:" << grp_name << ":";
         IGroup::sptr grp_ptr = this->requireGroup( grp_name );
 
         status = ( grp_ptr != NULL )  ?FDP_FILE_STATUS_NOERR : FDP_FILE_STATUS_ERR;
@@ -1743,8 +1741,6 @@ std::string str_itm;
 
         if( grp_ptr )
         {
-            IDimension::sptr dim_ptr;
-
             if( cvd.isUnlimited() )
                 dim_ptr = grp_ptr->addUnlimitedDim( itm_name );
             else
@@ -1775,7 +1771,7 @@ std::string str_itm;
 
         return status;
     }
-    int Builder::prepare( const TableDefinition& td )
+    int GroupImpl::prepare( const TableDefinition& td )
     {
         int status = 0;
 
@@ -1783,7 +1779,7 @@ std::string str_itm;
         const std::string& grp_name = parent_item.first;
         const std::string& itm_name = parent_item.second;
 
-        IGroup::sptr grp_ptr = _file->requireGroup( grp_name );
+        IGroup::sptr grp_ptr = this->requireGroup( grp_name );
 
         status = ( grp_ptr != NULL ) ? 0 : 1;
 
@@ -1794,8 +1790,6 @@ std::string str_itm;
 
             if( grp_ptr )
             {
-                IDimension::sptr dim_ptr;
-
                 if( td.isUnlimited() )
                     dim_ptr = grp_ptr->addUnlimitedDim( dim_name );
                 else
@@ -1826,9 +1820,20 @@ std::string str_itm;
 #endif
              //
              // add the columns as DimensionalVariableDefinitions
+             for( int i = 0; i < td.getColumns().size(); ++i )
+             {
+                 const LocalVAriableDefinition& lvd = td.getColumns()[i];
+
+
+                 DimensionalVariableDefinition dvd;
+                 dvd.name = this->getName() + "/";// + lvd.name
+                 dvd.name += lvd.name;
+                 dvd.datatype = lvd.datatype;
+
+                 this->prepare( dvd );
+             }
+
              grp_ptr->putAtt( ATTRIB_KEY_GROUP_TYPE, "table" );
-            
-            
         }
         
         return status;
@@ -1839,7 +1844,7 @@ std::string str_itm;
         return this->dimensions;
     }
 
-    int Builder::prepare( const DimensionalVariableDefinition& dvd )
+    int GroupImpl::prepare( const DimensionalVariableDefinition& dvd )
     {
         int status = 0;
 
@@ -1847,7 +1852,7 @@ std::string str_itm;
         const std::string& grp_name = grp_item.first;
         const std::string& itm_name = grp_item.second;
 
-        IGroup::sptr grp_ptr = _file->requireGroup( grp_name );
+        IGroup::sptr grp_ptr = this->requireGroup( grp_name );
 
         status = grp_ptr ? 0 : 1;
 
