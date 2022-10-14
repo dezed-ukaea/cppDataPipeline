@@ -339,8 +339,24 @@ TEST_F(BuilderTest, TestGroupWithDim)
     {
         fdp::IDimension::sptr dim_ptr = grp_ptr->addDim( "bla", 3 );
     }
+}
+
+TEST_F(BuilderTest, Test2GroupWithDim) 
+{
+    std::string path = "test_2group_with_dim.nc";
+    std::remove( path.c_str() );
+
+    fdp::IFile::sptr file_ptr = fdp::FileFactory::create( path, fdp::IFile::Mode::WRITE );
+
+    ASSERT_TRUE( NULL != file_ptr );
 
 
+    fdp::IGroup::sptr grp1_ptr = file_ptr->requireGroup( "aap/noot/mies" );
+    fdp::IGroup::sptr grp2_ptr = file_ptr->requireGroup( "aap/noot/mies/pis" );
 
+    grp1_ptr->addDim( "miesdim", 3 );
+    grp2_ptr->addDim( "pisdim", 2 );
 
+    ASSERT_TRUE( NULL != grp1_ptr );
+    ASSERT_TRUE( NULL != grp2_ptr );
 }
