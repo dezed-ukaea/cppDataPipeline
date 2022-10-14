@@ -1016,6 +1016,7 @@ struct DataTypeTraits< DataType::UINT64 >
             
 
 
+    int prepare( const CoordinatVariableDefinition& cvd );
 
         protected:
 
@@ -1468,10 +1469,13 @@ struct DataTypeTraits< DataType::UINT64 >
 
     IGroup::sptr GroupImpl::requireGroup( const std::string& name )
     {
+
+        IGroup::sptr parent_grp_ptr = this->shared_from_this();
+	    if( name.empty() ) return parent_grp_ptr;
+
         std::vector< std::string > splits;
         split_str( name, '/', splits );
 
-        IGroup::sptr parent_grp_ptr = this->shared_from_this();
         IGroup::sptr grp_ptr;
 
         for( auto it = splits.begin(); it != splits.end(); ++it )
@@ -1668,12 +1672,26 @@ struct DataTypeTraits< DataType::UINT64 >
 
     PARENT_ITEM_TYPE split_item_name( std::string str )
     {
+	    std::cout << __FUNCTION__ << ":" << str << std::endl;
         str = str_strip( str, "/" );
 
         size_t pos = str.rfind( "/" );
+std::cout << "POS:" << pos << std::endl;
+std::string str_grp;
+std::string str_itm;
 
-        std::string str_grp( str.begin(), str.begin() + pos );
-        std::string str_itm( str.begin() + pos +1 , str.end() );
+	if( std::string::npos == pos )
+	{
+		//not found
+		str_grp = "";
+		str_itm = str;
+	}
+	else
+	{
+
+		str_grp = std::string( str.begin(), str.begin() + pos );
+		str_itm = std::string( str.begin() + pos +1 , str.end() );
+	}
 
        return  std::make_pair( str_grp, str_itm );
     }
@@ -1704,15 +1722,20 @@ struct DataTypeTraits< DataType::UINT64 >
 
 
 
-    int Builder::prepare( const CoordinatVariableDefinition& cvd )
+    int GroupImpl::prepare( const CoordinatVariableDefinition& cvd )
     {
         int status = 0;
 
+	std::cout << "XXXXXXXXXXXXXX\n";
         PARENT_ITEM_TYPE grp_item = split_item_name( cvd.name );
+	std::cout << "AAAAAAA\n";
         const std::string& grp_name = grp_item.first;
-        const std::string itm_name = grp_item.second;
 
-        IGroup::sptr grp_ptr = _file->requireGroup( grp_name );
+        const std::string& itm_name = grp_item.second;
+
+	std::cout << "BBBBBAAAAAAA\n";
+	std::cout << "GRP:" << grp_name << ":";
+        IGroup::sptr grp_ptr = this->requireGroup( grp_name );
 
         status = ( grp_ptr != NULL )  ?FDP_FILE_STATUS_NOERR : FDP_FILE_STATUS_ERR;
 

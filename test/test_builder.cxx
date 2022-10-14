@@ -360,3 +360,32 @@ TEST_F(BuilderTest, Test2GroupWithDim)
     ASSERT_TRUE( NULL != grp1_ptr );
     ASSERT_TRUE( NULL != grp2_ptr );
 }
+
+TEST_F(BuilderTest, TestPrepareCoordinateVar)
+{
+    std::string path = "test_prepare_coordinate_var.nc";
+    std::remove( path.c_str() );
+
+    fdp::IFile::sptr file_ptr = fdp::FileFactory::create( path, fdp::IFile::Mode::WRITE );
+
+    ASSERT_TRUE( NULL != file_ptr );
+
+
+    int dim_values1[] = {1,2,3};
+    fdp::CoordinatVariableDefinition cvdef1; 
+    cvdef1.name = "dim";
+    cvdef1.values = &dim_values1;
+    cvdef1.size = 3;
+    cvdef1.datatype = fdp::DataType::INT;
+    cvdef1.units = "";
+
+    //file_ptr->prepare( cvdef1 );
+
+//	    new CoordinateVariableDefinition(
+			//    "dim", new int[] {1, 2, 3}, "", "", "");
+    fdp::CoordinatVariableDefinition cvdef2 ;
+//	    new CoordinateVariableDefinition(
+//			    new VariableName("dim", "one"), new int[] {1, 2, 3, 4}, "", "", "");
+
+}
+

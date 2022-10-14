@@ -268,6 +268,11 @@ namespace FairDataPipeline
         virtual IGroupAtt::sptr getAtt( const std::string& key ) = 0;
         virtual std::vector< std::string > getAtts() = 0;
 
+
+
+
+	virtual int prepare( const CoordinatVariableDefinition& cvd ) = 0;
+
     };
 
     struct IFile : public IGroup
@@ -314,7 +319,7 @@ namespace FairDataPipeline
 
             Builder( const std::string& path, IFile::Mode mode );
 
-            int prepare( const CoordinatVariableDefinition& cvd );
+            //int prepare( const CoordinatVariableDefinition& cvd );
             int prepare( const TableDefinition& td );
             int prepare( const DimensionalVariableDefinition& dvd );
 
