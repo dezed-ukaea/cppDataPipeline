@@ -12,8 +12,6 @@ class BuilderTest : public ::testing::Test {
     protected:
         void SetUp() override 
         {
-            std::remove( "xtest.nc" );
-            std::remove( "xbuildertest.nc" );
         }
 
         std::string getHomeDirectory() 
@@ -70,7 +68,7 @@ TEST_F(BuilderTest, TestInterface)
 
     ASSERT_TRUE( NULL != ibuilder );
 
-    auto grp_bob_ptr = ibuilder->addGroup("bob");
+    auto grp_bob_ptr = ibuilder->requireGroup("bob");
     grp_bob_ptr->putAtt( "int", 123 );
     grp_bob_ptr->putAtt( "float", 123.123f );
     grp_bob_ptr->putAtt( "string", "a string" );
@@ -88,7 +86,7 @@ TEST_F(BuilderTest, TestInterface)
 
     ASSERT_TRUE( NULL != grp_bob_ptr );
 
-    auto grp_bob_terry_ptr = grp_bob_ptr->addGroup( "terry");
+    auto grp_bob_terry_ptr = grp_bob_ptr->requireGroup( "terry");
 
     ASSERT_TRUE( NULL != grp_bob_terry_ptr );
 
@@ -205,6 +203,8 @@ TEST_F(BuilderTest, TestInterface2)
         arrdef.dimension_names = { "grp/dim1", "grp/dim2" };
         //arrdef.shape = { 2,3 };
 
+        std::remove( "xtest.nc" );
+
         fdp::Builder builder2( "xtest.nc", fdp::IFile::Mode::WRITE );
 
         int status = FDP_FILE_STATUS_NOERR;
@@ -320,3 +320,27 @@ TEST_F(BuilderTest, TestInterface2)
         ASSERT_TRUE( NULL == att_ptr );
 
 } 
+
+TEST_F(BuilderTest, TestGroupWithDim) 
+{
+    std::string path = "test_group_with_dim.nc";
+    std::remove( path.c_str() );
+
+    fdp::IFile::sptr file_ptr = fdp::FileFactory::create( path, fdp::IFile::Mode::WRITE );
+
+    ASSERT_TRUE( NULL != file_ptr );
+
+
+    fdp::IGroup::sptr grp_ptr = file_ptr->requireGroup( "aap/noot/mies" );
+
+    ASSERT_TRUE( NULL != grp_ptr );
+
+    if( grp_ptr )
+    {
+        fdp::IDimension::sptr dim_ptr = grp_ptr->addDim( "bla", 3 );
+    }
+
+
+
+
+}

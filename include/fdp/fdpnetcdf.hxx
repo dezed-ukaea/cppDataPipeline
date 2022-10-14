@@ -222,7 +222,7 @@ namespace FairDataPipeline
 
         virtual IGroup::sptr requireGroup( const std::string& name ) = 0;
 
-        virtual IGroup::sptr addGroup( const std::string& s ) = 0;
+        //virtual IGroup::sptr addGroup( const std::string& s ) = 0;
 
         virtual IGroup::sptr getGroup( const std::string& name ) = 0;
 

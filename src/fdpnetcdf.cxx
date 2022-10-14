@@ -974,13 +974,11 @@ struct DataTypeTraits< DataType::UINT64 >
 
             IGroup::sptr getGroup( const std::string& name );
 
-            IGroup::sptr  _getGroup( const std::string name );
 
             std::vector< std::string > getGroups();
 
             IGroup::sptr requireGroup( const std::string& name );
 
-            IGroup::sptr addGroup( const std::string& name );
 
             IDimension::sptr addDim( const std::string& name, size_t sz );
             IDimension::sptr addUnlimitedDim( const std::string& name );
@@ -1034,6 +1032,11 @@ struct DataTypeTraits< DataType::UINT64 >
 
 
         private:
+
+            IGroup::sptr _addGroup( const std::string& name );
+
+            IGroup::sptr  _getGroup( const std::string name );
+
             std::weak_ptr<GroupImpl> _parent;
 
             IGroup::NAME_GROUP_MAP _name_grp_map;
@@ -1465,15 +1468,29 @@ struct DataTypeTraits< DataType::UINT64 >
 
     IGroup::sptr GroupImpl::requireGroup( const std::string& name )
     {
-        IGroup::sptr grp_ptr = this->_getGroup( name );
+        std::vector< std::string > splits;
+        split_str( name, '/', splits );
 
-        if( !grp_ptr )
-            grp_ptr = this->addGroup( name );
+        IGroup::sptr parent_grp_ptr = this->shared_from_this();
+        IGroup::sptr grp_ptr;
+
+        for( auto it = splits.begin(); it != splits.end(); ++it )
+        {
+            if( parent_grp_ptr )
+            {
+                grp_ptr = std::static_pointer_cast< GroupImpl >(parent_grp_ptr)->_getGroup( *it );
+
+                if( !grp_ptr )
+                    grp_ptr = std::static_pointer_cast<GroupImpl>(parent_grp_ptr)->_addGroup( *it );
+
+                parent_grp_ptr = grp_ptr;
+            }
+        }
 
         return grp_ptr;
     }
 
-    IGroup::sptr GroupImpl::addGroup( const std::string& name )
+    IGroup::sptr GroupImpl::_addGroup( const std::string& name )
     {
         GroupImpl::sptr grp_ptr;
 
