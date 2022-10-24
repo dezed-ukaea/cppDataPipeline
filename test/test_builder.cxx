@@ -56,8 +56,14 @@ TEST_F(BuilderTest, TestGroupItemType )
 {
     fdp::PARENT_ITEM_TYPE parent_item = fdp::split_item_name( "/grp1/grp2/itm" );
 
+    ASSERT_EQ( parent_item.first, "/grp1/grp2" );
+    ASSERT_EQ( parent_item.second, "itm" );
+
+    parent_item = fdp::split_item_name( "grp1/grp2/itm" );
+
     ASSERT_EQ( parent_item.first, "grp1/grp2" );
     ASSERT_EQ( parent_item.second, "itm" );
+
 }
 
 TEST_F(BuilderTest, TestInterface) 
@@ -103,6 +109,9 @@ TEST_F(BuilderTest, TestInterface)
     ASSERT_TRUE( NULL == grp_bad );
 
     auto grp_ptr = ibuilder->getGroup("bob/terry");
+
+    ASSERT_EQ( grp_ptr->requireGroup( "/" ), root_grp_ptr );
+    ASSERT_EQ( grp_ptr->requireGroup( "/bob" ), grp_bob_ptr );
 
 
     //std::string dimx = "grp1/grp2/grp3i/dimx";
@@ -431,14 +440,18 @@ TEST_F(BuilderTest, TestPrepareCoordinateVars)
 
     status = file_ptr->prepare( cvdef2 );
 
-    //fdp::DimensionalVariableDefinition dvd;
-    //dvd.name = "one/two/var";
-    //dvd.datatype = fdp::DataType::INT;
-    //dvd.dimensions = {"dim"};
+    fdp::DimensionalVariableDefinition dvd;
+    dvd.name = "one/two/var";
+    dvd.datatype = fdp::DataType::INT;
+    dvd.dimensions = {"/dim"};
 
 
 
 
+return;
+    ASSERT_TRUE( FDP_FILE_ISNOERR( status ) );
+
+    status = file_ptr->prepare( dvd );
 
     ASSERT_TRUE( FDP_FILE_ISNOERR( status ) );
 
@@ -446,3 +459,4 @@ TEST_F(BuilderTest, TestPrepareCoordinateVars)
 			//    "dim", new int[] {1, 2, 3}, "", "", "");
 
 }
+

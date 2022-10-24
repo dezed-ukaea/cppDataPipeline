@@ -84,55 +84,55 @@ template< typename T >
 
 namespace FairDataPipeline
 {
-template< int > struct  DataTypeTraits;
+    template< int > struct  DataTypeTraits;
 
-template<>
-struct DataTypeTraits< DataType::CHAR >
-{
-    typedef char native_type;
-};
+    template<>
+        struct DataTypeTraits< DataType::CHAR >
+        {
+            typedef char native_type;
+        };
 
-template<>
-struct DataTypeTraits< DataType::SHORT >
-{
-    typedef short native_type;
-};
+    template<>
+        struct DataTypeTraits< DataType::SHORT >
+        {
+            typedef short native_type;
+        };
 
-template<>
-struct DataTypeTraits< DataType::INT >
-{
-    typedef int native_type;
-};
+    template<>
+        struct DataTypeTraits< DataType::INT >
+        {
+            typedef int native_type;
+        };
 
-template<>
-struct DataTypeTraits< DataType::INT64 >
-{
-    typedef long native_type;
-};
+    template<>
+        struct DataTypeTraits< DataType::INT64 >
+        {
+            typedef long native_type;
+        };
 
-//template<>
-//struct DataTypeTraits< DataType::UCHAR >
-//{
-//    typedef unsigned char native_type;
-//};
+    //template<>
+    //struct DataTypeTraits< DataType::UCHAR >
+    //{
+    //    typedef unsigned char native_type;
+    //};
 
-template<>
-struct DataTypeTraits< DataType::USHORT >
-{
-    typedef unsigned short native_type;
-};
+    template<>
+        struct DataTypeTraits< DataType::USHORT >
+        {
+            typedef unsigned short native_type;
+        };
 
-template<>
-struct DataTypeTraits< DataType::UINT >
-{
-    typedef unsigned int native_type;
-};
+    template<>
+        struct DataTypeTraits< DataType::UINT >
+        {
+            typedef unsigned int native_type;
+        };
 
-template<>
-struct DataTypeTraits< DataType::UINT64 >
-{
-    typedef long native_type;
-};
+    template<>
+        struct DataTypeTraits< DataType::UINT64 >
+        {
+            typedef long native_type;
+        };
 
 
 
@@ -254,6 +254,14 @@ struct DataTypeTraits< DataType::UINT64 >
         {
             splits.push_back( s_ );
         }
+    }
+
+    void split_name( const std::string& name, std::vector< std::string >& splits )
+    {
+        if( '/' == name[0] )
+            splits.push_back( "/" );
+
+        split_str( name, '/', splits );
     }
 
     class VarImpl : public IVar
@@ -972,6 +980,8 @@ struct DataTypeTraits< DataType::UINT64 >
             int getGroupCount();
             IGroup::sptr parent();
 
+            IGroup::sptr rootGroup();
+
             IGroup::sptr getGroup( const std::string& name );
 
 
@@ -1023,7 +1033,7 @@ struct DataTypeTraits< DataType::UINT64 >
 
         protected:
 
-            static GroupImpl::sptr create( GroupImpl::sptr p );
+            static GroupImpl::sptr create( GroupImpl::sptr p, const std::string& name );
 
             NcGroupPtr _nc;	
 
@@ -1036,6 +1046,7 @@ struct DataTypeTraits< DataType::UINT64 >
 
 
         private:
+            std::string _name;
 
             IGroup::sptr _addGroup( const std::string& name );
 
@@ -1246,19 +1257,26 @@ struct DataTypeTraits< DataType::UINT64 >
     {
         VarImpl::sptr var_ptr;
 
+        PARENT_ITEM_TYPE grp_item = split_item_name( name );
+        const std::string& grp_name = grp_item.first;
+        const std::string itm_name = grp_item.second;
+
+        IGroup::sptr grp_ptr = this->requireGroup( grp_name );
+        auto grp_impl_ptr = std::static_pointer_cast< GroupImpl > ( grp_ptr );
+
         std::vector< netCDF::NcDim > ncdims;
         for( auto it = vdims.begin(); it != vdims.end(); ++it )
         {
-            DimensionImpl::sptr dim_ptr = std::dynamic_pointer_cast< DimensionImpl >(*it);
+            auto dim_ptr = std::dynamic_pointer_cast< DimensionImpl >(*it);
             ncdims.push_back( dim_ptr->_nc_dim );
         }
 
         try
         {
             netCDF::NcType::ncType nctype = DataType2NcType( dataType );
-            netCDF::NcVar ncvar = _nc->addVar( name, nctype, ncdims );
-            var_ptr = VarImpl::create( this->shared_from_this(), name,  ncvar );
-            _name_var_map[ name ] = var_ptr;
+            netCDF::NcVar ncvar = grp_impl_ptr->_nc->addVar( name, nctype, ncdims );
+            var_ptr = VarImpl::create( grp_impl_ptr, name,  ncvar );
+            grp_impl_ptr->_name_var_map[ name ] = var_ptr;
         }
         catch( NcException& e )
         {
@@ -1322,9 +1340,22 @@ struct DataTypeTraits< DataType::UINT64 >
     IDimension::sptr GroupImpl::getDim( const std::string& name )
     {
         IDimension::sptr dim_ptr;
+        IGroup::sptr grp_ptr = this->shared_from_this();
 
-        auto it = _name_dim_map.find( name );
-        if( it != _name_dim_map.end() )
+        PARENT_ITEM_TYPE parent_item = split_item_name( name );
+        const std::string& grp_name = parent_item.first;
+        const std::string& dim_name = parent_item.second;
+
+        if( !(grp_name.empty()) )
+            grp_ptr = grp_ptr->getGroup( grp_name );
+
+        if( grp_ptr )
+        {
+            GroupImpl::sptr grp_impl_ptr = std::static_pointer_cast< GroupImpl > ( grp_ptr );
+
+
+        auto it = grp_impl_ptr->_name_dim_map.find( dim_name );
+        if( it != grp_impl_ptr->_name_dim_map.end() )
         {
             dim_ptr = it->second;
         }
@@ -1332,12 +1363,12 @@ struct DataTypeTraits< DataType::UINT64 >
         {
             try
             {
-                netCDF::NcDim nc_dim = _nc->getDim( name );
+                netCDF::NcDim nc_dim = grp_impl_ptr->_nc->getDim( dim_name );
 
                 if( !nc_dim.isNull() )
                 {
-                    dim_ptr = DimensionImpl::create( this->shared_from_this(), nc_dim );
-                    _name_dim_map[ name ] = dim_ptr;
+                    dim_ptr = DimensionImpl::create( grp_ptr, nc_dim );
+                    grp_impl_ptr->_name_dim_map[ dim_name ] = dim_ptr;
                 }
             }
             catch( NcException& e )
@@ -1345,8 +1376,9 @@ struct DataTypeTraits< DataType::UINT64 >
                 e.what();
             }
         }
-
+        }
         return dim_ptr;
+
     }
 
     IDimension::sptr GroupImpl::addUnlimitedDim( const std::string& name )
@@ -1402,10 +1434,13 @@ struct DataTypeTraits< DataType::UINT64 >
 
     IGroup::sptr GroupImpl::getGroup( const std::string& name )
     {
+        IGroup::sptr parent_grp_ptr = this->shared_from_this();
+        if( '/' == name[0] )
+            parent_grp_ptr = this->rootGroup();
+
         std::vector< std::string > splits;
         split_str( name, '/', splits );
 
-        IGroup::sptr parent_grp_ptr = this->shared_from_this();
         IGroup::sptr grp_ptr;
 
         for( auto it = splits.begin(); it != splits.end(); ++it )
@@ -1421,6 +1456,8 @@ struct DataTypeTraits< DataType::UINT64 >
 
     IGroup::sptr  GroupImpl::_getGroup( const std::string name )
     {
+        if( name.empty() )
+            return this->shared_from_this();
         IGroup::sptr grp_ptr;
 
         auto it = _name_grp_map.find( name );
@@ -1435,7 +1472,7 @@ struct DataTypeTraits< DataType::UINT64 >
                 NcGroup new_ncgrp = this->_nc->getGroup( name );
                 if( ! new_ncgrp.isNull() )
                 {
-                    GroupImpl::sptr new_grp_ptr = GroupImpl::create( this->shared_from_this() );
+                    GroupImpl::sptr new_grp_ptr = GroupImpl::create( this->shared_from_this(), name );
                     new_grp_ptr->_nc = std::make_shared<NcGroup>(new_ncgrp);
                     grp_ptr = new_grp_ptr;
                     _name_grp_map[ name ] = grp_ptr;
@@ -1470,11 +1507,30 @@ struct DataTypeTraits< DataType::UINT64 >
         return grp_names;
     }
 
+    IGroup::sptr GroupImpl::rootGroup()
+    {
+        IGroup::sptr parent_grp_ptr = this->shared_from_this();
+        IGroup::sptr root_grp_ptr;
+
+        while( parent_grp_ptr )
+        {
+            parent_grp_ptr = parent_grp_ptr->parent();
+            if( parent_grp_ptr )
+                root_grp_ptr = parent_grp_ptr;
+        }
+       return root_grp_ptr; 
+    }
+
     IGroup::sptr GroupImpl::requireGroup( const std::string& name )
     {
 
         IGroup::sptr parent_grp_ptr = this->shared_from_this();
+
 	    if( name.empty() ) return parent_grp_ptr;
+
+        if( '/' == name[0] )
+            parent_grp_ptr = this->rootGroup();
+
 
         std::vector< std::string > splits;
         split_str( name, '/', splits );
@@ -1511,7 +1567,7 @@ struct DataTypeTraits< DataType::UINT64 >
             {
                 auto self_ptr = this->shared_from_this();
 
-                GroupImpl::sptr new_grp_ptr = GroupImpl::create( self_ptr );
+                GroupImpl::sptr new_grp_ptr = GroupImpl::create( self_ptr, name );
 
                 new_grp_ptr->_nc =std::make_shared< NcGroup >( new_ncgrp) ;
 
@@ -1529,10 +1585,11 @@ struct DataTypeTraits< DataType::UINT64 >
 
     }
 
-    GroupImpl::sptr GroupImpl::create( GroupImpl::sptr p )
+    GroupImpl::sptr GroupImpl::create( GroupImpl::sptr p, const std::string& name )
     {
         auto _nc = std::make_shared< NcGroup >();
         auto pgrp = GroupImpl::sptr( new GroupImpl(p, _nc));
+        pgrp->_name = name;
         return pgrp;
     }
 
@@ -1675,6 +1732,8 @@ struct DataTypeTraits< DataType::UINT64 >
 
     PARENT_ITEM_TYPE split_item_name( std::string str )
     {
+        bool bAbsPath = (str[0] == '/');
+
         str = str_strip( str, "/" );
 
         size_t pos = str.rfind( "/" );
@@ -1693,6 +1752,9 @@ struct DataTypeTraits< DataType::UINT64 >
             str_grp = std::string( str.begin(), str.begin() + pos );
             str_itm = std::string( str.begin() + pos +1 , str.end() );
         }
+
+        if(bAbsPath)
+            str_grp.insert( 0, 1, '/' );
 
         return  std::make_pair( str_grp, str_itm );
     }
@@ -1751,9 +1813,11 @@ struct DataTypeTraits< DataType::UINT64 >
 
         std::vector< IDimension::sptr > vdims = { dim_ptr };
 
-        IVar::sptr var_ptr;
 
-        var_ptr = grp_ptr->addVar( itm_name, cvd.datatype, vdims );
+        IVar::sptr var_ptr = grp_ptr->addVar( itm_name, cvd.datatype, vdims );
+
+        if( var_ptr )
+            var_ptr->putVar( cvd.values );
 
         status = ( var_ptr != NULL ) ? FDP_FILE_STATUS_NOERR : FDP_FILE_STATUS_ERR;
 
@@ -1783,7 +1847,7 @@ struct DataTypeTraits< DataType::UINT64 >
 
         status = ( grp_ptr != NULL ) ? 0 : 1;
 
-        if( 0==status )
+        if( 0 == status )
         {
             std::string dim_name = "index";
             IDimension::sptr dim_ptr;
@@ -1806,27 +1870,15 @@ struct DataTypeTraits< DataType::UINT64 >
 
             if( !td.long_name.empty() )
                 grp_ptr->putAtt( ATTRIB_KEY_LNAME, td.long_name );
-#if 0
-             // add the optional attribs
-            for( int i  = 0; i < td.optional_attribs.size(); ++i )
-            {
-                std::string key = "key" + std::to_string( i );
-                int* pv = &i;
-                size_t nvals = 1;
-                DataType datatype = INT;
-
-                grp_ptr->putAtt( key, nvals, pv );
-            }
-#endif
-             //
-             // add the columns as DimensionalVariableDefinitions
+             
+            // add the columns as DimensionalVariableDefinitions
              for( int i = 0; i < td.getColumns().size(); ++i )
              {
                  const LocalVAriableDefinition& lvd = td.getColumns()[i];
 
 
                  DimensionalVariableDefinition dvd;
-                 dvd.name = this->getName() + "/";// + lvd.name
+                 dvd.name = this->getName() + "/" + lvd.name;
                  dvd.name += lvd.name;
                  dvd.datatype = lvd.datatype;
 

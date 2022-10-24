@@ -151,8 +151,6 @@ namespace FairDataPipeline
     };
 
 
-
-
     struct IGroup;
     typedef std::shared_ptr< IGroup > IGroupPtr;
 
