@@ -72,6 +72,7 @@ TEST_F(BuilderTest, TestInterface)
     fdp::IFile::sptr 
         ibuilder = fdp::FileFactory::create( "xbuildertest.nc", fdp::IFile::Mode::WRITE );
 
+
     ASSERT_TRUE( NULL != ibuilder );
 
     auto root_grp_ptr = ibuilder->requireGroup( "" );
@@ -448,11 +449,11 @@ TEST_F(BuilderTest, TestPrepareCoordinateVars)
 
 
 
-return;
     ASSERT_TRUE( FDP_FILE_ISNOERR( status ) );
 
     status = file_ptr->prepare( dvd );
 
+return;
     ASSERT_TRUE( FDP_FILE_ISNOERR( status ) );
 
 //	    new CoordinateVariableDefinition(
@@ -460,3 +461,98 @@ return;
 
 }
 
+TEST_F(BuilderTest, TestLinkedFromMultiAttribute)
+{
+    std::string path = "test_linked_from_multi_attribute.nc";
+    std::remove( path.c_str() );
+
+    fdp::IFile::sptr file_ptr = fdp::FileFactory::create( path, fdp::IFile::Mode::WRITE );
+
+    ASSERT_TRUE( NULL != file_ptr );
+
+    int status = FDP_FILE_STATUS_NOERR;
+
+    fdp::LocalVAriableDefinition lvs[1];
+
+    lvs[0].name = "column1";
+    lvs[0].datatype = fdp::DataType::INT;
+
+    fdp::TableDefinition td;
+    td.name = "table";
+    td.columns = { lvs[0] };
+
+    status = file_ptr->prepare( td );
+    
+
+    ASSERT_TRUE( FDP_FILE_ISNOERR( status ) );
+
+}
+
+TEST_F(BuilderTest, TestPrepareDimensionalVar)
+{
+    std::string path = "test_prepare_dimensionalvar.nc";
+    std::remove( path.c_str() );
+
+    fdp::IFile::sptr file_ptr = fdp::FileFactory::create( path, fdp::IFile::Mode::WRITE );
+
+    ASSERT_TRUE( NULL != file_ptr );
+
+    int status = FDP_FILE_STATUS_NOERR;
+
+    int cvd_values[3] = {1,2,3};
+    fdp::CoordinatVariableDefinition cvd;
+    cvd.name = "dimension1";
+    cvd.datatype = fdp::DataType::INT;
+    cvd.values = cvd_values;
+
+    status = file_ptr->prepare( cvd );
+
+    ASSERT_TRUE( FDP_FILE_ISNOERR( status ) );
+
+
+    int values[3] = { 1,2,3 };
+    fdp::DimensionalVariableDefinition dvd;
+    dvd.name = "dimensionalvariable";
+    dvd.datatype = fdp::DataType::INT;
+    dvd.dimensions = { "dimension1" };
+
+    status = file_ptr->prepare( dvd );
+
+
+    ASSERT_TRUE( FDP_FILE_ISNOERR( status ) );
+
+
+}
+
+TEST_F(BuilderTest, TestPrepareDimensionalVarRemoteDim)
+{
+    std::string path = "test_prepare_dimensionalvar_remote_dim.nc";
+    std::remove( path.c_str() );
+
+    fdp::IFile::sptr file_ptr = fdp::FileFactory::create( path, fdp::IFile::Mode::WRITE );
+
+    ASSERT_TRUE( NULL != file_ptr );
+
+    int status = FDP_FILE_STATUS_NOERR;
+
+    int cvd_values[3] = {1,2,3};
+    fdp::CoordinatVariableDefinition cvd;
+    cvd.name = "mygroup/dimension1";
+    cvd.datatype = fdp::DataType::INT;
+    cvd.values = cvd_values;
+
+    status = file_ptr->prepare( cvd );
+    
+    ASSERT_TRUE( FDP_FILE_ISNOERR( status ) );
+
+    fdp::DimensionalVariableDefinition dvd;
+    dvd.name = "mygroup/subgroup/dimensionalvariable";
+    dvd.datatype = fdp::DataType::INT;
+    dvd.dimensions = { cvd.name };
+
+    status = file_ptr->prepare( dvd );
+
+    ASSERT_TRUE( FDP_FILE_ISNOERR( status ) );
+
+
+}

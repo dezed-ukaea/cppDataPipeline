@@ -406,7 +406,7 @@ namespace FairDataPipeline
 		    }
 		    catch (NcException& ex )
 		    {
-			    ex.what();
+			    std::cerr << "VarImpl::putVarImpl : " << ex.what();
 		    }
 	    }
 
@@ -421,7 +421,7 @@ namespace FairDataPipeline
 		    }
 		    catch (NcException& ex )
 		    {
-			    ex.what();
+			    std::cerr << "VarImpl::putVarImpl : " << ex.what();
 		    }
 	    }
 
@@ -434,7 +434,7 @@ namespace FairDataPipeline
 	    }
 	    catch( NcException& ex )
 	    {
-		    ex.what();
+		    std::cerr << "VarImpl::putVar : " << ex.what();
 	    }
     }
 
@@ -528,6 +528,10 @@ namespace FairDataPipeline
             catch( NcException& e )
             {
                 e.what();
+
+		std::cerr << "GroupAtt::getValuesImpl : " << e.what();
+
+
 		status = FDP_FILE_STATUS_ERR;
             }
 
@@ -596,6 +600,8 @@ namespace FairDataPipeline
         catch( NcException& e )
         {
             e.what();
+
+		    std::cerr << "GroupAtt::ptAtt : " << e.what();
 	    status = FDP_FILE_STATUS_ERR;
         }
 
@@ -650,7 +656,7 @@ namespace FairDataPipeline
             }
             catch( NcException& e )
             {
-                e.what();
+		std::cerr << "VarAtt::getValuesImpl : " << e.what();
 		status = FDP_FILE_STATUS_ERR;
             }
 
@@ -719,6 +725,8 @@ namespace FairDataPipeline
         catch( NcException& e )
         {
             e.what();
+	    
+	    std::cerr << "VarAttl::getValues : " << e.what();
 	    status = FDP_FILE_STATUS_ERR;
         }
 
@@ -737,6 +745,8 @@ namespace FairDataPipeline
         catch( NcException& e )
         {
             e.what();
+
+	    std::cerr << "VarImpl::putAtt : " << e.what();
         }
         return att_ptr;
     }
@@ -753,6 +763,8 @@ namespace FairDataPipeline
         catch( NcException& e )
         {
             e.what();
+
+	    std::cerr << "VarImpl::putAtt : " << e.what();
         }
         return att_ptr;
 
@@ -775,6 +787,8 @@ namespace FairDataPipeline
             catch( NcException& e )
             {
                 e.what();
+
+		    std::cerr << "VarImpl::putAttImpl : " << e.what();
             }
 
             return var_att;
@@ -843,6 +857,8 @@ namespace FairDataPipeline
         catch( NcException& e )
         {
             e.what();
+
+	    std::cerr << "VarImpl::putAtt : " << e.what();
         }
 
         return var_att;
@@ -860,6 +876,8 @@ namespace FairDataPipeline
         catch( NcException& e )
         {
             e.what();
+
+	    std::cerr << "VarImpl::putAtt : " << e.what();
         }
         return att_ptr;
     }
@@ -883,6 +901,8 @@ namespace FairDataPipeline
             catch( NcException& e )
             {
                 e.what();
+
+	    std::cerr << "VarImpl::getAtt : " << e.what();
             }
 
         }
@@ -1081,6 +1101,8 @@ namespace FairDataPipeline
             catch( NcException& e )
             {
                 e.what();
+
+	    std::cerr << "VarImpl::putAttImpl : " << e.what();
             }
 
 
@@ -1101,6 +1123,8 @@ namespace FairDataPipeline
         catch( NcException& e )
         {
             e.what();
+
+	    std::cerr << "GroupImpl::putAtt : " << e.what();
         }
 
 
@@ -1199,6 +1223,8 @@ namespace FairDataPipeline
         catch( NcException& e )
         {
             e.what();
+
+	    std::cerr << "GroupImpl::putAtt : " << e.what();
         }
 
         return grp_att;
@@ -1222,7 +1248,7 @@ namespace FairDataPipeline
             }
             catch( NcException& e )
             {
-                std::cerr << e.what();
+                std::cerr << "GroupImpl::getAtt:" << e.what();
             }
 
         }
@@ -1246,7 +1272,7 @@ namespace FairDataPipeline
         }
         catch( NcException& e ) 
         {
-            std::cerr << e.what();
+            std::cerr << "GroupImpl::getAtts:" << e.what();
         }
         return att_names;
 
@@ -1258,6 +1284,7 @@ namespace FairDataPipeline
         VarImpl::sptr var_ptr;
 
         PARENT_ITEM_TYPE grp_item = split_item_name( name );
+
         const std::string& grp_name = grp_item.first;
         const std::string itm_name = grp_item.second;
 
@@ -1274,13 +1301,13 @@ namespace FairDataPipeline
         try
         {
             netCDF::NcType::ncType nctype = DataType2NcType( dataType );
-            netCDF::NcVar ncvar = grp_impl_ptr->_nc->addVar( name, nctype, ncdims );
+            netCDF::NcVar ncvar = grp_impl_ptr->_nc->addVar( itm_name, nctype, ncdims );
             var_ptr = VarImpl::create( grp_impl_ptr, name,  ncvar );
-            grp_impl_ptr->_name_var_map[ name ] = var_ptr;
+            grp_impl_ptr->_name_var_map[ itm_name ] = var_ptr;
         }
         catch( NcException& e )
         {
-            e.what();
+		std::cerr << "GroupImpl::addVar(" << name << ") : " << e.what();
         }
 
         return var_ptr;
@@ -1303,7 +1330,7 @@ namespace FairDataPipeline
         }
         catch( NcException& e )
         {
-            std::cerr << e.what();
+            std::cerr << "GRoupImpl::getVars:" << e.what();
         }
         return var_names;
     }
@@ -1331,6 +1358,7 @@ namespace FairDataPipeline
             catch( NcException& e )
             {
                 e.what();
+		std::cerr << "GroupImpl::getVar : " << e.what();
             }
         }
 
@@ -1374,6 +1402,7 @@ namespace FairDataPipeline
             catch( NcException& e )
             {
                 e.what();
+		std::cerr << "GroupImpl::getDim : " << e.what();
             }
         }
         }
@@ -1398,7 +1427,7 @@ namespace FairDataPipeline
         }
         catch( NcException& e )
         {
-            e.what();
+	    std::cerr << "GroupImpl::addUnlimitedDim : " << e.what();
         }
 
         return dim_ptr;
@@ -1422,6 +1451,7 @@ namespace FairDataPipeline
         catch( NcException& e )
         {
             e.what();
+	    std::cerr << "GroupImpl::addDim : " << e.what();
         }
 
         return dim_ptr;
@@ -1435,22 +1465,25 @@ namespace FairDataPipeline
     IGroup::sptr GroupImpl::getGroup( const std::string& name )
     {
         IGroup::sptr parent_grp_ptr = this->shared_from_this();
-        if( '/' == name[0] )
-            parent_grp_ptr = this->rootGroup();
+        IGroup::sptr grp_ptr;
+
+	if( name.empty() )
+		return parent_grp_ptr;
+	else if( '/' == name[0] )
+		parent_grp_ptr = this->rootGroup();
 
         std::vector< std::string > splits;
         split_str( name, '/', splits );
 
-        IGroup::sptr grp_ptr;
+	auto its = splits.begin();
+	auto ite = splits.end();
 
-        for( auto it = splits.begin(); it != splits.end(); ++it )
+        for( auto it = its; parent_grp_ptr && it != ite; ++it )
         {
-            if( parent_grp_ptr )
-            {
-                grp_ptr = std::dynamic_pointer_cast< GroupImpl >( parent_grp_ptr)->_getGroup( *it );
+                grp_ptr = std::static_pointer_cast< GroupImpl >( parent_grp_ptr)->_getGroup( *it );
                 parent_grp_ptr = grp_ptr;
-            }
         }
+
         return grp_ptr;
     }
 
@@ -1481,6 +1514,7 @@ namespace FairDataPipeline
             catch( NcException& e )
             {
                 e.what();
+		std::cerr << "GroupImpl::_getGroup : " << e.what();
             }
         }
         return grp_ptr;
@@ -1501,7 +1535,7 @@ namespace FairDataPipeline
         }
         catch( NcException& e )
         {
-            std::cerr << e.what();
+            std::cerr << "GroupImpl::getGroups : " << e.what();
         }
 
         return grp_names;
@@ -1510,7 +1544,7 @@ namespace FairDataPipeline
     IGroup::sptr GroupImpl::rootGroup()
     {
         IGroup::sptr parent_grp_ptr = this->shared_from_this();
-        IGroup::sptr root_grp_ptr;
+        IGroup::sptr root_grp_ptr = parent_grp_ptr;
 
         while( parent_grp_ptr )
         {
@@ -1523,19 +1557,16 @@ namespace FairDataPipeline
 
     IGroup::sptr GroupImpl::requireGroup( const std::string& name )
     {
-
+        IGroup::sptr grp_ptr;
         IGroup::sptr parent_grp_ptr = this->shared_from_this();
 
-	    if( name.empty() ) return parent_grp_ptr;
-
-        if( '/' == name[0] )
+	if( name.empty() )
+	       	return parent_grp_ptr;
+	else if( '/' == name[0] )
             parent_grp_ptr = this->rootGroup();
-
 
         std::vector< std::string > splits;
         split_str( name, '/', splits );
-
-        IGroup::sptr grp_ptr;
 
         for( auto it = splits.begin(); it != splits.end(); ++it )
         {
@@ -1578,7 +1609,7 @@ namespace FairDataPipeline
         }
         catch( NcException& e )
         {
-            e.what();
+		std::cerr << "GroupImpl::_addGroup : " << e.what();
         }
 
         return  grp_ptr;
@@ -1650,7 +1681,7 @@ namespace FairDataPipeline
                     }
                     catch( NcException& e )
                     {
-                        e.what();
+			    std::cerr << "FileImpl::open : " << e.what();
                     }
                 }
                 break;
@@ -1685,7 +1716,8 @@ namespace FairDataPipeline
         }
         catch( NcException& e )
         {
-            e.what();
+		std::cerr << "FileImpl::close : " << e.what();
+
         }
     }
 
@@ -1847,9 +1879,10 @@ namespace FairDataPipeline
 
         status = ( grp_ptr != NULL ) ? 0 : 1;
 
+	std::string dim_name = "index";
+
         if( 0 == status )
         {
-            std::string dim_name = "index";
             IDimension::sptr dim_ptr;
 
             if( grp_ptr )
@@ -1872,17 +1905,22 @@ namespace FairDataPipeline
                 grp_ptr->putAtt( ATTRIB_KEY_LNAME, td.long_name );
              
             // add the columns as DimensionalVariableDefinitions
-             for( int i = 0; i < td.getColumns().size(); ++i )
+             for( int i = 0; i < !status && td.getColumns().size(); ++i )
              {
                  const LocalVAriableDefinition& lvd = td.getColumns()[i];
 
 
                  DimensionalVariableDefinition dvd;
-                 dvd.name = this->getName() + "/" + lvd.name;
-                 dvd.name += lvd.name;
-                 dvd.datatype = lvd.datatype;
 
-                 this->prepare( dvd );
+		 if( grp_name.empty() )
+			 dvd.name = lvd.name;
+		 else
+			 dvd.name = grp_name + "/" + lvd.name;
+
+                 dvd.datatype = lvd.datatype;
+		 dvd.dimensions = { dim_name };
+
+		 status = grp_ptr->prepare( dvd );
              }
 
              grp_ptr->putAtt( ATTRIB_KEY_GROUP_TYPE, "table" );

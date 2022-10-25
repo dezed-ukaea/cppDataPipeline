@@ -309,6 +309,8 @@ namespace FairDataPipeline
 
     virtual int prepare( const DimensionalVariableDefinition& dvd ) = 0;
 
+    virtual int prepare( const TableDefinition& td ) = 0; 
+
     };
 
     struct IFile : public IGroup
@@ -354,8 +356,6 @@ namespace FairDataPipeline
             Builder( const Builder& rhs ) = delete;
 
             Builder( const std::string& path, IFile::Mode mode );
-
-            //int prepare( const CoordinatVariableDefinition& cvd );
 
             int writeArray( const std::string& name
                     , const ArrayDefinition& arraydef, const void* data );
