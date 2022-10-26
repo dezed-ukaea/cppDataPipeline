@@ -64,6 +64,16 @@ TEST_F(BuilderTest, TestGroupItemType )
     ASSERT_EQ( parent_item.first, "grp1/grp2" );
     ASSERT_EQ( parent_item.second, "itm" );
 
+    parent_item = fdp::split_item_name( "/itm" );
+
+    ASSERT_EQ( parent_item.first, "/" );
+    ASSERT_EQ( parent_item.second, "itm" );
+
+    parent_item = fdp::split_item_name( "itm" );
+
+    ASSERT_EQ( parent_item.first, "" );
+    ASSERT_EQ( parent_item.second, "itm" );
+
 }
 
 TEST_F(BuilderTest, TestInterface) 
@@ -188,6 +198,34 @@ TEST_F(BuilderTest, TestInterface)
     }
 
 }
+
+TEST_F(BuilderTest, TestInterfaceRemoteDim)
+{
+  const testing::TestInfo* const test_info =
+            testing::UnitTest::GetInstance()->current_test_info();
+
+    std::string path = std::string( test_info->name() ) + ".nc";
+    std::remove( path.c_str() );
+
+    fdp::IFile::sptr file_ptr = fdp::FileFactory::create( path, fdp::IFile::Mode::WRITE );
+
+    ASSERT_TRUE( NULL != file_ptr );
+
+    auto grp2_ptr = file_ptr->requireGroup( "/grp1/grp2" );
+    auto grp1_ptr = grp2_ptr->parent();
+
+
+
+    auto dim_ptr = grp1_ptr->addDim( "dim1", 3);
+
+    std::vector< fdp::IDimension::sptr > vdims ={ dim_ptr };
+
+    auto var_ptr = grp2_ptr->addVar( "var1", fdp::DataType::INT, vdims ); 
+
+    ASSERT_TRUE( NULL != var_ptr );
+
+
+} 
 
 TEST_F(BuilderTest, TestInterface2) 
 {
@@ -341,13 +379,16 @@ TEST_F(BuilderTest, TestInterface2)
 
 TEST_F(BuilderTest, TestGroupWithDim) 
 {
-    std::string path = "test_group_with_dim.nc";
+  const testing::TestInfo* const test_info =
+            testing::UnitTest::GetInstance()->current_test_info();
+
+    std::string path = std::string( test_info->name() ) + ".nc";
+
     std::remove( path.c_str() );
 
     fdp::IFile::sptr file_ptr = fdp::FileFactory::create( path, fdp::IFile::Mode::WRITE );
 
     ASSERT_TRUE( NULL != file_ptr );
-
 
     fdp::IGroup::sptr grp_ptr = file_ptr->requireGroup( "aap/noot/mies" );
 
@@ -361,7 +402,11 @@ TEST_F(BuilderTest, TestGroupWithDim)
 
 TEST_F(BuilderTest, Test2GroupWithDim) 
 {
-    std::string path = "test_2group_with_dim.nc";
+  const testing::TestInfo* const test_info =
+            testing::UnitTest::GetInstance()->current_test_info();
+
+    std::string path = std::string( test_info->name() ) + ".nc";
+
     std::remove( path.c_str() );
 
     fdp::IFile::sptr file_ptr = fdp::FileFactory::create( path, fdp::IFile::Mode::WRITE );
@@ -381,7 +426,11 @@ TEST_F(BuilderTest, Test2GroupWithDim)
 
 TEST_F(BuilderTest, TestPrepareCoordinateVar)
 {
-    std::string path = "test_prepare_coordinate_var.nc";
+  const testing::TestInfo* const test_info =
+            testing::UnitTest::GetInstance()->current_test_info();
+
+    std::string path = std::string( test_info->name() ) + ".nc";
+
     std::remove( path.c_str() );
 
     fdp::IFile::sptr file_ptr = fdp::FileFactory::create( path, fdp::IFile::Mode::WRITE );
@@ -411,7 +460,11 @@ TEST_F(BuilderTest, TestPrepareCoordinateVar)
 
 TEST_F(BuilderTest, TestPrepareCoordinateVars)
 {
-    std::string path = "test_prepare_coordinate_vars.nc";
+  const testing::TestInfo* const test_info =
+            testing::UnitTest::GetInstance()->current_test_info();
+
+    std::string path = std::string( test_info->name() ) + ".nc";
+
     std::remove( path.c_str() );
 
     fdp::IFile::sptr file_ptr = fdp::FileFactory::create( path, fdp::IFile::Mode::WRITE );
@@ -463,7 +516,12 @@ return;
 
 TEST_F(BuilderTest, TestLinkedFromMultiAttribute)
 {
-    std::string path = "test_linked_from_multi_attribute.nc";
+  const testing::TestInfo* const test_info =
+            testing::UnitTest::GetInstance()->current_test_info();
+
+    std::string path = std::string( test_info->name() ) + ".nc";
+
+    //std::string path = "test_linked_from_multi_attribute.nc";
     std::remove( path.c_str() );
 
     fdp::IFile::sptr file_ptr = fdp::FileFactory::create( path, fdp::IFile::Mode::WRITE );
@@ -490,7 +548,12 @@ TEST_F(BuilderTest, TestLinkedFromMultiAttribute)
 
 TEST_F(BuilderTest, TestPrepareDimensionalVar)
 {
-    std::string path = "test_prepare_dimensionalvar.nc";
+  const testing::TestInfo* const test_info =
+            testing::UnitTest::GetInstance()->current_test_info();
+
+    std::string path = std::string( test_info->name() ) + ".nc";
+
+    //std::string path = "test_prepare_dimensionalvar.nc";
     std::remove( path.c_str() );
 
     fdp::IFile::sptr file_ptr = fdp::FileFactory::create( path, fdp::IFile::Mode::WRITE );
@@ -526,7 +589,12 @@ TEST_F(BuilderTest, TestPrepareDimensionalVar)
 
 TEST_F(BuilderTest, TestPrepareDimensionalVarRemoteDim)
 {
-    std::string path = "test_prepare_dimensionalvar_remote_dim.nc";
+  const testing::TestInfo* const test_info =
+            testing::UnitTest::GetInstance()->current_test_info();
+
+    std::string path = std::string( test_info->name() ) + ".nc";
+
+    //std::string path = "test_prepare_dimensionalvar_remote_dim.nc";
     std::remove( path.c_str() );
 
     fdp::IFile::sptr file_ptr = fdp::FileFactory::create( path, fdp::IFile::Mode::WRITE );

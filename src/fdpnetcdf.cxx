@@ -1936,117 +1936,51 @@ namespace FairDataPipeline
 
     int GroupImpl::prepare( const DimensionalVariableDefinition& dvd )
     {
+        IVar::sptr var_ptr;
         int status = 0;
 
         PARENT_ITEM_TYPE grp_item = split_item_name( dvd.name );
-        const std::string& grp_name = grp_item.first;
-        const std::string& itm_name = grp_item.second;
+        const std::string& dvd_grp_name = grp_item.first;
+        const std::string& dvd_itm_name = grp_item.second;
 
-        IGroup::sptr grp_ptr = this->requireGroup( grp_name );
+        IGroup::sptr dvd_grp_ptr = this->requireGroup( dvd_grp_name );
 
-        status = grp_ptr ? 0 : 1;
+        status = dvd_grp_ptr ? 0 : 1;
 
         std::vector< IDimension::sptr > dims;
 
         for( size_t i = 0; i < dvd.getDimensions().size() && !status ; ++i )
         {
-            IDimension::sptr dim_ptr = grp_ptr->getDim( dvd.getDimensions()[i] );
+            IDimension::sptr dim_ptr = this->getDim( dvd.getDimensions()[i] );
 
             if( dim_ptr )
-            {
                 dims.push_back( dim_ptr );
-            }
             else
-            {
                 status = 1;
-            }
-
         }
 
-        IVar::sptr var_ptr;
         if( !status )
         {
-            var_ptr = grp_ptr->addVar( dvd.name, dvd.datatype, dims );
+            var_ptr = dvd_grp_ptr->addVar( dvd_itm_name, dvd.datatype, dims );
             status = var_ptr ? 0 : 1;
         }
 
         if( var_ptr )
         {
-            var_ptr->putAtt( ATTRIB_KEY_DESC, dvd.description );
-            var_ptr->putAtt( ATTRIB_KEY_UNITS, dvd.units );
-            var_ptr->putAtt( ATTRIB_KEY_LNAME, dvd.long_name );
+            if( !dvd.description.empty() )
+                var_ptr->putAtt( ATTRIB_KEY_DESC, dvd.description );
+            if( !dvd.units.empty() )
+                var_ptr->putAtt( ATTRIB_KEY_UNITS, dvd.units );
+            if( !dvd.long_name.empty() )
+                var_ptr->putAtt( ATTRIB_KEY_LNAME, dvd.long_name );
 
             if( dvd._missing_ptr )
                 var_ptr->putAtt( ATTRIB_KEY_FILLVALUE, dvd.datatype, 1
                         , dvd._missing_ptr.get() );
-#if 0
-            //misiing values?
-            if( dvd._missing_ptr)
-            {
-                switch( dvd.datatype )
-                {
-                    case DataType::SHORT:
-
-                        var_ptr->putAtt( ATTRIB_KEY_FILLVALUE, 1
-                                , (const short*)(dvd._missing_ptr.get()) );
-                        break;
-
-                    case DataType::INT:
-
-                        var_ptr->putAtt( ATTRIB_KEY_FILLVALUE, 1
-                                , (const int*)(dvd._missing_ptr.get()) );
-                        break;
-                    case DataType::INT64:
-
-                        var_ptr->putAtt( ATTRIB_KEY_FILLVALUE, 1
-                                , (const long*)(dvd._missing_ptr.get()) );
-                        break;
-                    case DataType::USHORT:
-
-                        var_ptr->putAtt( ATTRIB_KEY_FILLVALUE, 1
-                                , (const unsigned short*)(dvd._missing_ptr.get()) );
-                        break;
-
-                    case DataType::UINT:
-
-                        var_ptr->putAtt( ATTRIB_KEY_FILLVALUE, 1
-                                , (const unsigned int*)(dvd._missing_ptr.get()) );
-                        break;
-                    case DataType::UINT64:
-
-                        var_ptr->putAtt( ATTRIB_KEY_FILLVALUE, 1
-                                , (const unsigned long*)(dvd._missing_ptr.get()) );
-                        break;
-
-
-                    case DataType::FLOAT:
-
-                        var_ptr->putAtt( ATTRIB_KEY_FILLVALUE, 1
-                                , (const float*)(dvd._missing_ptr.get()) );
-                        break;
-                    case DataType::DOUBLE:
-
-                        var_ptr->putAtt( ATTRIB_KEY_FILLVALUE, 1
-                                , (const double*)(dvd._missing_ptr.get()) );
-                        break;
-
-
-
-                    default:
-                        std::cerr << __FUNCTION__ << ": Unhandled datatype";
-                        break;
-
-                }
-            }
-
-#endif
         }
-
-
 
         return status;
     }
-
 
 
     int Builder::readDim_metadata( const std::string& name
