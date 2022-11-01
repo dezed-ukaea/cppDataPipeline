@@ -1791,11 +1791,11 @@ namespace FairDataPipeline
         return  std::make_pair( str_grp, str_itm );
     }
 
-    int CoordinatVariableDefinition::UNLIMITED = 0;
+//    int CoordinatVariableDefinition::UNLIMITED = 0;
 
     bool CoordinatVariableDefinition::isUnlimited() const
     {
-        return this->size == CoordinatVariableDefinition::UNLIMITED;
+        return this->size == FDP_UNLIMITED;
     }
 
     size_t TableDefinition::getSize() const
@@ -1805,7 +1805,7 @@ namespace FairDataPipeline
 
     bool TableDefinition::isUnlimited() const
     {
-        return this->getSize() == CoordinatVariableDefinition::UNLIMITED;
+        return this->getSize() == FDP_UNLIMITED;
     }
 
     std::string TableDefinition::getVariableName( int i )

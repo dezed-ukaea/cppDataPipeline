@@ -17,6 +17,7 @@
 #define FDP_FILE_ISNOERR(x) (0 == x)
 #define FDP_FILE_ISERR(x) (!FDP_FILE_ISNOERR(x))
 
+
 namespace FairDataPipeline
 {
     std::string str_strip_right( std::string str, const std::string& chars );
@@ -52,67 +53,67 @@ namespace FairDataPipeline
         //COMPOUND
     };
 
-	struct netCDFComponentDefinition
+    struct netCDFComponentDefinition
+    {
+	    netCDFComponentDefinition()
+	    {
+	    }
+
+	    std::string description;
+	    std::string long_name;
+
+    };
+
+    struct VariableDefinition : netCDFComponentDefinition
 	{
-        netCDFComponentDefinition()
-        {
-        }
-
-		std::string description;
-		std::string long_name;
-
-		//std::map< std::string, std::vector<std::string> > optional_attribs;
-	};
-
-	struct VariableDefinition : netCDFComponentDefinition
-	{
-        VariableDefinition() : netCDFComponentDefinition(), _sz_missing(0)
-        {
-            datatype = DataType::UNKNOWN;
-        }
+		VariableDefinition() : netCDFComponentDefinition(), _sz_missing(0)
+		{
+			datatype = DataType::UNKNOWN;
+		}
 
 		DataType datatype;
 		std::string units;
-        std::shared_ptr< void > _missing_ptr;
-        size_t _sz_missing;
+		std::shared_ptr< void > _missing_ptr;
+		size_t _sz_missing;
 
-        template< typename T >
-        int setFillValue( const T& pval )
-        {
-            int status = 0;
+		template< typename T >
+			int setFillValue( const T& pval )
+			{
+				int status = 0;
 
-            std::shared_ptr<T> p( new T() );
+				std::shared_ptr<T> p( new T() );
+				*p = pval;
 
-            _missing_ptr = p;
-            _sz_missing = sizeof( T );
+				_missing_ptr = p;
+				_sz_missing = sizeof( T );
 
-            return status;
-        }
+				return status;
+			}
 	};
 
-	struct LocalVAriableDefinition : VariableDefinition
+    struct LocalVAriableDefinition : VariableDefinition
 	{
-        LocalVAriableDefinition() : VariableDefinition()
-        {
-        }
+		LocalVAriableDefinition() : VariableDefinition()
+		{
+		}
 
-        std::string name;
+		std::string name;
 	};
 
-	struct CoordinatVariableDefinition : VariableDefinition
+#define FDP_UNLIMITED 0
+    struct CoordinatVariableDefinition : VariableDefinition
 	{
-        CoordinatVariableDefinition() : VariableDefinition()
-        {
-            size=0;
-            values = NULL;
-        }
+		CoordinatVariableDefinition() : VariableDefinition()
+		{
+			size=0;
+			values = NULL;
+		}
 
 		int size;
-        static int UNLIMITED;
 		void* values;
 		std::string name;//variable name in jave splits the group and patgh
 
-        bool isUnlimited() const;
+		bool isUnlimited() const;
 	};
 
     struct DimensionalVariableDefinition : VariableDefinition
