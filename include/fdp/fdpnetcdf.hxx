@@ -55,66 +55,66 @@ namespace FairDataPipeline
 
     struct netCDFComponentDefinition
     {
-	    netCDFComponentDefinition()
-	    {
-	    }
+        netCDFComponentDefinition()
+        {
+        }
 
-	    std::string description;
-	    std::string long_name;
+        std::string description;
+        std::string long_name;
 
     };
 
     struct VariableDefinition : netCDFComponentDefinition
-	{
-		VariableDefinition() : netCDFComponentDefinition(), _sz_missing(0)
-		{
-			datatype = DataType::UNKNOWN;
-		}
+    {
+        VariableDefinition() : netCDFComponentDefinition(), _sz_missing(0)
+        {
+            datatype = DataType::UNKNOWN;
+        }
 
-		DataType datatype;
-		std::string units;
-		std::shared_ptr< void > _missing_ptr;
-		size_t _sz_missing;
+        DataType datatype;
+        std::string units;
+        std::shared_ptr< void > _missing_ptr;
+        size_t _sz_missing;
 
-		template< typename T >
-			int setFillValue( const T& pval )
-			{
-				int status = 0;
+        template< typename T >
+            int setFillValue( const T& pval )
+            {
+                int status = 0;
 
-				std::shared_ptr<T> p( new T() );
-				*p = pval;
+                std::shared_ptr<T> p( new T() );
+                *p = pval;
 
-				_missing_ptr = p;
-				_sz_missing = sizeof( T );
+                _missing_ptr = p;
+                _sz_missing = sizeof( T );
 
-				return status;
-			}
-	};
+                return status;
+            }
+    };
 
     struct LocalVAriableDefinition : VariableDefinition
-	{
-		LocalVAriableDefinition() : VariableDefinition()
-		{
-		}
+    {
+        LocalVAriableDefinition() : VariableDefinition()
+        {
+        }
 
-		std::string name;
-	};
+        std::string name;
+    };
 
 #define FDP_UNLIMITED 0
     struct CoordinatVariableDefinition : VariableDefinition
-	{
-		CoordinatVariableDefinition() : VariableDefinition()
-		{
-			size=0;
-			values = NULL;
-		}
+    {
+        CoordinatVariableDefinition() : VariableDefinition()
+        {
+            size=0;
+            values = NULL;
+        }
 
-		int size;
-		void* values;
-		std::string name;//variable name in jave splits the group and patgh
+        int size;
+        void* values;
+        std::string name;//variable name in jave splits the group and patgh
 
-		bool isUnlimited() const;
-	};
+        bool isUnlimited() const;
+    };
 
     struct DimensionalVariableDefinition : VariableDefinition
     {
@@ -195,8 +195,6 @@ namespace FairDataPipeline
     struct IGroupAtt : public IAtt
     {
         typedef std::shared_ptr< IGroupAtt > sptr;
-
-
     };
 
     struct IVarAtt : public IAtt
@@ -204,7 +202,49 @@ namespace FairDataPipeline
         typedef std::shared_ptr< IVarAtt > sptr;
     };
 
-    struct IVar
+    struct IAttComposite
+    {
+        typedef std::shared_ptr< IAttComposite > sptr;
+
+        virtual IAtt::sptr putAttShort( const std::string& key, short value ) = 0;
+        virtual IAtt::sptr putAttInt( const std::string& key, int value ) = 0;
+        virtual IAtt::sptr putAttLong( const std::string& key, long value ) = 0;
+        virtual IAtt::sptr putAttLongLong( const std::string& key, long long value ) = 0;
+
+        virtual IAtt::sptr putAttUShort( const std::string& key, unsigned short value ) = 0;
+        virtual IAtt::sptr putAttUInt( const std::string& key, unsigned int value ) = 0;
+        //virtual IAtt::sptr putAttULong( const std::string& key, unsigned long value ) = 0;
+
+        virtual IAtt::sptr putAttString( const std::string& key, const std::string& value ) = 0;
+        virtual IAtt::sptr putAttFloat( const std::string& key, float value ) = 0;
+        virtual IAtt::sptr putAttDouble( const std::string& key, double value ) = 0;
+
+
+        virtual IAtt::sptr putAttShorts( const std::string& key, size_t nvals, const short* values ) = 0;
+        virtual IAtt::sptr putAttInts( const std::string& key, int nvals, const int* values ) = 0;
+        virtual IAtt::sptr putAttLongs( const std::string& key, size_t nvals, const long* values ) = 0;
+        virtual IAtt::sptr putAttLongLongs( const std::string& key, size_t nvals, const long long* values ) = 0;
+
+        virtual IAtt::sptr putAttUShorts( const std::string& key, size_t nvals, const unsigned short* values ) = 0;
+        virtual IAtt::sptr putAttUInts( const std::string& key, size_t nvals, const unsigned int* values ) = 0;
+        virtual IAtt::sptr putAttULongs( const std::string& key, size_t nvals, const unsigned long* values ) = 0;
+        virtual IAtt::sptr putAttULongLongs( const std::string& key, size_t nvals, const unsigned long long* values ) = 0;
+
+        virtual IAtt::sptr putAttFloats( const std::string& key, size_t nvals, const float* values ) = 0;
+        virtual IAtt::sptr putAttDoubles( const std::string& key, size_t nvals, const double* values ) = 0;
+
+        virtual IAtt::sptr putAtt2( const std::string& key, size_t nvals, const char** values ) = 0;
+
+        virtual  IAtt::sptr putAtt( const std::string& key
+                , DataType datatype, size_t nvals, const void* pv ) = 0;
+
+
+        virtual IAtt::sptr getAtt( const std::string& key ) = 0;
+
+    };
+
+
+    struct IVar : public IAttComposite
     {
         typedef std::vector< IDimension::sptr > VDIMS;
 
@@ -220,31 +260,10 @@ namespace FairDataPipeline
         virtual std::vector< IDimension::sptr > getDims() = 0;
 
         virtual DataType getType() = 0;
-
-        virtual IVarAtt::sptr putAtt( const std::string& key, const std::string& value ) = 0;
-
-        virtual IVarAtt::sptr putAtt( const std::string& key, size_t nvals, const short* values ) = 0;
-        virtual IVarAtt::sptr putAtt( const std::string& key, size_t nvals, const int* values ) = 0;
-        virtual IVarAtt::sptr putAtt( const std::string& key, size_t nvals, const long* values ) = 0;
-        virtual IVarAtt::sptr putAtt( const std::string& key, size_t nvals, const long long* values ) = 0;
-
-        virtual IVarAtt::sptr putAtt( const std::string& key, size_t nvals, const unsigned short* values ) = 0;
-        virtual IVarAtt::sptr putAtt( const std::string& key, size_t nvals, const unsigned int* values ) = 0;
-        virtual IVarAtt::sptr putAtt( const std::string& key, size_t nvals, const unsigned long* values ) = 0;
-        virtual IVarAtt::sptr putAtt( const std::string& key, size_t nvals, const unsigned long long* values ) = 0;
-
-        virtual IVarAtt::sptr putAtt( const std::string& key, size_t nvals, const float* values ) = 0;
-        virtual IVarAtt::sptr putAtt( const std::string& key, size_t nvals, const double* values ) = 0;
-        
-        virtual IVarAtt::sptr putAtt( const std::string& key, size_t nvals, const char** values ) = 0;
-       virtual  IVarAtt::sptr putAtt( const std::string& key
-                , DataType datatype, size_t nvals, void* pv ) = 0;
-
-
-        virtual IVarAtt::sptr getAtt( const std::string& key ) = 0;
     };
 
-    struct IGroup
+
+    struct IGroup : public IAttComposite
     {
         typedef std::shared_ptr< IGroup > sptr;
 
@@ -257,7 +276,7 @@ namespace FairDataPipeline
 
         virtual IGroup::sptr requireGroup( const std::string& name ) = 0;
 
-        //virtual IGroup::sptr addGroup( const std::string& s ) = 0;
+        ////virtual IGroup::sptr addGroup( const std::string& s ) = 0;
 
         virtual IGroup::sptr getGroup( const std::string& name ) = 0;
 
@@ -279,38 +298,13 @@ namespace FairDataPipeline
         virtual int getGroupCount() = 0;
 
         virtual std::string getName() = 0;
-
-        virtual IGroupAtt::sptr putAtt( const std::string& key, const std::string& value ) = 0;
-        virtual IGroupAtt::sptr putAtt( const std::string& key, int value ) = 0;
-        virtual IGroupAtt::sptr putAtt( const std::string& key, float value ) = 0;
-
-        virtual IGroupAtt::sptr putAtt( const std::string& key, size_t nvals, const short* values ) = 0;
-        virtual IGroupAtt::sptr putAtt( const std::string& key, size_t nvals, const int* values ) = 0;
-        virtual IGroupAtt::sptr putAtt( const std::string& key, size_t nvals, const long* values ) = 0;
-        virtual IGroupAtt::sptr putAtt( const std::string& key, size_t nvals, const long long* values ) = 0;
-
-        virtual IGroupAtt::sptr putAtt( const std::string& key, size_t nvals, const unsigned short* values ) = 0;
-        virtual IGroupAtt::sptr putAtt( const std::string& key, size_t nvals, const unsigned int* values ) = 0;
-        virtual IGroupAtt::sptr putAtt( const std::string& key, size_t nvals, const unsigned long* values ) = 0;
-        virtual IGroupAtt::sptr putAtt( const std::string& key, size_t nvals, const unsigned long long* values ) = 0;
-
-        virtual IGroupAtt::sptr putAtt( const std::string& key, size_t nvals, const float* values ) = 0;
-        virtual IGroupAtt::sptr putAtt( const std::string& key, size_t nvals, const double* values ) = 0;
-
-        virtual IGroupAtt::sptr putAtt( const std::string& key, size_t nvals, const char** values ) = 0;
-
-
-        virtual IGroupAtt::sptr getAtt( const std::string& key ) = 0;
         virtual std::vector< std::string > getAtts() = 0;
 
+        virtual int prepare( const CoordinatVariableDefinition& cvd ) = 0;
 
+        virtual int prepare( const DimensionalVariableDefinition& dvd ) = 0;
 
-
-	virtual int prepare( const CoordinatVariableDefinition& cvd ) = 0;
-
-    virtual int prepare( const DimensionalVariableDefinition& dvd ) = 0;
-
-    virtual int prepare( const TableDefinition& td ) = 0; 
+        virtual int prepare( const TableDefinition& td ) = 0; 
 
     };
 
@@ -318,7 +312,7 @@ namespace FairDataPipeline
     {
         enum Mode{ READ, WRITE};
     };
-
+#if 0
     struct DimensionDefinition
     {
         size_t size;
@@ -334,7 +328,7 @@ namespace FairDataPipeline
         std::string description;
         std::vector< std::string > dimension_names;
     };
-
+#endif
 
     class FileFactory
     {
@@ -347,70 +341,6 @@ namespace FairDataPipeline
             static IFile::sptr create( const std::string& path, Mode mode );
         private:
 
-    };
-
-    class Builder
-    {
-        public:
-            Builder() = delete;
-
-            Builder( const Builder& rhs ) = delete;
-
-            Builder( const std::string& path, IFile::Mode mode );
-
-            int writeArray( const std::string& name
-                    , const ArrayDefinition& arraydef, const void* data );
-
-            int writeDimension( const std::string& name
-                    , const DimensionDefinition& dimdef, const void* data );
-
-            int readDim_metadata( const std::string& name, DimensionDefinition& dimdef );
-
-            int readDim_data( const std::string& name
-                    , const DimensionDefinition& dimdef, void* data );
-
-            int readArray_metadata( const std::string& name,  ArrayDefinition& arraydef );
-
-            int readArray_data( const std::string& name
-                    , const ArrayDefinition& arraydef, void *data );
-
-            int putAtt( const std::string& name
-                    , const std::string& key, size_t nvals,  const short* values );
-
-            int putAtt( const std::string& name
-                    , const std::string& key, size_t nvals,  const int* values );
-
-            int putAtt( const std::string& name
-                    , const std::string& key, size_t nvals,  const long* values );
-
-            int putAtt( const std::string& name
-                    , const std::string& key, size_t nvals,  const long long* values );
-
-            int putAtt( const std::string& name
-                    , const std::string& key, size_t nvals,  const unsigned short* values );
-
-            int putAtt( const std::string& name
-                    , const std::string& key, size_t nvals,  const unsigned int* values );
-
-            int putAtt( const std::string& name
-                    , const std::string& key, size_t nvals,  const unsigned long* values );
-
-            int putAtt( const std::string& name
-                    , const std::string& key, size_t nvals,  const unsigned long long* values );
-            
-            int putAtt( const std::string& name
-                    , const std::string& key, size_t nvals,  const float* values );
-
-            int putAtt( const std::string& name
-                    , const std::string& key, size_t nvals,  const double* values );
-
-            int putAtt( const std::string& name
-                    , const std::string& key, size_t nvals,  const char** values );
-
-
-            int getAtt( const std::string& name, const std::string& key, IAtt::sptr& att_ptr );
-        private:
-            IFile::sptr _file;
     };
 }
 #endif

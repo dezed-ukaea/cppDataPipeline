@@ -18,66 +18,66 @@ typedef std::shared_ptr< NcFile > NcFilePtr;
 
 
 template< typename T >
-        struct NcTraits;
+struct NcTraits;
 
-    template<>
-        struct NcTraits< short >
-        {
-            typedef netCDF::NcShort MyNcType;
-        };
+template<>
+struct NcTraits< short >
+{
+    typedef netCDF::NcShort MyNcType;
+};
 
-    template<>
-        struct NcTraits< int >
-        {
-            typedef netCDF::NcInt MyNcType;
-        };
+template<>
+struct NcTraits< int >
+{
+    typedef netCDF::NcInt MyNcType;
+};
 
-    template<>
-        struct NcTraits< unsigned short >
-        {
-            typedef netCDF::NcUshort MyNcType;
-        };
+template<>
+struct NcTraits< unsigned short >
+{
+    typedef netCDF::NcUshort MyNcType;
+};
 
-    template<>
-        struct NcTraits< unsigned int >
-        {
-            typedef netCDF::NcUint MyNcType;
-        };
+template<>
+struct NcTraits< unsigned int >
+{
+    typedef netCDF::NcUint MyNcType;
+};
 
 
-    template<>
-        struct NcTraits< float >
-        {
-            typedef netCDF::NcFloat MyNcType;
-        };
+template<>
+struct NcTraits< float >
+{
+    typedef netCDF::NcFloat MyNcType;
+};
 
-    template<>
-        struct NcTraits< double >
-        {
-            typedef netCDF::NcDouble MyNcType;
-        };
+template<>
+struct NcTraits< double >
+{
+    typedef netCDF::NcDouble MyNcType;
+};
 
-    template<>
-        struct NcTraits< long >
-        {
-            typedef netCDF::NcInt64 MyNcType;
-        };
-    template<>
-        struct NcTraits< long long >
-        {
-            typedef netCDF::NcInt64 MyNcType;
-        };
+template<>
+struct NcTraits< long >
+{
+    typedef netCDF::NcInt64 MyNcType;
+};
+template<>
+struct NcTraits< long long >
+{
+    typedef netCDF::NcInt64 MyNcType;
+};
 
-    template<>
-        struct NcTraits< unsigned long >
-        {
-            typedef netCDF::NcUint64 MyNcType;
-        };
-    template<>
-        struct NcTraits< unsigned long long >
-        {
-            typedef netCDF::NcUint64 MyNcType;
-        };
+template<>
+struct NcTraits< unsigned long >
+{
+    typedef netCDF::NcUint64 MyNcType;
+};
+template<>
+struct NcTraits< unsigned long long >
+{
+    typedef netCDF::NcUint64 MyNcType;
+};
 
 
 
@@ -276,10 +276,10 @@ namespace FairDataPipeline
 
             void putVar( const void* vals );
 
-	    void putVar( const std::vector< size_t >& index, int value ) const;
-	    void putVar( const std::vector< size_t >& index
-			    , const std::vector< size_t >& countp
-			    , int* values ) const;
+            void putVar( const std::vector< size_t >& index, int value ) const;
+            void putVar( const std::vector< size_t >& index
+                    , const std::vector< size_t >& countp
+                    , int* values ) const;
 
             void getVar( void* vals );
 
@@ -287,106 +287,52 @@ namespace FairDataPipeline
 
             std::vector< IDimension::sptr > getDims();
 
-            IGroup::sptr parent(){return _parent.lock();}
-
-            IVarAtt::sptr putAtt( const std::string& key, const std::string& value );
-            IVarAtt::sptr putAtt( const std::string& key, int value );
-            IVarAtt::sptr putAtt( const std::string& key, float value );
-
-            IVarAtt::sptr putAtt( const std::string& key, size_t nvals, const short* values );
-            IVarAtt::sptr putAtt( const std::string& key, size_t nvals, const int* values );
-            IVarAtt::sptr putAtt( const std::string& key, size_t nvals, const long* values );
-            IVarAtt::sptr putAtt( const std::string& key, size_t nvals, const long long* values );
-
-            IVarAtt::sptr putAtt( const std::string& key, size_t nvals, const unsigned short* values );
-            IVarAtt::sptr putAtt( const std::string& key, size_t nvals, const unsigned int* values );
-            IVarAtt::sptr putAtt( const std::string& key, size_t nvals, const unsigned long* values );
-            IVarAtt::sptr putAtt( const std::string& key, size_t nvals, const unsigned long long* values );
-
-            IVarAtt::sptr putAtt( const std::string& key, size_t nvals, const float* values );
-            IVarAtt::sptr putAtt( const std::string& key, size_t nvals, const double* values );
-
-            IVarAtt::sptr putAtt( const std::string& key, size_t nvals, const char** values );
-
-            IVarAtt::sptr putAtt( const std::string& key
-                    , DataType datatype, size_t nvals, void* pv )
-            {
-                IVarAtt::sptr att_ptr;
-                switch( datatype )
-                {
-                    case DataType::SHORT:
-
-                        this->putAtt( ATTRIB_KEY_FILLVALUE, 1
-                                , (const short*)(pv) );
-                        break;
-
-                    case DataType::INT:
-
-                        this->putAtt( ATTRIB_KEY_FILLVALUE, 1
-                                , (const int*)(pv) );
-                        break;
-                    case DataType::INT64:
-
-                        this->putAtt( ATTRIB_KEY_FILLVALUE, 1
-                                , (const long*)(pv) );
-                        break;
-                    case DataType::USHORT:
-
-                        this->putAtt( ATTRIB_KEY_FILLVALUE, 1
-                                , (const unsigned short*)(pv) );
-                        break;
-
-                    case DataType::UINT:
-
-                        this->putAtt( ATTRIB_KEY_FILLVALUE, 1
-                                , (const unsigned int*)(pv) );
-                        break;
-                    case DataType::UINT64:
-
-                        this->putAtt( ATTRIB_KEY_FILLVALUE, 1
-                                , (const unsigned long*)(pv) );
-                        break;
+            IGroup::sptr parent();
 
 
-                    case DataType::FLOAT:
+            IAtt::sptr putAttShort( const std::string& key, short value );
+            IAtt::sptr putAttInt( const std::string& key, int value );
+            IAtt::sptr putAttLong( const std::string& key, long value );
+            IAtt::sptr putAttLongLong( const std::string& key, long long value );
 
-                        this->putAtt( ATTRIB_KEY_FILLVALUE, 1
-                                , (const float*)(pv) );
-                        break;
-                    case DataType::DOUBLE:
+            IAtt::sptr putAttUShort( const std::string& key, unsigned short value );
+            IAtt::sptr putAttUInt( const std::string& key, unsigned int value );
+            
+            IAtt::sptr putAttString( const std::string& key, const std::string& value);
+            IAtt::sptr putAttFloat( const std::string& key, float value );
+            IAtt::sptr putAttDouble( const std::string& key, double value );
 
-                        this->putAtt( ATTRIB_KEY_FILLVALUE, 1
-                                , (const double*)(pv) );
-                        break;
+            IAtt::sptr putAttShorts( const std::string& key, size_t nvals, const short* values );
+            IAtt::sptr putAttInts( const std::string& key, int nvals, const int* values );
+            IAtt::sptr putAttLongs( const std::string& key, size_t nvals, const long* values );
+            IAtt::sptr putAttLongLongs( const std::string& key, size_t nvals, const long long* values );
 
+            IAtt::sptr putAttUShorts( const std::string& key, size_t nvals, const unsigned short* values );
+            IAtt::sptr putAttUInts( const std::string& key, size_t nvals, const unsigned int* values );
+            IAtt::sptr putAttULongs( const std::string& key, size_t nvals, const unsigned long* values );
+            IAtt::sptr putAttULongLongs( const std::string& key, size_t nvals, const unsigned long long* values );
 
+            IAtt::sptr putAttFloats( const std::string& key, size_t nvals, const float* values );
+            IAtt::sptr putAttDoubles( const std::string& key, size_t nvals, const double* values );
 
-                    default:
-                        std::cerr << __FUNCTION__ << ": Unhandled datatype";
-                        break;
+            IAtt::sptr putAtt2( const std::string& key, size_t nvals, const char** values );
 
-             
-                }
-                return att_ptr;
-            }
+            IAtt::sptr putAtt( const std::string& key, DataType datatype, size_t nvals, const void* pv );
 
-
-
-
-            IVarAtt::sptr getAtt( const std::string& key );
+            IAtt::sptr getAtt( const std::string& key );
 
         private:
             template< typename T >
                 IVarAtt::sptr putAttImpl( const std::string& key
                         , size_t nvals, const T* values );
 
-	    template< typename T >  
-		    void putVarImpl( const std::vector< size_t >& index, T* values ) const;
+            template< typename T >  
+                void putVarImpl( const std::vector< size_t >& index, T* values ) const;
 
-	    template< typename T >  
-		 void putVarImpl( const std::vector< size_t >& index
-				 , const std::vector< size_t >& countp
-				 , T* values ) const;
+            template< typename T >  
+                void putVarImpl( const std::vector< size_t >& index
+                        , const std::vector< size_t >& countp
+                        , T* values ) const;
 
 
 
@@ -397,52 +343,108 @@ namespace FairDataPipeline
 
             IVar::NAME_VARATT_MAP _name_varatt_map;
     };
-    template< typename T >  
-	    void VarImpl::putVarImpl( const std::vector< size_t >& index, T* values ) const
-	    {
-		    try
-		    {
-			    _nc_var.putVar( index, values );
-		    }
-		    catch (NcException& ex )
-		    {
-			    std::cerr << "VarImpl::putVarImpl : " << ex.what();
-		    }
-	    }
+
+    IAtt::sptr VarImpl::putAtt( const std::string& key, DataType datatype, size_t nvals, const void* pv )
+    {
+        IVarAtt::sptr att_ptr;
+        switch( datatype )
+        {
+            case DataType::SHORT:
+
+                this->putAttShorts( key, 1, (const short*)(pv) );
+                break;
+
+            case DataType::INT:
+
+                this->putAttInts( key, 1, (const int*)(pv) );
+                break;
+            case DataType::INT64:
+
+                this->putAttLongs( key, 1, (const long*)(pv) );
+                break;
+            case DataType::USHORT:
+
+                this->putAttUShorts( key, 1, (const unsigned short*)(pv) );
+                break;
+
+            case DataType::UINT:
+
+                this->putAttUInts( key, 1, (const unsigned int*)(pv) );
+                break;
+            case DataType::UINT64:
+
+                this->putAttULongs( key, 1, (const unsigned long*)(pv) );
+                break;
+
+
+            case DataType::FLOAT:
+
+                this->putAttFloats( key, 1, (const float*)(pv) );
+                break;
+            case DataType::DOUBLE:
+
+                this->putAttDoubles( key, 1, (const double*)(pv) );
+                break;
+
+            default:
+                std::cerr << __FUNCTION__ << ": Unhandled datatype";
+                break;
+
+        }
+        return att_ptr;
+    }
+
+    IGroup::sptr VarImpl::parent( )
+    {
+        return _parent.lock();
+    }
 
     template< typename T >  
-	    void VarImpl::putVarImpl( const std::vector< size_t >& index
-			    , const std::vector< size_t >& countp
-			    , T* values ) const
-	    {
-		    try
-		    {
-			    _nc_var.putVar( index, countp, values );
-		    }
-		    catch (NcException& ex )
-		    {
-			    std::cerr << "VarImpl::putVarImpl : " << ex.what();
-		    }
-	    }
+        void VarImpl::putVarImpl( const std::vector< size_t >& index, T* values ) const
+        {
+            try
+            {
+                _nc_var.putVar( index, values );
+            }
+            catch (NcException& ex )
+            {
+                std::cerr << "VarImpl::putVarImpl : " << ex.what();
+            }
+        }
+
+    template< typename T >  
+        void VarImpl::putVarImpl( const std::vector< size_t >& index
+                , const std::vector< size_t >& countp
+                , T* values ) const
+        {
+            try
+            {
+                _nc_var.putVar( index, countp, values );
+            }
+            catch (NcException& ex )
+            {
+                std::cerr << "VarImpl::putVarImpl : " << ex.what();
+            }
+        }
 
 
     void VarImpl::putVar( const std::vector< size_t >& index, int value ) const
     {
-	    try
-	    {
-		    _nc_var.putVar( index, value );
-	    }
-	    catch( NcException& ex )
-	    {
-		    std::cerr << "VarImpl::putVar : " << ex.what();
-	    }
+        try
+        {
+            _nc_var.putVar( index, value );
+        }
+        catch( NcException& ex )
+        {
+            std::cerr << "VarImpl::putVar : " << ex.what();
+        }
     }
 
     void VarImpl::putVar( const std::vector< size_t >& index
-		    , const std::vector< size_t >& countp
-		    , int* values ) const
+            , const std::vector< size_t >& countp
+            , int* values ) const
     {
-	    putVarImpl( index, countp, values );
+        putVarImpl( index, countp, values );
     }
 
 
@@ -475,9 +477,9 @@ namespace FairDataPipeline
             int getValues( double* values );
 
 
-			IGroupPtr getParentGroup();
-			//GroupImplSptr _getParentGroup();
-			std::string getName();
+            IGroupPtr getParentGroup();
+            //GroupImplSptr _getParentGroup();
+            std::string getName();
 
         private:
             template< typename T>
@@ -529,10 +531,10 @@ namespace FairDataPipeline
             {
                 e.what();
 
-		std::cerr << "GroupAtt::getValuesImpl : " << e.what();
+                std::cerr << "GroupAtt::getValuesImpl : " << e.what();
 
 
-		status = FDP_FILE_STATUS_ERR;
+                status = FDP_FILE_STATUS_ERR;
             }
 
             return status;
@@ -601,8 +603,8 @@ namespace FairDataPipeline
         {
             e.what();
 
-		    std::cerr << "GroupAtt::ptAtt : " << e.what();
-	    status = FDP_FILE_STATUS_ERR;
+            std::cerr << "GroupAtt::ptAtt : " << e.what();
+            status = FDP_FILE_STATUS_ERR;
         }
 
         return status;
@@ -656,8 +658,8 @@ namespace FairDataPipeline
             }
             catch( NcException& e )
             {
-		std::cerr << "VarAtt::getValuesImpl : " << e.what();
-		status = FDP_FILE_STATUS_ERR;
+                std::cerr << "VarAtt::getValuesImpl : " << e.what();
+                status = FDP_FILE_STATUS_ERR;
             }
 
             return status;
@@ -725,15 +727,32 @@ namespace FairDataPipeline
         catch( NcException& e )
         {
             e.what();
-	    
-	    std::cerr << "VarAttl::getValues : " << e.what();
-	    status = FDP_FILE_STATUS_ERR;
+
+            std::cerr << "VarAttl::getValues : " << e.what();
+            status = FDP_FILE_STATUS_ERR;
         }
 
         return status;
     }
-    
-    IVarAtt::sptr VarImpl::putAtt( const std::string& key, int value )
+    IAtt::sptr VarImpl::putAttShort( const std::string& key, short value )
+    {
+        VarAtt::sptr att_ptr;
+        try
+        {
+            netCDF::NcVarAtt ncatt = _nc_var.putAtt( key, netCDF::NcShort(), value );
+            att_ptr = VarAtt::create( ncatt );
+            _name_varatt_map[ key ] = att_ptr;
+        }
+        catch( NcException& e )
+        {
+            e.what();
+
+            std::cerr << "VarImpl::putAtt : " << e.what();
+        }
+        return att_ptr;
+    }
+
+    IAtt::sptr VarImpl::putAttInt( const std::string& key, int value )
     {
         VarAtt::sptr att_ptr;
         try
@@ -746,12 +765,82 @@ namespace FairDataPipeline
         {
             e.what();
 
-	    std::cerr << "VarImpl::putAtt : " << e.what();
+            std::cerr << "VarImpl::putAtt : " << e.what();
+        }
+        return att_ptr;
+    }
+    IAtt::sptr VarImpl::putAttLong( const std::string& key, long value )
+    {
+        VarAtt::sptr att_ptr;
+        try
+        {
+            netCDF::NcVarAtt ncatt = _nc_var.putAtt( key, netCDF::NcInt64(), value );
+            att_ptr = VarAtt::create( ncatt );
+            _name_varatt_map[ key ] = att_ptr;
+        }
+        catch( NcException& e )
+        {
+            e.what();
+
+            std::cerr << "VarImpl::putAtt : " << e.what();
+        }
+        return att_ptr;
+    }
+    IAtt::sptr VarImpl::putAttLongLong( const std::string& key, long long value )
+    {
+        VarAtt::sptr att_ptr;
+        try
+        {
+            netCDF::NcVarAtt ncatt = _nc_var.putAtt( key, netCDF::NcInt64(), value );
+            att_ptr = VarAtt::create( ncatt );
+            _name_varatt_map[ key ] = att_ptr;
+        }
+        catch( NcException& e )
+        {
+            e.what();
+
+            std::cerr << "VarImpl::putAtt : " << e.what();
         }
         return att_ptr;
     }
 
-    IVarAtt::sptr VarImpl::putAtt( const std::string& key, float value )
+    IAtt::sptr VarImpl::putAttUShort( const std::string& key, unsigned short value )
+    {
+        VarAtt::sptr att_ptr;
+        try
+        {
+            netCDF::NcVarAtt ncatt = _nc_var.putAtt( key, netCDF::NcUshort(), value );
+            att_ptr = VarAtt::create( ncatt );
+            _name_varatt_map[ key ] = att_ptr;
+        }
+        catch( NcException& e )
+        {
+            e.what();
+
+            std::cerr << "VarImpl::putAtt : " << e.what();
+        }
+        return att_ptr;
+    }
+
+    IAtt::sptr VarImpl::putAttUInt( const std::string& key, unsigned int value )
+    {
+        VarAtt::sptr att_ptr;
+        try
+        {
+            netCDF::NcVarAtt ncatt = _nc_var.putAtt( key, netCDF::NcUint(), value );
+            att_ptr = VarAtt::create( ncatt );
+            _name_varatt_map[ key ] = att_ptr;
+        }
+        catch( NcException& e )
+        {
+            e.what();
+
+            std::cerr << "VarImpl::putAtt : " << e.what();
+        }
+        return att_ptr;
+    }
+
+    IAtt::sptr VarImpl::putAttFloat( const std::string& key, float value )
     {
         VarAtt::sptr att_ptr;
         try
@@ -764,11 +853,33 @@ namespace FairDataPipeline
         {
             e.what();
 
-	    std::cerr << "VarImpl::putAtt : " << e.what();
+            std::cerr << "VarImpl::putAtt : " << e.what();
         }
         return att_ptr;
 
     }
+    IAtt::sptr VarImpl::putAttDouble( const std::string& key, double value )
+    {
+        VarAtt::sptr att_ptr;
+        try
+        {
+            netCDF::NcVarAtt ncatt = _nc_var.putAtt( key, netCDF::NcDouble(), value );
+            att_ptr = VarAtt::create( ncatt );
+            _name_varatt_map[ key ] = att_ptr;
+        }
+        catch( NcException& e )
+        {
+            e.what();
+
+            std::cerr << "VarImpl::putAtt : " << e.what();
+        }
+        return att_ptr;
+
+    }
+
+
+#if 0
+#endif
     template< typename T >
         IVarAtt::sptr VarImpl::putAttImpl( const std::string& key, size_t nvals, const T* values )
         {
@@ -788,63 +899,63 @@ namespace FairDataPipeline
             {
                 e.what();
 
-		    std::cerr << "VarImpl::putAttImpl : " << e.what();
+                std::cerr << "VarImpl::putAttImpl : " << e.what();
             }
 
             return var_att;
         }
 
-    IVarAtt::sptr VarImpl::putAtt( const std::string& key, size_t nvals, const short* values )
+    IAtt::sptr VarImpl::putAttShorts( const std::string& key, size_t nvals, const short* values )
     {
-        return this->putAttImpl( key, nvals, values );
+        return this->putAttImpl< short >( key, nvals, values );
     }
 
-    IVarAtt::sptr VarImpl::putAtt( const std::string& key, size_t nvals, const int* values )
+    IAtt::sptr VarImpl::putAttInts( const std::string& key, int nvals, const int* values )
     {
-        return this->putAttImpl( key, nvals, values );
+        return this->putAttImpl< int >( key, nvals, values );
     }
 
-    IVarAtt::sptr VarImpl::putAtt( const std::string& key, size_t nvals, const long* values )
+    IAtt::sptr VarImpl::putAttLongs( const std::string& key, size_t nvals, const long* values )
     {
-        return this->putAttImpl( key, nvals, values );
+        return this->putAttImpl< long >( key, nvals, values );
     }
 
-    IVarAtt::sptr VarImpl::putAtt( const std::string& key, size_t nvals, const long long* values )
+    IAtt::sptr VarImpl::putAttLongLongs( const std::string& key, size_t nvals, const long long* values )
     {
-        return this->putAttImpl( key, nvals, values );
+        return this->putAttImpl< long long >( key, nvals, values );
     }
 
-    IVarAtt::sptr VarImpl::putAtt( const std::string& key, size_t nvals, const unsigned short* values )
+    IAtt::sptr VarImpl::putAttUShorts( const std::string& key, size_t nvals, const unsigned short* values )
     {
-        return this->putAttImpl( key, nvals, values );
+        return this->putAttImpl< unsigned short >( key, nvals, values );
     }
 
-    IVarAtt::sptr VarImpl::putAtt( const std::string& key, size_t nvals, const unsigned int* values )
+    IAtt::sptr VarImpl::putAttUInts( const std::string& key, size_t nvals, const unsigned int* values )
     {
-        return this->putAttImpl( key, nvals, values );
+        return this->putAttImpl< unsigned int>( key, nvals, values );
     }
 
-    IVarAtt::sptr VarImpl::putAtt( const std::string& key, size_t nvals, const unsigned long* values )
+    IAtt::sptr VarImpl::putAttULongs( const std::string& key, size_t nvals, const unsigned long* values )
     {
-        return this->putAttImpl( key, nvals, values );
+        return this->putAttImpl< unsigned long >( key, nvals, values );
     }
 
-    IVarAtt::sptr VarImpl::putAtt( const std::string& key, size_t nvals, const unsigned long long* values )
+    IAtt::sptr VarImpl::putAttULongLongs( const std::string& key, size_t nvals, const unsigned long long* values )
     {
-        return this->putAttImpl( key, nvals, values );
+        return this->putAttImpl< unsigned long long >( key, nvals, values );
     }
 
-    IVarAtt::sptr VarImpl::putAtt( const std::string& key, size_t nvals, const float* values )
+    IAtt::sptr VarImpl::putAttFloats( const std::string& key, size_t nvals, const float* values )
     {
-        return this->putAttImpl( key, nvals, values );
+        return this->putAttImpl< float >( key, nvals, values );
     }
 
-    IVarAtt::sptr VarImpl::putAtt( const std::string& key, size_t nvals, const double* values )
+    IAtt::sptr VarImpl::putAttDoubles( const std::string& key, size_t nvals, const double* values )
     {
-        return this->putAttImpl( key, nvals, values );
+        return this->putAttImpl< double >( key, nvals, values );
     }
 
-    IVarAtt::sptr VarImpl::putAtt( const std::string& key, size_t nvals, const char** values )
+    IAtt::sptr VarImpl::putAtt2( const std::string& key, size_t nvals, const char** values )
     {
         IVarAtt::sptr var_att;
         try
@@ -858,13 +969,13 @@ namespace FairDataPipeline
         {
             e.what();
 
-	    std::cerr << "VarImpl::putAtt : " << e.what();
+            std::cerr << "VarImpl::putAtt : " << e.what();
         }
 
         return var_att;
     }
 
-    IVarAtt::sptr VarImpl::putAtt( const std::string& key, const std::string& value )
+    IAtt::sptr VarImpl::putAttString( const std::string& key, const std::string& value )
     {
         VarAtt::sptr att_ptr;
         try
@@ -877,12 +988,30 @@ namespace FairDataPipeline
         {
             e.what();
 
-	    std::cerr << "VarImpl::putAtt : " << e.what();
+            std::cerr << "VarImpl::putAtt : " << e.what();
         }
         return att_ptr;
     }
+#if 0
+    IAtt::sptr VarImpl::putAtt( const std::string& key, const std::string& value )
+    {
+        VarAtt::sptr att_ptr;
+        try
+        {
+            netCDF::NcVarAtt ncatt = _nc_var.putAtt( key, value );
+            att_ptr = VarAtt::create( ncatt );
+            _name_varatt_map[ key ] = att_ptr;
+        }
+        catch( NcException& e )
+        {
+            e.what();
 
-    IVarAtt::sptr VarImpl::getAtt( const std::string& key )
+            std::cerr << "VarImpl::putAtt : " << e.what();
+        }
+        return att_ptr;
+    }
+#endif
+    IAtt::sptr VarImpl::getAtt( const std::string& key )
     {
         IVarAtt::sptr att_ptr;
         auto it = _name_varatt_map.find( key );
@@ -902,7 +1031,7 @@ namespace FairDataPipeline
             {
                 e.what();
 
-	    std::cerr << "VarImpl::getAtt : " << e.what();
+                std::cerr << "VarImpl::getAtt : " << e.what();
             }
 
         }
@@ -1012,7 +1141,7 @@ namespace FairDataPipeline
 
             IDimension::sptr addDim( const std::string& name, size_t sz );
             IDimension::sptr addUnlimitedDim( const std::string& name );
-            
+
             IDimension::sptr getDim( const std::string& name );
 
             IVar::sptr addVar( const std::string& name, DataType dataType
@@ -1021,34 +1150,47 @@ namespace FairDataPipeline
             IVar::sptr getVar( const std::string& name );
             std::vector< std::string > getVars();
 
-            IGroupAtt::sptr putAtt( const std::string& key, const std::string& value );
-            IGroupAtt::sptr putAtt( const std::string& key, int value );
-            IGroupAtt::sptr putAtt( const std::string& key, float value );
 
-            IGroupAtt::sptr getAtt( const std::string& key );
+
+            //IAtt::sptr putAtt2(const std::string& a, const std::string& b );
+            IAtt::sptr putAttShort( const std::string& key, short value );
+            IAtt::sptr putAttInt( const std::string& key, int value );
+            IAtt::sptr putAttLong( const std::string& key, long value );
+            IAtt::sptr putAttLongLong( const std::string& key, long long value );
+
+
+
+            IAtt::sptr putAttUShort( const std::string& key, unsigned short value );
+            IAtt::sptr putAttUInt( const std::string& key, unsigned int value );
+
+            IAtt::sptr putAttString( const std::string& key, const std::string& value );
+            IAtt::sptr putAttFloat( const std::string& key, float value );
+            IAtt::sptr putAttDouble( const std::string& key, double value );
+
+            IAtt::sptr getAtt( const std::string& key );
             std::vector< std::string > getAtts();
 
-        
-            IGroupAtt::sptr putAtt( const std::string& key, size_t nvals, const short* values );
-            IGroupAtt::sptr putAtt( const std::string& key, size_t nvals, const int* values );
-            IGroupAtt::sptr putAtt( const std::string& key, size_t nvals, const long* values );
-            IGroupAtt::sptr putAtt( const std::string& key, size_t nvals, const long long* values );
 
-            IGroupAtt::sptr putAtt( const std::string& key, size_t nvals, const unsigned short* values );
-            IGroupAtt::sptr putAtt( const std::string& key, size_t nvals, const unsigned int* values );
-            IGroupAtt::sptr putAtt( const std::string& key, size_t nvals, const unsigned long* values );
-            IGroupAtt::sptr putAtt( const std::string& key, size_t nvals, const unsigned long long* values );
+            IAtt::sptr putAttShorts( const std::string& key, size_t nvals, const short* values );
+            IAtt::sptr putAttInts( const std::string& key, int nvals, const int* values );
+            IAtt::sptr putAttLongs( const std::string& key, size_t nvals, const long* values );
+            IAtt::sptr putAttLongLongs( const std::string& key, size_t nvals, const long long* values );
 
-            IGroupAtt::sptr putAtt( const std::string& key, size_t nvals, const float* values );
-            IGroupAtt::sptr putAtt( const std::string& key, size_t nvals, const double* values );
+            IAtt::sptr putAttUShorts( const std::string& key, size_t nvals, const unsigned short* values );
+            IAtt::sptr putAttUInts( const std::string& key, size_t nvals, const unsigned int* values );
+            IAtt::sptr putAttULongs( const std::string& key, size_t nvals, const unsigned long* values );
+            IAtt::sptr putAttULongLongs( const std::string& key, size_t nvals, const unsigned long long* values );
 
-            IGroupAtt::sptr putAtt( const std::string& key, size_t nvals, const char** values );
-            
+            IAtt::sptr putAttFloats( const std::string& key, size_t nvals, const float* values );
+            IAtt::sptr putAttDoubles( const std::string& key, size_t nvals, const double* values );
 
+            IAtt::sptr putAtt2( const std::string& key, size_t nvals, const char** values );
+
+            IAtt::sptr putAtt( const std::string& key
+                    , DataType datatype, size_t nvals, const void* pv );
 
             int prepare( const CoordinatVariableDefinition& cvd );
             int prepare( const TableDefinition& td );
-
             int prepare( const DimensionalVariableDefinition& dvd );
 
         protected:
@@ -1082,6 +1224,46 @@ namespace FairDataPipeline
 
     };
 
+    IAtt::sptr GroupImpl::putAtt( const std::string& key
+            , DataType datatype, size_t nvals, const void* pv )
+    {
+        IVarAtt::sptr att_ptr;
+        switch( datatype )
+        {
+            case DataType::SHORT:
+                this->putAttShorts( key, nvals, (const short*)(pv) );
+                break;
+            case DataType::INT:
+                this->putAttInts( key, nvals, (const int*)(pv) );
+                break;
+            case DataType::INT64:
+                this->putAttLongs( key, nvals, (const long*)(pv) );
+                break;
+            case DataType::USHORT:
+                this->putAttUShorts( key, nvals, (const unsigned short*)(pv) );
+                break;
+            case DataType::UINT:
+                this->putAttUInts( key, nvals, (const unsigned int*)(pv) );
+                break;
+            case DataType::UINT64:
+                this->putAttULongs( key, nvals, (const unsigned long*)(pv) );
+                break;
+            case DataType::FLOAT:
+                this->putAttFloats( key, nvals, (const float*)(pv) );
+                break;
+            case DataType::DOUBLE:
+                this->putAttDoubles( key, nvals, (const double*)(pv) );
+                break;
+
+            default:
+                std::cerr << __FUNCTION__ << ": Unhandled datatype";
+                break;
+
+        }
+        return att_ptr;
+    }
+
+
 
     template< typename T >
         IGroupAtt::sptr GroupImpl::putAttImpl( const std::string& key, size_t nvals, const T* values )
@@ -1102,7 +1284,7 @@ namespace FairDataPipeline
             {
                 e.what();
 
-	    std::cerr << "VarImpl::putAttImpl : " << e.what();
+                std::cerr << "VarImpl::putAttImpl : " << e.what();
             }
 
 
@@ -1110,7 +1292,7 @@ namespace FairDataPipeline
         }
 
 
-    IGroupAtt::sptr GroupImpl::putAtt( const std::string& key, size_t nvals, const char** values )
+    IAtt::sptr GroupImpl::putAtt2( const std::string& key, size_t nvals, const char** values )
     {
         IGroupAtt::sptr grp_att;
         try
@@ -1124,7 +1306,7 @@ namespace FairDataPipeline
         {
             e.what();
 
-	    std::cerr << "GroupImpl::putAtt : " << e.what();
+            std::cerr << "GroupImpl::putAtt : " << e.what();
         }
 
 
@@ -1132,85 +1314,83 @@ namespace FairDataPipeline
     }
 
 
-    IGroupAtt::sptr GroupImpl::putAtt( const std::string& key, size_t nvals, const double* values )
+    IAtt::sptr GroupImpl::putAttDoubles( const std::string& key, size_t nvals, const double* values )
     {
         IGroupAtt::sptr grp_att = this->putAttImpl< double >( key, nvals, values );
         return grp_att;
     }
 
-    IGroupAtt::sptr GroupImpl::putAtt( const std::string& key, size_t nvals, const float* values )
+    IAtt::sptr GroupImpl::putAttFloats( const std::string& key, size_t nvals, const float* values )
     {
         IGroupAtt::sptr grp_att = this->putAttImpl< float >( key, nvals, values );
         return grp_att;
     }
 
-    IGroupAtt::sptr GroupImpl::putAtt( const std::string& key, size_t nvals, const short* values )
+    IAtt::sptr GroupImpl::putAttShorts( const std::string& key, size_t nvals, const short* values )
     {
         IGroupAtt::sptr grp_att = this->putAttImpl< short >( key, nvals, values );
         return grp_att;
     }
 
-    IGroupAtt::sptr GroupImpl::putAtt( const std::string& key, size_t nvals, const int* values )
+    IAtt::sptr GroupImpl::putAttInts( const std::string& key, int nvals, const int* values )
     {
         IGroupAtt::sptr grp_att = this->putAttImpl< int >( key, nvals, values );
         return grp_att;
     }
 
-    IGroupAtt::sptr GroupImpl::putAtt( const std::string& key, size_t nvals, const long* values )
+    IAtt::sptr GroupImpl::putAttLongs( const std::string& key, size_t nvals, const long* values )
     {
         IGroupAtt::sptr grp_att = this->putAttImpl< long >( key, nvals, values );
         return grp_att;
     }
 
 
-
-    IGroupAtt::sptr GroupImpl::putAtt( const std::string& key, size_t nvals, const long long* values )
+    IAtt::sptr GroupImpl::putAttLongLongs( const std::string& key, size_t nvals, const long long* values )
     {
         IGroupAtt::sptr grp_att = this->putAttImpl< long long >( key, nvals, values );
         return grp_att;
     }
 
-    IGroupAtt::sptr GroupImpl::putAtt( const std::string& key, size_t nvals, const unsigned short* values )
+    IAtt::sptr GroupImpl::putAttUShorts( const std::string& key, size_t nvals, const unsigned short* values )
     {
         IGroupAtt::sptr grp_att = this->putAttImpl( key, nvals, values );
 
         return grp_att;
     }
 
-    IGroupAtt::sptr GroupImpl::putAtt( const std::string& key, size_t nvals, const unsigned int* values )
+    IAtt::sptr GroupImpl::putAttUInts( const std::string& key, size_t nvals, const unsigned int* values )
     {
         IGroupAtt::sptr grp_att = this->putAttImpl( key, nvals, values );
         return grp_att;
     }
 
-    IGroupAtt::sptr GroupImpl::putAtt( const std::string& key, size_t nvals, const unsigned long* values )
-    {
-        IGroupAtt::sptr grp_att = this->putAttImpl( key, nvals, values );
-        return grp_att;
-    }
-
-
-    IGroupAtt::sptr GroupImpl::putAtt( const std::string& key, size_t nvals, const unsigned long long* values )
+    IAtt::sptr GroupImpl::putAttULongs( const std::string& key, size_t nvals, const unsigned long* values )
     {
         IGroupAtt::sptr grp_att = this->putAttImpl( key, nvals, values );
         return grp_att;
     }
 
 
-    IGroupAtt::sptr GroupImpl::putAtt( const std::string& key, float value )
+    IAtt::sptr GroupImpl::putAttULongLongs( const std::string& key, size_t nvals, const unsigned long long* values )
     {
-        IGroupAtt::sptr grp_att = this->putAttImpl( key, 1, &value );
+        IGroupAtt::sptr grp_att = this->putAttImpl( key, nvals, values );
         return grp_att;
     }
 
-    IGroupAtt::sptr GroupImpl::putAtt( const std::string& key, int value )
+    IAtt::sptr GroupImpl::putAttFloat( const std::string& key, float value )
     {
-        IGroupAtt::sptr grp_att = this->putAttImpl( key, 1, &value );
+        IGroupAtt::sptr grp_att = this->putAttImpl<float>( key, 1, &value );
+        return grp_att;
+    }
+    IAtt::sptr GroupImpl::putAttDouble( const std::string& key, double value )
+    {
+        IGroupAtt::sptr grp_att = this->putAttImpl<double>( key, 1, &value );
         return grp_att;
     }
 
 
-    IGroupAtt::sptr GroupImpl::putAtt( const std::string& key, const std::string& value )
+
+    IAtt::sptr GroupImpl::putAttString(const std::string& key, const std::string& value )
     {
         IGroupAtt::sptr grp_att;
         try
@@ -1224,13 +1404,131 @@ namespace FairDataPipeline
         {
             e.what();
 
-	    std::cerr << "GroupImpl::putAtt : " << e.what();
+            std::cerr << "GroupImpl::putAtt : " << e.what();
+        }
+
+        return grp_att;
+    }
+    IAtt::sptr GroupImpl::putAttShort(const std::string& key, short value)
+    {
+        IGroupAtt::sptr grp_att;
+        try
+        {
+            netCDF::NcGroupAtt ncatt = _nc->putAtt( key, netCDF::NcShort(), value );
+            grp_att = GroupAtt::create( this->shared_from_this(), ncatt );
+
+            _name_att_map[ key ] = grp_att;
+        }
+        catch( NcException& e )
+        {
+            e.what();
+
+            std::cerr << "GroupImpl::putAtt : " << e.what();
         }
 
         return grp_att;
     }
 
-    IGroupAtt::sptr GroupImpl::getAtt( const std::string& key )
+    IAtt::sptr GroupImpl::putAttInt(const std::string& key, int value)
+    {
+        IGroupAtt::sptr grp_att;
+        try
+        {
+            netCDF::NcGroupAtt ncatt = _nc->putAtt( key, netCDF::NcInt(), value );
+            grp_att = GroupAtt::create( this->shared_from_this(), ncatt );
+
+            _name_att_map[ key ] = grp_att;
+        }
+        catch( NcException& e )
+        {
+            e.what();
+
+            std::cerr << "GroupImpl::putAtt : " << e.what();
+        }
+
+        return grp_att;
+    }
+    IAtt::sptr GroupImpl::putAttLong(const std::string& key, long value)
+    {
+        IGroupAtt::sptr grp_att;
+        try
+        {
+            netCDF::NcGroupAtt ncatt = _nc->putAtt( key, netCDF::NcInt64(), value );
+            grp_att = GroupAtt::create( this->shared_from_this(), ncatt );
+
+            _name_att_map[ key ] = grp_att;
+        }
+        catch( NcException& e )
+        {
+            e.what();
+
+            std::cerr << "GroupImpl::putAtt : " << e.what();
+        }
+
+        return grp_att;
+    }
+    IAtt::sptr GroupImpl::putAttLongLong(const std::string& key, long long value)
+    {
+        IGroupAtt::sptr grp_att;
+        try
+        {
+            netCDF::NcGroupAtt ncatt = _nc->putAtt( key, netCDF::NcInt64(), value );
+            grp_att = GroupAtt::create( this->shared_from_this(), ncatt );
+
+            _name_att_map[ key ] = grp_att;
+        }
+        catch( NcException& e )
+        {
+            e.what();
+
+            std::cerr << "GroupImpl::putAtt : " << e.what();
+        }
+
+        return grp_att;
+    }
+
+    IAtt::sptr GroupImpl::putAttUShort(const std::string& key, unsigned short value)
+    {
+        IGroupAtt::sptr grp_att;
+        try
+        {
+            netCDF::NcGroupAtt ncatt = _nc->putAtt( key, netCDF::NcUshort(), value );
+            grp_att = GroupAtt::create( this->shared_from_this(), ncatt );
+
+            _name_att_map[ key ] = grp_att;
+        }
+        catch( NcException& e )
+        {
+            e.what();
+
+            std::cerr << "GroupImpl::putAtt : " << e.what();
+        }
+
+        return grp_att;
+    }
+
+    IAtt::sptr GroupImpl::putAttUInt(const std::string& key, unsigned int value)
+    {
+        IGroupAtt::sptr grp_att;
+        try
+        {
+            netCDF::NcGroupAtt ncatt = _nc->putAtt( key, netCDF::NcUint(), value );
+            grp_att = GroupAtt::create( this->shared_from_this(), ncatt );
+
+            _name_att_map[ key ] = grp_att;
+        }
+        catch( NcException& e )
+        {
+            e.what();
+
+            std::cerr << "GroupImpl::putAtt : " << e.what();
+        }
+
+        return grp_att;
+    }
+
+
+    IAtt::sptr GroupImpl::getAtt( const std::string& key )
     {
         IGroupAtt::sptr att_ptr;
         auto it = _name_att_map.find( key );
@@ -1307,7 +1605,7 @@ namespace FairDataPipeline
         }
         catch( NcException& e )
         {
-		std::cerr << "GroupImpl::addVar(" << name << ") : " << e.what();
+            std::cerr << "GroupImpl::addVar(" << name << ") : " << e.what();
         }
 
         return var_ptr;
@@ -1325,7 +1623,7 @@ namespace FairDataPipeline
                 {
                     var_names.push_back( it->first );
                 }
-                
+
             }
         }
         catch( NcException& e )
@@ -1358,7 +1656,7 @@ namespace FairDataPipeline
             catch( NcException& e )
             {
                 e.what();
-		std::cerr << "GroupImpl::getVar : " << e.what();
+                std::cerr << "GroupImpl::getVar : " << e.what();
             }
         }
 
@@ -1381,30 +1679,29 @@ namespace FairDataPipeline
         {
             GroupImpl::sptr grp_impl_ptr = std::static_pointer_cast< GroupImpl > ( grp_ptr );
 
-
-        auto it = grp_impl_ptr->_name_dim_map.find( dim_name );
-        if( it != grp_impl_ptr->_name_dim_map.end() )
-        {
-            dim_ptr = it->second;
-        }
-        else
-        {
-            try
+            auto it = grp_impl_ptr->_name_dim_map.find( dim_name );
+            if( it != grp_impl_ptr->_name_dim_map.end() )
             {
-                netCDF::NcDim nc_dim = grp_impl_ptr->_nc->getDim( dim_name );
-
-                if( !nc_dim.isNull() )
+                dim_ptr = it->second;
+            }
+            else
+            {
+                try
                 {
-                    dim_ptr = DimensionImpl::create( grp_ptr, nc_dim );
-                    grp_impl_ptr->_name_dim_map[ dim_name ] = dim_ptr;
+                    netCDF::NcDim nc_dim = grp_impl_ptr->_nc->getDim( dim_name );
+
+                    if( !nc_dim.isNull() )
+                    {
+                        dim_ptr = DimensionImpl::create( grp_ptr, nc_dim );
+                        grp_impl_ptr->_name_dim_map[ dim_name ] = dim_ptr;
+                    }
+                }
+                catch( NcException& e )
+                {
+                    e.what();
+                    std::cerr << "GroupImpl::getDim : " << e.what();
                 }
             }
-            catch( NcException& e )
-            {
-                e.what();
-		std::cerr << "GroupImpl::getDim : " << e.what();
-            }
-        }
         }
         return dim_ptr;
 
@@ -1427,7 +1724,7 @@ namespace FairDataPipeline
         }
         catch( NcException& e )
         {
-	    std::cerr << "GroupImpl::addUnlimitedDim : " << e.what();
+            std::cerr << "GroupImpl::addUnlimitedDim : " << e.what();
         }
 
         return dim_ptr;
@@ -1451,7 +1748,7 @@ namespace FairDataPipeline
         catch( NcException& e )
         {
             e.what();
-	    std::cerr << "GroupImpl::addDim : " << e.what();
+            std::cerr << "GroupImpl::addDim : " << e.what();
         }
 
         return dim_ptr;
@@ -1467,21 +1764,21 @@ namespace FairDataPipeline
         IGroup::sptr parent_grp_ptr = this->shared_from_this();
         IGroup::sptr grp_ptr;
 
-	if( name.empty() )
-		return parent_grp_ptr;
-	else if( '/' == name[0] )
-		parent_grp_ptr = this->rootGroup();
+        if( name.empty() )
+            return parent_grp_ptr;
+        else if( '/' == name[0] )
+            parent_grp_ptr = this->rootGroup();
 
         std::vector< std::string > splits;
         split_str( name, '/', splits );
 
-	auto its = splits.begin();
-	auto ite = splits.end();
+        auto its = splits.begin();
+        auto ite = splits.end();
 
         for( auto it = its; parent_grp_ptr && it != ite; ++it )
         {
-                grp_ptr = std::static_pointer_cast< GroupImpl >( parent_grp_ptr)->_getGroup( *it );
-                parent_grp_ptr = grp_ptr;
+            grp_ptr = std::static_pointer_cast< GroupImpl >( parent_grp_ptr)->_getGroup( *it );
+            parent_grp_ptr = grp_ptr;
         }
 
         return grp_ptr;
@@ -1514,7 +1811,7 @@ namespace FairDataPipeline
             catch( NcException& e )
             {
                 e.what();
-		std::cerr << "GroupImpl::_getGroup : " << e.what();
+                std::cerr << "GroupImpl::_getGroup : " << e.what();
             }
         }
         return grp_ptr;
@@ -1552,7 +1849,7 @@ namespace FairDataPipeline
             if( parent_grp_ptr )
                 root_grp_ptr = parent_grp_ptr;
         }
-       return root_grp_ptr; 
+        return root_grp_ptr; 
     }
 
     IGroup::sptr GroupImpl::requireGroup( const std::string& name )
@@ -1560,9 +1857,9 @@ namespace FairDataPipeline
         IGroup::sptr grp_ptr;
         IGroup::sptr parent_grp_ptr = this->shared_from_this();
 
-	if( name.empty() )
-	       	return parent_grp_ptr;
-	else if( '/' == name[0] )
+        if( name.empty() )
+            return parent_grp_ptr;
+        else if( '/' == name[0] )
             parent_grp_ptr = this->rootGroup();
 
         std::vector< std::string > splits;
@@ -1609,7 +1906,7 @@ namespace FairDataPipeline
         }
         catch( NcException& e )
         {
-		std::cerr << "GroupImpl::_addGroup : " << e.what();
+            std::cerr << "GroupImpl::_addGroup : " << e.what();
         }
 
         return  grp_ptr;
@@ -1681,7 +1978,7 @@ namespace FairDataPipeline
                     }
                     catch( NcException& e )
                     {
-			    std::cerr << "FileImpl::open : " << e.what();
+                        std::cerr << "FileImpl::open : " << e.what();
                     }
                 }
                 break;
@@ -1716,7 +2013,7 @@ namespace FairDataPipeline
         }
         catch( NcException& e )
         {
-		std::cerr << "FileImpl::close : " << e.what();
+            std::cerr << "FileImpl::close : " << e.what();
 
         }
     }
@@ -1733,14 +2030,6 @@ namespace FairDataPipeline
     {
         auto builder = FileImpl::create( path, mode );
         return builder;
-    }
-
-    Builder::Builder( const std::string& path, IFile::Mode mode )
-    {
-        _file = FileFactory::create( path, mode );
-
-        if( IFile::Mode::WRITE == mode )	
-            _file->putAtt( "schema", 1 );
     }
 
     std::string str_strip_right( std::string str, const std::string& chars )
@@ -1791,7 +2080,7 @@ namespace FairDataPipeline
         return  std::make_pair( str_grp, str_itm );
     }
 
-//    int CoordinatVariableDefinition::UNLIMITED = 0;
+    //    int CoordinatVariableDefinition::UNLIMITED = 0;
 
     bool CoordinatVariableDefinition::isUnlimited() const
     {
@@ -1810,8 +2099,8 @@ namespace FairDataPipeline
 
     std::string TableDefinition::getVariableName( int i )
     {
-       PARENT_ITEM_TYPE col_grp_item = split_item_name( this->columns[i].name );
-       
+        PARENT_ITEM_TYPE col_grp_item = split_item_name( this->columns[i].name );
+
 
         return this->name + "/" + col_grp_item.second;
     }
@@ -1854,13 +2143,19 @@ namespace FairDataPipeline
         status = ( var_ptr != NULL ) ? FDP_FILE_STATUS_NOERR : FDP_FILE_STATUS_ERR;
 
         if( !cvd.description.empty() )
-            var_ptr->putAtt( ATTRIB_KEY_DESC, cvd.description );
+        {
+            //var_ptr->putAtt2( ATTRIB_KEY_DESC, cvd.description );
+            var_ptr->putAtt( ATTRIB_KEY_DESC, DataType::STRING, 1, &(cvd.description[0]) );
+            //var_ptr->putAtt2( "a","b");
+            //var_ptr->putAtt2( ATTRIB_KEY_UNITS,"b");
+            //var_ptr->putAtt2( ATTRIB_KEY_UNITS, cvd.description);
+        }
 
         if( !cvd.units.empty() )
-            var_ptr->putAtt( ATTRIB_KEY_UNITS, cvd.units );
+            var_ptr->putAtt( ATTRIB_KEY_UNITS, DataType::STRING, 1,&( cvd.units[0]) );
 
         if( !cvd.long_name.empty() )
-            var_ptr->putAtt( ATTRIB_KEY_LNAME, cvd.long_name );
+            var_ptr->putAtt( ATTRIB_KEY_LNAME, DataType::STRING, 1, &(cvd.long_name[0]) );
 
         if(cvd._missing_ptr)
             var_ptr->putAtt( ATTRIB_KEY_FILLVALUE, cvd.datatype, 1, cvd._missing_ptr.get() );
@@ -1879,7 +2174,7 @@ namespace FairDataPipeline
 
         status = ( grp_ptr != NULL ) ? 0 : 1;
 
-	std::string dim_name = "index";
+        std::string dim_name = "index";
 
         if( 0 == status )
         {
@@ -1899,33 +2194,33 @@ namespace FairDataPipeline
         if( 0==status )
         {
             if( !td.description.empty() )
-                grp_ptr->putAtt( ATTRIB_KEY_DESC, td.description );
+                grp_ptr->putAtt( ATTRIB_KEY_DESC, DataType::STRING, 1, &(td.description[0]) );
 
             if( !td.long_name.empty() )
-                grp_ptr->putAtt( ATTRIB_KEY_LNAME, td.long_name );
-             
+                grp_ptr->putAtt( ATTRIB_KEY_LNAME, DataType::STRING, 1, &(td.long_name[0]) );
+
             // add the columns as DimensionalVariableDefinitions
-             for( int i = 0; i < !status && td.getColumns().size(); ++i )
-             {
-                 const LocalVAriableDefinition& lvd = td.getColumns()[i];
+            for( int i = 0; i < !status && td.getColumns().size(); ++i )
+            {
+                const LocalVAriableDefinition& lvd = td.getColumns()[i];
 
 
-                 DimensionalVariableDefinition dvd;
+                DimensionalVariableDefinition dvd;
 
-		 if( grp_name.empty() )
-			 dvd.name = lvd.name;
-		 else
-			 dvd.name = grp_name + "/" + lvd.name;
+                if( grp_name.empty() )
+                    dvd.name = lvd.name;
+                else
+                    dvd.name = grp_name + "/" + lvd.name;
 
-                 dvd.datatype = lvd.datatype;
-		 dvd.dimensions = { dim_name };
+                dvd.datatype = lvd.datatype;
+                dvd.dimensions = { dim_name };
 
-		 status = grp_ptr->prepare( dvd );
-             }
+                status = grp_ptr->prepare( dvd );
+            }
 
-             grp_ptr->putAtt( ATTRIB_KEY_GROUP_TYPE, "table" );
+            grp_ptr->putAttString( ATTRIB_KEY_GROUP_TYPE, "table" );
         }
-        
+
         return status;
     }
 
@@ -1968,561 +2263,18 @@ namespace FairDataPipeline
         if( var_ptr )
         {
             if( !dvd.description.empty() )
-                var_ptr->putAtt( ATTRIB_KEY_DESC, dvd.description );
+                var_ptr->putAtt( ATTRIB_KEY_DESC, DataType::STRING, 1, &(dvd.description[0]) );
             if( !dvd.units.empty() )
-                var_ptr->putAtt( ATTRIB_KEY_UNITS, dvd.units );
+                var_ptr->putAtt( ATTRIB_KEY_UNITS, DataType::STRING, 1, &(dvd.units[0]) );
             if( !dvd.long_name.empty() )
-                var_ptr->putAtt( ATTRIB_KEY_LNAME, dvd.long_name );
+            {
+                const std::string s = ATTRIB_KEY_LNAME;
+                var_ptr->putAtt( s, DataType::STRING, 1, &(dvd.long_name[0]) );
+            }
 
             if( dvd._missing_ptr )
-                var_ptr->putAtt( ATTRIB_KEY_FILLVALUE, dvd.datatype, 1
-                        , dvd._missing_ptr.get() );
+                var_ptr->putAtt( ATTRIB_KEY_FILLVALUE, dvd.datatype, 1, dvd._missing_ptr.get() );
         }
-
-        return status;
-    }
-
-
-    int Builder::readDim_metadata( const std::string& name
-            , DimensionDefinition& dimdef )
-    {
-        int status = 0;
-        std::string dim_name( name );
-        std::string dim_name_orig = dim_name;
-
-        IGroup::sptr grp_ptr = _file;
-
-        std::vector< std::string > splits;
-        split_str( dim_name, '/', splits );
-
-        if( splits.size() > 1 )
-        {
-            auto its = splits.begin();
-            auto ite = splits.end();
-            for( auto it = splits.begin(); it != ite-1 && grp_ptr; ++it )
-            {
-                    grp_ptr = grp_ptr->getGroup( *it );
-            }
-            dim_name = splits.back();
-        }
-
-        if( grp_ptr )
-        {
-            IVar::sptr var_ptr = grp_ptr->getVar( dim_name );
-
-            if( var_ptr )
-            {
-                std::vector< IDimension::sptr > dimdef_ptrs = var_ptr->getDims();
-
-                auto dim_def_ptr = dimdef_ptrs[0];
-                size_t n = dim_def_ptr->getSize();
-                DataType dtype = var_ptr->getType();
-
-                std::string units, description;
-                IVarAtt::sptr att_units_ptr = var_ptr->getAtt( "units" );
-                if( att_units_ptr )
-                    att_units_ptr->getValues( units );
-
-                IVarAtt::sptr att_desc_ptr = var_ptr->getAtt( "description" );
-                if( att_desc_ptr )
-                    att_desc_ptr->getValues( description );
-
-                dimdef.dataType = dtype;
-                dimdef.size = n;
-                dimdef.units = units;
-                dimdef.description = description;
-            }
-            else status = FDP_FILE_STATUS_ERR;
-        }
-        else
-            status = FDP_FILE_STATUS_ERR;
-
-        return status;
-    }
-    int Builder::readDim_data( const std::string& name, const DimensionDefinition& dimdef, void* data )
-    {
-        int status = 0;
-
-        std::string dim_name_orig = name;
-        std::string dim_name = dim_name_orig;
-
-        IGroup::sptr grp_ptr = _file;
-
-        std::vector< std::string > splits;
-        split_str( dim_name_orig, '/', splits );
-
-        if( splits.size() > 1 )
-        {
-            auto its = splits.begin();
-            auto ite = splits.end();
-            for( auto it = splits.begin(); it != ite-1 && grp_ptr; ++it )
-            {
-                    grp_ptr = grp_ptr->getGroup( *it );
-            }
-            dim_name = splits.back();
-        }
-        
-        if( grp_ptr )
-        {
-            IVar::sptr var_ptr = grp_ptr->getVar( dim_name );
-
-            if( var_ptr )
-                var_ptr->getVar( data );
-            else
-                status = FDP_FILE_STATUS_ERR;
-        }
-        else 
-            status = FDP_FILE_STATUS_ERR;
-
-        return status;
-    }
-
-
-
-    int Builder::readArray_metadata( const std::string& name,  ArrayDefinition& arraydef )
-    {
-        int status = 0;
-        std::string array_name( name );
-        std::string array_name_orig = array_name;
-
-        IGroup::sptr grp_ptr = _file;
-
-        std::vector< std::string > splits;
-        split_str( array_name, '/', splits );
-
-        if( splits.size() > 1 )
-        {
-            auto its = splits.begin();
-            auto ite = splits.end();
-            for( auto it = splits.begin(); it != ite-1 && grp_ptr; ++it )
-            {
-                    grp_ptr = grp_ptr->getGroup( *it );
-            }
-            array_name = splits.back();
-        }
-
-        std::vector< size_t > shape;
-
-        if( grp_ptr )
-        {
-            IVar::sptr var_ptr = grp_ptr->getVar( array_name );
-
-            if( var_ptr )
-            {
-                std::vector< std::string > dim_names;
-
-                size_t n = 1;
-                auto dims = var_ptr->getDims();
-                for( int i = 0; i < dims.size(); ++i )
-                {
-                    IDimension::sptr dim_ptr = dims[i];
-
-                    n = n * dim_ptr->getSize();
-                    const std::string& dim_name = dim_ptr->getName();
-
-                    size_t size = dim_ptr->getSize();
-                    shape.push_back( size );
-
-                    std::string dim_var_name( dim_name.begin(), dim_name.end()/*-4*/ );
-                    IVar::sptr dim_var_ptr = grp_ptr->getVar( dim_var_name );
-
-                    if( dim_var_ptr )
-                    {
-                        IGroup::sptr parent_grp_ptr = dim_var_ptr->parent();
-                        while( parent_grp_ptr && parent_grp_ptr->getName() != "/" )
-                        {
-                            dim_var_name = parent_grp_ptr->getName() + "/" +dim_var_name;
-
-                            parent_grp_ptr = parent_grp_ptr->parent();
-                        }
-                    }
-
-
-                    if( dim_var_ptr )
-                        dim_names.push_back( dim_var_name );
-                    else
-                        dim_names.push_back( "" );
-                }
-
-                DataType dtype =  var_ptr->getType();
-
-                std::string units, description;
-
-                IVarAtt::sptr att_units_ptr = var_ptr->getAtt( "units" );
-                if( att_units_ptr )
-                    att_units_ptr->getValues( units );
-
-                IVarAtt::sptr att_desc_ptr = var_ptr->getAtt( "description" );
-                if( att_desc_ptr )
-                    att_desc_ptr->getValues( description );
-
-                arraydef.dataType = dtype;
-                arraydef.dimension_names = dim_names;
-                //arraydef.shape = shape;
-                arraydef.units = units;
-                arraydef.description = description;
-            }
-            else
-                status = FDP_FILE_STATUS_ERR;
-        }
-        else
-            status = FDP_FILE_STATUS_ERR;
-
-        return status;
-    }
-    int Builder::readArray_data( const std::string& name, const ArrayDefinition& arraydef, void* data )
-    {
-        int status = 0;
-        std::string array_name_orig = name;
-        std::string array_name = array_name_orig;
-
-        IGroup::sptr grp_ptr = _file;
-
-        std::vector< std::string > splits;
-        split_str( array_name_orig, '/', splits );
-
-        if( splits.size() > 1 )
-        {
-            auto its = splits.begin();
-            auto ite = splits.end();
-            for( auto it = splits.begin(); it != ite-1 && grp_ptr; ++it )
-            {
-                    grp_ptr = grp_ptr->getGroup( *it );
-            }
-            array_name = splits.back();
-        }
-
-        if( grp_ptr )
-        {
-            IVar::sptr var_ptr = grp_ptr->getVar( array_name );
-            if( var_ptr )
-                var_ptr->getVar( data );
-            else
-                status = FDP_FILE_STATUS_ERR;
-        }
-        else
-            status = FDP_FILE_STATUS_ERR;
-
-        return status;
-    }
-
-    int Builder::writeDimension( const std::string& name, const DimensionDefinition& dimdef, const void* data )
-    {
-        int status = 0;
-
-        std::string dimdef_name = name;
-
-        IGroup::sptr grp_ptr = _file;
-        
-        std::vector< std::string > splits;
-
-        split_str( name, '/', splits );
-
-        if( splits.size() > 1 )
-        {
-            auto its = splits.begin();
-            auto ite = splits.end();
-            for( auto it = splits.begin(); it != ite-1 && grp_ptr; ++it )
-            {
-                    grp_ptr = grp_ptr->requireGroup( *it );
-            }
-            dimdef_name = splits.back();
-        }
-        
-        IVar::sptr dim_var_ptr = grp_ptr->getVar( dimdef_name );
-        if( !dim_var_ptr )
-        {
-            IDimension::sptr dim_ptr = grp_ptr->addDim( dimdef_name /*+ "_dim"*/, dimdef.size );
-
-            std::vector< IDimension::sptr > vdims = {dim_ptr};
-
-            dim_var_ptr = grp_ptr->addVar( dimdef_name, dimdef.dataType, vdims );
-
-            if( data )
-                dim_var_ptr->putVar( data );
-
-            dim_var_ptr->putAtt( "units", dimdef.units );
-            dim_var_ptr->putAtt( "description", dimdef.description );
-        }
-        else
-            status = FDP_FILE_STATUS_ERR;
-
-        return status;
-    }
-
-    int Builder::writeArray( const std::string& name, const ArrayDefinition& arraydef, const void* data )
-    {
-        int status = 0;
-        
-        std::vector< IDimension::sptr > vdims;
-
-        IGroup::sptr grp_ptr;
-
-        for( int i = 0; i < arraydef.dimension_names.size();++i )
-        {
-            grp_ptr = _file;
-            std::string dim_name = arraydef.dimension_names[i];
-            std::vector< std::string > splits;
-            split_str( dim_name, '/', splits );
-
-            if( splits.size() > 1 )
-            {
-                auto its = splits.begin();
-                auto ite = splits.end();
-                for( auto it = splits.begin(); it != ite-1 && grp_ptr; ++it )
-                {
-                    grp_ptr = grp_ptr->getGroup( *it );
-                }
-                dim_name = splits.back();
-            }
-
-            IVar::sptr dim_var_ptr = grp_ptr->getVar( dim_name );
-            if( dim_var_ptr )
-            {
-                std::vector< IDimension::sptr > dim_ptrs = dim_var_ptr->getDims();
-
-                vdims.push_back( dim_ptrs[0] );
-            }
-            else 
-                status = FDP_FILE_STATUS_ERR;
-        }                    
-
-        if( !status )
-        {
-            std::vector< std::string > splits;
-            split_str( name, '/', splits );
-            std::string arrname = name;
-            grp_ptr = _file;
-
-            if( splits.size() > 1 )
-            {
-                auto its = splits.begin();
-                auto ite = splits.end();
-                for( auto it = splits.begin(); it != ite-1 && grp_ptr; ++it )
-                {
-                    grp_ptr = grp_ptr->requireGroup( *it );
-                }
-                arrname = splits.back();
-            }
-
-            IVar::sptr arr_var_ptr = grp_ptr->getVar( arrname );
-            if( !arr_var_ptr )
-            {
-                arr_var_ptr = grp_ptr->addVar( arrname, arraydef.dataType, vdims );
-                if( data )
-                    arr_var_ptr->putVar( data );
-
-                arr_var_ptr->putAtt( "units", arraydef.units );
-                arr_var_ptr->putAtt( "description", arraydef.description );
-            }
-            else
-                status = FDP_FILE_STATUS_ERR;
-        }
-
-        return status;
-    }
-
-
-    template< typename T >
-    int Builder_putAttImpl( IGroup::sptr grp_ptr, const std::string& name
-            , const std::string& key, size_t nvals, T* values  )
-    {
-        int status = 0;
-
-        std::vector< std::string > splits;
-        split_str( name, '/', splits );
-        std::string arrname = name;
-
-        auto its = splits.begin();
-        auto ite = splits.end();
-        for( auto it = splits.begin(); it != ite-1 && grp_ptr; ++it )
-        {
-            grp_ptr = grp_ptr->getGroup( *it );
-        }
-
-        if( grp_ptr )
-        {
-            IGroup::sptr last_grp_ptr = grp_ptr;
-
-            //last split could be a var or a group
-            grp_ptr = grp_ptr->getGroup( splits.back() );
-            if( grp_ptr )
-            {
-                grp_ptr->putAtt( key, nvals, values );
-            }
-            else
-            {
-                //could be a var
-                auto var_ptr = last_grp_ptr->getVar( splits.back() );
-
-                if( var_ptr )
-                    var_ptr->putAtt( key, nvals, values );
-                else
-                    status = FDP_FILE_STATUS_ERR;
-            }
-        }
-        else
-            status = FDP_FILE_STATUS_ERR;
-
-        return status;
-    }
-
-    int Builder_putAttImpl_strings( IGroup::sptr grp_ptr
-            , const std::string& name
-            , const std::string& key, size_t nvals, const char** values  )
-    {
-        int status = 0;
-
-        std::vector< std::string > splits;
-        split_str( name, '/', splits );
-        std::string arrname = name;
-
-        auto its = splits.begin();
-        auto ite = splits.end();
-        for( auto it = splits.begin(); it != ite-1 && grp_ptr; ++it )
-        {
-            grp_ptr = grp_ptr->getGroup( *it );
-        }
-
-        if( grp_ptr )
-        {
-            //last split could be a var or a group
-            grp_ptr = grp_ptr->getGroup( splits.back() );
-            if( grp_ptr )
-            {
-                grp_ptr->putAtt( key, nvals, values );
-            }
-            else
-            {
-                //could be a var
-                auto var_ptr = grp_ptr->getVar( splits.back() );
-
-                if( var_ptr )
-                    var_ptr->putAtt( key, nvals, values );
-                else
-                    status = FDP_FILE_STATUS_ERR;
-            }
-        }
-        else
-            status = FDP_FILE_STATUS_ERR;
-
-        return status;
-    }
-
-
-    int Builder::putAtt( const std::string& name
-            , const std::string& key, size_t nvals, const short* values  )
-    {
-        return Builder_putAttImpl( _file, name, key, nvals, values );
-    }
-
-    int Builder::putAtt( const std::string& name
-            , const std::string& key, size_t nvals, const int* values  )
-    {
-        return Builder_putAttImpl( _file, name, key, nvals, values );
-    }
-
-    int Builder::putAtt( const std::string& name
-            , const std::string& key, size_t nvals, const long* values  )
-    {
-        return Builder_putAttImpl( _file, name, key, nvals, values );
-    }
-
-    int Builder::putAtt( const std::string& name
-            , const std::string& key, size_t nvals, const long long* values  )
-    {
-        return Builder_putAttImpl( _file, name, key, nvals, values );
-    }
-
-    int Builder::putAtt( const std::string& name, const std::string& key, size_t nvals, const unsigned short* values  )
-    {
-        return Builder_putAttImpl( _file, name, key, nvals, values );
-    }
-
-    int Builder::putAtt( const std::string& name, const std::string& key, size_t nvals,  const unsigned int* values  )
-    {
-        return Builder_putAttImpl( _file, name, key, nvals, values );
-    }
-
-    int Builder::putAtt( const std::string& name, const std::string& key, size_t nvals,  const unsigned long* values  )
-    {
-        return Builder_putAttImpl( _file, name, key, nvals, values );
-    }
-
-    int Builder::putAtt( const std::string& name, const std::string& key, size_t nvals,  const unsigned long long* values  )
-    {
-        return Builder_putAttImpl( _file, name, key, nvals, values );
-    }
-
-    int Builder::putAtt( const std::string& name, const std::string& key, size_t nvals,  const double * values  )
-    {
-        return Builder_putAttImpl( _file, name, key, nvals, values );
-    }
-
-    int Builder::putAtt( const std::string& name, const std::string& key, size_t nvals,  const float* values  )
-    {
-        return Builder_putAttImpl( _file, name, key, nvals, values );
-    }
-
-    int Builder::putAtt( const std::string& name, const std::string& key, size_t nvals,  const char** values )
-    {
-        return Builder_putAttImpl_strings( _file, name, key, nvals, values );
-    }
-
-
-    int Builder::getAtt( const std::string& name, const std::string& key, IAtt::sptr& att_ptr )
-    {
-        int status = 0;
-
-        std::vector< std::string > splits;
-        split_str( name, '/', splits );
-        std::string arrname = name;
-
-        auto its = splits.begin();
-        auto ite = splits.end();
-
-        att_ptr = NULL;
-
-        IGroup::sptr grp_ptr = _file;
-
-        for( auto it = splits.begin(); it != ite-1 && grp_ptr; ++it )
-        {
-            grp_ptr = grp_ptr->getGroup( *it );
-        }
-
-        if( grp_ptr )
-        {
-            IGroup::sptr last_grp_ptr = grp_ptr;
-
-            //last split could be a var or a group
-            grp_ptr = grp_ptr->getGroup( splits.back() );
-            if( grp_ptr )
-            {
-                IGroupAtt::sptr grp_att_ptr = grp_ptr->getAtt( key );
-
-                att_ptr = grp_att_ptr;
-
-                status = (att_ptr != NULL) ? FDP_FILE_STATUS_NOERR : FDP_FILE_STATUS_ERR;
-            }
-            else
-            {
-                //could be a var
-                auto var_ptr = last_grp_ptr->getVar( splits.back() );
-
-                if( var_ptr )
-                {
-                    IVarAtt::sptr var_att_ptr =  var_ptr->getAtt( key );
-
-                    att_ptr = var_att_ptr;
-
-                    status = (att_ptr != NULL) ? FDP_FILE_STATUS_NOERR : FDP_FILE_STATUS_ERR;
-                }
-                else
-                    status = FDP_FILE_STATUS_ERR;
-            }
-        }
-        else
-            status = FDP_FILE_STATUS_ERR;
 
         return status;
     }
@@ -2542,9 +2294,6 @@ namespace FairDataPipeline
         DataType dtype = NcType2DataType( nctype );
         return dtype;
     }
-
-
-
 }
 
 
