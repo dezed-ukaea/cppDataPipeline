@@ -186,6 +186,17 @@ namespace FairDataPipeline {
                 Sink::sptr _sink;
                 std::string _name;
         };
+
+        class ScopeLogger
+    {
+        public:
+            ScopeLogger( Logger& logger, const std::string& s ); 
+            ~ScopeLogger();
+        private:
+            Logger& _logger;
+            std::string _msg;
+    };
+
     }
 
     class logger
@@ -197,6 +208,9 @@ namespace FairDataPipeline {
         private:
             static logger_sptr _instance;
     };
+
+
+
 
 } // namespace FairDataPipeline
 

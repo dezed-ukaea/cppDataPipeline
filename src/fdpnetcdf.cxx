@@ -271,6 +271,8 @@ namespace FairDataPipeline
         public:
             typedef std::shared_ptr< VarImpl > sptr;
 
+        typedef std::map< std::string, IVarAtt::sptr > NAME_VARATT_MAP;
+
             static VarImpl::sptr create( IGroup::sptr parent
                     , const std::string& name
                     , const netCDF::NcVar& nc_var );
@@ -330,14 +332,15 @@ namespace FairDataPipeline
             IAtt::sptr getAtt( const std::string& key );
 
         private:
+
+            VarImpl( IGroup::sptr parent, const std::string& name, const netCDF::NcVar& nc_var ) ;
+
             template< typename T >
                 IVarAtt::sptr putAttImpls( const std::string& key
                         , size_t nvals, const T* values );
 
-	    template< typename T >
+            template< typename T >
                 IVarAtt::sptr putAttImpl( const std::string& key, const T& value );
-
-
 
             template< typename T >  
                 void putVarImpl( const std::vector< size_t >& index, T* values ) const;
@@ -347,14 +350,11 @@ namespace FairDataPipeline
                         , const std::vector< size_t >& countp
                         , T* values ) const;
 
-
-
-
             std::weak_ptr< IGroup > _parent;
-            VarImpl( IGroup::sptr parent, const std::string& name, const netCDF::NcVar& nc_var ) ;
+
             netCDF::NcVar _nc_var;
 
-            IVar::NAME_VARATT_MAP _name_varatt_map;
+            NAME_VARATT_MAP _name_varatt_map;
     };
 
     std::vector< IAtt::sptr > VarImpl::getAtts()
@@ -407,9 +407,8 @@ namespace FairDataPipeline
                 break;
 
             default:
-		logger::get_logger()->error() << __PRETTY_FUNCTION__ << ": Unhandled datatype";
+                logger::get_logger()->error() << __PRETTY_FUNCTION__ << ": Unhandled datatype";
                 break;
-
         }
         return att_ptr;
     }
@@ -445,10 +444,8 @@ namespace FairDataPipeline
                 break;
 
             default:
-		logger::get_logger()->error() << __PRETTY_FUNCTION__ << ": Unhandled datatype";
-
+                logger::get_logger()->error() << __PRETTY_FUNCTION__ << ": Unhandled datatype";
                 break;
-
         }
         return att_ptr;
     }
@@ -467,7 +464,7 @@ namespace FairDataPipeline
             }
             catch (NcException& ex )
             {
-		logger::get_logger()->error() << __PRETTY_FUNCTION__ << ": " << ex.what();
+                logger::get_logger()->error() << __PRETTY_FUNCTION__ << ": " << ex.what();
             }
         }
 
@@ -482,7 +479,7 @@ namespace FairDataPipeline
             }
             catch (NcException& ex )
             {
-		logger::get_logger()->error() << __PRETTY_FUNCTION__ << ": " << ex.what();
+                logger::get_logger()->error() << __PRETTY_FUNCTION__ << ": " << ex.what();
             }
         }
 
@@ -495,7 +492,7 @@ namespace FairDataPipeline
         }
         catch( NcException& ex )
         {
-	    logger::get_logger()->error() << __PRETTY_FUNCTION__ << ": " << ex.what();
+            logger::get_logger()->error() << __PRETTY_FUNCTION__ << ": " << ex.what();
         }
     }
 
@@ -505,8 +502,6 @@ namespace FairDataPipeline
     {
         putVarImpl( index, countp, values );
     }
-
-
 
 
     class GroupAtt : public IGroupAtt
@@ -535,9 +530,7 @@ namespace FairDataPipeline
             int getValues( float* values );
             int getValues( double* values );
 
-
             IGroupPtr getParentGroup();
-            //GroupImplSptr _getParentGroup();
             std::string getName();
 
         private:
@@ -657,7 +650,7 @@ namespace FairDataPipeline
         }
         catch( NcException& ex )
         {
-	    logger::get_logger()->error() << __PRETTY_FUNCTION__ << ": " << ex.what();
+            logger::get_logger()->error() << __PRETTY_FUNCTION__ << ": " << ex.what();
             status = FDP_FILE_STATUS_ERR;
         }
 
@@ -1153,6 +1146,12 @@ namespace FairDataPipeline
 
         protected:
 
+        typedef std::map< std::string, IGroup::sptr > NAME_GROUP_MAP;
+        typedef std::map< std::string, IDimension::sptr > NAME_DIM_MAP;
+        typedef std::map< std::string, IVar::sptr > NAME_VAR_MAP;
+        typedef std::map< std::string, IGroupAtt::sptr > NAME_ATT_MAP;
+
+
             static GroupImpl::sptr create( GroupImpl::sptr p, const std::string& name );
 
             NcGroupPtr _nc;	
@@ -1172,11 +1171,11 @@ namespace FairDataPipeline
 
             std::weak_ptr<GroupImpl> _parent;
 
-            IGroup::NAME_GROUP_MAP _name_grp_map;
-            IGroup::NAME_DIM_MAP _name_dim_map;
-            IGroup::NAME_VAR_MAP _name_var_map;
+            NAME_GROUP_MAP _name_grp_map;
+            NAME_DIM_MAP _name_dim_map;
+            NAME_VAR_MAP _name_var_map;
 
-            IGroup::NAME_ATT_MAP _name_att_map;
+            NAME_ATT_MAP _name_att_map;
 
     };
 
@@ -1822,6 +1821,9 @@ namespace FairDataPipeline
 
     IGroup::sptr GroupImpl::requireGroup( const std::string& name )
     {
+
+        logging::ScopeLogger( *(logger::get_logger()), __PRETTY_FUNCTION__ );
+
         IGroup::sptr grp_ptr;
         IGroup::sptr parent_grp_ptr = this->shared_from_this();
 

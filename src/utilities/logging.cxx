@@ -12,7 +12,6 @@
 
 namespace FairDataPipeline {
     namespace logging {
-
         const std::string& to_string( enum  LOG_LEVEL lvl )
         {
             static const std::string strs[] = {"TRACE","DEBUG","INFO","WARN","ERROR","CRITICAL","OFF"};
@@ -197,6 +196,18 @@ namespace FairDataPipeline {
 
             return 0;
         }
+
+        ScopeLogger::ScopeLogger( Logger& logger, const std::string& msg ) : _logger(logger), _msg(msg)
+        {
+            _logger.trace() << _msg << " : START";
+        }
+
+        ScopeLogger::~ScopeLogger()
+        {
+            _logger.trace() << _msg << " : END";
+        }
+
+
     }
 
 

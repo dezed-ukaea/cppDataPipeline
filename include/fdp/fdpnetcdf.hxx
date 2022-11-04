@@ -1,16 +1,12 @@
 #ifndef __FDPAPI_NETCDF_H__
 #define __FDPAPI_NETCDF_H__
 
-//#include<stdio.h>
 #include<memory>
 #include<map>
 #include<vector>
 #include<string>
 #include<type_traits>
-//#include<netcdf>
 
-//#include "fdp/fdparrayref.hxx"
-//
 #define FDP_FILE_STATUS_NOERR 0
 #define FDP_FILE_STATUS_ERR 1
 
@@ -251,7 +247,6 @@ namespace FairDataPipeline
 
         typedef std::shared_ptr< IVar > sptr;
 
-        typedef std::map< std::string, IVarAtt::sptr > NAME_VARATT_MAP;
 
         virtual IGroupPtr parent() = 0;
 
@@ -268,16 +263,9 @@ namespace FairDataPipeline
     {
         typedef std::shared_ptr< IGroup > sptr;
 
-        typedef std::map< std::string, IGroup::sptr > NAME_GROUP_MAP;
-        typedef std::map< std::string, IDimension::sptr > NAME_DIM_MAP;
-        typedef std::map< std::string, IVar::sptr > NAME_VAR_MAP;
-        typedef std::map< std::string, IGroupAtt::sptr > NAME_ATT_MAP;
-
         virtual IGroup::sptr parent() = 0;
 
         virtual IGroup::sptr requireGroup( const std::string& name ) = 0;
-
-        ////virtual IGroup::sptr addGroup( const std::string& s ) = 0;
 
         virtual IGroup::sptr getGroup( const std::string& name ) = 0;
 
