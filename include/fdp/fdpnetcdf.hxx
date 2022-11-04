@@ -31,7 +31,6 @@ namespace FairDataPipeline
     PARENT_ITEM_TYPE split_item_name( std::string str );
 
 
-
     enum DataType
     {
         UNKNOWN,
@@ -233,13 +232,15 @@ namespace FairDataPipeline
         virtual IAtt::sptr putAttFloats( const std::string& key, size_t nvals, const float* values ) = 0;
         virtual IAtt::sptr putAttDoubles( const std::string& key, size_t nvals, const double* values ) = 0;
 
-        virtual IAtt::sptr putAtt2( const std::string& key, size_t nvals, const char** values ) = 0;
+        virtual IAtt::sptr putAttStrs( const std::string& key, size_t nvals, const char** values ) = 0;
 
-        virtual  IAtt::sptr putAtt( const std::string& key
-                , DataType datatype, size_t nvals, const void* pv ) = 0;
+        virtual  IAtt::sptr putAttVal( const std::string& key, DataType datatype, const void* pv ) = 0;
+        virtual  IAtt::sptr putAttVals( const std::string& key, DataType datatype, size_t nvals, const void* pv ) = 0;
 
 
         virtual IAtt::sptr getAtt( const std::string& key ) = 0;
+	virtual size_t getAttCount() = 0;
+//	virtual std::vector< IAtt::sptr > getAtts() = 0;
 
     };
 
@@ -298,7 +299,6 @@ namespace FairDataPipeline
         virtual int getGroupCount() = 0;
 
         virtual std::string getName() = 0;
-        virtual std::vector< std::string > getAtts() = 0;
 
         virtual int prepare( const CoordinatVariableDefinition& cvd ) = 0;
 
@@ -312,23 +312,6 @@ namespace FairDataPipeline
     {
         enum Mode{ READ, WRITE};
     };
-#if 0
-    struct DimensionDefinition
-    {
-        size_t size;
-        std::string units;
-        std::string description;
-        enum DataType dataType;
-    };
-
-    struct ArrayDefinition
-    {
-        std::string units;
-        enum DataType dataType;
-        std::string description;
-        std::vector< std::string > dimension_names;
-    };
-#endif
 
     class FileFactory
     {
