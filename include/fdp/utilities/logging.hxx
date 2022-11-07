@@ -170,6 +170,7 @@ namespace FairDataPipeline {
                 MsgBuilder warn();
                 MsgBuilder critical();
                 MsgBuilder error();
+                MsgBuilder log( enum LOG_LEVEL lvl );
 
                 Sink::sptr sink(){ return _sink; }
                 const std::string& name() const { return _name;}
@@ -190,10 +191,11 @@ namespace FairDataPipeline {
         class ScopeLogger
     {
         public:
-            ScopeLogger( Logger& logger, const std::string& s ); 
+            ScopeLogger( Logger& logger, enum LOG_LEVEL lvl, const std::string& s ); 
             ~ScopeLogger();
         private:
             Logger& _logger;
+            enum LOG_LEVEL _lvl;
             std::string _msg;
     };
 
@@ -213,6 +215,22 @@ namespace FairDataPipeline {
 
 
 } // namespace FairDataPipeline
+
+#define FDP_LOG_TRACE() (FairDataPipeline::logger::get_logger()->trace() )
+#define FDP_LOG_DEBUG() (FairDataPipeline::logger::get_logger()->debug() )
+#define FDP_LOG_INFO() (FairDataPipeline::logger::get_logger()->info() )
+#define FDP_LOG_WARN() (FairDataPipeline::logger::get_logger()->warn() )
+#define FDP_LOG_ERROR() (FairDataPipeline::logger::get_logger()->error() )
+#define FDP_LOG_CRITICAL() (FairDataPipeline::logger::get_logger()->critical() )
+
+#define FDP_SCOPE_LOG( lvl, msg ) (FairDataPipeline::logging::ScopeLogger( *(FairDataPipeline::logger::get_logger()), lvl, msg ))
+#define FDP_SCOPE_LOG_TRACE( msg ) ( FDP_SCOPE_LOG( FairDataPipeline::logging::LOG_LEVEL::TRACE, msg ) )
+#define FDP_SCOPE_LOG_DEBUG( msg ) ( FDP_SCOPE_LOG( FairDataPipeline::logging::LOG_LEVEL::DEBUG, msg ) )
+#define FDP_SCOPE_LOG_INFO( msg ) ( FDP_SCOPE_LOG( FairDataPipeline::logging::LOG_LEVEL::INFO, msg ) )
+#define FDP_SCOPE_LOG_WARN( msg ) ( FDP_SCOPE_LOG( FairDataPipeline::logging::LOG_LEVEL::WARN, msg ) )
+#define FDP_SCOPE_LOG_ERROR( msg ) ( FDP_SCOPE_LOG( FairDataPipeline::logging::LOG_LEVEL::ERROR, msg ) )
+#define FDP_SCOPE_LOG_CRITICAL( msg ) ( FDP_SCOPE_LOG( FairDataPipeline::logging::LOG_LEVEL::CRITICAL, msg ) )
+        
 
 
 

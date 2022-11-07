@@ -249,6 +249,7 @@ namespace FairDataPipeline
 
     void split_str( const std::string& s, const char delim, std::vector< std::string >& splits )
     {
+        FDP_SCOPE_LOG_TRACE( __PRETTY_FUNCTION__ );
         std::stringstream ss( s );
 
         std::string s_;
@@ -260,6 +261,7 @@ namespace FairDataPipeline
 
     void split_name( const std::string& name, std::vector< std::string >& splits )
     {
+        FDP_SCOPE_LOG_TRACE( __PRETTY_FUNCTION__ );
         if( '/' == name[0] )
             splits.push_back( "/" );
 
@@ -359,6 +361,7 @@ namespace FairDataPipeline
 
     std::vector< IAtt::sptr > VarImpl::getAtts()
     {
+        FDP_SCOPE_LOG_TRACE( __PRETTY_FUNCTION__ );
 	    std::vector< IAtt::sptr > v_atts;
 
 	    auto nc_name_att_map = _nc_var.getAtts();
@@ -378,6 +381,7 @@ namespace FairDataPipeline
 
     IAtt::sptr VarImpl::putAttVal( const std::string& key, DataType datatype, const void* pv )
     {
+        FDP_SCOPE_LOG_TRACE( __PRETTY_FUNCTION__ );
         IVarAtt::sptr att_ptr;
         switch( datatype )
         {
@@ -407,7 +411,7 @@ namespace FairDataPipeline
                 break;
 
             default:
-                logger::get_logger()->error() << __PRETTY_FUNCTION__ << ": Unhandled datatype";
+                FDP_LOG_ERROR() << __PRETTY_FUNCTION__ << ": Unhandled datatype";
                 break;
         }
         return att_ptr;
@@ -415,6 +419,7 @@ namespace FairDataPipeline
 
     IAtt::sptr VarImpl::putAttVals( const std::string& key, DataType datatype, size_t nvals, const void* pv )
     {
+        FDP_SCOPE_LOG_TRACE( __PRETTY_FUNCTION__ );
         IVarAtt::sptr att_ptr;
         switch( datatype )
         {
@@ -444,7 +449,7 @@ namespace FairDataPipeline
                 break;
 
             default:
-                logger::get_logger()->error() << __PRETTY_FUNCTION__ << ": Unhandled datatype";
+                FDP_LOG_ERROR() << __PRETTY_FUNCTION__ << ": Unhandled datatype";
                 break;
         }
         return att_ptr;
@@ -464,7 +469,7 @@ namespace FairDataPipeline
             }
             catch (NcException& ex )
             {
-                logger::get_logger()->error() << __PRETTY_FUNCTION__ << ": " << ex.what();
+                FDP_LOG_ERROR() << __PRETTY_FUNCTION__ << ": " << ex.what();
             }
         }
 
@@ -479,20 +484,21 @@ namespace FairDataPipeline
             }
             catch (NcException& ex )
             {
-                logger::get_logger()->error() << __PRETTY_FUNCTION__ << ": " << ex.what();
+                FDP_LOG_ERROR() << __PRETTY_FUNCTION__ << ": " << ex.what();
             }
         }
 
 
     void VarImpl::putVar( const std::vector< size_t >& index, int value ) const
     {
+        FDP_SCOPE_LOG_TRACE( __PRETTY_FUNCTION__ );
         try
         {
             _nc_var.putVar( index, value );
         }
         catch( NcException& ex )
         {
-            logger::get_logger()->error() << __PRETTY_FUNCTION__ << ": " << ex.what();
+            FDP_LOG_ERROR() << __PRETTY_FUNCTION__ << ": " << ex.what();
         }
     }
 
@@ -500,6 +506,7 @@ namespace FairDataPipeline
             , const std::vector< size_t >& countp
             , int* values ) const
     {
+        FDP_SCOPE_LOG_TRACE( __PRETTY_FUNCTION__ );
         putVarImpl( index, countp, values );
     }
 
@@ -548,6 +555,7 @@ namespace FairDataPipeline
 
     IGroupPtr GroupAtt::getParentGroup()
     {
+        FDP_SCOPE_LOG_TRACE( __PRETTY_FUNCTION__ );
         GroupImplSptr grp_ptr(_parent_group_ptr);
         //IGroup::sptr iptr( grp_ptr);
 
@@ -558,6 +566,7 @@ namespace FairDataPipeline
 
     std::string GroupAtt::getName()
     {
+        FDP_SCOPE_LOG_TRACE( __PRETTY_FUNCTION__ );
         return _ncatt.getName();
     }
 
@@ -565,6 +574,7 @@ namespace FairDataPipeline
 
     GroupAtt::sptr GroupAtt::create( GroupImplSptr grp_ptr, const netCDF::NcGroupAtt& ncatt ) 
     {
+        FDP_SCOPE_LOG_TRACE( __PRETTY_FUNCTION__ );
         return GroupAtt::sptr( new GroupAtt( grp_ptr, ncatt ) );
     }
 
@@ -581,7 +591,7 @@ namespace FairDataPipeline
             }
             catch( NcException& ex )
             {
-		logger::get_logger()->error() << __PRETTY_FUNCTION__ << ": " << ex.what();
+		FDP_LOG_ERROR() << __PRETTY_FUNCTION__ << ": " << ex.what();
 
                 status = FDP_FILE_STATUS_ERR;
             }
@@ -591,57 +601,68 @@ namespace FairDataPipeline
 
     int GroupAtt::getValues( short* values )
     {
+        FDP_SCOPE_LOG_TRACE( __PRETTY_FUNCTION__ );
         return this->getValuesImpl( values );
     }
 
     int GroupAtt::getValues( int* values )
     {
+        FDP_SCOPE_LOG_TRACE( __PRETTY_FUNCTION__ );
         return this->getValuesImpl( values );
     }
 
     int GroupAtt::getValues( long* values )
     {
+        FDP_SCOPE_LOG_TRACE( __PRETTY_FUNCTION__ );
         return this->getValuesImpl( values );
     }
 
     int GroupAtt::getValues( long long* values )
     {
+        FDP_SCOPE_LOG_TRACE( __PRETTY_FUNCTION__ );
         return this->getValuesImpl( values );
     }
 
     int GroupAtt::getValues( unsigned short* values )
     {
+        FDP_SCOPE_LOG_TRACE( __PRETTY_FUNCTION__ );
         return this->getValuesImpl( values );
     }
 
     int GroupAtt::getValues( unsigned int* values )
     {
+        FDP_SCOPE_LOG_TRACE( __PRETTY_FUNCTION__ );
         return this->getValuesImpl( values );
     }
 
     int GroupAtt::getValues( unsigned long* values )
     {
+        FDP_SCOPE_LOG_TRACE( __PRETTY_FUNCTION__ );
         return this->getValuesImpl( values );
     }
 
     int GroupAtt::getValues( unsigned long long* values )
     {
+        FDP_SCOPE_LOG_TRACE( __PRETTY_FUNCTION__ );
         return this->getValuesImpl( values );
     }
 
 
     int GroupAtt::getValues( float* values )
     {
+        FDP_SCOPE_LOG_TRACE( __PRETTY_FUNCTION__ );
         return this->getValuesImpl( values );
     }
 
     int GroupAtt::getValues( double* values )
     {
+        FDP_SCOPE_LOG_TRACE( __PRETTY_FUNCTION__ );
         return this->getValuesImpl( values );
     }
 
     int GroupAtt::getValues( std::string& values )
     {
+        FDP_SCOPE_LOG_TRACE( __PRETTY_FUNCTION__ );
         int status = FDP_FILE_STATUS_NOERR;
 
         try
@@ -650,7 +671,7 @@ namespace FairDataPipeline
         }
         catch( NcException& ex )
         {
-            logger::get_logger()->error() << __PRETTY_FUNCTION__ << ": " << ex.what();
+            FDP_LOG_ERROR() << __PRETTY_FUNCTION__ << ": " << ex.what();
             status = FDP_FILE_STATUS_ERR;
         }
 
@@ -705,7 +726,7 @@ namespace FairDataPipeline
             }
             catch( NcException& ex )
             {
-		logger::get_logger()->error() <<  __PRETTY_FUNCTION__ << ": " << ex.what();
+		FDP_LOG_ERROR() <<  __PRETTY_FUNCTION__ << ": " << ex.what();
 
                 status = FDP_FILE_STATUS_ERR;
             }
@@ -715,57 +736,68 @@ namespace FairDataPipeline
 
     int VarAtt::getValues( short* values )
     {
+        FDP_SCOPE_LOG_TRACE( __PRETTY_FUNCTION__ );
         return this->getValuesImpl( values );
     }
 
     int VarAtt::getValues( int* values )
     {
+        FDP_SCOPE_LOG_TRACE( __PRETTY_FUNCTION__ );
         return this->getValuesImpl( values );
     }
 
     int VarAtt::getValues( long* values )
     {
+        FDP_SCOPE_LOG_TRACE( __PRETTY_FUNCTION__ );
         return this->getValuesImpl( values );
     }
 
     int VarAtt::getValues( long long* values )
     {
+        FDP_SCOPE_LOG_TRACE( __PRETTY_FUNCTION__ );
         return this->getValuesImpl( values );
     }
 
     int VarAtt::getValues( unsigned short* values )
     {
+        FDP_SCOPE_LOG_TRACE( __PRETTY_FUNCTION__ );
         return this->getValuesImpl( values );
     }
 
     int VarAtt::getValues( unsigned int* values )
     {
+        FDP_SCOPE_LOG_TRACE( __PRETTY_FUNCTION__ );
         return this->getValuesImpl( values );
     }
 
     int VarAtt::getValues( unsigned long* values )
     {
+        FDP_SCOPE_LOG_TRACE( __PRETTY_FUNCTION__ );
         return this->getValuesImpl( values );
     }
 
     int VarAtt::getValues( unsigned long long* values )
     {
+        FDP_SCOPE_LOG_TRACE( __PRETTY_FUNCTION__ );
         return this->getValuesImpl( values );
     }
 
 
     int VarAtt::getValues( float* values )
     {
+        FDP_SCOPE_LOG_TRACE( __PRETTY_FUNCTION__ );
         return this->getValuesImpl( values );
     }
 
     int VarAtt::getValues( double* values )
     {
+        FDP_SCOPE_LOG_TRACE( __PRETTY_FUNCTION__ );
         return this->getValuesImpl( values );
     }
 
     int VarAtt::getValues( std::string& values )
     {
+        FDP_SCOPE_LOG_TRACE( __PRETTY_FUNCTION__ );
         int status = FDP_FILE_STATUS_NOERR;
 
         try
@@ -774,7 +806,7 @@ namespace FairDataPipeline
         }
         catch( NcException& ex )
         {
-	    logger::get_logger()->error() << __PRETTY_FUNCTION__ << ": " << ex.what();
+	    FDP_LOG_ERROR() << __PRETTY_FUNCTION__ << ": " << ex.what();
             status = FDP_FILE_STATUS_ERR;
         }
 
@@ -783,6 +815,7 @@ namespace FairDataPipeline
 
     IAtt::sptr VarImpl::putAttShort( const std::string& key, short value )
     {
+        FDP_SCOPE_LOG_TRACE( __PRETTY_FUNCTION__ );
         VarAtt::sptr att_ptr;
         try
         {
@@ -792,43 +825,50 @@ namespace FairDataPipeline
         }
         catch( NcException& ex )
         {
-	    logger::get_logger()->error() <<  __PRETTY_FUNCTION__ << ": " << ex.what();
+	    FDP_LOG_ERROR() <<  __PRETTY_FUNCTION__ << ": " << ex.what();
         }
         return att_ptr;
     }
 
     IAtt::sptr VarImpl::putAttInt( const std::string& key, int value )
     {
+        FDP_SCOPE_LOG_TRACE( __PRETTY_FUNCTION__ );
 	    return this->putAttImpl<int>( key, value );
     }
 
     IAtt::sptr VarImpl::putAttLong( const std::string& key, long value )
     {
+        FDP_SCOPE_LOG_TRACE( __PRETTY_FUNCTION__ );
 	    return this->putAttImpl<long>( key, value );
     }
 
     IAtt::sptr VarImpl::putAttLongLong( const std::string& key, long long value )
     {
+        FDP_SCOPE_LOG_TRACE( __PRETTY_FUNCTION__ );
 	    return this->putAttImpl<long long>( key, value );
     }
 
     IAtt::sptr VarImpl::putAttUShort( const std::string& key, unsigned short value )
     {
+        FDP_SCOPE_LOG_TRACE( __PRETTY_FUNCTION__ );
 	    return this->putAttImpl< unsigned short>( key, value );
     }
 
     IAtt::sptr VarImpl::putAttUInt( const std::string& key, unsigned int value )
     {
+        FDP_SCOPE_LOG_TRACE( __PRETTY_FUNCTION__ );
 	    return this->putAttImpl< unsigned int >( key, value );
     }
 
     IAtt::sptr VarImpl::putAttFloat( const std::string& key, float value )
     {
+        FDP_SCOPE_LOG_TRACE( __PRETTY_FUNCTION__ );
 	    return this->putAttImpl< float >( key, value );
     }
 
     IAtt::sptr VarImpl::putAttDouble( const std::string& key, double value )
     {
+        FDP_SCOPE_LOG_TRACE( __PRETTY_FUNCTION__ );
 	    return this->putAttImpl< double >( key, value );
     }
 
@@ -850,7 +890,7 @@ namespace FairDataPipeline
 		    }
 		    catch( NcException& ex )
 		    {
-			    logger::get_logger()->error() <<  __PRETTY_FUNCTION__ << ": " << ex.what();
+			    FDP_LOG_ERROR() <<  __PRETTY_FUNCTION__ << ": " << ex.what();
 		    }
 
 		    return var_att;
@@ -875,7 +915,7 @@ namespace FairDataPipeline
             }
             catch( NcException& ex )
             {
-		logger::get_logger()->error() <<  __PRETTY_FUNCTION__ << ": " << ex.what();
+		FDP_LOG_ERROR() <<  __PRETTY_FUNCTION__ << ": " << ex.what();
             }
 
             return var_att;
@@ -883,56 +923,67 @@ namespace FairDataPipeline
 
     IAtt::sptr VarImpl::putAttShorts( const std::string& key, size_t nvals, const short* values )
     {
+        FDP_SCOPE_LOG_TRACE( __PRETTY_FUNCTION__ );
         return this->putAttImpls< short >( key, nvals, values );
     }
 
     IAtt::sptr VarImpl::putAttInts( const std::string& key, int nvals, const int* values )
     {
+        FDP_SCOPE_LOG_TRACE( __PRETTY_FUNCTION__ );
         return this->putAttImpls< int >( key, nvals, values );
     }
 
     IAtt::sptr VarImpl::putAttLongs( const std::string& key, size_t nvals, const long* values )
     {
+        FDP_SCOPE_LOG_TRACE( __PRETTY_FUNCTION__ );
         return this->putAttImpls< long >( key, nvals, values );
     }
 
     IAtt::sptr VarImpl::putAttLongLongs( const std::string& key, size_t nvals, const long long* values )
     {
+        FDP_SCOPE_LOG_TRACE( __PRETTY_FUNCTION__ );
         return this->putAttImpls< long long >( key, nvals, values );
     }
 
     IAtt::sptr VarImpl::putAttUShorts( const std::string& key, size_t nvals, const unsigned short* values )
     {
+        FDP_SCOPE_LOG_TRACE( __PRETTY_FUNCTION__ );
         return this->putAttImpls< unsigned short >( key, nvals, values );
     }
 
     IAtt::sptr VarImpl::putAttUInts( const std::string& key, size_t nvals, const unsigned int* values )
     {
+        FDP_SCOPE_LOG_TRACE( __PRETTY_FUNCTION__ );
         return this->putAttImpls< unsigned int>( key, nvals, values );
     }
 
     IAtt::sptr VarImpl::putAttULongs( const std::string& key, size_t nvals, const unsigned long* values )
     {
+        FDP_SCOPE_LOG_TRACE( __PRETTY_FUNCTION__ );
         return this->putAttImpls< unsigned long >( key, nvals, values );
     }
 
     IAtt::sptr VarImpl::putAttULongLongs( const std::string& key, size_t nvals, const unsigned long long* values )
     {
+        FDP_SCOPE_LOG_TRACE( __PRETTY_FUNCTION__ );
         return this->putAttImpls< unsigned long long >( key, nvals, values );
     }
 
     IAtt::sptr VarImpl::putAttFloats( const std::string& key, size_t nvals, const float* values )
     {
+        FDP_SCOPE_LOG_TRACE( __PRETTY_FUNCTION__ );
         return this->putAttImpls< float >( key, nvals, values );
     }
 
     IAtt::sptr VarImpl::putAttDoubles( const std::string& key, size_t nvals, const double* values )
     {
+        FDP_SCOPE_LOG_TRACE( __PRETTY_FUNCTION__ );
         return this->putAttImpls< double >( key, nvals, values );
     }
 
     IAtt::sptr VarImpl::putAttStrs( const std::string& key, size_t nvals, const char** values )
     {
+        FDP_SCOPE_LOG_TRACE( __PRETTY_FUNCTION__ );
         IVarAtt::sptr var_att;
         try
         {
@@ -943,7 +994,7 @@ namespace FairDataPipeline
         }
         catch( NcException& ex )
         {
-	    logger::get_logger()->error() <<  __PRETTY_FUNCTION__ << ": " << ex.what();
+	    FDP_LOG_ERROR() <<  __PRETTY_FUNCTION__ << ": " << ex.what();
         }
 
         return var_att;
@@ -951,6 +1002,7 @@ namespace FairDataPipeline
 
     IAtt::sptr VarImpl::putAttString( const std::string& key, const std::string& value )
     {
+        FDP_SCOPE_LOG_TRACE( __PRETTY_FUNCTION__ );
         VarAtt::sptr att_ptr;
         try
         {
@@ -960,13 +1012,14 @@ namespace FairDataPipeline
         }
         catch( NcException& ex )
         {
-	    logger::get_logger()->error() << __PRETTY_FUNCTION__ << ": " << ex.what();
+	    FDP_LOG_ERROR() << __PRETTY_FUNCTION__ << ": " << ex.what();
         }
         return att_ptr;
     }
     
     IAtt::sptr VarImpl::getAtt( const std::string& key )
     {
+        FDP_SCOPE_LOG_TRACE( __PRETTY_FUNCTION__ );
         IVarAtt::sptr att_ptr;
         auto it = _name_varatt_map.find( key );
         if( it != _name_varatt_map.end() )
@@ -983,7 +1036,7 @@ namespace FairDataPipeline
             }
             catch( NcException& ex )
             {
-		logger::get_logger()->error() << __PRETTY_FUNCTION__ << ": " << ex.what();
+		FDP_LOG_ERROR() << __PRETTY_FUNCTION__ << ": " << ex.what();
             }
 
         }
@@ -993,6 +1046,7 @@ namespace FairDataPipeline
 
     DataType VarImpl::getType()
     {
+        FDP_SCOPE_LOG_TRACE( __PRETTY_FUNCTION__ );
         auto nctype = _nc_var.getType();
 
         DataType dtype = NcType2DataType( nctype.getTypeClass() );
@@ -1001,6 +1055,7 @@ namespace FairDataPipeline
 
     std::vector< IDimension::sptr > VarImpl::getDims()
     {
+        FDP_SCOPE_LOG_TRACE( __PRETTY_FUNCTION__ );
         std::vector< IDimension::sptr > dim_ptrs;
 
         std::vector< netCDF::NcDim > nc_dims = _nc_var.getDims();
@@ -1020,11 +1075,13 @@ namespace FairDataPipeline
 
     void VarImpl::putVar( const void* vals )
     {
+        FDP_SCOPE_LOG_TRACE( __PRETTY_FUNCTION__ );
         _nc_var.putVar( vals );
     }
 
     void VarImpl::getVar( void* vals )
     {
+        FDP_SCOPE_LOG_TRACE( __PRETTY_FUNCTION__ );
         _nc_var.getVar( vals );
     }
 
@@ -1181,6 +1238,7 @@ namespace FairDataPipeline
 
     std::vector< IAtt::sptr > GroupImpl::getAtts()
     {
+        FDP_SCOPE_LOG_TRACE( __PRETTY_FUNCTION__ );
 	    std::vector< IAtt::sptr > v_atts;
 
 	    auto nc_name_att_map = _nc->getAtts();
@@ -1200,6 +1258,7 @@ namespace FairDataPipeline
 
     IAtt::sptr GroupImpl::putAttVal( const std::string& key, DataType datatype, const void* pv )
     {
+        FDP_SCOPE_LOG_TRACE( __PRETTY_FUNCTION__ );
         IVarAtt::sptr att_ptr;
         switch( datatype )
         {
@@ -1229,7 +1288,7 @@ namespace FairDataPipeline
                 break;
 
             default:
-		logger::get_logger()->error() << __PRETTY_FUNCTION__ << ": unhanded datatype";
+		FDP_LOG_ERROR() << __PRETTY_FUNCTION__ << ": unhanded datatype";
                 break;
 
         }
@@ -1240,6 +1299,7 @@ namespace FairDataPipeline
     IAtt::sptr GroupImpl::putAttVals( const std::string& key
             , DataType datatype, size_t nvals, const void* pv )
     {
+        FDP_SCOPE_LOG_TRACE( __PRETTY_FUNCTION__ );
         IVarAtt::sptr att_ptr;
         switch( datatype )
         {
@@ -1269,7 +1329,7 @@ namespace FairDataPipeline
                 break;
 
             default:
-		logger::get_logger()->error() << __PRETTY_FUNCTION__ << ": unhanded datatype";
+		FDP_LOG_ERROR() << __PRETTY_FUNCTION__ << ": unhanded datatype";
                 break;
 
         }
@@ -1295,7 +1355,7 @@ namespace FairDataPipeline
             }
             catch( NcException& ex )
             {
-		logger::get_logger()->error() << __PRETTY_FUNCTION__ << ": " << ex.what();
+		FDP_LOG_ERROR() << __PRETTY_FUNCTION__ << ": " << ex.what();
             }
 
 
@@ -1305,6 +1365,7 @@ namespace FairDataPipeline
 
     IAtt::sptr GroupImpl::putAttStrs( const std::string& key, size_t nvals, const char** values )
     {
+        FDP_SCOPE_LOG_TRACE( __PRETTY_FUNCTION__ );
         IGroupAtt::sptr grp_att;
         try
         {
@@ -1315,7 +1376,7 @@ namespace FairDataPipeline
         }
         catch( NcException& ex )
         {
-		logger::get_logger()->error() << __PRETTY_FUNCTION__ << ": " << ex.what();
+		FDP_LOG_ERROR() << __PRETTY_FUNCTION__ << ": " << ex.what();
         }
 
 
@@ -1325,30 +1386,35 @@ namespace FairDataPipeline
 
     IAtt::sptr GroupImpl::putAttDoubles( const std::string& key, size_t nvals, const double* values )
     {
+        FDP_SCOPE_LOG_TRACE( __PRETTY_FUNCTION__ );
         IGroupAtt::sptr grp_att = this->putAttImpls< double >( key, nvals, values );
         return grp_att;
     }
 
     IAtt::sptr GroupImpl::putAttFloats( const std::string& key, size_t nvals, const float* values )
     {
+        FDP_SCOPE_LOG_TRACE( __PRETTY_FUNCTION__ );
         IGroupAtt::sptr grp_att = this->putAttImpls< float >( key, nvals, values );
         return grp_att;
     }
 
     IAtt::sptr GroupImpl::putAttShorts( const std::string& key, size_t nvals, const short* values )
     {
+        FDP_SCOPE_LOG_TRACE( __PRETTY_FUNCTION__ );
         IGroupAtt::sptr grp_att = this->putAttImpls< short >( key, nvals, values );
         return grp_att;
     }
 
     IAtt::sptr GroupImpl::putAttInts( const std::string& key, int nvals, const int* values )
     {
+        FDP_SCOPE_LOG_TRACE( __PRETTY_FUNCTION__ );
         IGroupAtt::sptr grp_att = this->putAttImpls< int >( key, nvals, values );
         return grp_att;
     }
 
     IAtt::sptr GroupImpl::putAttLongs( const std::string& key, size_t nvals, const long* values )
     {
+        FDP_SCOPE_LOG_TRACE( __PRETTY_FUNCTION__ );
         IGroupAtt::sptr grp_att = this->putAttImpls< long >( key, nvals, values );
         return grp_att;
     }
@@ -1356,12 +1422,14 @@ namespace FairDataPipeline
 
     IAtt::sptr GroupImpl::putAttLongLongs( const std::string& key, size_t nvals, const long long* values )
     {
+        FDP_SCOPE_LOG_TRACE( __PRETTY_FUNCTION__ );
         IGroupAtt::sptr grp_att = this->putAttImpls< long long >( key, nvals, values );
         return grp_att;
     }
 
     IAtt::sptr GroupImpl::putAttUShorts( const std::string& key, size_t nvals, const unsigned short* values )
     {
+        FDP_SCOPE_LOG_TRACE( __PRETTY_FUNCTION__ );
         IGroupAtt::sptr grp_att = this->putAttImpls( key, nvals, values );
 
         return grp_att;
@@ -1369,12 +1437,14 @@ namespace FairDataPipeline
 
     IAtt::sptr GroupImpl::putAttUInts( const std::string& key, size_t nvals, const unsigned int* values )
     {
+        FDP_SCOPE_LOG_TRACE( __PRETTY_FUNCTION__ );
         IGroupAtt::sptr grp_att = this->putAttImpls( key, nvals, values );
         return grp_att;
     }
 
     IAtt::sptr GroupImpl::putAttULongs( const std::string& key, size_t nvals, const unsigned long* values )
     {
+        FDP_SCOPE_LOG_TRACE( __PRETTY_FUNCTION__ );
         IGroupAtt::sptr grp_att = this->putAttImpls( key, nvals, values );
         return grp_att;
     }
@@ -1382,17 +1452,20 @@ namespace FairDataPipeline
 
     IAtt::sptr GroupImpl::putAttULongLongs( const std::string& key, size_t nvals, const unsigned long long* values )
     {
+        FDP_SCOPE_LOG_TRACE( __PRETTY_FUNCTION__ );
         IGroupAtt::sptr grp_att = this->putAttImpls( key, nvals, values );
         return grp_att;
     }
 
     IAtt::sptr GroupImpl::putAttFloat( const std::string& key, float value )
     {
+        FDP_SCOPE_LOG_TRACE( __PRETTY_FUNCTION__ );
         IGroupAtt::sptr grp_att = this->putAttImpls<float>( key, 1, &value );
         return grp_att;
     }
     IAtt::sptr GroupImpl::putAttDouble( const std::string& key, double value )
     {
+        FDP_SCOPE_LOG_TRACE( __PRETTY_FUNCTION__ );
         IGroupAtt::sptr grp_att = this->putAttImpls<double>( key, 1, &value );
         return grp_att;
     }
@@ -1401,6 +1474,7 @@ namespace FairDataPipeline
 
     IAtt::sptr GroupImpl::putAttString(const std::string& key, const std::string& value )
     {
+        FDP_SCOPE_LOG_TRACE( __PRETTY_FUNCTION__ );
         IGroupAtt::sptr grp_att;
         try
         {
@@ -1411,13 +1485,14 @@ namespace FairDataPipeline
         }
         catch( NcException& ex )
         {
-	    logger::get_logger()->error() << __PRETTY_FUNCTION__ << ": " << ex.what();
+	    FDP_LOG_ERROR() << __PRETTY_FUNCTION__ << ": " << ex.what();
         }
 
         return grp_att;
     }
     IAtt::sptr GroupImpl::putAttShort(const std::string& key, short value)
     {
+        FDP_SCOPE_LOG_TRACE( __PRETTY_FUNCTION__ );
         IGroupAtt::sptr grp_att;
         try
         {
@@ -1428,7 +1503,7 @@ namespace FairDataPipeline
         }
         catch( NcException& ex )
         {
-	    logger::get_logger()->error() << __PRETTY_FUNCTION__ << ": " << ex.what();
+	    FDP_LOG_ERROR() << __PRETTY_FUNCTION__ << ": " << ex.what();
         }
 
         return grp_att;
@@ -1436,6 +1511,7 @@ namespace FairDataPipeline
 
     IAtt::sptr GroupImpl::putAttInt(const std::string& key, int value)
     {
+        FDP_SCOPE_LOG_TRACE( __PRETTY_FUNCTION__ );
         IGroupAtt::sptr grp_att;
         try
         {
@@ -1446,13 +1522,14 @@ namespace FairDataPipeline
         }
         catch( NcException& ex )
         {
-	    logger::get_logger()->error() << __PRETTY_FUNCTION__ << ": " << ex.what();
+	    FDP_LOG_ERROR() << __PRETTY_FUNCTION__ << ": " << ex.what();
         }
 
         return grp_att;
     }
     IAtt::sptr GroupImpl::putAttLong(const std::string& key, long value)
     {
+        FDP_SCOPE_LOG_TRACE( __PRETTY_FUNCTION__ );
         IGroupAtt::sptr grp_att;
         try
         {
@@ -1463,13 +1540,15 @@ namespace FairDataPipeline
         }
         catch( NcException& ex )
         {
-	    logger::get_logger()->error() << __PRETTY_FUNCTION__ << ": " << ex.what();
+	    FDP_LOG_ERROR() << __PRETTY_FUNCTION__ << ": " << ex.what();
         }
 
         return grp_att;
     }
+
     IAtt::sptr GroupImpl::putAttLongLong(const std::string& key, long long value)
     {
+        FDP_SCOPE_LOG_TRACE( __PRETTY_FUNCTION__ );
         IGroupAtt::sptr grp_att;
         try
         {
@@ -1480,7 +1559,7 @@ namespace FairDataPipeline
         }
         catch( NcException& ex )
         {
-	    logger::get_logger()->error() << __PRETTY_FUNCTION__ << ": " << ex.what();
+	    FDP_LOG_ERROR() << __PRETTY_FUNCTION__ << ": " << ex.what();
         }
 
         return grp_att;
@@ -1488,6 +1567,7 @@ namespace FairDataPipeline
 
     IAtt::sptr GroupImpl::putAttUShort(const std::string& key, unsigned short value)
     {
+        FDP_SCOPE_LOG_TRACE( __PRETTY_FUNCTION__ );
         IGroupAtt::sptr grp_att;
         try
         {
@@ -1498,7 +1578,7 @@ namespace FairDataPipeline
         }
         catch( NcException& ex )
         {
-	    logger::get_logger()->error() << __PRETTY_FUNCTION__ << ": " << ex.what();
+	    FDP_LOG_ERROR() << __PRETTY_FUNCTION__ << ": " << ex.what();
         }
 
         return grp_att;
@@ -1506,6 +1586,7 @@ namespace FairDataPipeline
 
     IAtt::sptr GroupImpl::putAttUInt(const std::string& key, unsigned int value)
     {
+        FDP_SCOPE_LOG_TRACE( __PRETTY_FUNCTION__ );
         IGroupAtt::sptr grp_att;
         try
         {
@@ -1516,7 +1597,7 @@ namespace FairDataPipeline
         }
         catch( NcException& ex )
         {
-	    logger::get_logger()->error() << __PRETTY_FUNCTION__ << ": " << ex.what();
+	    FDP_LOG_ERROR() << __PRETTY_FUNCTION__ << ": " << ex.what();
         }
 
         return grp_att;
@@ -1525,6 +1606,7 @@ namespace FairDataPipeline
 
     IAtt::sptr GroupImpl::getAtt( const std::string& key )
     {
+        FDP_SCOPE_LOG_TRACE( __PRETTY_FUNCTION__ );
         IGroupAtt::sptr att_ptr;
         auto it = _name_att_map.find( key );
         if( it != _name_att_map.end() )
@@ -1541,7 +1623,7 @@ namespace FairDataPipeline
             }
             catch( NcException& ex )
             {
-		logger::get_logger()->error() << __PRETTY_FUNCTION__ << ": " << ex.what();
+		FDP_LOG_ERROR() << __PRETTY_FUNCTION__ << ": " << ex.what();
             }
 
         }
@@ -1551,6 +1633,7 @@ namespace FairDataPipeline
 
     IVar::sptr GroupImpl::addVar( const std::string& name, DataType dataType, IVar::VDIMS& vdims )
     {
+        FDP_SCOPE_LOG_TRACE( __PRETTY_FUNCTION__ );
         VarImpl::sptr var_ptr;
 
         PARENT_ITEM_TYPE grp_item = split_item_name( name );
@@ -1577,7 +1660,7 @@ namespace FairDataPipeline
         }
         catch( NcException& ex )
         {
-	    logger::get_logger()->error() << __PRETTY_FUNCTION__ << ": " << ex.what();
+	    FDP_LOG_ERROR() << __PRETTY_FUNCTION__ << ": " << ex.what();
         }
 
         return var_ptr;
@@ -1585,6 +1668,7 @@ namespace FairDataPipeline
 
     std::vector< std::string > GroupImpl::getVars()
     {
+        FDP_SCOPE_LOG_TRACE( __PRETTY_FUNCTION__ );
         std::vector< std::string > var_names;
         try
         {
@@ -1599,13 +1683,14 @@ namespace FairDataPipeline
         }
         catch( NcException& ex )
         {
-	    logger::get_logger()->error() << __PRETTY_FUNCTION__ << ": " << ex.what();
+	    FDP_LOG_ERROR() << __PRETTY_FUNCTION__ << ": " << ex.what();
         }
         return var_names;
     }
 
     IVar::sptr GroupImpl::getVar( const std::string& name )
     {
+        FDP_SCOPE_LOG_TRACE( __PRETTY_FUNCTION__ );
         IVar::sptr var_ptr;
         auto it = _name_var_map.find( name );
         if( it != _name_var_map.end() )
@@ -1626,7 +1711,7 @@ namespace FairDataPipeline
             }
             catch( NcException& ex )
             {
-		logger::get_logger()->error() << __PRETTY_FUNCTION__ << ": " << ex.what();
+		FDP_LOG_ERROR() << __PRETTY_FUNCTION__ << ": " << ex.what();
             }
         }
 
@@ -1635,6 +1720,7 @@ namespace FairDataPipeline
 
     IDimension::sptr GroupImpl::getDim( const std::string& name )
     {
+        FDP_SCOPE_LOG_TRACE( __PRETTY_FUNCTION__ );
         IDimension::sptr dim_ptr;
         IGroup::sptr grp_ptr = this->shared_from_this();
 
@@ -1668,7 +1754,7 @@ namespace FairDataPipeline
                 }
                 catch( NcException& ex )
                 {
-		    logger::get_logger()->error() << __PRETTY_FUNCTION__ << ": " << ex.what();
+		    FDP_LOG_ERROR() << __PRETTY_FUNCTION__ << ": " << ex.what();
                 }
             }
         }
@@ -1678,6 +1764,7 @@ namespace FairDataPipeline
 
     IDimension::sptr GroupImpl::addUnlimitedDim( const std::string& name )
     {
+        FDP_SCOPE_LOG_TRACE( __PRETTY_FUNCTION__ );
         DimensionImpl::sptr dim_ptr;
 
         try
@@ -1693,7 +1780,7 @@ namespace FairDataPipeline
         }
         catch( NcException& ex )
         {
-	    logger::get_logger()->error() << __PRETTY_FUNCTION__ << ": " << ex.what();
+            FDP_LOG_ERROR() << __PRETTY_FUNCTION__ << ": " << ex.what();
         }
 
         return dim_ptr;
@@ -1701,6 +1788,7 @@ namespace FairDataPipeline
 
     IDimension::sptr GroupImpl::addDim( const std::string& name, size_t sz )
     {
+        FDP_SCOPE_LOG_TRACE( __PRETTY_FUNCTION__ );
         DimensionImpl::sptr dim_ptr;
 
         try
@@ -1716,7 +1804,7 @@ namespace FairDataPipeline
         }
         catch( NcException& ex )
         {
-	    logger::get_logger()->error() << __PRETTY_FUNCTION__ << ": " << ex.what();
+            FDP_LOG_ERROR() << __PRETTY_FUNCTION__ << ": " << ex.what();
         }
 
         return dim_ptr;
@@ -1724,11 +1812,14 @@ namespace FairDataPipeline
 
     int GroupImpl::getGroupCount()
     {
+        FDP_SCOPE_LOG_TRACE( __PRETTY_FUNCTION__ );
         return this->_nc->getGroupCount();
     }
 
     IGroup::sptr GroupImpl::getGroup( const std::string& name )
     {
+        FDP_SCOPE_LOG_TRACE( __PRETTY_FUNCTION__ );
+
         IGroup::sptr parent_grp_ptr = this->shared_from_this();
         IGroup::sptr grp_ptr;
 
@@ -1778,7 +1869,7 @@ namespace FairDataPipeline
             }
             catch( NcException& ex )
             {
-		logger::get_logger()->error() << __PRETTY_FUNCTION__ << ": " << ex.what();
+		FDP_LOG_ERROR() << __PRETTY_FUNCTION__ << ": " << ex.what();
             }
         }
         return grp_ptr;
@@ -1786,6 +1877,8 @@ namespace FairDataPipeline
 
     std::vector< std::string > GroupImpl::getGroups()
     {
+        FDP_SCOPE_LOG_TRACE( __PRETTY_FUNCTION__ );
+
         std::vector< std::string > grp_names;
 
         try
@@ -1799,7 +1892,7 @@ namespace FairDataPipeline
         }
         catch( NcException& ex )
         {
-	    logger::get_logger()->error() << __PRETTY_FUNCTION__ << ": " << ex.what();
+	    FDP_LOG_ERROR() << __PRETTY_FUNCTION__ << ": " << ex.what();
         }
 
         return grp_names;
@@ -1807,6 +1900,8 @@ namespace FairDataPipeline
 
     IGroup::sptr GroupImpl::rootGroup()
     {
+        FDP_SCOPE_LOG_TRACE( __PRETTY_FUNCTION__ );
+
         IGroup::sptr parent_grp_ptr = this->shared_from_this();
         IGroup::sptr root_grp_ptr = parent_grp_ptr;
 
@@ -1821,8 +1916,7 @@ namespace FairDataPipeline
 
     IGroup::sptr GroupImpl::requireGroup( const std::string& name )
     {
-
-        logging::ScopeLogger( *(logger::get_logger()), __PRETTY_FUNCTION__ );
+        FDP_SCOPE_LOG_TRACE( __PRETTY_FUNCTION__ );
 
         IGroup::sptr grp_ptr;
         IGroup::sptr parent_grp_ptr = this->shared_from_this();
@@ -1876,7 +1970,7 @@ namespace FairDataPipeline
         }
         catch( NcException& ex )
         {
-	    logger::get_logger()->error() << __PRETTY_FUNCTION__ << ": " << ex.what();
+	    FDP_LOG_ERROR() << __PRETTY_FUNCTION__ << ": " << ex.what();
         }
 
         return  grp_ptr;
@@ -1898,11 +1992,13 @@ namespace FairDataPipeline
 
     IGroup::sptr GroupImpl::parent()
     {
+        FDP_SCOPE_LOG_TRACE( __PRETTY_FUNCTION__ );
         return _parent.lock(); 
     }
 
     std::string GroupImpl::getName()
     {
+        FDP_SCOPE_LOG_TRACE( __PRETTY_FUNCTION__ );
         std::string s = this->_nc->getName();
         return s;
     }
@@ -1936,6 +2032,7 @@ namespace FairDataPipeline
 
     void FileImpl::open( const std::string& path, IFile::Mode mode )
     {
+        FDP_SCOPE_LOG_TRACE( __PRETTY_FUNCTION__ );
         auto ncmode = NcFile::FileMode::read;
 
         switch( mode )
@@ -1948,7 +2045,7 @@ namespace FairDataPipeline
                     }
                     catch( NcException& ex )
                     {
-			logger::get_logger()->error() << __PRETTY_FUNCTION__ << ": " << ex.what();
+			FDP_LOG_ERROR() << __PRETTY_FUNCTION__ << ": " << ex.what();
                     }
                 }
                 break;
@@ -1977,13 +2074,14 @@ namespace FairDataPipeline
 
     void FileImpl::close()
     {
+        FDP_SCOPE_LOG_TRACE( __PRETTY_FUNCTION__ );
         try
         {
             ncfile()->close();
         }
         catch( NcException& ex )
         {
-	    logger::get_logger()->error() << __PRETTY_FUNCTION__ << ": " << ex.what();
+            FDP_LOG_ERROR() << __PRETTY_FUNCTION__ << ": " << ex.what();
         }
     }
 
@@ -2003,18 +2101,24 @@ namespace FairDataPipeline
 
     std::string str_strip_right( std::string str, const std::string& chars )
     {
+        FDP_SCOPE_LOG_TRACE( __PRETTY_FUNCTION__ );
+
         str.erase( str.find_last_not_of( chars ) + 1 );
         return str;
     }
 
     std::string str_strip_left( std::string str, const std::string& chars )
     {
+        FDP_SCOPE_LOG_TRACE( __PRETTY_FUNCTION__ );
+
         str.erase( 0, str.find_first_not_of( chars ) );
         return str;
     }
 
     std::string str_strip( std::string str, const std::string& chars )
     {
+        FDP_SCOPE_LOG_TRACE( __PRETTY_FUNCTION__ );
+
         str = str_strip_right( str, chars );
         str = str_strip_left( str, chars );
         return str;
@@ -2022,6 +2126,8 @@ namespace FairDataPipeline
 
     PARENT_ITEM_TYPE split_item_name( std::string str )
     {
+        FDP_SCOPE_LOG_TRACE( __PRETTY_FUNCTION__ );
+
         bool bAbsPath = (str[0] == '/');
 
         str = str_strip( str, "/" );
@@ -2053,23 +2159,30 @@ namespace FairDataPipeline
 
     bool CoordinatVariableDefinition::isUnlimited() const
     {
+        FDP_SCOPE_LOG_TRACE( __PRETTY_FUNCTION__ );
+
         return this->size == FDP_UNLIMITED;
     }
 
     size_t TableDefinition::getSize() const
     {
+        FDP_SCOPE_LOG_TRACE( __PRETTY_FUNCTION__ );
+
         return this->size;
     }
 
     bool TableDefinition::isUnlimited() const
     {
+        FDP_SCOPE_LOG_TRACE( __PRETTY_FUNCTION__ );
+
         return this->getSize() == FDP_UNLIMITED;
     }
 
     std::string TableDefinition::getVariableName( int i )
     {
-        PARENT_ITEM_TYPE col_grp_item = split_item_name( this->columns[i].name );
+        FDP_SCOPE_LOG_TRACE( __PRETTY_FUNCTION__ );
 
+        PARENT_ITEM_TYPE col_grp_item = split_item_name( this->columns[i].name );
 
         return this->name + "/" + col_grp_item.second;
     }
@@ -2078,6 +2191,7 @@ namespace FairDataPipeline
 
     int GroupImpl::prepare( const CoordinatVariableDefinition& cvd )
     {
+        FDP_SCOPE_LOG_TRACE( __PRETTY_FUNCTION__ );
         int status = 0;
 
         PARENT_ITEM_TYPE grp_item = split_item_name( cvd.name );
@@ -2125,8 +2239,10 @@ namespace FairDataPipeline
 
         return status;
     }
+
     int GroupImpl::prepare( const TableDefinition& td )
     {
+        FDP_SCOPE_LOG_TRACE( __PRETTY_FUNCTION__ );
         int status = 0;
 
         PARENT_ITEM_TYPE parent_item = split_item_name( td.name );
@@ -2193,6 +2309,7 @@ namespace FairDataPipeline
 
     int GroupImpl::prepare( const DimensionalVariableDefinition& dvd )
     {
+        FDP_SCOPE_LOG_TRACE( __PRETTY_FUNCTION__ );
         IVar::sptr var_ptr;
         int status = 0;
 
@@ -2244,6 +2361,7 @@ namespace FairDataPipeline
 
     DataType VarAtt::getAttType()
     {
+        FDP_SCOPE_LOG_TRACE( __PRETTY_FUNCTION__ );
         auto nctype = _ncvaratt.getType().getTypeClass();
         DataType dtype = NcType2DataType( nctype );
         return dtype;
@@ -2251,6 +2369,7 @@ namespace FairDataPipeline
 
     DataType GroupAtt::getAttType()
     {
+        FDP_SCOPE_LOG_TRACE( __PRETTY_FUNCTION__ );
         auto nctype = _ncatt.getType().getTypeClass();
 
         DataType dtype = NcType2DataType( nctype );

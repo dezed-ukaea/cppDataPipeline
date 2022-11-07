@@ -117,11 +117,17 @@ namespace FairDataPipeline {
             return std::move(  MsgBuilder( ERROR, this ) ); 
         }
 
+        Logger::MsgBuilder Logger::log( enum LOG_LEVEL lvl )
+        {
+            return std::move(  MsgBuilder( lvl, this ) ); 
+        }
+
         Sink::Sink( enum LOG_LEVEL log_lvl ) 
             :  ISink(), _log_lvl(log_lvl) 
         {
             _fmtr = SinkFormatter::create();
         }
+
 
         enum LOG_LEVEL Sink::log_level(){ return _log_lvl;}
 
@@ -197,7 +203,8 @@ namespace FairDataPipeline {
             return 0;
         }
 
-        ScopeLogger::ScopeLogger( Logger& logger, const std::string& msg ) : _logger(logger), _msg(msg)
+        ScopeLogger::ScopeLogger( Logger& logger, enum LOG_LEVEL lvl, const std::string& msg ) 
+            : _logger(logger), _lvl(lvl), _msg(msg)
         {
             _logger.trace() << _msg << " : START";
         }
