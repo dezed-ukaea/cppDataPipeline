@@ -1198,7 +1198,7 @@ namespace FairDataPipeline
                     , DataType datatype, size_t nvals, const void* pv );
 
             int prepare( const CoordinatVariableDefinition& cvd );
-            int prepare( const TableDefinition& td );
+            int prepare( const TableDefinition& td, ITable::sptr& table_ptr );
             int prepare( const DimensionalVariableDefinition& dvd );
 
         protected:
@@ -1219,14 +1219,15 @@ namespace FairDataPipeline
                 IGroupAtt::sptr putAttImpls( const std::string& key
                         , size_t nvals, const T* values );
 
-        private:
             std::string _name;
+
+            std::weak_ptr<GroupImpl> _parent;
+        private:
 
             IGroup::sptr _addGroup( const std::string& name );
 
             IGroup::sptr  _getGroup( const std::string name );
 
-            std::weak_ptr<GroupImpl> _parent;
 
             NAME_GROUP_MAP _name_grp_map;
             NAME_DIM_MAP _name_dim_map;
@@ -1235,6 +1236,39 @@ namespace FairDataPipeline
             NAME_ATT_MAP _name_att_map;
 
     };
+
+    class TableImpl 
+	    : public GroupImpl, ITable
+    {
+	    public:
+		    typedef std::shared_ptr< TableImpl > sptr;
+
+		    static sptr create( GroupImpl::sptr parent, const std::string& name ) 
+		    {
+			    TableImpl::sptr p = TableImpl::sptr( new TableImpl(parent) );
+			    p->_name = name;
+
+			    return p;
+		    }
+
+		    TableImpl( GroupImpl::sptr parent ) 
+			    : GroupImpl( parent, std::make_shared< NcGroup >() )
+		    {
+		    }
+
+		ICol::sptr addCol( const std::string& name
+				, const std::string& long_name
+				, const std::string& units
+				, const std::string& description
+				, DataType type )
+		{return NULL;}
+
+		ICol::sptr getCol( const std::string& name )
+		{return NULL;}
+
+		IGroup::sptr getParentGroup(){ return GroupImpl::parent();}//_parent.lock(); }
+
+	};
 
     std::vector< IAtt::sptr > GroupImpl::getAtts()
     {
@@ -2240,7 +2274,13 @@ namespace FairDataPipeline
         return status;
     }
 
-    int GroupImpl::prepare( const TableDefinition& td )
+    int GroupImpl::prepare( const TableDefinition& td 
+		    /*
+		    const std::string& name
+		    const std::string description
+		    const std::vector< std::string >& col_names
+*/
+		    , ITable::sptr& table_ptr )
     {
         FDP_SCOPE_LOG_TRACE( __PRETTY_FUNCTION__ );
         int status = 0;
@@ -2297,6 +2337,8 @@ namespace FairDataPipeline
             }
 
             grp_ptr->putAttString( ATTRIB_KEY_GROUP_TYPE, "table" );
+
+	    //table_ptr = std::static_pointer_cast< ITable >( grp_ptr );
         }
 
         return status;

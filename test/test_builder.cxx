@@ -544,10 +544,13 @@ TEST_F(BuilderTest, TestLinkedFromMultiAttribute)
     td.name = "table";
     td.columns = { lvs[0] };
 
-    status = file_ptr->prepare( td );
+
+    fdp::ITable::sptr table_ptr;
+    status = file_ptr->prepare( td, table_ptr );
     
 
     ASSERT_TRUE( FDP_FILE_ISNOERR( status ) );
+    ASSERT_TRUE( table_ptr != NULL );
 
 }
 

@@ -258,6 +258,9 @@ namespace FairDataPipeline
         virtual DataType getType() = 0;
     };
 
+    struct ITable;
+    typedef std::shared_ptr< ITable > ITableSptr;
+
 
     struct IGroup : public IAttComposite
     {
@@ -292,13 +295,33 @@ namespace FairDataPipeline
 
         virtual int prepare( const DimensionalVariableDefinition& dvd ) = 0;
 
-        virtual int prepare( const TableDefinition& td ) = 0; 
+        virtual int prepare( const TableDefinition& td, ITableSptr& table_ptr ) = 0; 
+    };
 
+    struct ICol : public IVar
+    {
+	    typedef std::shared_ptr< ICol > sptr;
+
+	    virtual const std::string name() = 0;
+	    virtual DataType type() = 0;
+    };
+
+    struct ITable //: public IGroup
+    {
+	    typedef std::shared_ptr< ITable > sptr;
+	    virtual ICol::sptr addCol( const std::string& name
+			    , const std::string& long_name
+			    , const std::string& units
+			    , const std::string& description
+			    , DataType dtype ) = 0;
+	    virtual ICol::sptr getCol( const std::string& name ) = 0;
+
+	    virtual IGroup::sptr getParentGroup() = 0;
     };
 
     struct IFile : public IGroup
     {
-        enum Mode{ READ, WRITE};
+        enum Mode{ READ, WRITE };
     };
 
     class FileFactory
