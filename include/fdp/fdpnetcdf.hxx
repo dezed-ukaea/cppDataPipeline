@@ -7,6 +7,8 @@
 #include<string>
 #include<type_traits>
 
+//#include "netcdf_details.h"
+
 #define FDP_FILE_STATUS_NOERR 0
 #define FDP_FILE_STATUS_ERR 1
 
@@ -14,18 +16,21 @@
 #define FDP_FILE_ISERR(x) (!FDP_FILE_ISNOERR(x))
 
 
+#define FDP_UNLIMITED 0
+
 namespace FairDataPipeline
 {
-    std::string str_strip_right( std::string str, const std::string& chars );
+    struct IAtt;
+    typedef std::shared_ptr< IAtt > IAttSptr;
 
-    std::string str_strip_left( std::string str, const std::string& chars );
+    struct IVarAtt;
+    typedef std::shared_ptr< IVarAtt > IVarAttSptr;
 
-    std::string str_strip( std::string str, const std::string& chars );
+    struct IGroup;
+    typedef std::shared_ptr< IGroup > IGroupSptr;
 
-    typedef std::pair< std::string, std::string > PARENT_ITEM_TYPE;
-
-    PARENT_ITEM_TYPE split_item_name( std::string str );
-
+    struct IDimension;
+    typedef std::shared_ptr< IDimension > IDimensionSptr;
 
     enum DataType
     {
@@ -48,6 +53,18 @@ namespace FairDataPipeline
         //COMPOUND
     };
 
+    std::string str_strip_right( std::string str, const std::string& chars );
+
+    std::string str_strip_left( std::string str, const std::string& chars );
+
+    std::string str_strip( std::string str, const std::string& chars );
+
+    typedef std::pair< std::string, std::string > PARENT_ITEM_TYPE;
+
+    PARENT_ITEM_TYPE split_item_name( std::string str );
+
+
+#if 0
     struct netCDFComponentDefinition
     {
         netCDFComponentDefinition()
@@ -95,7 +112,6 @@ namespace FairDataPipeline
         std::string name;
     };
 
-#define FDP_UNLIMITED 0
     struct CoordinatVariableDefinition : VariableDefinition
     {
         CoordinatVariableDefinition() : VariableDefinition()
@@ -145,7 +161,7 @@ namespace FairDataPipeline
         const std::string& getName() const { return name;}
         std::string getVariableName( int i );
     };
-
+#endif
 
     struct IGroup;
     typedef std::shared_ptr< IGroup > IGroupPtr;
@@ -235,8 +251,8 @@ namespace FairDataPipeline
 
 
         virtual IAtt::sptr getAtt( const std::string& key ) = 0;
-	virtual size_t getAttCount() = 0;
-//	virtual std::vector< IAtt::sptr > getAtts() = 0;
+        virtual size_t getAttCount() = 0;
+        //	virtual std::vector< IAtt::sptr > getAtts() = 0;
 
     };
 
@@ -256,13 +272,19 @@ namespace FairDataPipeline
         virtual std::vector< IDimension::sptr > getDims() = 0;
 
         virtual DataType getType() = 0;
+
+        virtual int long_name( const std::string& s ) = 0;
+        virtual int description( const std::string& s ) = 0;
+        virtual int units( const std::string& s ) = 0;
+
+
     };
 
     struct ITable;
     typedef std::shared_ptr< ITable > ITableSptr;
 
 
-    struct IGroup : public IAttComposite
+    struct IGroup : virtual public IAttComposite
     {
         typedef std::shared_ptr< IGroup > sptr;
 
@@ -287,36 +309,36 @@ namespace FairDataPipeline
         virtual std::vector< std::string > getGroups() = 0;
 
 
-        virtual int getGroupCount() = 0;
+        //virtual int getGroupCount() = 0;
 
         virtual std::string getName() = 0;
 
-        virtual int prepare( const CoordinatVariableDefinition& cvd ) = 0;
+        //virtual int prepare( const CoordinatVariableDefinition& cvd ) = 0;
 
-        virtual int prepare( const DimensionalVariableDefinition& dvd ) = 0;
+        //virtual int prepare( const DimensionalVariableDefinition& dvd ) = 0;
 
-        virtual int prepare( const TableDefinition& td, ITableSptr& table_ptr ) = 0; 
+        //virtual int prepare( const TableDefinition& td, ITableSptr& table_ptr ) = 0; 
+
+        virtual int addTable( const std::string& name, size_t size, ITableSptr& table_ptr ) = 0;
+        virtual std::vector< std::string > getTables() = 0;
+
+        virtual int long_name( const std::string& s ) = 0;
+        virtual int description( const std::string& s ) = 0;
+
     };
 
-    struct ICol : public IVar
+    struct ITable  : virtual public IAttComposite
     {
-	    typedef std::shared_ptr< ICol > sptr;
+        typedef std::shared_ptr< ITable > sptr;
+        virtual IVar::sptr addCol( const std::string& name
+                , DataType dtype ) = 0;
+        virtual IVar::sptr getCol( const std::string& name ) = 0;
+        virtual std::vector< std::string > getColNames() = 0;
 
-	    virtual const std::string name() = 0;
-	    virtual DataType type() = 0;
-    };
+        virtual IGroup::sptr getParentGroup() = 0;
+        virtual int long_name( const std::string& s ) = 0;
+        virtual int description( const std::string& s ) = 0;
 
-    struct ITable //: public IGroup
-    {
-	    typedef std::shared_ptr< ITable > sptr;
-	    virtual ICol::sptr addCol( const std::string& name
-			    , const std::string& long_name
-			    , const std::string& units
-			    , const std::string& description
-			    , DataType dtype ) = 0;
-	    virtual ICol::sptr getCol( const std::string& name ) = 0;
-
-	    virtual IGroup::sptr getParentGroup() = 0;
     };
 
     struct IFile : public IGroup

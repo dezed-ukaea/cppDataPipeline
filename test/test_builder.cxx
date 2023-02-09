@@ -90,12 +90,12 @@ TEST_F(BuilderTest, TestInterface)
     ASSERT_EQ( ibuilder, root_grp_ptr );
 
     auto grp_bob_ptr = ibuilder->requireGroup("bob");
-    
+
     auto tmp_grp_ptr = grp_bob_ptr->requireGroup("");
 
     ASSERT_EQ( tmp_grp_ptr, grp_bob_ptr );
 
-   // grp_bob_ptr->putAtt( "int", 123 );
+    // grp_bob_ptr->putAtt( "int", 123 );
     //grp_bob_ptr->putAtt( "float", 123.123f );
     char* psz_ = "a string";
     grp_bob_ptr->putAtt( "string", fdp::DataType::STRING, 1, &psz_ );
@@ -205,8 +205,8 @@ TEST_F(BuilderTest, TestInterface)
 
 TEST_F(BuilderTest, TestInterfaceRemoteDim)
 {
-  const testing::TestInfo* const test_info =
-            testing::UnitTest::GetInstance()->current_test_info();
+    const testing::TestInfo* const test_info =
+        testing::UnitTest::GetInstance()->current_test_info();
 
     std::string path = std::string( test_info->name() ) + ".nc";
     std::remove( path.c_str() );
@@ -235,157 +235,157 @@ TEST_F(BuilderTest, TestInterface2)
 {
 
 #if 0
-        double data[2][3];
-        int dim1[2] = {1,2};
-        float dim2[3] ={3.1,4.2,5.3};
-        int val=0;
+    double data[2][3];
+    int dim1[2] = {1,2};
+    float dim2[3] ={3.1,4.2,5.3};
+    int val=0;
 
-        for( int i = 0; i < 2; i++)
-        {
-            for( int j = 0; j < 3; ++j )
-                data[i][j] = val++ +.1;
-        }
-
-        fdp::DimensionDefinition dimdef1, dimdef2;
-
-        dimdef1.units = "units1";
-        dimdef1.description = "description1";
-        dimdef1.dataType = fdp::DataType::INT;
-        dimdef1.size = 2;
-
-        dimdef2.units = "units2";
-        dimdef2.description = "description2";
-        dimdef2.dataType = fdp::DataType::FLOAT;
-        dimdef2.size = 3;
-
-        fdp::ArrayDefinition arrdef;
-        arrdef.units="arrunits";
-        arrdef.description = "arrdescription";
-        arrdef.dataType = fdp::DataType::DOUBLE;
-        arrdef.dimension_names = { "grp/dim1", "grp/dim2" };
-        //arrdef.shape = { 2,3 };
-
-        std::remove( "xtest.nc" );
-        fdp::Builder builder2( "xtest.nc", fdp::IFile::Mode::WRITE );
-
-        int status = FDP_FILE_STATUS_NOERR;
-
-        status = builder2.writeDimension( "grp/dim1", dimdef1, dim1 );
-        ASSERT_EQ( FDP_FILE_STATUS_NOERR, status );
-
-        status = builder2.writeDimension( "grp/dim2", dimdef2, dim2 );
-        ASSERT_EQ( FDP_FILE_STATUS_NOERR, status );
-
-        status = builder2.writeArray( "grp/arr1", arrdef, data );
-        ASSERT_EQ( FDP_FILE_STATUS_NOERR, status );
-
-        // write already existing dim name
-        status = builder2.writeDimension( "grp/dim1", dimdef1, dim1 );
-        ASSERT_TRUE( FDP_FILE_STATUS_NOERR != status );
-
-        status = builder2.writeArray( "grp/arr1", arrdef, data );
-        ASSERT_TRUE( FDP_FILE_STATUS_NOERR != status );
-        fdp::ArrayDefinition arrdef_bad;
-        arrdef_bad.units="arrunits";
-        arrdef_bad.description = "arrdescription";
-        arrdef_bad.dataType = fdp::DataType::INT;
-
-        arrdef_bad.dimension_names = { "baddim1", "baddim2" };
-
-        status = builder2.writeArray( "grp/arr1", arrdef_bad, data );
-        ASSERT_TRUE( FDP_FILE_STATUS_NOERR != status );
-
-        fdp::ArrayDefinition arrdef_;
-
-        status = builder2.readArray_metadata( "grp/arr1",  arrdef_ );
-
-        ASSERT_EQ( FDP_FILE_STATUS_NOERR, status );
-        ASSERT_EQ( "arrunits", arrdef_.units );
-        ASSERT_EQ( "arrdescription", arrdef_.description );
-        //ASSERT_EQ( arrdef_.shape, arrdef.shape );
-        ASSERT_EQ( arrdef_.dimension_names, arrdef.dimension_names );
-        ASSERT_EQ( arrdef_.dataType, fdp::DataType::DOUBLE );
-
-        double data_[2][3];
-
-        status = builder2.readArray_data( "grp/arr1", arrdef_, data_ );
-
-        for( int i = 0; i < 2; ++i )
-            for( int j = 0; j < 3; ++j )
-                ASSERT_EQ( data[i][j], data_[i][j] );
-
-        fdp::DimensionDefinition dimdef1_;
-        status = builder2.readDim_metadata( "grp/dim1",  dimdef1_ );
-
-        ASSERT_EQ( FDP_FILE_STATUS_NOERR, status );
-        ASSERT_EQ( 2, dimdef1_.size );
-
-        ASSERT_EQ( "units1", dimdef1_.units );
-        ASSERT_EQ( "description1", dimdef1_.description );
-
-        int dim1_[2];
-
-        status = builder2.readDim_data( "grp/dim1", dimdef1_, dim1_ );
-
-        ASSERT_EQ( FDP_FILE_STATUS_NOERR, status );
-
-        for( int j = 0; j < 2; ++j )
-            ASSERT_EQ( dim1[j], dim1_[j] );
-
-        fdp::DimensionDefinition dimdef2_;
-        status = builder2.readDim_metadata( "grp/dim2", dimdef2_ );
-
-        ASSERT_EQ( FDP_FILE_STATUS_NOERR, status );
-        ASSERT_EQ( 3, dimdef2_.size );
-
-        ASSERT_EQ( "units2", dimdef2_.units );
-        ASSERT_EQ( "description2", dimdef2_.description );
-
-        float dim2_[3];
-
-        status = builder2.readDim_data( "grp/dim2", dimdef2_, dim2_ );
-
+    for( int i = 0; i < 2; i++)
+    {
         for( int j = 0; j < 3; ++j )
-            ASSERT_EQ( dim2[j], dim2_[j] );
+            data[i][j] = val++ +.1;
+    }
 
-        fdp::DimensionDefinition dimdef3;
-        dimdef3.units = "";
-        dimdef3.description = "";
-        dimdef3.dataType = fdp::DataType::STRING;
-        dimdef3.size = 3;
+    fdp::DimensionDefinition dimdef1, dimdef2;
 
-        const char* dim3data[3] = {"a", "test", "bob"};
+    dimdef1.units = "units1";
+    dimdef1.description = "description1";
+    dimdef1.dataType = fdp::DataType::INT;
+    dimdef1.size = 2;
+
+    dimdef2.units = "units2";
+    dimdef2.description = "description2";
+    dimdef2.dataType = fdp::DataType::FLOAT;
+    dimdef2.size = 3;
+
+    fdp::ArrayDefinition arrdef;
+    arrdef.units="arrunits";
+    arrdef.description = "arrdescription";
+    arrdef.dataType = fdp::DataType::DOUBLE;
+    arrdef.dimension_names = { "grp/dim1", "grp/dim2" };
+    //arrdef.shape = { 2,3 };
+
+    std::remove( "xtest.nc" );
+    fdp::Builder builder2( "xtest.nc", fdp::IFile::Mode::WRITE );
+
+    int status = FDP_FILE_STATUS_NOERR;
+
+    status = builder2.writeDimension( "grp/dim1", dimdef1, dim1 );
+    ASSERT_EQ( FDP_FILE_STATUS_NOERR, status );
+
+    status = builder2.writeDimension( "grp/dim2", dimdef2, dim2 );
+    ASSERT_EQ( FDP_FILE_STATUS_NOERR, status );
+
+    status = builder2.writeArray( "grp/arr1", arrdef, data );
+    ASSERT_EQ( FDP_FILE_STATUS_NOERR, status );
+
+    // write already existing dim name
+    status = builder2.writeDimension( "grp/dim1", dimdef1, dim1 );
+    ASSERT_TRUE( FDP_FILE_STATUS_NOERR != status );
+
+    status = builder2.writeArray( "grp/arr1", arrdef, data );
+    ASSERT_TRUE( FDP_FILE_STATUS_NOERR != status );
+    fdp::ArrayDefinition arrdef_bad;
+    arrdef_bad.units="arrunits";
+    arrdef_bad.description = "arrdescription";
+    arrdef_bad.dataType = fdp::DataType::INT;
+
+    arrdef_bad.dimension_names = { "baddim1", "baddim2" };
+
+    status = builder2.writeArray( "grp/arr1", arrdef_bad, data );
+    ASSERT_TRUE( FDP_FILE_STATUS_NOERR != status );
+
+    fdp::ArrayDefinition arrdef_;
+
+    status = builder2.readArray_metadata( "grp/arr1",  arrdef_ );
+
+    ASSERT_EQ( FDP_FILE_STATUS_NOERR, status );
+    ASSERT_EQ( "arrunits", arrdef_.units );
+    ASSERT_EQ( "arrdescription", arrdef_.description );
+    //ASSERT_EQ( arrdef_.shape, arrdef.shape );
+    ASSERT_EQ( arrdef_.dimension_names, arrdef.dimension_names );
+    ASSERT_EQ( arrdef_.dataType, fdp::DataType::DOUBLE );
+
+    double data_[2][3];
+
+    status = builder2.readArray_data( "grp/arr1", arrdef_, data_ );
+
+    for( int i = 0; i < 2; ++i )
+        for( int j = 0; j < 3; ++j )
+            ASSERT_EQ( data[i][j], data_[i][j] );
+
+    fdp::DimensionDefinition dimdef1_;
+    status = builder2.readDim_metadata( "grp/dim1",  dimdef1_ );
+
+    ASSERT_EQ( FDP_FILE_STATUS_NOERR, status );
+    ASSERT_EQ( 2, dimdef1_.size );
+
+    ASSERT_EQ( "units1", dimdef1_.units );
+    ASSERT_EQ( "description1", dimdef1_.description );
+
+    int dim1_[2];
+
+    status = builder2.readDim_data( "grp/dim1", dimdef1_, dim1_ );
+
+    ASSERT_EQ( FDP_FILE_STATUS_NOERR, status );
+
+    for( int j = 0; j < 2; ++j )
+        ASSERT_EQ( dim1[j], dim1_[j] );
+
+    fdp::DimensionDefinition dimdef2_;
+    status = builder2.readDim_metadata( "grp/dim2", dimdef2_ );
+
+    ASSERT_EQ( FDP_FILE_STATUS_NOERR, status );
+    ASSERT_EQ( 3, dimdef2_.size );
+
+    ASSERT_EQ( "units2", dimdef2_.units );
+    ASSERT_EQ( "description2", dimdef2_.description );
+
+    float dim2_[3];
+
+    status = builder2.readDim_data( "grp/dim2", dimdef2_, dim2_ );
+
+    for( int j = 0; j < 3; ++j )
+        ASSERT_EQ( dim2[j], dim2_[j] );
+
+    fdp::DimensionDefinition dimdef3;
+    dimdef3.units = "";
+    dimdef3.description = "";
+    dimdef3.dataType = fdp::DataType::STRING;
+    dimdef3.size = 3;
+
+    const char* dim3data[3] = {"a", "test", "bob"};
 
 
-        status = builder2.writeDimension("grp/dim3", dimdef3, dim3data );
+    status = builder2.writeDimension("grp/dim3", dimdef3, dim3data );
 
-        int iatts[] = { 1,2,3 };
-        builder2.putAtt( "grp/dim3", "dim3_att", 3, iatts );
+    int iatts[] = { 1,2,3 };
+    builder2.putAtt( "grp/dim3", "dim3_att", 3, iatts );
 
-        fdp::IAtt::sptr att_ptr;
-        status = builder2.getAtt( "grp/dim3", "dim3_att",  att_ptr );
+    fdp::IAtt::sptr att_ptr;
+    status = builder2.getAtt( "grp/dim3", "dim3_att",  att_ptr );
 
-        ASSERT_EQ( FDP_FILE_STATUS_NOERR, status );
+    ASSERT_EQ( FDP_FILE_STATUS_NOERR, status );
 
-        ASSERT_TRUE( NULL != att_ptr );
+    ASSERT_TRUE( NULL != att_ptr );
 
-        ASSERT_EQ( fdp::DataType::INT, att_ptr->getAttType() );
-        ASSERT_EQ( fdp::IAtt::ATTRIBUTE_VAR_TYPE, att_ptr->getClassType() );
-        ASSERT_EQ( 3, att_ptr->getAttLength() );
+    ASSERT_EQ( fdp::DataType::INT, att_ptr->getAttType() );
+    ASSERT_EQ( fdp::IAtt::ATTRIBUTE_VAR_TYPE, att_ptr->getClassType() );
+    ASSERT_EQ( 3, att_ptr->getAttLength() );
 
-        status = builder2.getAtt( "grp/dim3", "bad_att",  att_ptr );
+    status = builder2.getAtt( "grp/dim3", "bad_att",  att_ptr );
 
-        ASSERT_NE( FDP_FILE_STATUS_NOERR, status );
+    ASSERT_NE( FDP_FILE_STATUS_NOERR, status );
 
-        ASSERT_TRUE( NULL == att_ptr );
+    ASSERT_TRUE( NULL == att_ptr );
 
 #endif
 } 
 
 TEST_F(BuilderTest, TestGroupWithDim) 
 {
-  const testing::TestInfo* const test_info =
-            testing::UnitTest::GetInstance()->current_test_info();
+    const testing::TestInfo* const test_info =
+        testing::UnitTest::GetInstance()->current_test_info();
 
     std::string path = std::string( test_info->name() ) + ".nc";
 
@@ -407,8 +407,8 @@ TEST_F(BuilderTest, TestGroupWithDim)
 
 TEST_F(BuilderTest, Test2GroupWithDim) 
 {
-  const testing::TestInfo* const test_info =
-            testing::UnitTest::GetInstance()->current_test_info();
+    const testing::TestInfo* const test_info =
+        testing::UnitTest::GetInstance()->current_test_info();
 
     std::string path = std::string( test_info->name() ) + ".nc";
 
@@ -429,10 +429,11 @@ TEST_F(BuilderTest, Test2GroupWithDim)
     ASSERT_TRUE( NULL != grp2_ptr );
 }
 
+#if 0
 TEST_F(BuilderTest, TestPrepareCoordinateVar)
 {
-  const testing::TestInfo* const test_info =
-            testing::UnitTest::GetInstance()->current_test_info();
+    const testing::TestInfo* const test_info =
+        testing::UnitTest::GetInstance()->current_test_info();
 
     std::string path = std::string( test_info->name() ) + ".nc";
 
@@ -450,23 +451,23 @@ TEST_F(BuilderTest, TestPrepareCoordinateVar)
     cvdef1.size = 3;
     cvdef1.datatype = fdp::DataType::INT;
     cvdef1.units = "";
-
     int status = file_ptr->prepare( cvdef1 );
 
     ASSERT_TRUE( FDP_FILE_ISNOERR( status ) );
 
-//	    new CoordinateVariableDefinition(
-			//    "dim", new int[] {1, 2, 3}, "", "", "");
+    //	    new CoordinateVariableDefinition(
+    //    "dim", new int[] {1, 2, 3}, "", "", "");
     fdp::CoordinatVariableDefinition cvdef2 ;
-//	    new CoordinateVariableDefinition(
-//			    new VariableName("dim", "one"), new int[] {1, 2, 3, 4}, "", "", "");
-
+    //	    new CoordinateVariableDefinition(
+    //			    new VariableName("dim", "one"), new int[] {1, 2, 3, 4}, "", "", "");
 }
 
+#endif
+#if 0
 TEST_F(BuilderTest, TestPrepareCoordinateVars)
 {
-  const testing::TestInfo* const test_info =
-            testing::UnitTest::GetInstance()->current_test_info();
+    const testing::TestInfo* const test_info =
+        testing::UnitTest::GetInstance()->current_test_info();
 
     std::string path = std::string( test_info->name() ) + ".nc";
 
@@ -511,18 +512,19 @@ TEST_F(BuilderTest, TestPrepareCoordinateVars)
 
     status = file_ptr->prepare( dvd );
 
-return;
+    return;
     ASSERT_TRUE( FDP_FILE_ISNOERR( status ) );
 
-//	    new CoordinateVariableDefinition(
-			//    "dim", new int[] {1, 2, 3}, "", "", "");
+    //	    new CoordinateVariableDefinition(
+    //    "dim", new int[] {1, 2, 3}, "", "", "");
 
 }
-
+#endif
+#if 0
 TEST_F(BuilderTest, TestLinkedFromMultiAttribute)
 {
-  const testing::TestInfo* const test_info =
-            testing::UnitTest::GetInstance()->current_test_info();
+    const testing::TestInfo* const test_info =
+        testing::UnitTest::GetInstance()->current_test_info();
 
     std::string path = std::string( test_info->name() ) + ".nc";
 
@@ -547,17 +549,16 @@ TEST_F(BuilderTest, TestLinkedFromMultiAttribute)
 
     fdp::ITable::sptr table_ptr;
     status = file_ptr->prepare( td, table_ptr );
-    
+
 
     ASSERT_TRUE( FDP_FILE_ISNOERR( status ) );
     ASSERT_TRUE( table_ptr != NULL );
 
 }
-
 TEST_F(BuilderTest, TestPrepareDimensionalVar)
 {
-  const testing::TestInfo* const test_info =
-            testing::UnitTest::GetInstance()->current_test_info();
+    const testing::TestInfo* const test_info =
+        testing::UnitTest::GetInstance()->current_test_info();
 
     std::string path = std::string( test_info->name() ) + ".nc";
 
@@ -597,8 +598,8 @@ TEST_F(BuilderTest, TestPrepareDimensionalVar)
 
 TEST_F(BuilderTest, TestPrepareDimensionalVarRemoteDim)
 {
-  const testing::TestInfo* const test_info =
-            testing::UnitTest::GetInstance()->current_test_info();
+    const testing::TestInfo* const test_info =
+        testing::UnitTest::GetInstance()->current_test_info();
 
     std::string path = std::string( test_info->name() ) + ".nc";
 
@@ -618,7 +619,7 @@ TEST_F(BuilderTest, TestPrepareDimensionalVarRemoteDim)
     cvd.values = cvd_values;
 
     status = file_ptr->prepare( cvd );
-    
+
     ASSERT_TRUE( FDP_FILE_ISNOERR( status ) );
 
     fdp::DimensionalVariableDefinition dvd;
@@ -629,6 +630,61 @@ TEST_F(BuilderTest, TestPrepareDimensionalVarRemoteDim)
     status = file_ptr->prepare( dvd );
 
     ASSERT_TRUE( FDP_FILE_ISNOERR( status ) );
+
+
+}
+
+#endif
+TEST_F(BuilderTest, TestTable )
+{
+    const testing::TestInfo* const test_info =
+        testing::UnitTest::GetInstance()->current_test_info();
+
+    std::string path = std::string( test_info->name() ) + ".nc";
+
+    //std::string path = "test_prepare_dimensionalvar_remote_dim.nc";
+    std::remove( path.c_str() );
+
+    fdp::IFile::sptr file_ptr = fdp::FileFactory::create( path, fdp::IFile::Mode::WRITE );
+
+    ASSERT_TRUE( NULL != file_ptr );
+
+    int status = FDP_FILE_STATUS_NOERR;
+
+    fdp::ITable::sptr table_ptr;
+    size_t size=3;
+
+    status = file_ptr->addTable( "myTestTable", size, table_ptr );
+
+    ASSERT_EQ( 0, status );
+    ASSERT_TRUE( NULL != table_ptr );
+
+
+    table_ptr->long_name( "My little simple initial test table");
+
+    fdp::IVar::sptr id_ptr = table_ptr->addCol( "id", fdp::DataType::INT );
+
+    int id_data[] = {1,2,3};
+    id_ptr->putVar( id_data );
+
+
+    auto name_ptr = table_ptr->addCol( "itemName", fdp::DataType::STRING );
+    name_ptr->long_name( "" )
+        ;
+    auto val_ptr = table_ptr->addCol( "value", fdp::DataType::DOUBLE );
+    double val_data[] = {1.1, 2.2, 3.3};
+    val_ptr->putVar( val_data );
+    val_ptr->long_name( "value of the item" );
+
+
+
+    //cant add table with existing table name
+    status = file_ptr->addTable( "myTestTable", size, table_ptr );
+
+    ASSERT_NE( 0, status );
+    ASSERT_TRUE( NULL == table_ptr );
+
+
 
 
 }
