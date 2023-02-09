@@ -1653,7 +1653,7 @@ ITable::sptr  GroupImpl::_getTable( const std::string& name )
                 new_grp_ptr->_nc = std::make_shared<NcGroup>(new_ncgrp);
                 //grp_ptr = new_grp_ptr;
 
-                auto at = new_grp_ptr->getAtt( "group_type" );
+                auto at = new_grp_ptr->getAtt( ATTRIB_KEY_GROUP_TYPE );
 
                 if( at )
                 {
@@ -1720,7 +1720,7 @@ std::vector< std::string > GroupImpl::getGroups()
             std::string name = it_nc_grp->first;
 
             auto grp_ptr = this->getGroup( name );
-            auto att = grp_ptr->getAtt( "group_type" );
+            auto att = grp_ptr->getAtt( ATTRIB_KEY_GROUP_TYPE );
             if( !att )
                 grps.push_back( name );
         }
@@ -2268,7 +2268,7 @@ std::vector< std::string > GroupImpl::getTables()
         IGroup::sptr grp_ptr = this->getGroup( name );
         if( grp_ptr )
         {
-            auto att = grp_ptr->getAtt( "group_type" );
+            auto att = grp_ptr->getAtt( ATTRIB_KEY_GROUP_TYPE );
             if( att )
             {
                 TableImpl::sptr ptr = TableImpl::create( std::static_pointer_cast< GroupImpl >(this->parent()), name );
