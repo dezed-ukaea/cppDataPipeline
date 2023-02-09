@@ -5,7 +5,7 @@
 
 #include<netcdf>
 
-#include "fdp/netcdf_details.h"
+#include "fdpnetcdf_details.hxx"
 
 #define ATTRIB_KEY_DESC "description"
 #define ATTRIB_KEY_LNAME "long_name"
@@ -142,7 +142,7 @@ namespace FairDataPipeline
             netCDF::NcVarAtt ncatt = _nc_var.putAtt( key, netCDF::NcShort(), value );
 
             att_ptr = VarAtt::create( ncatt );
-            _name_varatt_map[ key ] = att_ptr;
+            _name_att_map[ key ] = att_ptr;
 
         }
         catch( NcException& ex )
@@ -675,7 +675,7 @@ namespace FairDataPipeline
         {
             netCDF::NcVarAtt ncatt = _nc_var.putAtt( key, netCDF::NcShort(), value );
             att_ptr = VarAtt::create( ncatt );
-            _name_varatt_map[ key ] = att_ptr;
+            _name_att_map[ key ] = att_ptr;
         }
         catch( NcException& ex )
         {
@@ -740,7 +740,7 @@ namespace FairDataPipeline
                 netCDF::NcVarAtt ncatt = _nc_var.putAtt( key, theNcType, value );
                 var_att = VarAtt::create( ncatt );
 
-                _name_varatt_map[ key ] = var_att;
+                _name_att_map[ key ] = var_att;
             }
             catch( NcException& ex )
             {
@@ -765,7 +765,7 @@ namespace FairDataPipeline
                 netCDF::NcVarAtt ncatt = _nc_var.putAtt( key, theNcType, nvals, values );
                 var_att = VarAtt::create( ncatt );
 
-                _name_varatt_map[ key ] = var_att;
+                _name_att_map[ key ] = var_att;
             }
             catch( NcException& ex )
             {
@@ -844,7 +844,7 @@ namespace FairDataPipeline
             netCDF::NcVarAtt ncatt = _nc_var.putAtt( key, netCDF::NcString(), nvals, values );
             var_att = VarAtt::create( ncatt );
 
-            _name_varatt_map[ key ] = var_att;
+            _name_att_map[ key ] = var_att;
         }
         catch( NcException& ex )
         {
@@ -862,7 +862,7 @@ namespace FairDataPipeline
         {
             netCDF::NcVarAtt ncatt = _nc_var.putAtt( key, value );
             att_ptr = VarAtt::create( ncatt );
-            _name_varatt_map[ key ] = att_ptr;
+            _name_att_map[ key ] = att_ptr;
         }
         catch( NcException& ex )
         {
@@ -874,9 +874,9 @@ namespace FairDataPipeline
     IAtt::sptr VarImpl::getAtt( const std::string& key )
     {
         FDP_SCOPE_LOG_TRACE( __PRETTY_FUNCTION__ );
-        IVarAtt::sptr att_ptr;
-        auto it = _name_varatt_map.find( key );
-        if( it != _name_varatt_map.end() )
+        IAtt::sptr att_ptr;
+        auto it = _name_att_map.find( key );
+        if( it != _name_att_map.end() )
         {
             att_ptr = it->second;
         }
@@ -886,7 +886,7 @@ namespace FairDataPipeline
             {
                 netCDF::NcVarAtt ncatt = _nc_var.getAtt( key );
                 att_ptr = VarAtt::create( ncatt );
-                _name_varatt_map[ key ] = att_ptr;
+                _name_att_map[ key ] = att_ptr;
             }
             catch( NcException& ex )
             {
@@ -991,8 +991,7 @@ namespace FairDataPipeline
             }
 
 
-            IVar::sptr addCol( const std::string& name
-                    , DataType type )
+            IVar::sptr addCol( const std::string& name, DataType type )
             {
                 IDimension::sptr dim_ptr = this->getDim( "index" );
                 IVar::VDIMS vdims = { dim_ptr };
@@ -1000,6 +999,18 @@ namespace FairDataPipeline
 
                 return var_ptr;
             }
+
+            IVar::sptr addCol( const std::string& name, IVar::VDIMS& vdims_, DataType type )
+            {
+                IDimension::sptr dim_ptr = this->getDim( "index" );
+                IVar::VDIMS vdims = { dim_ptr };
+                vdims.insert( vdims.end(), vdims_.begin(), vdims_.end() );
+
+                IVar::sptr var_ptr = this->addVar( name, type, vdims );
+
+                return var_ptr;
+            }
+
 
             IVar::sptr getCol( const std::string& name )
             {
@@ -1391,7 +1402,7 @@ IAtt::sptr GroupImpl::putAttUInt(const std::string& key, unsigned int value)
 IAtt::sptr GroupImpl::getAtt( const std::string& key )
 {
     FDP_SCOPE_LOG_TRACE( __PRETTY_FUNCTION__ );
-    IGroupAtt::sptr att_ptr;
+    IAtt::sptr att_ptr;
     auto it = _name_att_map.find( key );
     if( it != _name_att_map.end() )
     {
@@ -1706,23 +1717,39 @@ IGroup::sptr  GroupImpl::_getGroup( const std::string name )
     return grp_ptr;
 }
 
-std::vector< std::string > GroupImpl::getGroups()
+std::vector< IGroup::sptr > GroupImpl::getGroups()
+{
+    std::vector< IGroup::sptr > the_grps;
+    auto grps = _getGroups();
+    for( auto it = grps.begin(); it != grps.end(); ++it )
+    {
+        auto grp_ptr = *it;
+        auto att = grp_ptr->getAtt( ATTRIB_KEY_GROUP_TYPE );
+        if( !att )
+            the_grps.push_back( grp_ptr );
+
+    }
+
+    return the_grps;
+}
+
+std::vector< IGroup::sptr > GroupImpl::_getGroups()
 {
     FDP_SCOPE_LOG_TRACE( __PRETTY_FUNCTION__ );
 
-    std::vector<std::string > grps;
+    std::vector< IGroup::sptr  > grps;
 
     try
     {
         auto nc_grps = this->_nc->getGroups();
         for( auto it_nc_grp = nc_grps.begin(); it_nc_grp != nc_grps.end(); ++it_nc_grp )
         {
-            std::string name = it_nc_grp->first;
+            const std::string& name = it_nc_grp->first;
 
             auto grp_ptr = this->getGroup( name );
-            auto att = grp_ptr->getAtt( ATTRIB_KEY_GROUP_TYPE );
-            if( !att )
-                grps.push_back( name );
+            //auto att = grp_ptr->getAtt( ATTRIB_KEY_GROUP_TYPE );
+            //if( !att )
+                grps.push_back( grp_ptr );
         }
     }
     catch( NcException& ex )
@@ -2255,27 +2282,26 @@ TableImpl::sptr GroupImpl::_addTable( const std::string& name )
 
 }
 #if 1    
-std::vector< std::string > GroupImpl::getTables()
+std::vector< ITable::sptr > GroupImpl::getTables()
 {
-    std::vector< std::string > tables;
-    std::vector< std::string > grp_names = getGroups();
+    std::vector< ITable::sptr > tables;
+    std::vector< IGroup::sptr > grps = _getGroups();
 
     GroupImpl::sptr self_ptr = this->shared_from_this();
 
-    for( int i = 0; i < grp_names.size(); ++i )
+    for( int i = 0; i < grps.size(); ++i )
     {
-        const std::string& name = grp_names[i];
-        IGroup::sptr grp_ptr = this->getGroup( name );
+        IGroup::sptr grp_ptr = grps[i];
         if( grp_ptr )
         {
             auto att = grp_ptr->getAtt( ATTRIB_KEY_GROUP_TYPE );
             if( att )
             {
-                TableImpl::sptr ptr = TableImpl::create( std::static_pointer_cast< GroupImpl >(this->parent()), name );
-                ptr->_nc = this->_nc;
+                const std::string& name = grp_ptr->getName();
+                auto table_ptr = this->getTable( name );
 
-
-                tables.push_back( name );
+                if( NULL != table_ptr )
+                    tables.push_back( table_ptr );
             }
         }
     }
@@ -2329,6 +2355,7 @@ int GroupImpl::addTable( const std::string& name, size_t size, ITable::sptr& tab
         }
 
         table_ptr->putAttString( ATTRIB_KEY_GROUP_TYPE, "table" );
+        _name_table_map[ name ] = table_ptr;
 
     }
 
@@ -2373,7 +2400,7 @@ int VarImpl::long_name( const std::string& s ){ this->putAttString( ATTRIB_KEY_L
 int VarImpl::description( const std::string& s ){ this->putAttString( ATTRIB_KEY_DESC, s ); return 0;}
 int VarImpl::units( const std::string& s ){ this->putAttString( ATTRIB_KEY_DESC, s ); return 0;}
 
-size_t VarImpl::getAttCount(){ return _name_varatt_map.size();}
+size_t VarImpl::getAttCount(){ return _name_att_map.size();}
 
 VarAtt::sptr VarAtt::create( const netCDF::NcVarAtt& ncvaratt ) { return VarAtt::sptr( new VarAtt( ncvaratt ) );}
 

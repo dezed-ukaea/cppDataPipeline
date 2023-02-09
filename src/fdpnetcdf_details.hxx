@@ -67,7 +67,8 @@ namespace FairDataPipeline
         public:
             typedef std::shared_ptr< VarImpl > sptr;
 
-            typedef std::map< std::string, IVarAttSptr > NAME_VARATT_MAP;
+            //typedef std::map< std::string, IVarAttSptr > NAME_VARATT_MAP;
+            typedef std::map< std::string, IAttSptr > NAME_ATT_MAP;
 
             static VarImpl::sptr create( IGroupSptr parent
                     , const std::string& name
@@ -134,7 +135,7 @@ namespace FairDataPipeline
 
             netCDF::NcVar _nc_var;
 
-            NAME_VARATT_MAP _name_varatt_map;
+            NAME_ATT_MAP _name_att_map;
         private:
 
             VarImpl( IGroupSptr parent, const std::string& name, const netCDF::NcVar& nc_var ) ;
@@ -243,7 +244,8 @@ namespace FairDataPipeline
             IGroup::sptr getGroup( const std::string& name );
 
 
-            std::vector< std::string > getGroups();
+            std::vector< IGroup::sptr > getGroups();
+            std::vector< IGroup::sptr > _getGroups();
 
             IGroup::sptr requireGroup( const std::string& name );
 
@@ -307,7 +309,7 @@ namespace FairDataPipeline
 
 
             int addTable( const std::string& name, size_t size, ITable::sptr& table_ptr );
-            std::vector< std::string > getTables();
+            std::vector< ITable::sptr > getTables();
 
             ITable::sptr getTable( const std::string& name );
             ITable::sptr _getTable( const std::string& name );
@@ -321,7 +323,7 @@ namespace FairDataPipeline
             typedef std::map< std::string, ITable::sptr > NAME_TABLE_MAP;
             typedef std::map< std::string, IDimension::sptr > NAME_DIM_MAP;
             typedef std::map< std::string, IVar::sptr > NAME_VAR_MAP;
-            typedef std::map< std::string, IGroupAtt::sptr > NAME_ATT_MAP;
+            typedef std::map< std::string, IAtt::sptr > NAME_ATT_MAP;
 
 
             static GroupImpl::sptr create( GroupImpl::sptr p, const std::string& name );

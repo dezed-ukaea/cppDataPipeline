@@ -283,8 +283,17 @@ namespace FairDataPipeline
     struct ITable;
     typedef std::shared_ptr< ITable > ITableSptr;
 
+    struct IDimensioncomposite
+    {
+        virtual IDimension::sptr addDim( const std::string& name, size_t sz ) = 0;
 
-    struct IGroup : virtual public IAttComposite
+        virtual IDimension::sptr addUnlimitedDim( const std::string& name ) = 0;
+
+        virtual IDimension::sptr getDim( const std::string& name ) = 0;
+    };
+
+
+    struct IGroup : virtual public IAttComposite, virtual public IDimensioncomposite
     {
         typedef std::shared_ptr< IGroup > sptr;
 
@@ -294,11 +303,6 @@ namespace FairDataPipeline
 
         virtual IGroup::sptr getGroup( const std::string& name ) = 0;
 
-        virtual IDimension::sptr addDim( const std::string& name, size_t sz ) = 0;
-        virtual IDimension::sptr addUnlimitedDim( const std::string& name ) = 0;
-
-        virtual IDimension::sptr getDim( const std::string& name ) = 0;
-
         virtual IVar::sptr addVar( const std::string& name
                 , DataType dtype
                 , std::vector< IDimension::sptr >& vdims ) = 0;
@@ -306,7 +310,7 @@ namespace FairDataPipeline
         virtual IVar::sptr getVar( const std::string& name ) = 0;
         virtual std::vector< std::string > getVars() = 0;
 
-        virtual std::vector< std::string > getGroups() = 0;
+        virtual std::vector< sptr > getGroups() = 0;
 
 
         //virtual int getGroupCount() = 0;
@@ -320,25 +324,28 @@ namespace FairDataPipeline
         //virtual int prepare( const TableDefinition& td, ITableSptr& table_ptr ) = 0; 
 
         virtual int addTable( const std::string& name, size_t size, ITableSptr& table_ptr ) = 0;
-        virtual std::vector< std::string > getTables() = 0;
+        virtual std::vector< ITableSptr > getTables() = 0;
 
         virtual int long_name( const std::string& s ) = 0;
         virtual int description( const std::string& s ) = 0;
 
     };
 
-    struct ITable  : virtual public IAttComposite
+    struct ITable  : virtual public IAttComposite, virtual public IDimensioncomposite
     {
         typedef std::shared_ptr< ITable > sptr;
+
         virtual IVar::sptr addCol( const std::string& name
                 , DataType dtype ) = 0;
+
+        virtual IVar::sptr addCol( const std::string& name, IVar::VDIMS& vdims_, DataType type ) = 0;
+
         virtual IVar::sptr getCol( const std::string& name ) = 0;
         virtual std::vector< std::string > getColNames() = 0;
 
         virtual IGroup::sptr getParentGroup() = 0;
         virtual int long_name( const std::string& s ) = 0;
         virtual int description( const std::string& s ) = 0;
-
     };
 
     struct IFile : public IGroup

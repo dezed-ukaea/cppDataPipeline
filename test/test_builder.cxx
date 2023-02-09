@@ -677,12 +677,24 @@ TEST_F(BuilderTest, TestTable )
     val_ptr->long_name( "value of the item" );
 
 
+    fdp::IDimension::sptr dim_ptr1= table_ptr->addDim( "x", 2 );
+    fdp::IDimension::sptr dim_ptr2= table_ptr->addDim( "y", 2 );
+
+    fdp::IVar::VDIMS vdims = { dim_ptr1, dim_ptr2 };
+
+    auto val_array_ptr = table_ptr->addCol( "array", vdims,  fdp::DataType::INT );
 
     //cant add table with existing table name
-    status = file_ptr->addTable( "myTestTable", size, table_ptr );
+    fdp::ITable::sptr bad_table_ptr;
+    status = file_ptr->addTable( "myTestTable", size, bad_table_ptr );
 
     ASSERT_NE( 0, status );
-    ASSERT_TRUE( NULL == table_ptr );
+    ASSERT_TRUE( NULL == bad_table_ptr );
+
+    auto tables = file_ptr->getTables();
+    ASSERT_EQ( 1, tables.size() );
+
+    ASSERT_TRUE( tables[0] == table_ptr );
 
 
 
