@@ -429,6 +429,20 @@ namespace FairDataPipeline
             FDP_LOG_ERROR() << __PRETTY_FUNCTION__ << ": " << ex.what();
         }
     }
+    void VarImpl::putVar( const std::vector< size_t >& index, const std::vector< size_t >& count, const void* value ) 
+    {
+        FDP_SCOPE_LOG_TRACE( __PRETTY_FUNCTION__ );
+        try
+        {
+            _nc_var.putVar( index, count, value );
+        }
+        catch( NcException& ex )
+        {
+            FDP_LOG_ERROR() << __PRETTY_FUNCTION__ << ": " << ex.what();
+        }
+    }
+
+
 
     void VarImpl::putVar( const std::vector< size_t >& index
             , const std::vector< size_t >& countp
@@ -932,6 +946,21 @@ namespace FairDataPipeline
         FDP_SCOPE_LOG_TRACE( __PRETTY_FUNCTION__ );
         _nc_var.putVar( vals );
     }
+    void VarImpl::putVar( const std::vector< size_t >& index, const void* value )
+    {
+        FDP_SCOPE_LOG_TRACE( __PRETTY_FUNCTION__ );
+        //_nc_var.putVar( vals );
+        try
+        {
+            _nc_var.putVar( index, value );
+        }
+        catch( NcException& ex )
+        {
+            FDP_LOG_ERROR() << __PRETTY_FUNCTION__ << ": " << ex.what();
+        }
+
+    }
+
 
     void VarImpl::getVar( void* vals )
     {

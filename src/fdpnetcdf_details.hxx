@@ -76,6 +76,9 @@ namespace FairDataPipeline
 
 
             void putVar( const void* vals );
+            void putVar( const std::vector< size_t >& index, const void* vals );
+            void putVar( const std::vector< size_t >& index, const std::vector< size_t >& countp, const void* values );
+
 
             void putVar( const std::vector< size_t >& index, int value ) const;
             void putVar( const std::vector< size_t >& index

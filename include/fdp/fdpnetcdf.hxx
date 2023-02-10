@@ -267,6 +267,8 @@ namespace FairDataPipeline
         virtual IGroupPtr parent() = 0;
 
         virtual void putVar( const void* vals ) = 0;
+        virtual void putVar( const std::vector< size_t >& index, const void* val ) = 0;
+        virtual void putVar( const std::vector< size_t >& index, const std::vector< size_t >& count, const void* val ) = 0;
         virtual void getVar( void* vals ) = 0;
 
         virtual std::vector< IDimension::sptr > getDims() = 0;
