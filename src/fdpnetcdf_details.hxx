@@ -22,6 +22,9 @@ namespace FairDataPipeline
     class TableImpl;
     typedef std::shared_ptr< TableImpl > TableImplSptr;
 
+    class CompoundTypeImp;
+    typedef std::shared_ptr< CompoundTypeImp > CompoundTypeImpSptr;
+
 
     class VarAtt : public IVarAtt
     {
@@ -317,6 +320,8 @@ namespace FairDataPipeline
             ITable::sptr getTable( const std::string& name );
             ITable::sptr _getTable( const std::string& name );
 
+            CompoundTypeImpSptr addCompoundType( const std::string& name, size_t size );
+
 
         protected:
 
@@ -358,5 +363,25 @@ namespace FairDataPipeline
 
     };
 
+    #define FDP_COMPOUND_OFFSET(S,M) (offsetof(S,M))
+    
+
+    class CompoundTypeImp
+    {
+        public:
+            typedef CompoundTypeImp this_type;
+            typedef std::shared_ptr< this_type > sptr;
+
+
+            void addMember( const std::string& name, const DataType dtype, size_t offset );
+            static sptr create(const netCDF::NcCompoundType& nc){ return sptr( new this_type(nc) );}
+
+        private:
+            CompoundTypeImp( const netCDF::NcCompoundType& nc ) : _nc(nc)
+            {
+
+            }
+            netCDF::NcCompoundType _nc;
+    };
 }
 #endif

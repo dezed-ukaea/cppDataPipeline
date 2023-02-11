@@ -840,3 +840,200 @@ TEST_F(BuilderTest, TestTableUnlimited )
 
     ASSERT_TRUE( tables[0] == table_ptr );
 }
+
+class table_t;
+class row_t;
+class cell_t;
+
+class table_t
+{
+    public:
+    table_t( std::vector< fdp::IVar::sptr >& vars );
+    std::vector< fdp::IVar::sptr > vars;
+    private:
+
+};
+
+class cell_t
+{
+    public:
+        int id;
+        row_t* row;    
+
+        std::vector< size_t > shape();
+    private:
+
+};
+class row_t
+{
+    public:
+        row_t(){}
+        row_t( table_t* t )
+        {
+            this->table = t;
+        }
+    int add( cell_t& cell );
+
+    table_t* table;
+    private:
+
+    std::vector< cell_t > _cells;
+};
+table_t::table_t( std::vector< fdp::IVar::sptr >& vars )
+    {
+        this->vars = vars;
+
+        row_t row;
+        for( int i = 0; i < vars.size(); ++i )
+        {
+            cell_t c;
+            row.add( c );
+        }
+    }
+
+
+
+int row_t::add( cell_t& cell )
+{
+    cell.row = this;
+    cell.id = this->_cells.size();
+    this->_cells.push_back( cell );
+    return 0;
+}
+
+std::vector< size_t > cell_t::shape()
+{
+    std::vector< size_t > dim_shapes;
+
+    table_t* table = this->row->table; 
+
+    fdp::IVar::sptr var_ptr = table->vars[this->id];
+
+    fdp::IVar::VDIMS vdims = var_ptr->getDims();
+
+    for( int i = 1; i < vdims.size(); ++i )
+    {
+        fdp::IDimension::sptr dim_ptr = vdims[i];
+        dim_shapes.push_back( dim_ptr->getSize() );
+    }
+
+    return dim_shapes;
+}
+
+
+
+TEST_F(BuilderTest, TestRow )
+
+{
+
+    // Prepare some data
+    size_t size=3;
+
+    int id_data[ size ] = {1,2,3};
+    int data[ size ][2][2];
+    double val_data[ size ] = {1.1, 2.2, 3.3};
+    const char* names[3] = { "a", "b", "c" };
+
+    for( int i = 0; i < size; ++i )
+    {
+        id_data[i] = i;
+        val_data[i] = (i+1) * 1.1;
+
+        int (*row)[2] = &(data[i][0]);
+        for( int j = 0;  j < 2; ++j )
+        {
+            row[j][0] = i;
+            row[j][1] = i;
+        }
+    }
+
+    //craete the netcdf file
+    const testing::TestInfo* const test_info =
+        testing::UnitTest::GetInstance()->current_test_info();
+
+    std::string path = std::string( test_info->name() ) + ".nc";
+
+    //std::string path = "test_prepare_dimensionalvar_remote_dim.nc";
+    std::remove( path.c_str() );
+
+    fdp::IFile::sptr file_ptr = fdp::FileFactory::create( path, fdp::IFile::Mode::WRITE );
+
+    ASSERT_TRUE( NULL != file_ptr );
+
+    int status = FDP_FILE_STATUS_NOERR;
+
+    fdp::ITable::sptr table_ptr;
+
+    status = file_ptr->addTable( "myTestTable", FDP_UNLIMITED, table_ptr );
+
+    ASSERT_EQ( 0, status );
+    ASSERT_TRUE( NULL != table_ptr );
+
+    table_ptr->long_name( "My little simple initial test table");
+
+    fdp::IVar::sptr col_id_ptr = table_ptr->addCol( "id", fdp::DataType::INT );
+
+    //col_id_ptr->putVar( id_data );
+
+    auto col_name_ptr = table_ptr->addCol( "itemName", fdp::DataType::STRING );
+    col_name_ptr->long_name( "" );
+    //col_name_ptr->putVar( names );
+    auto col_val_ptr = table_ptr->addCol( "value", fdp::DataType::DOUBLE );
+    //col_val_ptr->putVar( val_data );
+    col_val_ptr->long_name( "value of the item" );
+
+
+    fdp::IDimension::sptr dim_ptr1= table_ptr->addDim( "x", 2 );
+    fdp::IDimension::sptr dim_ptr2= table_ptr->addDim( "y", 2 );
+
+    fdp::IVar::VDIMS vdims = { dim_ptr1, dim_ptr2 };
+
+    auto col_val_array_ptr = table_ptr->addCol( "array", vdims,  fdp::DataType::INT );
+    //col_val_array_ptr->putVar( data );
+    //
+    for( int i = 0; i  < size; ++i )
+    {
+        void* row[3] = { &i, &names[i], &data[i][0] };
+
+#if 1
+
+#else
+        std::vector< size_t > index = { i };
+        std::vector< size_t > index2 = { i, 0, 0 };
+        const char* pszname = names[i];
+
+        int (*row)[2] = &(data[i][0]);
+
+        col_id_ptr->putVar( index, &i );
+
+        col_val_ptr->putVar( index, &(val_data[i]) );
+        col_name_ptr->putVar( index, &(names[i]) );
+
+#if 0
+        for( int j = 0; j < 2; j++)
+        {
+            for( int k = 0; k < 2; ++k )
+            {
+                std::vector< size_t > index2 = { i, j, k };
+                col_val_array_ptr->putVar( index2, row );
+            }
+        }
+#endif
+        std::vector< size_t > count = { 1, 2, 2 };
+        col_val_array_ptr->putVar( index2, count, row );
+#endif
+    }
+
+    //cant add table with existing table name
+    fdp::ITable::sptr bad_table_ptr;
+    status = file_ptr->addTable( "myTestTable", size, bad_table_ptr );
+
+    ASSERT_NE( 0, status );
+    ASSERT_TRUE( NULL == bad_table_ptr );
+
+    auto tables = file_ptr->getTables();
+    ASSERT_EQ( 1, tables.size() );
+
+    ASSERT_TRUE( tables[0] == table_ptr );
+
+}
