@@ -934,18 +934,20 @@ class table_accessor
         template< typename T>
             int get_rows_imp( int row, int col, T* val )
             {
-                std::cout << "bCOL:" << col << std::endl;
+		    int status = 0;
                 const std::string& col_name = _col_names[ col ];
                 fdp::IVar::sptr col_ptr = _table_ptr->getCol( col_name );
 
 
                 //get_rows_imp( table_ptr, col+1, Fargs...);
-                return 0;
+                return status;
             }
         template< typename T, typename... Targs>
             int get_rows_imp( int row, int col, T* val, Targs... Fargs )
             {
-               return get_rows_imp( row, col+1, Fargs...);
+		    int status = 0;
+		    status = get_rows_imp( row, col+1, Fargs...);
+		    return status;
             }
 
         template< typename T>
@@ -963,7 +965,9 @@ class table_accessor
         template< typename T, typename... Targs>
             int put_row_imp( int col, T* val, Targs... Fargs )
             {
-               return put_row_imp( col+1, Fargs...);
+		    int status = 0;
+               status = put_row_imp( col+1, Fargs...);
+	       return status;
             }
 
 
