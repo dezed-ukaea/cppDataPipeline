@@ -2424,6 +2424,37 @@ int GroupImpl::addTable( const std::string& name, size_t size, ITable::sptr& tab
 
     return status;
 }
+void CompoundTypeImp::addMember( const std::string& name, const DataType dtype, size_t offset )
+{
+#if 1
+    try
+    {
+        auto nctype = DataType2NcType( dtype );
+        _nc.addMember( name, nctype, offset );
+    }
+    catch( NcException& ex )
+    {
+        FDP_LOG_ERROR() << __PRETTY_FUNCTION__ << ": " << ex.what();
+    }
+#endif
+
+}
+
+    CompoundTypeImpSptr GroupImpl::addCompoundType( const std::string& name, size_t size )
+    {
+        CompoundTypeImpSptr cmp_type_ptr;
+        try
+        {
+            netCDF::NcCompoundType nc_cmp_type = _nc->addCompoundType( name, size );
+            cmp_type_ptr = CompoundTypeImp::create( nc_cmp_type );
+        }
+        catch( NcException& ex )
+        {
+            FDP_LOG_ERROR() << __PRETTY_FUNCTION__ << ": " << ex.what();
+        }
+
+        return cmp_type_ptr;
+    }
 
 int VarImpl::long_name( const std::string& s ){ this->putAttString( ATTRIB_KEY_LNAME, s ); return 0;}
 int VarImpl::description( const std::string& s ){ this->putAttString( ATTRIB_KEY_DESC, s ); return 0;}

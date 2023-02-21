@@ -803,8 +803,8 @@ TEST_F(BuilderTest, TestTableUnlimited )
     //
     for( int i = 0; i  < size; ++i )
     {
-        std::vector< size_t > index = { i };
-        std::vector< size_t > index2 = { i, 0, 0 };
+        std::vector< size_t > index = { (size_t)i };
+        std::vector< size_t > index2 = { (size_t)i, 0, 0 };
         const char* pszname = names[i];
 
         int (*row)[2] = &(data[i][0]);
@@ -920,6 +920,75 @@ std::vector< size_t > cell_t::shape()
     return dim_shapes;
 }
 
+template<typename T>
+void get_cell( fdp::ITable::sptr table_ptr,  int col, T* val )
+{
+}
+
+class table_accessor
+{
+    private:
+        fdp::ITable::sptr _table_ptr;
+        std::vector< std::string > _col_names;
+
+        template< typename T>
+            int get_rows_imp( int row, int col, T* val )
+            {
+                std::cout << "bCOL:" << col << std::endl;
+                const std::string& col_name = _col_names[ col ];
+                fdp::IVar::sptr col_ptr = _table_ptr->getCol( col_name );
+
+
+                //get_rows_imp( table_ptr, col+1, Fargs...);
+                return 0;
+            }
+        template< typename T, typename... Targs>
+            int get_rows_imp( int row, int col, T* val, Targs... Fargs )
+            {
+               return get_rows_imp( row, col+1, Fargs...);
+            }
+
+        template< typename T>
+            int put_row_imp( int col, T* val )
+            {
+                std::cout << "bCOL:" << col << std::endl;
+                const std::string& col_name = _col_names[ col ];
+                fdp::IVar::sptr col_ptr = _table_ptr->getCol( col_name );
+
+                col_ptr->putVar( val );
+
+                //get_rows_imp( table_ptr, col+1, Fargs...);
+                return 0;
+            }
+        template< typename T, typename... Targs>
+            int put_row_imp( int col, T* val, Targs... Fargs )
+            {
+               return put_row_imp( col+1, Fargs...);
+            }
+
+
+
+    public:
+            table_accessor( fdp::ITable::sptr table_ptr ) 
+                : _table_ptr( table_ptr )
+            {
+                _col_names = _table_ptr->getColNames();
+            }
+
+
+
+        template< typename T, typename... Targs>
+            int get_rows( int row, T* val, Targs... Fargs )
+            {
+                return get_rows_imp( row, 0, val, Fargs... );
+            }
+        template< typename T, typename... Targs>
+            int put_row( T* val, Targs... Fargs )
+            {
+                return put_row_imp( 0, val, Fargs... );
+            }
+
+};
 
 
 TEST_F(BuilderTest, TestRow )
@@ -1035,5 +1104,17 @@ TEST_F(BuilderTest, TestRow )
     ASSERT_EQ( 1, tables.size() );
 
     ASSERT_TRUE( tables[0] == table_ptr );
+
+
+    int ival = 0;
+    char buffer[ 120 ];
+    double dval = 0.0;
+
+    strcpy( buffer, "HELLO" );
+
+    table_accessor ta(table_ptr);
+
+    ta.get_rows( 0, &ival, buffer, &dval );
+    ta.put_row( &ival, buffer, &dval );
 
 }
